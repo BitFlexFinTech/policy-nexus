@@ -27,10 +27,10 @@ export function EngineStatus() {
         </div>
       </div>
       <div className="grid grid-cols-4 gap-4 px-4 py-3">
-        <Metric label="Agents" value="10,240" sub="Active instances" />
+        <Metric label="ASO Agents" value="10,240" sub="Active stakeholder objects" />
         <Metric label="Rounds" value="25/50" sub="Simulation progress" />
-        <Metric label="Graph Nodes" value="128" sub="Entities tracked" />
-        <Metric label="Relations" value="342" sub="Knowledge edges" />
+        <Metric label="ZiG Rate" value="13.56" sub="ZiG per USD" />
+        <Metric label="Graph Nodes" value="128" sub="Knowledge entities" />
       </div>
     </div>
   );
