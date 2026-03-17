@@ -1,16 +1,32 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { HeaderBar } from "@/components/HeaderBar";
+import { PolicyInput } from "@/components/PolicyInput";
+import { AgentFeed } from "@/components/AgentFeed";
+import { EngineStatus } from "@/components/EngineStatus";
+import { HistoryTable } from "@/components/HistoryTable";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="flex h-screen flex-col overflow-hidden">
+      <HeaderBar />
+      <div className="flex flex-1 min-h-0">
+        {/* Left: Policy Input — 40% */}
+        <div className="w-[40%] min-w-[320px]">
+          <PolicyInput />
+        </div>
+        {/* Right: Engine Status + Agent Feed — 60% */}
+        <div className="flex flex-1 flex-col min-h-0">
+          <EngineStatus />
+          <div className="flex-1 min-h-0">
+            <AgentFeed />
+          </div>
+        </div>
+      </div>
+      {/* Bottom: History Table */}
+      <div className="max-h-[30%] overflow-y-auto">
+        <HistoryTable />
+      </div>
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
