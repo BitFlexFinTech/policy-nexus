@@ -61,7 +61,7 @@ export function AgentFeed() {
     const timer = setTimeout(() => {
       setMessages((prev) => [...prev, streamMessages[streamIdx]]);
       setStreamIdx((i) => i + 1);
-    }, 3000 + Math.random() * 2000);
+    }, 2500);
     return () => clearTimeout(timer);
   }, [streamIdx, messages]);
 
