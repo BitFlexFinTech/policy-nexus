@@ -283,6 +283,7 @@ const Simulation = () => {
           </Panel>
         </div>
       </div>
+      </div>
 
       {/* Recommendations */}
       <div className="border-t bg-card px-4 py-2.5">
