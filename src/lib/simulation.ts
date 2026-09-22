@@ -64,6 +64,32 @@ export interface RiskItem {
   mitigation: string;
 }
 
+export type ApprovalStatus = "Approved" | "Conditional" | "Pending" | "Objected";
+
+export interface ApprovalPoint {
+  milestone: string;
+  approval: number;
+  status: ApprovalStatus;
+}
+
+export interface StakeholderTrack {
+  name: string;
+  points: ApprovalPoint[];
+}
+
+export interface Milestone {
+  name: string;
+  week: number;
+  gate: string;
+  weightedApproval: number;
+  status: ApprovalStatus;
+}
+
+export interface ApprovalTrackerData {
+  milestones: Milestone[];
+  tracks: StakeholderTrack[];
+}
+
 export interface SimulationReport {
   seed: string;
   policy: string;
@@ -80,7 +106,42 @@ export interface SimulationReport {
   risks: RiskItem[];
   ubuntu: { cohesion: number; equity: number; trust: number; narrative: string };
   recommendations: string[];
+  tracker: ApprovalTrackerData;
 }
+
+const MILESTONE_DEFS: Record<ScenarioId, { name: string; week: number; gate: string }[]> = {
+  "public-opinion": [
+    { name: "Draft Published", week: 0, gate: "Cabinet clearance to consult" },
+    { name: "Provincial Consultation", week: 4, gate: "All 10 provinces reported" },
+    { name: "Stakeholder Hearings", week: 9, gate: "Union and operator submissions logged" },
+    { name: "Revised Draft", week: 15, gate: "Mitigations incorporated" },
+    { name: "Implementation Sign-off", week: 22, gate: "Weighted approval above 55%" },
+  ],
+  financial: [
+    { name: "Monetary Statement", week: 0, gate: "RBZ committee endorsement" },
+    { name: "Bank Sector Briefing", week: 3, gate: "Liquidity impact modelled" },
+    { name: "Exporter Consultation", week: 7, gate: "Surrender terms agreed" },
+    { name: "Market Pilot", week: 12, gate: "Interbank spread within band" },
+    { name: "Full Rollout", week: 20, gate: "Reserve cover reported monthly" },
+  ],
+  narrative: [
+    { name: "Policy Concept Note", week: 0, gate: "Ministry sponsor confirmed" },
+    { name: "Sector Roundtables", week: 5, gate: "Producer and artist bodies heard" },
+    { name: "Quota Modelling", week: 10, gate: "Content supply capacity tested" },
+    { name: "Broadcaster Agreement", week: 16, gate: "Licence conditions accepted" },
+    { name: "Season One Launch", week: 24, gate: "Audience retention monitored" },
+  ],
+  enterprise: [
+    { name: "Regulatory Impact Draft", week: 0, gate: "Cost assessment published" },
+    { name: "Industry Submissions", week: 4, gate: "Chambers and SME bodies filed" },
+    { name: "Compliance Pilot", week: 11, gate: "Tiered obligations tested" },
+    { name: "Investor Assurance", week: 18, gate: "Incentive terms locked" },
+    { name: "Statutory Instrument", week: 26, gate: "Gazetted with transition period" },
+  ],
+};
+
+const statusFor = (n: number): ApprovalStatus =>
+  n >= 70 ? "Approved" : n >= 55 ? "Conditional" : n >= 40 ? "Pending" : "Objected";
 
 const STAKEHOLDERS: Record<ScenarioId, { name: string; population: number; driver: string }[]> = {
   "public-opinion": [
@@ -274,6 +335,26 @@ export function runSimulation(policy: string, scenario: ScenarioId): SimulationR
     `Re-run scenario ${meta.code} after the first implementation quarter to validate the ${kpis[0].label.toLowerCase()} trajectory.`,
   ];
 
+  const milestoneDefs = MILESTONE_DEFS[scenario];
+
+  const tracks: StakeholderTrack[] = stakeholders.map((s) => {
+    const start = clamp(s.approval - 8 - r() * 18, 10, 92);
+    return {
+      name: s.name,
+      points: milestoneDefs.map((m, i) => {
+        const t = i / (milestoneDefs.length - 1);
+        const wobble = (r() - 0.5) * 9 * (1 - t);
+        const value = i === milestoneDefs.length - 1 ? s.approval : clamp(start + (s.approval - start) * t + wobble, 8, 95);
+        return { milestone: m.name, approval: value, status: statusFor(value) };
+      }),
+    };
+  });
+
+  const milestones: Milestone[] = milestoneDefs.map((m, i) => {
+    const weighted = Math.round(tracks.reduce((acc, t) => acc + t.points[i].approval, 0) / tracks.length);
+    return { ...m, weightedApproval: weighted, status: statusFor(weighted) };
+  });
+
   const doc = DOCUMENTS.find((d) => normalised.startsWith(d.excerpt.slice(0, 60)));
 
   return {
@@ -297,5 +378,6 @@ export function runSimulation(policy: string, scenario: ScenarioId): SimulationR
       )}% under Ubuntu weighting: cohesion ${ubuntu.cohesion}%, distributional equity ${ubuntu.equity}%, institutional trust ${ubuntu.trust}%. Gains concentrate where stakeholder classes share the burden of adjustment rather than where aggregate output rises.`,
     },
     recommendations,
+    tracker: { milestones, tracks },
   };
 }
