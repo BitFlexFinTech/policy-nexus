@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HeaderBar } from "@/components/HeaderBar";
+import { ApprovalTracker } from "@/components/ApprovalTracker";
 import { SovereignFooter } from "@/components/SovereignFooter";
 import { getPendingSimulation } from "@/lib/policyStore";
 import { runSimulation } from "@/lib/simulation";
@@ -143,7 +144,11 @@ const Simulation = () => {
       </div>
 
       {/* Body grid */}
-      <div className="grid min-h-0 flex-1 grid-cols-3 gap-3 p-3">
+      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="px-3 pt-3">
+        <ApprovalTracker data={report.tracker} />
+      </div>
+      <div className="grid grid-cols-3 gap-3 p-3">
         <Panel
           title="Stakeholder Response"
           right={<span className="text-[10px] text-muted-foreground">{report.stakeholders.length} ASO classes</span>}
