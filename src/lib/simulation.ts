@@ -335,6 +335,26 @@ export function runSimulation(policy: string, scenario: ScenarioId): SimulationR
     `Re-run scenario ${meta.code} after the first implementation quarter to validate the ${kpis[0].label.toLowerCase()} trajectory.`,
   ];
 
+  const milestoneDefs = MILESTONE_DEFS[scenario];
+
+  const tracks: StakeholderTrack[] = stakeholders.map((s) => {
+    const start = clamp(s.approval - 8 - r() * 18, 10, 92);
+    return {
+      name: s.name,
+      points: milestoneDefs.map((m, i) => {
+        const t = i / (milestoneDefs.length - 1);
+        const wobble = (r() - 0.5) * 9 * (1 - t);
+        const value = i === milestoneDefs.length - 1 ? s.approval : clamp(start + (s.approval - start) * t + wobble, 8, 95);
+        return { milestone: m.name, approval: value, status: statusFor(value) };
+      }),
+    };
+  });
+
+  const milestones: Milestone[] = milestoneDefs.map((m, i) => {
+    const weighted = Math.round(tracks.reduce((acc, t) => acc + t.points[i].approval, 0) / tracks.length);
+    return { ...m, weightedApproval: weighted, status: statusFor(weighted) };
+  });
+
   const doc = DOCUMENTS.find((d) => normalised.startsWith(d.excerpt.slice(0, 60)));
 
   return {
@@ -358,5 +378,6 @@ export function runSimulation(policy: string, scenario: ScenarioId): SimulationR
       )}% under Ubuntu weighting: cohesion ${ubuntu.cohesion}%, distributional equity ${ubuntu.equity}%, institutional trust ${ubuntu.trust}%. Gains concentrate where stakeholder classes share the burden of adjustment rather than where aggregate output rises.`,
     },
     recommendations,
+    tracker: { milestones, tracks },
   };
 }
