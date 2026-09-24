@@ -5,17 +5,17 @@
 @layer base {
   :root {
     /* Zimbabwe State Palette */
-    --background: 120 5% 96%;
-    --foreground: 120 10% 6%;
+    --background: 60 14% 95%;
+    --foreground: 0 0% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 120 10% 6%;
+    --card-foreground: 0 0% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 120 10% 6%;
+    --popover-foreground: 0 0% 13%;
 
     /* Dark Emerald Green #006400 → hsl(120 100% 20%) */
-    --primary: 120 100% 20%;
+    --primary: 123 55% 24%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 120 5% 96%;
@@ -27,39 +27,43 @@
     --accent: 120 5% 96%;
     --accent-foreground: 120 6% 25%;
 
-    --destructive: 4 90% 58%;
+    --destructive: 0 66% 47%;
     --destructive-foreground: 0 0% 100%;
 
     /* Success stays green */
-    --success: 142 71% 45%;
+    --success: 123 55% 24%;
     --success-foreground: 0 0% 100%;
 
     /* Gold #FFD700 → hsl(51 100% 50%) */
-    --warning: 51 100% 50%;
+    --warning: 42 100% 50%;
     --warning-foreground: 0 0% 10%;
 
     /* Gold accent for engine/highlights */
-    --engine: 51 100% 50%;
+    --engine: 42 100% 50%;
     --engine-foreground: 0 0% 10%;
 
     /* Gold token */
-    --gold: 51 100% 50%;
+    --gold: 42 100% 50%;
     --gold-foreground: 0 0% 10%;
 
     --border: 120 6% 83%;
     --input: 120 6% 83%;
-    --ring: 120 100% 20%;
+    --ring: 123 55% 24%;
 
+    --ink: 0 0% 13%;
+    --ink-foreground: 0 0% 100%;
+    --terracotta: 0 66% 47%;
+    --terracotta-foreground: 0 0% 100%;
     --radius: 0.5rem;
 
     --sidebar-background: 120 8% 97%;
     --sidebar-foreground: 120 5% 26%;
-    --sidebar-primary: 120 100% 20%;
+    --sidebar-primary: 123 55% 24%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 120 5% 95%;
     --sidebar-accent-foreground: 120 6% 10%;
     --sidebar-border: 120 8% 88%;
-    --sidebar-ring: 120 100% 20%;
+    --sidebar-ring: 123 55% 24%;
   }
 }
 
@@ -73,7 +77,22 @@
   }
 }
 
+@layer base {
+  h1, h2, h3, .font-display { font-family: 'Montserrat', 'Inter', sans-serif; font-weight: 700; }
+}
+
 @layer utilities {
+  /* Ndebele-inspired geometric border accent */
+  .ndebele-border {
+    height: 6px;
+    background-image:
+      repeating-linear-gradient(90deg, hsl(var(--primary)) 0 12px, hsl(var(--gold)) 12px 18px, hsl(var(--ink)) 18px 24px, hsl(var(--card)) 24px 28px, hsl(var(--terracotta)) 28px 40px, hsl(var(--card)) 40px 44px);
+  }
+  /* Flag-inspired ribbon divider (flat bands) */
+  .flag-ribbon {
+    height: 5px;
+    background-image: linear-gradient(180deg, hsl(var(--primary)) 0 20%, hsl(var(--gold)) 20% 40%, hsl(var(--terracotta)) 40% 60%, hsl(var(--ink)) 60% 80%, hsl(var(--card)) 80% 100%);
+  }
   .font-mono-code {
     font-family: 'JetBrains Mono', monospace;
   }

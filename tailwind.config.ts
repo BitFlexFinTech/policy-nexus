@@ -15,12 +15,15 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Montserrat", "Inter", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       letterSpacing: {
         tight: "-0.02em",
       },
       colors: {
+        ink: { DEFAULT: "hsl(var(--ink))", foreground: "hsl(var(--ink-foreground))" },
+        terracotta: { DEFAULT: "hsl(var(--terracotta))", foreground: "hsl(var(--terracotta-foreground))" },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
