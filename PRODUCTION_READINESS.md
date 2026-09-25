@@ -80,3 +80,23 @@ implementation must require zero UI code changes.
 - Note on the fonts: Google served the *same* variable woff2 for every requested weight
   (confirmed by md5), so the build ships one file per family with the full weight axis declared,
   rather than four identical copies of Inter.
+
+## 8. Production hosting / deployment (Phase J — DONE)
+| Item | Current value | Notes |
+|---|---|---|
+| Live URL | `https://nzwisiso.bitflex.app/` | HTTP 301s to HTTPS. Verified 200 serving the app |
+| Docroot | `/home/bitfempm/nzwisiso.bitflex.app` | FTP account is chrooted directly into it |
+| FTP host | `ftp.bitflex.app` (`162.0.232.207`) | **NOT** `ftp.nzwisiso.bitflex.app` — that host does not resolve |
+| FTP user | `nzwisiso@nzwisiso.bitflex.app` | cPanel account |
+| Transport | Explicit **FTPS** (AUTH TLS), port 21 | No SSH/SFTP daemon exists (22/2222/990 closed) |
+| SPA routing | `public/.htaccess` → `RewriteRule . /index.html [L]` | Shipped by Vite into `dist/`. Without it, refresh on `/app/**` 404s |
+| Server files to preserve | `cgi-bin/`, `.well-known/pki-validation/<token>.txt` | Never deploy with `mirror --delete` |
+
+**Credential status:** the FTP password is a **real, live credential**, supplied in plaintext and
+therefore compromised — **rotate it in cPanel → FTP Accounts**. It is not stored anywhere in this
+repo. No API keys, tokens, or `.env` files ship in `dist/` (the build is a static SPA with zero
+runtime network calls).
+
+**Non-credential work still outstanding for hosting:** none required for the current static
+build. If server-side PDF/DOCX extraction or the MiroFish backend is added later, that needs a
+Node/PHP service endpoint — the current host serves static files plus `cgi-bin/` only.

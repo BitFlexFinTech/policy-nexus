@@ -334,6 +334,58 @@ real-browser visual/pixel check yet (Playwright Chromium is not installed; that 
 ### Phase I — Push + review zip
 **Status: NOT STARTED** (push ONLY when every suite is green; never to `main`).
 
+### Phase J — Production deployment (live on `nzwisiso.bitflex.app`)
+**Status: DONE — verified this session by live HTTPS checks + the FTPS upload log**
+
+- **Live URL:** `https://nzwisiso.bitflex.app/` — HTTP **301**s to HTTPS; HTTPS returns **200**.
+- **Host / credentials actually used — the brief's host was wrong:**
+  - FTP host: **`ftp.bitflex.app`** (`162.0.232.207`).
+    **`ftp.nzwisiso.bitflex.app` does NOT exist in DNS** (NXDOMAIN, confirmed by `nslookup`).
+  - User: `nzwisiso@nzwisiso.bitflex.app`
+  - Transport: **explicit FTPS (AUTH TLS) on port 21.** Ports 22, 2222 and 990 are all
+    **closed** — this host has **no SSH/SFTP service**, so "SFTP" here means *FTP over TLS*,
+    not SSH SFTP. Deploying over plain FTP was avoided because it sends credentials in cleartext.
+  - Web root: **`/home/bitfempm/nzwisiso.bitflex.app`** — the FTP account is chrooted straight
+    into it and that directory **is** the document root (proved by `cgi-bin/` + `.well-known/`
+    sitting at its top level, and by `Index of /` being served there before deploy).
+- **Method:** `npm run build` → `lftp mirror -R dist/ /` over FTPS.
+  **No `--delete`, deliberately:** the pre-existing `.well-known/pki-validation/*.txt`
+  **SSL validation token and `cgi-bin/` were preserved.** Pre-deploy remote listing was captured
+  first (only `.ftpquota`, `.well-known/`, `cgi-bin/` existed — no prior `index.html`, so nothing
+  was overwritten and no rollback was needed).
+- **New file added this session:** `public/.htaccess` (Vite copies it into `dist/`). It provides
+  the **SPA fallback** (without it a refresh on `/app/policies` 404s at the web-server layer),
+  plus `Options -Indexes`, `no-store` on `*.html`, 1-year cache on hashed assets/fonts, and the
+  `font/woff2` MIME type. Requesting `.htaccess` over HTTP returns **403**, so it is not readable.
+- **Verified live (real output, this session):**
+  `/`, `/app`, `/app/policies`, `/app/simulations`, `/app/documents`, `/app/reference`,
+  `/nonexistent-route` → **all HTTP 200**, each serving the 994 B app index (SPA fallback working).
+  `assets/index-6a-dXd5_.js` → 200 / 426,163 B · `assets/index-DNkeX2mW.css` → 200 / 60,276 B ·
+  `fonts/inter-latin-variable.woff2` → 200 / 48,432 B, `Content-Type: font/woff2` ·
+  `robots.txt` → 200 · `favicon.ico` → 200 · HTTP→HTTPS → **301**.
+  The old directory listing is **gone** (`grep -ci autoindex` on `/` → **0**).
+  Deployed JS bundle contains `Nzwisiso`, `Understanding before action`, `Policy Register`,
+  `2026-09-24`, `one-click` — it is this build, not a stale one.
+- **Upload evidence:** `Total: 2 directories, 10 files, 0 symlinks / New: 10 files` in 189 s;
+  remote `find` afterwards lists `./.htaccess`, `./index.html`, `./assets/*`, `./fonts/*`,
+  `./favicon.ico`, `./placeholder.svg`, `./robots.txt`.
+- **NOT verified — stated plainly, not claimed:** the **in-browser end-to-end journey**
+  (homepage → pick department → `/app` → registers → sign-out). No Playwright Chromium binary is
+  installed and no `e2e/` spec exists, so **no real browser interaction was run**. Server-level
+  responses and bundle content are verified; click-through behaviour is **unverified**.
+- **⚠ SECURITY ACTION REQUIRED:** the FTP password was supplied in plaintext in chat. It is live
+  and grants **full write access to the web root**. **Rotate it** in cPanel → FTP Accounts after
+  this session. Nothing was written into the repo — it was passed only via the `LFTP_PASSWORD`
+  env var and never committed (`git status` clean, no secrets in any tracked file).
+- **Redeploy next time:**
+```bash
+npm run build
+export LFTP_PASSWORD='<rotated-password>'
+lftp --env-password -u 'nzwisiso@nzwisiso.bitflex.app' ftp://ftp.bitflex.app \
+  -e "set ftp:ssl-force yes; set ftp:ssl-protect-data yes; set ssl:verify-certificate no; \
+      mirror -R --verbose '/absolute/path/to/policy-nexus/dist' /; quit"
+```
+
 ---
 
 ## Verification log
@@ -376,8 +428,33 @@ real-browser visual/pixel check yet (Playwright Chromium is not installed; that 
 | 2026-09-25 | `npm run build` (Phase D) | PASS — 1,683 modules, 423 ms; 426.16 kB JS / 60.27 kB CSS |
 | 2026-09-25 | network refs in dist (Phase D) | PASS — `grep -roE 'https?://' dist/index.html dist/assets/*.css` → **0** |
 | 2026-09-25 | vendor/random grep in app source (Phase D) | PASS — 1 hit, and it is the comment-only doc line in `src/config/reference.ts` (correctly ignored by the validator) |
+| 2026-09-25 | pre-deploy gate `validate && typecheck && lint && test && build` | PASS — `VALIDATE: PASS — all checks green`; `0 errors, 7 warnings`; **62/62 tests**; built in 476 ms |
+| 2026-09-25 | `nslookup ftp.nzwisiso.bitflex.app` | **NXDOMAIN** — the host in the deployment brief does not exist; `nzwisiso.bitflex.app` → 162.0.232.206, `ftp.bitflex.app` → 162.0.232.207 |
+| 2026-09-25 | TCP probe 21/22/2222/990 on 162.0.232.206 + .207 | Only **:21 OPEN**; 22/2222/990 closed ⇒ no SSH/SFTP daemon. "SFTP" = FTP over TLS here |
+| 2026-09-25 | `lftp` login with explicit FTPS (`ftp:ssl-force yes`) as `nzwisiso@nzwisiso.bitflex.app` | PASS — `ls -la` returned `.ftpquota`, `.well-known/`, `cgi-bin/`; TLS negotiation succeeded |
+| 2026-09-25 | pre-deploy remote listing (captured before any write) | PASS — docroot **empty of app files** (no `index.html`, no `.htaccess`); live site served `Index of /` autoindex (1372 B) |
+| 2026-09-25 | `lftp mirror -R dist/ /` over FTPS (no `--delete`) | PASS — `Total: 2 directories, 10 files, 0 symlinks / New: 10 files`, 1,309,465 bytes in 189 s; `.well-known/pki-validation/*.txt` + `cgi-bin/` preserved |
+| 2026-09-25 | post-deploy remote `find` | PASS — `./.htaccess`, `./index.html`, `./assets/*`, `./fonts/*`, `./favicon.ico`, `./placeholder.svg`, `./robots.txt` |
+| 2026-09-25 | live route checks `/`, `/app`, `/app/policies`, `/app/simulations`, `/app/documents`, `/app/reference`, `/nonexistent-route` | PASS — **all HTTP 200**, 994 B text/html (SPA fallback via `.htaccess` confirmed working) |
+| 2026-09-25 | live asset/font checks | PASS — JS 200/426,163 B · CSS 200/60,276 B · woff2 200/48,432 B `font/woff2` · `robots.txt` 200 · `favicon.ico` 200 |
+| 2026-09-25 | `curl http://nzwisiso.bitflex.app/` | PASS — HTTP **301** → `https://nzwisiso.bitflex.app/` |
+| 2026-09-25 | `.htaccess` requested over HTTP | PASS — **403** (config not publicly readable) |
+| 2026-09-25 | autoindex removed check on `/` | PASS — `grep -ci autoindex` → **0** (was 3 on the pre-deploy `Index of /` page) |
+| 2026-09-25 | deployed-bundle identity grep | PASS — bundle contains `Nzwisiso`(2), `Understanding before action`(1), `Policy Register`(1), `2026-09-24`(1), `one-click`(1) |
+| 2026-09-25 | full suite re-run AFTER adding `public/.htaccess` | PASS — `SUITE_EXIT=0`; `VALIDATE: PASS`; 0 errors; **62/62 tests**; built in 484 ms |
+| 2026-09-25 | in-browser end-to-end journey (Playwright) | **NOT RUN — Chromium binary not installed, no `e2e/` spec exists.** Click-through behaviour is **unverified**, not claimed working |
 
 ## Known-red / open items
+- **DEPLOYMENT — two facts a cold session must not get wrong.** (a) The host in the deployment
+  brief, `ftp.nzwisiso.bitflex.app`, **does not exist in DNS**. The real FTP host is
+  **`ftp.bitflex.app`**, user **`nzwisiso@nzwisiso.bitflex.app`**, over **explicit FTPS on port
+  21** — there is **no SSH/SFTP daemon** on that server (ports 22/2222/990 closed).
+  (b) The FTP password was supplied in plaintext in chat and is **still active**; it grants full
+  write access to the web root. **Rotate it in cPanel** and never commit it.
+- **Deploy drift risk:** `public/.htaccess` (added for the SPA fallback) is part of the build, but
+  the server also holds files the build does not produce — `cgi-bin/` and
+  `.well-known/pki-validation/<token>.txt`. **Never deploy with `mirror --delete`**; that would
+  delete the live SSL validation token.
 - `npm run validate` is **GREEN as of Phase D** — all nine checks (plus the two SKIPs for
   not-yet-created report files) pass with zero violations. The 18 hits that used to be listed
   here (16 vendor-term + 2 non-determinism) were the Phase D work and are fixed at root cause.
@@ -447,6 +524,19 @@ dependencies, `src/components/ui/**` (still byte-identical stock primitives), `L
 `src/session/session.ts`, `src/session/useSession.ts`, `src/config/departments.ts`,
 `src/config/brand.ts`, `src/routes/RequireSession.tsx`
 
+## Files touched in Phase J (deployment)
+**Added:** `public/.htaccess` (SPA fallback + `Options -Indexes` + cache headers + woff2 MIME).
+
+**Modified:** `PROJECT_STATUS.md`.
+
+**Uploaded to production (`dist/`, via FTPS mirror):** `.htaccess`, `index.html`, `favicon.ico`,
+`placeholder.svg`, `robots.txt`, `assets/index-6a-dXd5_.js`, `assets/index-DNkeX2mW.css`,
+`assets/zimbabwe-coat-of-arms-Ch1vJiyp.png`, `fonts/inter-latin-variable.woff2`,
+`fonts/jetbrains-mono-latin-variable.woff2`.
+
+**Unaltered:** `src/index.css`, `tailwind.config.ts`, `package.json` deps, `src/components/ui/**`,
+`LICENSE`/`NOTICE`, all `src/**` app code (no app source changed for the deploy itself).
+
 ---
 
 ## RESUME HERE
@@ -458,7 +548,11 @@ dependencies, `src/components/ui/**` (still byte-identical stock primitives), `L
   (This shell's git rejects `--no-pager`; use plain `git log --oneline | cat`.)
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
   restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
-- **`main` is untouched. Nothing has been pushed.**
+- **`main` is untouched. Nothing has been pushed to any git remote.** (The app *is* **live in
+  production** — see Phase J — but that was an FTP upload of `dist/`, not a git push.)
+- **LIVE NOW:** `https://nzwisiso.bitflex.app/` serves this build (Phase J, verified by live HTTPS
+  checks). To redeploy: `npm run build`, then the `lftp mirror -R` FTPS command written in Phase J.
+  **Do not use `--delete`** (it would remove the server's SSL validation token).
 - **What actually works right now, end to end:** `npm run dev` → `/` shows all 16 departments as
   keyboard-accessible buttons → choose one → **Enter &lt;department&gt;** stores the session →
   `/app` renders the workspace labelled with that department → **Change department** / **Sign
@@ -504,3 +598,14 @@ git add -A && git commit -m "feat(phase-e): assessment service seam, determinist
 4. `package.json` dependencies must stay unchanged. Fonts are vendored files in
    `public/fonts/`, not a package.
 5. Never run `bun install` — `bun.lock` is stale and must stay untouched; this project uses npm.
+6. **Deployment is FTP, not SSH.** `ftp.nzwisiso.bitflex.app` does not resolve. Use host
+   `ftp.bitflex.app`, user `nzwisiso@nzwisiso.bitflex.app`, **explicit FTPS** (`set ftp:ssl-force
+   yes`), and mirror into `/` (the account is chrooted to the document root
+   `/home/bitfempm/nzwisiso.bitflex.app`). `ssh`/`sftp`/`scp` will simply hang — there is no
+   daemon on 22.
+7. **Only `dist/` ships, never the repo root.** The built `index.html` references hashed filenames
+   (`assets/index-<hash>.js`). Uploading `index.html` without its matching `assets/` yields a
+   white screen, and uploading an *old* `index.html` over a *new* `assets/` does the same.
+   Always `npm run build` immediately before mirroring.
+8. **`mirror --delete` is forbidden here** — it would wipe `cgi-bin/` and the live
+   `.well-known/pki-validation/<token>.txt` SSL validation file.
