@@ -914,6 +914,59 @@ instructs the card to carry the workflow) rather than a defect.
 
 ---
 
+### Phase P — brief §8–§16 implemented (the truncated sections) — DONE
+
+**Instruction (user, 2026-09-25):** the remaining sections of the brief, supplied after Phase O
+shipped. They **changed four things Phase O had built**, which is the point of recording them here
+rather than quietly rewriting Phase O's entry.
+
+| § | Required | What was done |
+|---|---|---|
+| §8 | Hero subheading "Explore potential policy responses before implementation." | `BRAND.summary` is now exactly that line and renders as the hero subheading at 18/20px in `text-foreground`, above the body copy |
+| §9 | Replace the dense paragraph with the "controlled AI-assisted environment" paragraph; remove "Bring a draft, and the Nzwisiso simulation core models…"; no technical AI vocabulary | `BRAND.description` added and rendered; the mechanism paragraph **deleted** (so the landing page no longer names the simulation core); `validate` check 3 extended to ban `LLM/LLMs/API/APIs` in user-facing app copy |
+| §10 | Keep "Choose your Department →" dominant; remove/de-emphasise "See what the platform does" | The secondary link is **removed** — the hero now has exactly one action. The footer nav still links to the section |
+| §11 | Keep the disclaimer near the primary CTA | Unchanged and still rendered directly under the CTA |
+| §12 | **Remove the six-step workflow** from the hero card (it read as economic modelling) and replace it with POLICY ASSESSMENT → three steps (Add your policy / Run simulation / Review assessment) with "Understanding before action." at the bottom; reuse the existing card styling | The card keeps its pale-green surface, gold rule and green rail; the step list is now three steps verbatim from the brief; the tagline closes the card |
+| §13 | Heading "A new capability for policy assessment", the given intro, and **three** labelled capability blocks | Heading + intro replaced; `CAPABILITIES` went from four long cards to three (Policy input / Stakeholder simulation / Policy assessment) with the brief's exact one-line bodies; the grid is now 3-up and the labels render in capitals by styling |
+| §14 | New restrained section "From policy draft to policy intelligence" with two fixed sentences, the second of which must not imply AI decides | New band on the page, styled with the existing left-green-rule band treatment. Both sentences live in `GOVERNANCE` in `brand.ts` and are asserted **verbatim** in the unit test, because the brief says the wording matters |
+| §15 | Ministerial / government positioning block: proposal label, initiative name, one-sentence description, Ministerial Champion + Hon. Tatenda A. Mavetera, MP + ministry, "Powered by Nzwisiso AI®" | New tinted panel with a gold rule and a green caps label. Restrained: no portrait, no party styling, no second `<h1>` |
+| §16 | Use the design skills | `better-typography` applied to the §14 band (raised to 14px because the brief calls that wording important, deliberately above the 12px technical note next to it); `better-colors` re-run; the measured-contrast validator re-run after every token change |
+
+#### Conflicts and judgement calls (stated, not hidden)
+
+- **§12's rationale described reference data; the card it quoted was Phase O's workflow.** Either way
+  the instruction is unambiguous — replace it — so the six-step list is gone from the landing page.
+  The workflow itself is unchanged in the workspace, and the reference date/fiscal year are still
+  stated above the hero.
+- **"Understanding before action" now appears twice on the page, by instruction:** once as the §6
+  eyebrow (a label, no full stop) and once closing the §12 card (a sentence, full stop). Both derive
+  from one `PRINCIPLE` constant, so the *words* cannot drift; the punctuation is what tells them
+  apart, and the test asserts the eyebrow appears once and the tagline once.
+- **"Powered by Nzwisiso AI®" appears twice too** (§4's relationship line in the hero, and §15's
+  attribution). One config string, two placements, asserted as exactly two.
+- **Two things are called "Policy assessment"** — the §12 card's label and the §13 capability block.
+  That would have produced two identically-named headings, so the card's label is a non-heading caps
+  overline and its `<h2>` is "From policy draft to structured assessment". The page therefore still
+  has exactly one `<h1>` and no duplicated heading names, both asserted.
+- **The ® was implemented as written.** A registered-mark symbol asserts registration, so it is worth
+  confirming the mark is actually registered before this page is published.
+- **The footer nav label "What this platform does" was left alone** even though §13 renamed the
+  section heading. It is a nav description rather than a heading, and the shared shell is out of this
+  task's scope. Recorded as a LOW finding.
+- **The closing CTA still reads "Ready to test a policy draft?"** — not mentioned in §8–§16, so it was
+  left as it was rather than "improved" silently.
+
+#### Evidence
+
+`npm run validate` **10/10** · `npm run typecheck` PASS · `npm run lint` 0 errors · `npm test`
+**9 files, 150/150** · `npm run build` PASS · `npx playwright test` **6/6**. Renders inspected at
+1440×820 (hero fully visible, one CTA, card balanced against the left column), 390×844 (nothing
+clipped), and the full 2766px page. Pixel census after the new sections: **64.2% warm/neutral,
+23.7% pale tint, 12.1% solid green** — the tint share rose because §15's panel is a pale-green
+surface by design, and the tint measures ≈0.97 luminance, i.e. it reads as a near-white surface.
+
+---
+
 ## Verification log
 | Date | Command | Result |
 |---|---|---|
@@ -1029,6 +1082,13 @@ instructs the card to carry the workflow) rather than a defect.
 | 2026-09-25 | `npm run build` (Phase O) | PASS — built in **495 ms** |
 | 2026-09-25 | renders inspected after the refinement (Phase O) | PASS at **1440×820** — 2-line balanced headline, hero card fully visible and balanced against the left column (535px vs 530px), CTA above the fold. PASS at **390×844** — single column, 3-line headline, CTA above the fold, nothing clipped. First build was inspected and **rejected** (card clipped step 06 mid-sentence) before the copy was tightened |
 | 2026-09-25 | full-document pixel census of the rendered page (Phase O) | PASS as a measurement — **69.4% warm/neutral, 14.8% pale green tint, 15.8% solid institutional green, ~0.15% gold** over 24,480 samples. Recorded with the honest reading that the 15.8% solid green is the locked masthead + footer, and that a 5% *pixel* share of gold would be a gold block, not an accent |
+| 2026-09-25 | brief §8–§16 supplied (Phase P) | Received; **four Phase O decisions were reversed by it** — the six-step hero card, the secondary CTA link, the mechanism paragraph naming the simulation core, and the four long capability cards. Recorded in `### Phase P` rather than retro-edited into Phase O |
+| 2026-09-25 | `npm run validate` (Phase P) | **PASS — 10/10**, with check 3 extended to also ban `LLM/LLMs/API/APIs` in user-facing app copy (uppercase-only, so the stock carousel's `api` identifier is not a false positive) |
+| 2026-09-25 | `npm test` (Phase P) | **PASS — 9 files, 150/150.** New assertions: three capability labels render in capitals by styling with normal-case DOM text; the hero card holds **3** steps ending on the tagline; the secondary link is **absent**; `GOVERNANCE.humanJudgement` present **verbatim**; the §15 panel holds the champion and ministry **scoped to that panel** (the ministry also appears in the footer, so an unscoped query would pass while the panel said nothing); the initiative name appears twice but as a heading **once**; and the "Powered by" line appears exactly **twice**, both reading one config string |
+| 2026-09-25 | `npx playwright test` (Phase P) | **PASS — 6/6 (7.5 s)**, 0 console errors, 0 off-origin requests — now also asserting the §8 subheading, the §9 description, one-and-only-one hero action, the three §13 capability headings, the §14 governance sentence, and the §15 proposal label and champion |
+| 2026-09-25 | `npm run build` (Phase P) | PASS — built in **521 ms** |
+| 2026-09-25 | renders inspected after §8–§16 (Phase P) | PASS at **1440×820** — single CTA (no competing link), hero fully visible, card now *shorter* than the left column and balanced against it. PASS at **390×844** — nothing clipped, CTA above the fold. Full 2766px page inspected section by section (§13 three cards, §14 band, coverage, how-it-works, deterministic band, §15 panel, closing CTA, footer). One refinement made **after** rendering: the §14 band's text raised from 12px to 14px, because the brief says that wording is important and it should out-rank the technical note band beside it |
+| 2026-09-25 | full-document pixel census after §8–§16 (Phase P) | **64.2% warm/neutral, 23.7% pale tint, 12.1% solid green** over 32,640 samples — the tint share rose because §15's positioning panel is a pale-green surface by design; recorded rather than tuned to hit a percentage |
 | 2026-09-25 | dev-server port root cause confirmed (Phase M) | PASS — `vite.config.ts` sets `server.port = 8080` and `host: "::"`; `npm run dev` therefore serves at **http://localhost:8080/**, not 5173. This is why the user's browser still showed the old entry |
 
 ## Known-red / open items
@@ -1266,6 +1326,18 @@ relative path so it does not duplicate the source of truth).
 | `src/test/routes.test.tsx` | Two landing-heading assertions |
 | `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md` | Phase O record, verification rows, known-red entries, identity section |
 
+## Files touched in Phase P (brief §8–§16)
+
+| File | Change |
+|---|---|
+| `src/config/brand.ts` | `summary` replaced with the §8 subheading, new `description` (§9), `proposalLabel`, `initiativeDescription`, `ministerialChampion`, `poweredBy`; new `GOVERNANCE` export holding the two §14 sentences verbatim |
+| `src/pages/Landing.tsx` | Hero: subheading + §9 description, mechanism paragraph removed, secondary CTA removed, credit reads `poweredBy`. Card: `POLICY ASSESSMENT` overline + `<h2>` "From policy draft to structured assessment" + 3 steps + tagline. `CAPABILITIES` reduced to the three §13 blocks (grid 3-up, labels uppercased); §14 band added; §15 positioning panel added; `Scale`/`Upload` icons in, `FileText`/`Play`/`VOCABULARY` out |
+| `scripts/validate.mjs` | Check 3 extended with the `LLM|LLMs|API|APIs` implementation-term ban |
+| `index.html` | Description + `og:description` moved to the §9 paragraph |
+| `e2e/journey.spec.ts` | §8–§15 assertions; the card locator renamed to `landing-assessment-heading` with 3 steps; the removed secondary link asserted absent; the single level-one asserted once |
+| `src/test/landing.test.tsx` | Capability test now three labels incl. the caps-by-styling check; card test now 3 steps + tagline; new "one primary action" test; new governance-verbatim test; new §15 panel test; the duplicate-heading guard re-pointed |
+| `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md` | Phase P record, verification rows, files-touched table, identity section |
+
 ## RESUME HERE
 
 - **Branch:** `feature/unified-platform` · **HEAD:** the `feat(phase-m)` commit — run `git rev-parse HEAD`.
@@ -1275,17 +1347,26 @@ relative path so it does not duplicate the source of truth).
   Phase H = the commit whose message begins `test(phase-h)` ·
   Phase M = the commit whose message begins `feat(phase-m)` ·
   Phase N = the commit whose message begins `feat(phase-n)` ·
-  Phase O = the commit whose message begins `feat(phase-o)`.
+  Phase O = the commit whose message begins `feat(phase-o)` ·
+  Phase P = the commit whose message begins `feat(phase-p)`.
   `git log --oneline -10 | cat` is the second opinion on state.
   (This shell's git rejects `--no-pager`; use plain `git log --oneline | cat`.)
-- **Phase O is the current state of the public landing page.** Positioning is now the **Zimbabwe AI
-  Policy Intelligence Initiative** (h1 and masthead), *Powered by Nzwisiso AI*, with the service
-  principle **Understanding before action** as the eyebrow, and the hero's right-hand card holding a
-  **6-step policy-assessment workflow** instead of the economic reference rates. `BRAND.workspaceLabel`
-  no longer exists. A validator (check 10) now fails the build if any rendered colour pair drops below
-  its contrast floor. **Read `## Phase O` above before touching `Landing.tsx`, `brand.ts`,
-  `index.css` or `PublicPageShell.tsx`.** If the brief's §8–§16 are supplied, they are the next
-  increment — Phase O could not implement sections that never arrived.
+- **Phase P is the current state of the public landing page** (supersedes Phase O, which had built
+  four things the brief later reversed). The page now reads: eyebrow *Understanding before action* →
+  `<h1>` **Zimbabwe AI Policy Intelligence Initiative** → *Powered by Nzwisiso AI®* → subheading
+  **"Explore potential policy responses before implementation."** → the §9 description → **ONE**
+  primary action (**Choose your Department**) → the disclaimer. The hero's right card is **POLICY
+  ASSESSMENT — three steps**, closing on the tagline. Below: **A new capability for policy
+  assessment** (three labelled blocks), the **From policy draft to policy intelligence** governance
+  band, coverage, how-it-works, the deterministic band, the **ministerial positioning panel**
+  (Hon. Tatenda A. Mavetera, MP), and the closing CTA. `BRAND.workspaceLabel` no longer exists;
+  §14's governance sentences live in `GOVERNANCE` in `brand.ts` and are asserted verbatim.
+  A validator (check 10) fails the build if any rendered colour pair drops below its contrast floor,
+  and check 3 blocks `LLM/API` vocabulary in user-facing copy. **Read `### Phase P` (then Phase O)
+  before touching `Landing.tsx`, `brand.ts`, `index.css` or `PublicPageShell.tsx`.**
+- **Nothing is outstanding on the landing page itself.** The only open items are: (a) the live host
+  still serving the Phase D bundle — see the deployment facts above; and (b) the two recorded
+  known-reds (`--destructive` contrast, the hand-maintained `index.html` description).
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
   restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
 - **`main` is untouched at `7451db0`, and the agent has never pushed to it.** The feature branch

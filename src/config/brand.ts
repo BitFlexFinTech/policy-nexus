@@ -41,11 +41,23 @@ export const BRAND = {
   eyebrow: PRINCIPLE,
   /** The same principle as a sentence. */
   tagline: `${PRINCIPLE}.`,
-  /** Short description used for the homepage sub-heading and meta description. */
-  summary:
-    "A Government of Zimbabwe initiative for AI-assisted policy intelligence. It examines how a " +
-    "proposed measure would land before it is implemented, and sets out the assessment behind that " +
-    "reading.",
+  /** The primary supporting statement on the public landing page — the subheading. */
+  summary: "Explore potential policy responses before implementation.",
+  /** The longer description: what Nzwisiso AI provides, in the hero and the meta description. */
+  description:
+    "Nzwisiso AI provides government institutions with a controlled AI-assisted environment to " +
+    "explore potential stakeholder responses, identify areas of risk and examine policy scenarios " +
+    "before implementation.",
+  /** How the initiative is labelled while it is still a proposal. */
+  proposalLabel: "A proposed national digital innovation initiative",
+  /** What the proposed capability is, in one sentence. */
+  initiativeDescription:
+    "A proposed government capability for applying artificial intelligence and controlled simulation " +
+    "to policy assessment and decision support.",
+  /** The minister championing the initiative. */
+  ministerialChampion: "Hon. Tatenda A. Mavetera, MP",
+  /** The platform credit line. Rendered in the hero and in the positioning section. */
+  poweredBy: "Powered by Nzwisiso AI\u00AE",
   /**
    * Official attribution line, required on the homepage footer. The wording is
    * fixed by the commissioning ministry and must not be softened or reworded.
@@ -90,6 +102,23 @@ export const DISCLAIMER = {
 export const SOVEREIGNTY_STATEMENT =
   "Sovereign data architecture — every simulation is computed locally within the " +
   "Government of Zimbabwe estate. No policy text or result leaves national custody.";
+
+/**
+ * The governance position. The wording is fixed by the initiative's brief and must
+ * not be softened: the platform supports human judgement and does not make
+ * decisions. `humanJudgement` is asserted verbatim by the landing test, and no page
+ * may claim otherwise.
+ */
+export const GOVERNANCE = {
+  /** What the platform is for. */
+  lens:
+    "Nzwisiso is designed to help government institutions examine proposed policies through " +
+    "controlled AI-assisted simulation before implementation.",
+  /** Who decides. This sentence is the point. */
+  humanJudgement:
+    "The platform does not replace policymakers or determine policy outcomes. It provides an " +
+    "additional analytical lens to support informed human judgement.",
+} as const;
 
 export type Brand = typeof BRAND;
 export type Vocabulary = typeof VOCABULARY;

@@ -1,31 +1,26 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, ClipboardCheck, FileText, Play, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, ClipboardCheck, Scale, ShieldCheck, Upload, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicPageShell } from "@/components/public/PublicPageShell";
-import { BRAND, DISCLAIMER, VOCABULARY } from "@/config/brand";
+import { BRAND, DISCLAIMER, GOVERNANCE } from "@/config/brand";
 import { COVERAGE } from "@/lib/coverage";
 
-/** What the platform does — four capabilities, in the order a user meets them. */
+/** What the platform does — three capabilities, in the order a user meets them. */
 const CAPABILITIES = [
   {
-    icon: Users,
-    title: "Model the national picture",
-    body: "Every department carries its own stated priorities, published reference indicators, stakeholder groups and prepared policy drafts, so a measure is read against the context it actually lands in.",
+    icon: Upload,
+    title: "Policy input",
+    body: "Upload or enter a proposed policy.",
   },
   {
-    icon: Play,
-    title: "Simulate before you commit",
-    body: "The simulation core models how each stakeholder group responds and where the pressure points sit. The same department and the same draft always reproduce the identical result.",
+    icon: Users,
+    title: "Stakeholder simulation",
+    body: "Explore potential responses across simulated stakeholder perspectives.",
   },
   {
     icon: ClipboardCheck,
-    title: "Read the assessment",
-    body: "A short executive summary for decisions, a full assessment for the detail, and a long-form report that records the working behind every figure.",
-  },
-  {
-    icon: FileText,
-    title: "Draft the policy itself",
-    body: "The run also drafts the instrument: operative measures, risk mitigation, engagement, transitional and monitoring provisions — editable, and exportable to Word, PDF or print.",
+    title: "Policy assessment",
+    body: "Review structured findings, potential risks and areas requiring further consideration.",
   },
 ];
 
@@ -46,35 +41,24 @@ const STEPS = [
 ];
 
 /**
- * The route from a policy draft to a finished assessment, in the order the
- * workspace implements it. These titles are deliberately NOT headings — this is
- * one panel's contents, not a document section, so the heading outline stays
- * h1 → section h2 and no step name competes with a section name.
+ * The three steps from a draft to a structured assessment, as the landing page
+ * states them. Deliberately NOT headings: this is one panel's contents, not a
+ * document section, so the heading outline stays h1 → section h2 and no step name
+ * competes with a section name. The full six-step journey is unchanged in the
+ * workspace itself.
  */
-const WORKFLOW = [
+const ASSESSMENT_STEPS = [
   {
-    title: "Choose your department",
-    body: "Each department brings its own priorities and indicators.",
+    title: "Add your policy",
+    body: "Upload a document or enter a policy draft.",
   },
   {
-    title: "Enter the workspace",
-    body: "One click signs you in — no account, no form.",
+    title: "Run simulation",
+    body: "Explore potential responses across simulated stakeholder perspectives.",
   },
   {
-    title: "Add the policy",
-    body: "Paste the draft, or upload a PDF, DOCX or TXT.",
-  },
-  {
-    title: "Run the simulation",
-    body: "Models each stakeholder group and its pressure points.",
-  },
-  {
-    title: "Read the assessment",
-    body: "A summary for the decision, plus the full detail.",
-  },
-  {
-    title: "Take away the drafted policy",
-    body: "The instrument itself, editable and exportable.",
+    title: "Review assessment",
+    body: "Examine potential concerns, risks and areas for further consideration.",
   },
 ];
 
@@ -113,32 +97,25 @@ export default function Landing() {
           >
             {BRAND.initiative}
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Powered by <span className="font-medium text-foreground">{BRAND.name}</span>
-          </p>
-          <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p className="mt-2 text-sm text-muted-foreground">{BRAND.poweredBy}</p>
+          {/* The primary supporting statement, then what the platform provides. */}
+          <p className="mt-5 max-w-xl text-pretty text-lg font-medium leading-relaxed text-foreground sm:text-xl">
             {BRAND.summary}
           </p>
           <p className="mt-3 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground">
-            Bring a draft, and the{" "}
-            <span className="font-medium text-foreground">{VOCABULARY.simulationCore}</span> models how
-            stakeholder groups respond, what the fiscal and currency effects look like, and where the
-            risks sit — before the measure is finalised.
+            {BRAND.description}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+          {/* ONE primary action. The secondary link that used to sit beside it was
+              removed: two side-by-side actions left the page without an obvious next
+              step. The section it pointed at is still linked from the footer nav. */}
+          <div className="mt-8">
             <Button asChild size="lg" className="h-11 px-5 text-sm">
               <Link to="/start">
                 Choose your Department
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </Button>
-            <Link
-              to="/#capabilities"
-              className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-            >
-              See what the platform does
-            </Link>
           </div>
 
           <p className="mt-5 max-w-xl text-xs leading-relaxed text-muted-foreground">
@@ -147,33 +124,33 @@ export default function Landing() {
           </p>
         </div>
 
-        {/* The policy-assessment workflow. The reference rates that used to sit here
-            were economic inputs for the engine, not orientation for a visitor — and
-            they are already stated where they are actually used, in the workspace
-            header, engine-vitals panel and reference page. What a reader needs
-            beside the proposition is the route from a draft to an assessment, and
-            where that route ends. */}
+        {/* POLICY ASSESSMENT — three steps from a draft to a structured assessment.
+            The six-step workspace journey that was listed here made the page read as
+            an economic-modelling pipeline; this states the assessment the reader
+            actually ends up with. The full journey is unchanged in the workspace. The
+            tagline closes the card, where it reads as the principle behind the method
+            rather than as a slogan. */}
         <aside
-          aria-labelledby="landing-workflow-heading"
+          aria-labelledby="landing-assessment-heading"
           className="rounded-lg border bg-primary-tint p-5"
         >
-          <h2
-            id="landing-workflow-heading"
-            className="text-xs font-semibold uppercase tracking-[0.16em] text-primary"
-          >
-            How an assessment is produced
-          </h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+            Policy assessment
+          </p>
           {/* A short gold rule — the institutional mark, drawn in the rule token
               rather than the fill gold, which is invisible on a light surface. */}
           <div aria-hidden="true" className="mt-3 h-[3px] w-10 rounded-full bg-gold-rule" />
-          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            Six steps from a policy draft to a structured assessment you can act on.
-          </p>
+          <h2
+            id="landing-assessment-heading"
+            className="mt-3 text-base font-semibold tracking-tight text-foreground"
+          >
+            From policy draft to structured assessment
+          </h2>
           <ol className="mt-4">
-            {WORKFLOW.map((step, index) => (
+            {ASSESSMENT_STEPS.map((step, index) => (
               <li key={step.title} className="relative flex gap-3 pb-4 last:pb-0">
                 {/* The rail is decorative — the step number and title carry the meaning. */}
-                {index < WORKFLOW.length - 1 ? (
+                {index < ASSESSMENT_STEPS.length - 1 ? (
                   <span
                     aria-hidden="true"
                     className="absolute bottom-0 left-3 top-7 w-px bg-primary/25"
@@ -191,9 +168,8 @@ export default function Landing() {
               </li>
             ))}
           </ol>
-          <p className="mt-1 border-t border-border pt-3 text-xs leading-relaxed text-foreground">
-            The run ends in a structured policy assessment. It informs the decision; it does not take
-            it.
+          <p className="mt-1 border-t border-border pt-3 text-sm font-medium tracking-tight text-foreground">
+            {BRAND.tagline}
           </p>
         </aside>
       </section>
@@ -204,13 +180,14 @@ export default function Landing() {
           id="capabilities-heading"
           className="mt-4 text-xl font-semibold tracking-tight text-foreground sm:text-2xl"
         >
-          What this platform does
+          A new capability for policy assessment
         </h2>
         <p className="mt-2 max-w-3xl text-pretty text-sm leading-relaxed text-muted-foreground">
-          One workspace for the whole policy cycle: prepare the draft, test how it lands, read the
-          assessment, and take away the instrument itself.
+          Government policy can have complex effects across communities, institutions, industries and
+          stakeholders. Nzwisiso provides an additional analytical lens for exploring those potential
+          responses before implementation.
         </p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {CAPABILITIES.map((capability) => (
             <article
               key={capability.title}
@@ -219,12 +196,37 @@ export default function Landing() {
               <span className="flex h-8 w-8 items-center justify-center rounded-md border border-primary/20 bg-primary/5 text-primary">
                 <capability.icon className="h-4 w-4" aria-hidden="true" />
               </span>
-              <h3 className="text-sm font-semibold leading-snug tracking-tight text-foreground">
+              <h3 className="text-sm font-semibold uppercase leading-snug tracking-wide text-foreground">
                 {capability.title}
               </h3>
               <p className="text-xs leading-relaxed text-muted-foreground">{capability.body}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      {/* What the platform is for, and who decides. The second sentence is the
+          initiative's governance position, asserted verbatim in the tests: the
+          platform supports human judgement and does not make policy decisions. */}
+      <section
+        aria-labelledby="lens-heading"
+        className="mt-16 rounded-lg border border-l-4 border-border border-l-primary bg-card p-5"
+      >
+        <div className="flex items-start gap-3">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-primary/20 bg-primary/5 text-primary">
+            <Scale className="h-4 w-4" aria-hidden="true" />
+          </span>
+          <div>
+            <h2 id="lens-heading" className="text-sm font-semibold tracking-tight text-foreground">
+              From policy draft to policy intelligence
+            </h2>
+            <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+              {GOVERNANCE.lens}
+            </p>
+            <p className="mt-2 max-w-3xl text-sm font-medium leading-relaxed text-foreground">
+              {GOVERNANCE.humanJudgement}
+            </p>
+          </div>
         </div>
       </section>
 
@@ -322,6 +324,38 @@ export default function Landing() {
               scenario mode (Mock): no policy text and no result is sent to any external service.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* The proposal and its ministerial champion. Visually important, deliberately
+          not promotional: one restrained panel, no portrait, no party styling. The
+          initiative name is deliberately NOT a second heading — the section heading
+          is the proposal label, so the page still has exactly one <h1> and no
+          duplicated heading names. */}
+      <section
+        aria-labelledby="positioning-heading"
+        className="mt-16 rounded-lg border bg-primary-tint p-5 sm:p-6"
+      >
+        <SectionRule />
+        <h2
+          id="positioning-heading"
+          className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-primary"
+        >
+          {BRAND.proposalLabel}
+        </h2>
+        <p className="mt-3 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+          {BRAND.initiative}
+        </p>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          {BRAND.initiativeDescription}
+        </p>
+        <div className="mt-6 border-t border-border pt-4">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Ministerial champion
+          </h3>
+          <p className="mt-2 text-sm font-semibold text-foreground">{BRAND.ministerialChampion}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">{BRAND.entityCustodian}</p>
+          <p className="mt-4 text-xs text-muted-foreground">{BRAND.poweredBy}</p>
         </div>
       </section>
 

@@ -87,6 +87,10 @@ check("forbidden predictive phrasing", scan(appFiles, [
 // 3 — vendor / implementation terminology must never be user-visible
 check("vendor terminology scrubbed", scan(appFiles, [
   ["vendor-term", /\b(MiroFish|OASIS|GraphRAG|Graphiti|Zep|Puter|puter|Vultr|Neo4j|DeepSeek)\b/],
+  // Implementation vocabulary the initiative's brief forbids in user-facing copy.
+  // Uppercase-only on purpose: `api` is a legitimate local identifier (the stock
+  // carousel primitive uses one), while `API` in prose is the banned sense.
+  ["implementation-term", /\b(LLM|LLMs|API|APIs)\b/],
 ], { ignoreLine: commentLine }));
 
 // 4 — determinism inside app logic (ui/** is stock shadcn; its unused helper is excluded explicitly)

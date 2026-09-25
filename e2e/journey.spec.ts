@@ -143,11 +143,45 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Zimbabwe AI Policy Intelligence Initiative" }),
     ).toBeVisible();
-    await expect(page.getByText("Powered by Nzwisiso AI", { exact: true })).toBeVisible();
+    await expect(page.getByText("Powered by Nzwisiso AI®", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("Zimbabwe AI Policy Intelligence", { exact: true })).toBeVisible();
     await expect(page.getByText("Policy Intelligence Platform", { exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "What this platform does", exact: true })).toBeVisible();
+    // The supporting statement and the description, in the hero.
+    await expect(
+      page.getByText("Explore potential policy responses before implementation.", { exact: true }),
+    ).toBeVisible();
+    await expect(page.getByText(/controlled AI-assisted environment/)).toBeVisible();
+    // ONE primary action: the competing secondary link is gone for good.
+    await expect(page.getByText("See what the platform does")).toHaveCount(0);
+    // §13 — three capabilities under the new heading.
+    await expect(
+      page.getByRole("heading", { name: "A new capability for policy assessment", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Policy input", exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Stakeholder simulation", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Policy assessment", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "How it works", exact: true })).toBeVisible();
+    // §14 — the governance position, word for word.
+    await expect(
+      page.getByRole("heading", { name: "From policy draft to policy intelligence", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByText(/does not replace policymakers or determine policy outcomes/)).toBeVisible();
+    // §15 — the proposal and its ministerial champion.
+    await expect(
+      page.getByRole("heading", {
+        name: "A proposed national digital innovation initiative",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(page.getByText("Hon. Tatenda A. Mavetera, MP", { exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ministerial champion", exact: true })).toBeVisible();
+    // The initiative is named once as the h1 and once in the positioning panel —
+    // never twice as a heading, which is asserted below by the single level-one.
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Zimbabwe AI Policy Intelligence Initiative" }),
+    ).toHaveCount(1);
 
     // The headline must RENDER in capitals. This reads the real computed style, which
     // is the only way to prove a visual requirement — and it also proves the caps come
@@ -183,19 +217,22 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     expect(Number.isNaN(principleSize)).toBe(false);
     expect(principleSize).toBeLessThan(headline?.fontSize ?? Number.NaN);
 
-    // The hero carries the policy-assessment workflow, in the workspace's order, and
-    // states where the route ends. The economic reference rates are not repeated here
-    // — they are stated in the workspace, beside the engine that consumes them — but
-    // the reference frame a run is read against is still on the page, in the notice
-    // strip above the hero, so no figure is left unreadable against its own frame.
-    const workflow = page.locator("aside[aria-labelledby='landing-workflow-heading']");
+    // The hero card carries the three assessment steps and closes on the principle.
+    // The full six-step workspace journey is not listed here any more — it made the
+    // page read as an economic-modelling pipeline — but the reference frame a run is
+    // read against is still on the page, in the notice strip above the hero, so no
+    // figure is left unreadable against its own frame.
+    const assessment = page.locator("aside[aria-labelledby='landing-assessment-heading']");
     await expect(
-      workflow.getByRole("heading", { name: "How an assessment is produced", exact: true }),
+      assessment.getByRole("heading", {
+        name: "From policy draft to structured assessment",
+        exact: true,
+      }),
     ).toBeVisible();
-    await expect(workflow.getByRole("listitem")).toHaveCount(6);
-    await expect(workflow.getByText("Choose your department", { exact: true })).toBeVisible();
-    await expect(workflow.getByText("Take away the drafted policy", { exact: true })).toBeVisible();
-    await expect(workflow.getByText(/It informs the decision; it does not take it\./)).toBeVisible();
+    await expect(assessment.getByRole("listitem")).toHaveCount(3);
+    await expect(assessment.getByText("Add your policy", { exact: true })).toBeVisible();
+    await expect(assessment.getByText("Review assessment", { exact: true })).toBeVisible();
+    await expect(assessment.getByText("Understanding before action.", { exact: true })).toBeVisible();
     await expect(page.getByText(/Reference date\s+24 September 2026/).first()).toBeVisible();
     await expect(page.getByText(/Fiscal year\s+2026/).first()).toBeVisible();
     await expect(

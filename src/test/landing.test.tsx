@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import Landing from "@/pages/Landing";
 import { DEPARTMENT_COUNT, DEPARTMENTS } from "@/config/departments";
 import { STAKEHOLDER_SEGMENTS, REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR, REFERENCE_RATES } from "@/config/reference";
-import { BRAND, SOVEREIGNTY_STATEMENT } from "@/config/brand";
+import { BRAND, GOVERNANCE, SOVEREIGNTY_STATEMENT } from "@/config/brand";
 
 const renderLanding = () =>
   render(
@@ -37,9 +37,11 @@ describe("Landing — the pure public landing page", () => {
 
     // The programme and the platform are distinguished on the same screen: the
     // initiative is the government capability, Nzwisiso AI is what delivers it.
-    // (The credit line's words live in a child node, so match the line and assert
-    // its full rendered text rather than the direct text node alone.)
-    expect(screen.getByText(/Powered by/)).toHaveTextContent(`Powered by ${BRAND.name}`);
+    // §15 places the credit twice — under the hero heading and in the positioning
+    // panel — and both must read from the one config string.
+    const credits = screen.getAllByText(/Powered by/);
+    expect(credits).toHaveLength(2);
+    credits.forEach((credit) => expect(credit).toHaveTextContent(BRAND.poweredBy));
   });
 
   it("renders the heading in capitals by styling, not by hard-coding capital letters", () => {
@@ -75,17 +77,19 @@ describe("Landing — the pure public landing page", () => {
     actions.forEach((action) => expect(action).toHaveAttribute("href", "/start"));
   });
 
-  it("states what the platform does, as four named capabilities", () => {
+  it("states what the platform does, as three named capabilities", () => {
     renderLanding();
-    expect(screen.getByRole("heading", { name: "What this platform does" })).toBeInTheDocument();
-    [
-      "Model the national picture",
-      "Simulate before you commit",
-      "Read the assessment",
-      "Draft the policy itself",
-    ].forEach((title) => {
+    expect(
+      screen.getByRole("heading", { name: "A new capability for policy assessment" }),
+    ).toBeInTheDocument();
+    ["Policy input", "Stakeholder simulation", "Policy assessment"].forEach((title) => {
       expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
     });
+    // The capability labels render in capitals by styling, so the DOM keeps normal
+    // case and the accessible name stays a readable phrase.
+    const label = screen.getByRole("heading", { name: "Policy input" });
+    expect(label.className).toContain("uppercase");
+    expect(label.textContent?.trim()).toBe("Policy input");
   });
 
   it("reports coverage figures read from the configuration, never written by hand", () => {
@@ -105,24 +109,25 @@ describe("Landing — the pure public landing page", () => {
     ).toEqual(expected);
   });
 
-  it("carries the policy-assessment workflow in the hero, ending at a structured assessment", () => {
+  it("states the three assessment steps in the hero card, and closes on the principle", () => {
     renderLanding();
     // One panel, one name: two identically-named headings on one page read as a mistake.
     expect(
-      screen.getAllByRole("heading", { name: "How an assessment is produced" }),
+      screen.getAllByRole("heading", { name: "From policy draft to structured assessment" }),
     ).toHaveLength(1);
     const card = screen
-      .getByRole("heading", { name: "How an assessment is produced" })
+      .getByRole("heading", { name: "From policy draft to structured assessment" })
       .closest("aside");
     expect(card).not.toBeNull();
 
     const steps = within(card as HTMLElement).getAllByRole("listitem");
-    expect(steps).toHaveLength(6);
-    // The order is the workspace's own order, from entering to taking the instrument away.
-    expect(steps[0]).toHaveTextContent("Choose your department");
-    expect(steps[5]).toHaveTextContent("Take away the drafted policy");
-    // The boundary the page must state: it informs the decision, it does not take it.
-    expect(card).toHaveTextContent("It informs the decision; it does not take it.");
+    expect(steps).toHaveLength(3);
+    expect(steps[0]).toHaveTextContent("Add your policy");
+    expect(steps[1]).toHaveTextContent("Run simulation");
+    expect(steps[2]).toHaveTextContent("Review assessment");
+    // The card closes on the principle as a sentence — the eyebrow above the heading
+    // states the same words as a label, and the full stop keeps the two distinct.
+    expect(card).toHaveTextContent(BRAND.tagline);
   });
 
   it("does NOT restate the economic reference rates — those belong beside the engine", () => {
@@ -142,6 +147,46 @@ describe("Landing — the pure public landing page", () => {
     // those are still stated in the notice strip above the hero.
     expect(screen.getByText(REFERENCE_DATE_LABEL)).toBeInTheDocument();
     expect(screen.getByText(REFERENCE_FISCAL_YEAR)).toBeInTheDocument();
+  });
+
+  it("offers ONE primary action — the secondary link is gone", () => {
+    renderLanding();
+    // The footer nav still links to the capabilities section; what was removed is the
+    // second, competing action beside the hero CTA.
+    expect(screen.queryByText("See what the platform does")).toBeNull();
+  });
+
+  it("states the governance position verbatim — the platform does not decide", () => {
+    renderLanding();
+    expect(
+      screen.getByRole("heading", { name: "From policy draft to policy intelligence" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(GOVERNANCE.lens)).toBeInTheDocument();
+    // The wording of this sentence is the point of the section, so it is asserted word
+    // for word: nothing may imply that AI makes policy decisions.
+    expect(screen.getByText(GOVERNANCE.humanJudgement)).toBeInTheDocument();
+  });
+
+  it("presents the proposal with its ministerial champion, without a second <h1>", () => {
+    renderLanding();
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+
+    const panel = screen.getByRole("heading", { name: BRAND.proposalLabel }).closest("section");
+    expect(panel).not.toBeNull();
+    // Scoped deliberately: the ministry also appears in the footer, so an unscoped
+    // query would pass while the panel said nothing at all.
+    expect(within(panel as HTMLElement).getByText(BRAND.ministerialChampion)).toBeInTheDocument();
+    expect(within(panel as HTMLElement).getByText(BRAND.entityCustodian)).toBeInTheDocument();
+    expect(within(panel as HTMLElement).getByText(BRAND.poweredBy)).toBeInTheDocument();
+    expect(
+      within(panel as HTMLElement).getByRole("heading", { name: "Ministerial champion" }),
+    ).toBeInTheDocument();
+
+    // The initiative name appears once as the h1 and once here as plain text — never as
+    // a second heading, which would let the page name itself twice.
+    const nameMatches = screen.getAllByText(BRAND.initiative);
+    expect(nameMatches).toHaveLength(2);
+    expect(nameMatches.filter((node) => node.tagName === "H1")).toHaveLength(1);
   });
 
   it("explains the three steps of a run and anchors the sections", () => {

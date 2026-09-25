@@ -100,14 +100,25 @@ client is registered.
   from `src/config/departments.ts`, three "how it works" steps, and an official footer carrying
   **"A Project by the Ministry of IT"** with **"For Internal Use Only"** beneath it in smaller text
   (asserted against the **real computed font size**: 11px vs 9px).
-- **Phase O** re-positioned and refined that page on the user's instruction (refine, do not redesign).
-  Final state: the prominent `<h1>` is **"Zimbabwe AI Policy Intelligence Initiative"**, credited
-  *Powered by Nzwisiso AI*; the eyebrow is the service principle **"Understanding before action"**;
-  the masthead right reads **"Zimbabwe AI Policy Intelligence"** and the subtitle is **"Policy
-  Intelligence Platform"**. The hero's right column is now a pale-green **"How an assessment is
-  produced"** card holding a 6-step workflow with a green rail and a short gold rule, replacing the
-  economic reference-rate panel (the rates remain in the workspace beside the engine; the reference
-  date and fiscal year are still stated in the notice strip). `BRAND.workspaceLabel` was **deleted**.
+- **Phase P** implemented the brief's §8–§16 (supplied after Phase O) and **reversed four Phase O
+  decisions**. The hero now reads: eyebrow *Understanding before action*, `<h1>` "Zimbabwe AI Policy
+  Intelligence Initiative", *Powered by Nzwisiso AI®*, the §8 subheading "Explore potential policy
+  responses before implementation.", the §9 description, and **one** primary action ("Choose your
+  Department") with the disclaimer beneath it — the secondary "See what the platform does" link is
+  gone. The hero card is **POLICY ASSESSMENT → three steps** closing on the tagline. Below:
+  **"A new capability for policy assessment"** with three labelled blocks, a **"From policy draft to
+  policy intelligence"** governance band whose second sentence is asserted verbatim (the platform
+  "does not replace policymakers or determine policy outcomes"), coverage, how-it-works, the
+  deterministic band, and a restrained **ministerial positioning panel** (Hon. Tatenda A. Mavetera, MP)
+  carrying "Powered by Nzwisiso AI®". `npm test` → **9 files, 150 tests**; `npx playwright test` →
+  **6/6**; `npm run validate` → **10/10** (check 3 now also blocks LLM/API vocabulary in user-facing
+  copy). One refinement was made *after* inspecting the render, as §21 requires: the governance band's
+  text was raised to 14px so it out-ranks the technical note beside it.
+- **Phase O** (superseded by Phase P) re-positioned and refined the page: the `<h1>` became
+  **"Zimbabwe AI Policy Intelligence Initiative"**, the eyebrow the service principle, the masthead
+  right **"Zimbabwe AI Policy Intelligence"** and the subtitle **"Policy Intelligence Platform"**;
+  `BRAND.workspaceLabel` was **deleted**. Its hero card held a 6-step workflow — Phase P replaced that
+  card at the brief's instruction. Recorded because the reversal was deliberate, not a correction.
   `npm test` → **9 files, 147 tests**; `npx playwright test` → **6/6**, now also asserting the
   workflow's 6 steps, the closing boundary line, the h1 rendering in ≤3 lines at ≥30px, and the
   principle rendering smaller than the h1. `npm run validate` → **10/10**, including a new check that
