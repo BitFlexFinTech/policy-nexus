@@ -117,11 +117,11 @@ describe("journey — run a policy, then read its assessment", () => {
     expect(screen.getByText(/No recorded run matches this reference/)).toBeInTheDocument();
   });
 
-  it("guards the simulation and assessment routes without a session", () => {
+  it("guards the simulation and assessment routes without a session, sending the user to the chooser", () => {
     const run = assessmentService.run(requestFor("fin"));
     clearSession();
     renderAt(`/app/simulations/${encodeURIComponent(run.id)}`);
-    expect(window.location.pathname).toBe("/");
+    expect(window.location.pathname).toBe("/start");
   });
 
   it("opens the long-form report with every group the run produced", () => {

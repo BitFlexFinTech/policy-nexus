@@ -22,6 +22,9 @@ export function HeaderBar() {
 
   const signOut = () => {
     sessionActions.clearSession();
+    // Signing out returns to the public landing page (`/`), not the chooser: the
+    // chooser is a step within "choose your department", which the user re-enters
+    // deliberately from the landing page.
     navigate("/");
   };
 
@@ -60,7 +63,7 @@ export function HeaderBar() {
               variant="secondary"
               size="sm"
               className="h-7 px-2 text-[10px] uppercase tracking-wide"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/start")}
             >
               Change department
             </Button>

@@ -3,7 +3,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Home from "./pages/Home.tsx";
+import Home from "./pages/Landing.tsx";
+import ChooseDepartment from "./pages/ChooseDepartment.tsx";
 import Index from "./pages/Index.tsx";
 import Documents from "./pages/Documents.tsx";
 import Policies from "./pages/Policies.tsx";
@@ -28,6 +29,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/start" element={<ChooseDepartment />} />
           {/* Everything under /app requires a department session, and shares one
               workspace shell (header + secondary nav + sovereign footer). */}
           <Route element={<RequireSession />}>

@@ -95,8 +95,8 @@ describe("workspace — all 16 departments, department-aware panels", () => {
     });
   });
 
-  it.each(SECONDARY)("guards %s without a department session", (path) => {
+  it.each(SECONDARY)("guards %s without a department session, sending the user to the chooser", (path) => {
     renderAt(path);
-    expect(window.location.pathname).toBe("/");
+    expect(window.location.pathname).toBe("/start");
   });
 });

@@ -8,13 +8,17 @@ import { clearSession, getSessionDepartmentId, signInToDepartment } from "@/sess
  * workspace guard must genuinely refuse entry without a department session.
  * A rules-of-hooks violation or a broken guard passes typecheck/build and only
  * shows up here.
+ *
+ * Phase M: `/` is the pure landing page and `/start` is the department chooser,
+ * so the guard now sends a signed-out visit to `/start`, not `/`.
  */
 const renderAt = (path: string) => {
   window.history.pushState({}, "", path);
   return render(<App />);
 };
 
-const homeGrid = () => screen.getByRole("group", { name: /select a department/i });
+const chooserGrid = () => screen.getByRole("group", { name: /select a department/i });
+const landingHeading = () => screen.getByRole("heading", { level: 1 });
 
 describe("routes smoke-render and the workspace guard", () => {
   beforeEach(() => {
@@ -22,9 +26,16 @@ describe("routes smoke-render and the workspace guard", () => {
     clearSession();
   });
 
-  it("renders the public homepage at /", () => {
+  it("renders the public landing page at / — and it holds no department picker", () => {
     renderAt("/");
-    expect(homeGrid()).toBeInTheDocument();
+    expect(landingHeading()).toHaveTextContent("Understanding before action.");
+    expect(screen.queryByRole("group", { name: /select a department/i })).toBeNull();
+  });
+
+  it("renders the department chooser at /start", () => {
+    renderAt("/start");
+    expect(landingHeading()).toHaveTextContent("Choose your Department");
+    expect(chooserGrid()).toBeInTheDocument();
   });
 
   it("renders NotFound for an unknown route", () => {
@@ -32,11 +43,11 @@ describe("routes smoke-render and the workspace guard", () => {
     expect(screen.getByText("404")).toBeInTheDocument();
   });
 
-  it("refuses /app when there is no department session, returning to the selector", () => {
+  it("refuses /app without a department session, sending the user to the chooser", () => {
     renderAt("/app");
-    expect(homeGrid()).toBeInTheDocument();
+    expect(chooserGrid()).toBeInTheDocument();
     expect(screen.queryByText("Engine Vitals")).not.toBeInTheDocument();
-    expect(window.location.pathname).toBe("/");
+    expect(window.location.pathname).toBe("/start");
   });
 
   it("renders the workspace at /app for the signed-in department, labelled with it", () => {
@@ -62,19 +73,19 @@ describe("routes smoke-render and the workspace guard", () => {
     expect(screen.getByText("Entry: one-click (Mock)")).toBeInTheDocument();
   });
 
-  it("signs out back to the selector and clears the stored session", () => {
+  it("signs out to the landing page and clears the stored session", () => {
     signInToDepartment("health");
     renderAt("/app");
     fireEvent.click(screen.getByRole("button", { name: /Sign out/ }));
-    expect(homeGrid()).toBeInTheDocument();
+    expect(landingHeading()).toHaveTextContent("Understanding before action.");
     expect(getSessionDepartmentId()).toBeNull();
   });
 
-  it("switches department while keeping the session until a new choice is made", () => {
+  it("sends 'Change department' to the chooser, keeping the session until a new choice is made", () => {
     signInToDepartment("zimra");
     renderAt("/app");
     fireEvent.click(screen.getByRole("button", { name: /Change department/ }));
-    expect(homeGrid()).toBeInTheDocument();
+    expect(chooserGrid()).toBeInTheDocument();
     expect(getSessionDepartmentId()).toBe("zimra");
     expect(screen.getByRole("button", { name: /Continue to workspace/ })).toBeInTheDocument();
   });

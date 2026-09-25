@@ -27,7 +27,8 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
 
 ## Target route map (authoritative)
 ```
-/                          Home (public, 16-department select)
+/                          Landing (public) — pure landing page, no department picker
+/start                     Choose your Department (public) — the 16-department picker
 /app                       Department dashboard (existing Index layout, department-aware)
 /app/policies              Policy register
 /app/simulations           Simulation register
@@ -529,7 +530,78 @@ Determinism: both documents are seeded from the run's seed string (`<seed>::long
 external AI call — and the editable text is local state only; whatever is in the box is exactly what
 Print / Save as PDF / Download Word / Share export.
 
-### Phase L — Homepage redesign (government aesthetic)
+### Phase M — Landing page and department chooser split
+**Status: DONE — verified this session.** (Requested by the user this session.)
+
+The user's requirement, verbatim: **"i wanted the homepage to be a pure landing page with a 'Run
+Simulation' button which then takes the user to the page we currently see to choose the department"**
+and then, on the label: **"Yes you can use 'Choose your Department' on the homepage"**.
+
+So Phase L's design was applied to the **wrong shape**: it redesigned `/` in place, leaving the
+department picker *inside* the landing page. Phase M splits them:
+
+| Route | Screen | Contents |
+|---|---|---|
+| `/` | **Landing (public)** | masthead + gold rule · notice strip · proposition + primary **Choose your Department** action → `/start` · capabilities · coverage · how it works · deterministic panel · official footer. **No department grid, no session banner.** |
+| `/start` | **Choose your Department (public)** | the 16-department picker (guidance, session banner + *Continue to workspace* when a session exists, `Selected: …`, `Enter <department>`, disclaimer) |
+| `/app/**` | unchanged | guarded workspace; signed-out visits now redirect to **`/start`** instead of `/` |
+
+Consequential edits (not a two-line change): `RequireSession` redirect target · `HeaderBar`
+*Change department* → `/start` and *Sign out* → `/` · `App.tsx` routes · shared public chrome extracted
+so both public screens have one masthead/notice/footer definition · all tests that entered via `/` and
+expected the 16-department grid there must move to `/start`.
+
+The **authoritative route map above has been updated deliberately** under this instruction; it is no
+longer "`/` = 16-department select".
+
+**Why the user still saw the old page** (root cause, worth recording): the dev server does **not**
+listen on Vite's default 5173 — `vite.config.ts` sets `server.port = 8080` (and `host: "::"`), so
+`npm run dev` serves the new build at **`http://localhost:8080/`**. The old tab/URL was pointing at
+the previously-cached entry. Nothing was wrong with the code; the port was.
+
+**Built:**
+- `src/pages/Landing.tsx` — pure landing page at `/`: proposition + primary **Choose your Department**
+  action → `/start`, four capability cards, platform-coverage strip, three "how it works" steps, the
+  deterministic/local panel, closing CTA. **Contains no department grid and no session banner.**
+- `src/pages/ChooseDepartment.tsx` — the picker at `/start`. Preserves the exact Phase D entry
+  contract (session banner + *Continue to workspace* when a session exists, `Selected: …` line,
+  `Enter <department>` button, disclaimer, *Overview* back-link to `/`).
+- `src/components/public/PublicPageShell.tsx` — the shared public chrome (masthead + 3px gold rule,
+  coat of arms, notice strip, official footer with the attribution/classification lines, hash-scroll
+  effect) so the two public screens cannot drift apart. `src/pages/Landing.tsx` and
+  `src/pages/ChooseDepartment.tsx` both render through it.
+- `src/lib/coverage.ts` — coverage counts **derived** from `src/config/departments.ts` (16 / 63 / 48),
+  never hardcoded, so the page cannot claim more coverage than the platform has.
+- `src/pages/Home.tsx` deleted (`git rm`); its responsibilities are now split across the two pages.
+
+**Rewired:** `src/App.tsx` (`/` → Landing, `/start` → ChooseDepartment, `/app/**` unchanged) ·
+`src/routes/RequireSession.tsx` (signed-out → `/start`, so a guarded deep-link still lands on the
+picker) · `src/components/HeaderBar.tsx` (*Change department* → `/start`, *Sign out* → `/`).
+
+**Tests moved with the route, not deleted:** `src/test/home.test.tsx` → `src/test/landing.test.tsx`
+(pure-landing assertions: picker absent, CTA present and pointing at `/start`) + new
+`src/test/choose-department.test.tsx` (16 departments, `Selected: …`, `Enter <department>`).
+`src/test/routes.test.tsx` rewritten for landing/chooser/guard; `src/test/workspace.test.tsx` and
+`src/test/journey.test.tsx` guard assertions updated `/` → `/start`; `e2e/journey.spec.ts` gained an
+`openChooser` helper and now proves the **two-step** entry (landing → chooser → workspace).
+
+**Two real bugs found and fixed at root while doing this** (not worked around):
+1. `npm run validate` failed on the banned-term check because a test string contained a term the
+   validator forbids — the offending test was removed with `Home.tsx`, and the validator is unchanged.
+2. The Playwright landing test used `getByRole(..., { name: "Choose your Department" })`, which
+   substring-matched *two* elements (the hero CTA and the closing CTA) → strict-mode violation. Fixed
+   with `exact: true` and a scoped locator, not by loosening the assertion.
+
+**Evidence this session:** `npm run validate` PASS · `npm run typecheck` PASS · `npm run lint` PASS ·
+`npm test` PASS — **143/143 tests, 10 files** · `npm run build` PASS · `npx playwright test`
+**6/6 passed (7.4s)** including *"the landing page hands off to the chooser, which lists all 16
+departments"* and the full upload → run → assessment → report → policy-draft journey entered through
+the new two-step flow. Both new screens were also rendered in the production preview
+(`npm run preview`) and inspected as images: `/` shows no picker, `/start` shows all 16 departments
+with `No department selected` and a disabled *Enter workspace* button.
+
+---
+
 **Status: DONE — verified this session.** (Requested by the user this session.)
 
 Requirement: a professional, modern homepage with a **government aesthetic** that **highlights what the
@@ -677,6 +749,15 @@ before a choice), and the `Continue to workspace` route when a session exists. T
 | 2026-09-25 | `npx tsc -b --pretty false` (Phase L) | PASS — exit 0 |
 | 2026-09-25 | `npm run lint` (Phase L) | PASS — 0 errors, 7 pre-existing react-refresh warnings |
 | 2026-09-25 | `npm run build` (Phase L) | PASS — built in 341 ms |
+| 2026-09-25 | `npm run validate` (Phase M) | PASS — all 9 checks green. One real violation surfaced first: a banned term inside the test file being removed with `Home.tsx` — the offending test was deleted (validator unchanged), not exempted |
+| 2026-09-25 | `npm run typecheck` (Phase M) | PASS — `tsc -b --pretty false`, no output, `SUITE_DONE=0` |
+| 2026-09-25 | `npm run lint` (Phase M) | PASS — 0 errors, 7 pre-existing react-refresh warnings |
+| 2026-09-25 | `npm test` (Phase M) | PASS — **9 files, 143/143 tests**: palette-lock 5 · departments 14 · assessment 22 · documents 40 · routes 9 · workspace 29 · **choose-department 6 (new)** · journey 9 · **landing 9 (new)** |
+| 2026-09-25 | `npm run build` (Phase M) | PASS — 1,703 modules, built in 492 ms; 489.44 kB JS (145.30 kB gzip) / 63.05 kB CSS |
+| 2026-09-25 | `npx playwright test` (Phase M) — real Chromium vs `vite preview` | **PASS — 6/6 in 7.4 s**, now entering through the **two-step** flow. New/rewritten: *"the landing page hands off to the chooser, which lists all 16 departments"* (asserts the landing holds **no** picker, then that `/start` lists all 16), plus the homepage test rewritten for the pure landing. The other four journeys (paste → run → assessment → export; upload → run; long-form report + policy draft; session survives reload) all pass unchanged through the new entry. Runtime invariants hold: **0 console errors, 0 page errors, 0 off-origin requests** |
+| 2026-09-25 | `npm run preview` + rendered `/` and `/start` to images and inspected them (Phase M) | PASS — `/` = pure landing (proposition, **Choose your Department** CTA, 4 capability cards, coverage 16 / 63 / 48, 3 steps, deterministic panel, footer attribution + classification); **no department grid, no session banner**. `/start` = all **16** department cards, `No department selected`, *Enter workspace* disabled until a pick is made, *Overview* back-link to `/` |
+| 2026-09-25 | Playwright strict-mode bug found and fixed at root (Phase M) | PASS — `getByRole("button", { name: "Choose your Department" })` substring-matched **two** CTAs (hero + closing) → strict-mode violation. Fixed by scoping the locator and adding `exact: true`; the assertion was not loosened |
+| 2026-09-25 | dev-server port root cause confirmed (Phase M) | PASS — `vite.config.ts` sets `server.port = 8080` and `host: "::"`; `npm run dev` therefore serves at **http://localhost:8080/**, not 5173. This is why the user's browser still showed the old entry |
 
 ## Known-red / open items
 - **DEPLOYMENT — two facts a cold session must not get wrong.** (a) The host in the deployment
@@ -698,10 +779,11 @@ before a choice), and the `Continue to workspace` route when a session exists. T
 - **Recorded correction:** the Phase 0 verification log claimed `npm run typecheck` was PASS.
   That was wrong — the test files failed to typecheck at HEAD. It has been fixed (see Phase B
   bug 1) and the log row is retained with a note rather than quietly deleted.
-- **Playwright is GREEN as of Phase H.** Chromium is present (`chromium-1208` / `chromium-1234` in
-  the Playwright cache), `e2e/journey.spec.ts` exists, and `npx playwright test` → **4/4 passing**
-  against the production preview build. The browser journey, the reload-persistence check, and the
-  **0 console-error / 0 off-origin-request** invariants are now *verified*, not assumed. Phase B's
+- **Playwright is GREEN as of Phase M — 6/6.** Chromium is present (`chromium-1208` / `chromium-1234`
+  in the Playwright cache), `e2e/journey.spec.ts` exists, and `npx playwright test` passes against the
+  production preview build, now entering through the **two-step** flow (`/` → `/start` → `/app`).
+  The browser journey, the reload-persistence check, and the
+  **0 console-error / 0 off-origin-request** invariants are *verified*, not assumed. Phase B's
   old "no real-browser render check" caveat is closed by this run.
 - **Two bugs found and fixed during Phase K (bug-fix-forward, both at root cause):**
   1. **The project validator caught a real violation I introduced.** `src/test/documents.test.ts`
@@ -805,6 +887,33 @@ dependencies, `src/components/ui/**` (still byte-identical stock primitives), `L
 `src/config/brand.ts`, `src/config/reference.ts`, `src/routes/RequireSession.tsx`,
 and all palette tokens in `src/index.css` (`:root` unchanged — palette-lock test still green).
 
+## Files touched in Phase M (landing / chooser split)
+
+**New**
+- `src/pages/Landing.tsx` — pure landing page at `/`.
+- `src/pages/ChooseDepartment.tsx` — the 16-department picker at `/start`.
+- `src/components/public/PublicPageShell.tsx` — shared public chrome (masthead + gold rule, coat of
+  arms, notice strip, official footer, hash-scroll effect).
+- `src/lib/coverage.ts` — coverage counts derived from `src/config/departments.ts`.
+- `src/test/landing.test.tsx` — 9 tests for the pure landing page.
+- `src/test/choose-department.test.tsx` — 6 tests for the picker.
+
+**Rewired**
+- `src/App.tsx` — `/` → `Landing`, `/start` → `ChooseDepartment`; `/app/**` untouched.
+- `src/routes/RequireSession.tsx` — signed-out redirect `/` → `/start`.
+- `src/components/HeaderBar.tsx` — *Change department* → `/start`; *Sign out* → `/`.
+
+**Deleted (with proof: `git rm`, zero remaining references)**
+- `src/pages/Home.tsx` — replaced by `Landing.tsx` + `ChooseDepartment.tsx`.
+- `src/test/home.test.tsx` — replaced by `landing.test.tsx` + `choose-department.test.tsx`.
+
+**Tests updated to the new route**
+- `src/test/routes.test.tsx` (rewritten: landing / chooser / guard) · `src/test/workspace.test.tsx`
+  (guard assertion `/` → `/start`) · `src/test/journey.test.tsx` (same) · `e2e/journey.spec.ts`
+  (`openChooser` helper; two-step entry; homepage test rewritten).
+
+---
+
 ## Files touched in Phase L (homepage redesign)
 **Modified:** `src/pages/Home.tsx` (full redesign; the department-entry contract is unchanged) ·
 `src/config/brand.ts` (added `workspaceLabel`, `attribution`, `classification` — identity strings stay
@@ -842,11 +951,12 @@ relative path so it does not duplicate the source of truth).
 
 ## RESUME HERE
 
-- **Branch:** `feature/unified-platform` · **HEAD:** the Phase H commit — run `git rev-parse HEAD`.
+- **Branch:** `feature/unified-platform` · **HEAD:** the `feat(phase-m)` commit — run `git rev-parse HEAD`.
   `tree:` clean. Functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C ·
   Phase D = the commit whose message begins `feat(phase-d)` · Phase J = `feat(phase-j)` ·
   Phases E–G = the commit whose message begins `feat(phase-e)` ·
-  Phase H = the commit whose message begins `test(phase-h)`.
+  Phase H = the commit whose message begins `test(phase-h)` ·
+  Phase M = the commit whose message begins `feat(phase-m)`.
   `git log --oneline -10 | cat` is the second opinion on state.
   (This shell's git rejects `--no-pager`; use plain `git log --oneline | cat`.)
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
@@ -858,8 +968,9 @@ relative path so it does not duplicate the source of truth).
 - **LIVE NOW:** `https://nzwisiso.bitflex.app/` serves the **Phase D** build (Phase J, verified by
   live HTTPS checks). To publish Phases E–H: `npm run build`, then the `lftp mirror -R` FTPS command
   written in Phase J. **Do not use `--delete`** (it would remove the server's SSL validation token).
-- **The whole journey works in a REAL browser, verified this session (Phase H, extended in Phase K):**
-  `/` → pick one of the 16 departments (count asserted) → one-click entry → `/app`
+- **The whole journey works in a REAL browser, verified this session (Phase M, extended in Phases K/L):**
+  `/` **(pure landing page)** → click **Choose your Department** → **`/start`** → pick one of the 16
+  departments (count asserted) → one-click entry → `/app`
   (department-labelled workspace, `Entry: one-click (Mock)` visible) → paste or upload a draft →
   **Run Simulation** → `/app/simulations/:id` replays the seeded rounds and reaches
   **Assessment Complete** → then **three documents**: **Open executive summary**
@@ -869,10 +980,15 @@ relative path so it does not duplicate the source of truth).
   Download Word / Share. `npx playwright test` → **6/6**, and every test asserts **0 console errors +
   0 off-origin requests**. The session also survives a genuine page reload (asserted against
   `localStorage["nzwisiso.session.v1"]`). Same inputs always reproduce the same run *and* the same
-  two generated documents. **The entry screen itself is now the redesigned government homepage**
-  (Phase L): official masthead + gold rule, service notice strip, tagline `<h1>`, four capability
-  cards, a coverage strip computed from the configuration, three steps, the department "Start" panel,
-  and the official footer carrying "A Project by the Ministry of IT" / "For Internal Use Only".
+  two generated documents. **The public entry is now two screens** (Phase M): `/` is a pure landing
+  page — official masthead + gold rule, service notice strip, tagline `<h1>`, four capability cards,
+  a coverage strip computed from the configuration, three steps, closing CTA, and the official footer
+  carrying "A Project by the Ministry of IT" / "For Internal Use Only" — and it holds **no department
+  picker**. `/start` is the department chooser. Both render through
+  `src/components/public/PublicPageShell.tsx`, so their chrome cannot drift apart.
+- **Dev server port:** `npm run dev` serves at **http://localhost:8080/** (`vite.config.ts` sets
+  `server.port = 8080`), *not* Vite's default 5173. A stale tab on 5173 shows an old build — this is
+  the confirmed root cause of the "I still see the old page" report in Phase M.
 - **Determinism is enforced by real tests, not by inspection:** `src/test/assessment.test.ts`
   asserts a `JSON.stringify`-identical run for identical input, whitespace/case insensitivity, a
   different id for changed text, and coverage of every segment + priority for all 16 departments.
@@ -880,10 +996,11 @@ relative path so it does not duplicate the source of truth).
   Word export is HTML-based `application/msword`), the remote assessment service client (registered
   in `CLIENTS` but deliberately unimplemented — the mock-first seam), and Government SSO. Playwright
   click-through is **no longer** on this list: it is built and green (Phase H).
-- **Next action: no phase is outstanding — the build is complete and verified (Phases 0–L).** The
-  full suite is green (validate, typecheck, lint, test, build, **and `npx playwright test` 6/6**).
+- **Next action: no phase is outstanding — the build is complete and verified (Phases 0–M).** The
+  full suite is green (validate, typecheck, lint, test **143/143**, build, **and `npx playwright test`
+  6/6**).
   Remaining work, in priority order:
-  1. **Redeploy `dist/`** to publish Phases E–L to the live host (Phase J's FTPS command; **never
+  1. **Redeploy `dist/`** to publish Phases E–M to the live host (Phase J's FTPS command; **never
      `--delete`**), then re-run the live route checks. The live build is still **Phase D**.
   2. **Open the Pull Request** (GitHub link in Phase I) for review before any merge to `main`.
   3. Non-credential backlog in `PRODUCTION_READINESS.md`: server-side PDF/DOCX extraction, a real
@@ -895,7 +1012,8 @@ relative path so it does not duplicate the source of truth).
 - **Exact commands:**
 ```bash
 npm run validate; npm run typecheck; npm run lint; npm test; npm run build
-npx playwright test   # 4/4 — real browser vs vite preview; asserts 0 console errors, 0 off-origin requests
+npx playwright test   # 6/6 — real browser vs vite preview; asserts 0 console errors, 0 off-origin requests
+npm run dev           # serves at http://localhost:8080/  (NOT 5173)
 ```
 
 ### Traps a cold session must not re-discover the hard way

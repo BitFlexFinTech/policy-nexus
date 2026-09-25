@@ -71,7 +71,16 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
       name: new RegExp(`Select a department — ${DEPARTMENT_COUNT} available`),
     });
 
+  /** The two-step entry introduced in Phase M: landing page → chooser. */
+  const openChooser = async (page: Page) => {
+    await page.goto("/");
+    await page.getByRole("link", { name: "Choose your Department" }).first().click();
+    await expect(page).toHaveURL(/\/start$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Choose your Department" })).toBeVisible();
+  };
+
   const enterWorkspace = async (page: Page) => {
+    await openChooser(page);
     await departmentGroup(page)
       .getByRole("button", { name: new RegExp(escapeRegex(DEPARTMENT.shortName)) })
       .first()
@@ -80,10 +89,18 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await expect(page).toHaveURL(/\/app$/);
   };
 
-  test("home lists all 16 departments and one-click entry opens the workspace", async ({ page }) => {
+  test("the landing page hands off to the chooser, which lists all 16 departments", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { name: "Understanding before action." })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Understanding before action." })).toBeVisible();
+
+    // The landing page is pure: it must NOT carry the department picker.
+    await expect(departmentGroup(page)).toHaveCount(0);
+
+    // Its one primary action leads to the chooser.
+    await page.getByRole("link", { name: "Choose your Department" }).first().click();
+    await expect(page).toHaveURL(/\/start$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Choose your Department" })).toBeVisible();
 
     // Dataset completeness check: the canonical 16, never a silent subset.
     const options = departmentGroup(page).getByRole("button");
@@ -125,8 +142,10 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await expect(page.getByRole("heading", { name: "What this platform does", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "How it works", exact: true })).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Start: choose your department", exact: true }),
+      page.getByRole("heading", { name: "Ready to test a policy draft?", exact: true }),
     ).toBeVisible();
+    // The landing page must NOT hold the picker — that is the chooser's job.
+    await expect(departmentGroup(page)).toHaveCount(0);
 
     // Required footer strings, at the bottom of the page.
     const footer = page.locator("footer");
@@ -151,9 +170,10 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     expect(Number.isNaN(sizes.classification)).toBe(false);
     expect(sizes.classification).toBeLessThan(sizes.attribution);
 
-    // The primary call to action reaches the real department selector.
-    await page.getByRole("link", { name: "Start a simulation" }).first().click();
-    await expect(page.locator("#start")).toBeVisible();
+    // The primary action hands off to the department chooser.
+    await page.getByRole("link", { name: "Choose your Department" }).first().click();
+    await expect(page).toHaveURL(/\/start$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Choose your Department" })).toBeVisible();
     await expect(departmentGroup(page).getByRole("button")).toHaveCount(DEPARTMENT_COUNT);
 
     expectCleanRuntime();

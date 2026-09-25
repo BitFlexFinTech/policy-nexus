@@ -94,6 +94,29 @@ client is registered.
 - Known limitation: the `.doc` export is HTML-based (`application/msword`), not OOXML — unchanged
   from Phase G; and the drafted policy is a text an officer must review, not legal drafting advice.
 
+## 6e. Verified in a real browser (Phases L + M — public entry split)
+- **Phase L** rebuilt the public entry as a government-styled page: official masthead + 3px gold rule,
+  coat of arms, service notice strip, tagline `<h1>`, four capability cards, a coverage strip computed
+  from `src/config/departments.ts`, three "how it works" steps, and an official footer carrying
+  **"A Project by the Ministry of IT"** with **"For Internal Use Only"** beneath it in smaller text
+  (asserted against the **real computed font size**: 11px vs 9px).
+- **Phase M** split that entry into **two** public screens, because a landing page that also contains
+  the department picker is not a landing page:
+  - `/` — **pure landing page**. Asserts it holds **no department picker**.
+  - `/start` — **Choose your Department**, the 16-department picker (session banner,
+    `Selected: …`, `Enter <department>`, *Overview* back-link).
+  - Both render through one shared chrome component (`src/components/public/PublicPageShell.tsx`).
+- `npx playwright test` → **6/6** against the production `vite preview` build, entering through the
+  two-step flow, including the new test *"the landing page hands off to the chooser, which lists all
+  16 departments"*. Runtime invariants still hold: **0 console errors, 0 page errors, 0 off-origin
+  requests**.
+- `npm test` → **9 files, 143 tests**. `npm run validate` → all 9 checks green.
+- **Operational note (cost a real debugging cycle):** `npm run dev` serves at
+  **http://localhost:8080/** — `vite.config.ts` pins `server.port = 8080`. Opening 5173 shows a stale
+  build. This, not the code, was why the new landing page appeared missing.
+- Stated plainly: this is verified against the **local** production preview. The live host still
+  serves the **Phase D** bundle until `dist/` is redeployed.
+
 ## 7. Disabled by default (deliberate)
 - Puter CDN script and `puter.ai.chat()`: **fully removed.** Phase B deleted the
   `<script src="https://js.puter.com/v2/">` tag from `index.html`; **Phase D deleted the

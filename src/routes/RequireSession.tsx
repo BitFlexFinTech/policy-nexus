@@ -13,7 +13,7 @@ export function RequireSession() {
   const location = useLocation();
 
   if (!session) {
-    return <Navigate to="/" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/start" replace state={{ from: location.pathname }} />;
   }
 
   return <Outlet />;
