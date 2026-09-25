@@ -19,24 +19,27 @@ const renderLanding = () =>
  * the department picker — that is asserted below as a real, failable guard.
  */
 describe("Landing — the pure public landing page", () => {
-  it("leads with the service name as the single level-one heading, task line as small text above it", () => {
+  it("leads with the initiative as the single level-one heading, the principle above it", () => {
     renderLanding();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     const heading = screen.getByRole("heading", { level: 1 });
-    expect(heading).toHaveTextContent(BRAND.workspaceLabel);
+    expect(heading).toHaveTextContent(BRAND.initiative);
 
-    // The task line is SMALL text, sits ABOVE the heading, and is not itself a heading.
-    const taskLine = screen.getByText("Test the policy before you decide");
-    expect(taskLine.tagName).toBe("P");
+    // The principle is a LABEL above the heading, not a heading itself, and it appears
+    // exactly once — as an eyebrow and again lower down it would read as filler rather
+    // than as the service's position.
+    const principle = screen.getByText(BRAND.eyebrow);
+    expect(principle.tagName).toBe("P");
     expect(
-      heading.compareDocumentPosition(taskLine) & Node.DOCUMENT_POSITION_PRECEDING,
+      heading.compareDocumentPosition(principle) & Node.DOCUMENT_POSITION_PRECEDING,
     ).toBeTruthy();
-    expect(taskLine.className).toContain("text-[10px]");
-    expect(heading.className).toContain("text-[1.75rem]");
+    expect(screen.getAllByText(BRAND.eyebrow)).toHaveLength(1);
 
-    // The tagline is brand voice, not the page's proposition — it must still be
-    // present on the page, or it has been silently dropped rather than moved.
-    expect(screen.getByText(BRAND.tagline)).toBeInTheDocument();
+    // The programme and the platform are distinguished on the same screen: the
+    // initiative is the government capability, Nzwisiso AI is what delivers it.
+    // (The credit line's words live in a child node, so match the line and assert
+    // its full rendered text rather than the direct text node alone.)
+    expect(screen.getByText(/Powered by/)).toHaveTextContent(`Powered by ${BRAND.name}`);
   });
 
   it("renders the heading in capitals by styling, not by hard-coding capital letters", () => {
@@ -46,10 +49,10 @@ describe("Landing — the pure public landing page", () => {
 
     // The visible requirement: all caps.
     expect(heading.className).toContain("uppercase");
-    // The implementation requirement: the DOM text stays normal case, so the accessible
+    // The implementation requirement: the DOM text stays in normal case, so the accessible
     // name, search indexing and copy-paste are normal words and do not depend on how a
     // screen reader treats all-capital strings.
-    expect(text).toBe(BRAND.workspaceLabel);
+    expect(text).toBe(BRAND.initiative);
     expect(text).not.toBe(text.toUpperCase());
     // Caps lose the ascender/descender word-shape cues, so they need POSITIVE
     // tracking — the negative tracking used for sentence-case display type is wrong here.
@@ -102,28 +105,52 @@ describe("Landing — the pure public landing page", () => {
     ).toEqual(expected);
   });
 
-  it("states the reference frame from configuration, so no figure on the page is invented", () => {
+  it("carries the policy-assessment workflow in the hero, ending at a structured assessment", () => {
     renderLanding();
-    // The footer column is also called "Reference frame", so this heading must be
-    // distinct — two identically-named headings on one page read as a mistake.
-    expect(screen.getAllByRole("heading", { name: "Reference date and inputs" })).toHaveLength(1);
-    const frame = screen.getByRole("heading", { name: "Reference date and inputs" }).closest("aside");
-    expect(frame).not.toBeNull();
+    // One panel, one name: two identically-named headings on one page read as a mistake.
     expect(
-      within(frame as HTMLElement)
-        .getAllByRole("definition")
-        .map((node) => node.textContent?.trim()),
-    ).toEqual([
-      REFERENCE_DATE_LABEL,
-      REFERENCE_FISCAL_YEAR,
-      ...REFERENCE_RATES.map((rate) => `${rate.value} ${rate.unit}`),
-    ]);
+      screen.getAllByRole("heading", { name: "How an assessment is produced" }),
+    ).toHaveLength(1);
+    const card = screen
+      .getByRole("heading", { name: "How an assessment is produced" })
+      .closest("aside");
+    expect(card).not.toBeNull();
+
+    const steps = within(card as HTMLElement).getAllByRole("listitem");
+    expect(steps).toHaveLength(6);
+    // The order is the workspace's own order, from entering to taking the instrument away.
+    expect(steps[0]).toHaveTextContent("Choose your department");
+    expect(steps[5]).toHaveTextContent("Take away the drafted policy");
+    // The boundary the page must state: it informs the decision, it does not take it.
+    expect(card).toHaveTextContent("It informs the decision; it does not take it.");
+  });
+
+  it("does NOT restate the economic reference rates — those belong beside the engine", () => {
+    renderLanding();
+    // The hero card now carries the workflow. The rates are inputs for the engine and
+    // are stated where they are consumed (workspace header, engine vitals, reference
+    // page); repeating them here only crowded the proposition.
+    REFERENCE_RATES.forEach((rate) => {
+      expect(screen.queryByText(rate.label)).toBeNull();
+    });
+  });
+
+  it("still states the reference frame on the page, read from configuration", () => {
+    renderLanding();
+    // Removing the rates must not remove the frame: a simulated figure is only
+    // meaningful against the reference date and fiscal year it was computed in, and
+    // those are still stated in the notice strip above the hero.
+    expect(screen.getByText(REFERENCE_DATE_LABEL)).toBeInTheDocument();
+    expect(screen.getByText(REFERENCE_FISCAL_YEAR)).toBeInTheDocument();
   });
 
   it("explains the three steps of a run and anchors the sections", () => {
     renderLanding();
-    expect(screen.getByRole("heading", { name: "How it works" })).toBeInTheDocument();
-    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+    const how = screen.getByRole("heading", { name: "How it works" }).closest("section");
+    expect(how).not.toBeNull();
+    // Scoped to this section: the hero's workflow panel is a list of its own, so a
+    // page-wide listitem count would be measuring both and guarding neither.
+    expect(within(how as HTMLElement).getAllByRole("listitem")).toHaveLength(3);
     expect(document.querySelector("#capabilities")).not.toBeNull();
     expect(document.querySelector("#how-it-works")).not.toBeNull();
   });

@@ -40,12 +40,12 @@ export function HeaderBar() {
             <span className="rounded border border-primary-foreground/30 bg-primary-foreground/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
               {department.abbr}
             </span>
-            <span className="hidden max-w-[46ch] truncate text-xs text-primary-foreground/70 xl:inline">
+            <span className="hidden max-w-[46ch] truncate text-xs text-primary-foreground/75 xl:inline">
               {department.name}
             </span>
           </>
         ) : (
-          <span className="text-xs text-primary-foreground/70">National Policy Dashboard</span>
+          <span className="text-xs text-primary-foreground/75">National Policy Dashboard</span>
         )}
       </div>
       <div className="flex items-center gap-2">
@@ -55,7 +55,7 @@ export function HeaderBar() {
           <>
             {/* Mock-first rule: the entry mode must be unmistakable in the UI. */}
             {session?.mode === "oneclick" && (
-              <span className="rounded border border-primary-foreground/30 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-primary-foreground/70">
+              <span className="rounded border border-primary-foreground/30 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-primary-foreground/75">
                 Entry: one-click (Mock)
               </span>
             )}

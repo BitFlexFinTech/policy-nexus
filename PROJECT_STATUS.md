@@ -18,7 +18,10 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
 - **No new runtime dependency** without explicit user approval.
 - `main` is never committed to or pushed to by an agent. Baseline tag
   `baseline-pre-unified-platform` → `7451db0` (restore with `git checkout main`).
-- Branding: **Nzwisiso AI Policy Dashboard**, tagline **Understanding before action.**
+- Branding: **Nzwisiso AI Policy Dashboard**, tagline **Understanding before action.**, national
+  initiative **Zimbabwe AI Policy Intelligence Initiative** (short form **Zimbabwe AI Policy
+  Intelligence**). All four live in `src/config/brand.ts` only — `eyebrow`/`tagline` derive from one
+  constant and `initiativeShort` from `initiative`, so they cannot drift.
   User-visible vocabulary: *Nzwisiso simulation core*, *Nzwisiso knowledge map*,
   *Nzwisiso agent memory*. Never expose MiroFish / OASIS / GraphRAG / Zep / Puter.
 - Determinism: no `Math.random()`, no `Date.now()`, no `new Date()` for content.
@@ -789,6 +792,128 @@ lands"** (uses the page's own "test how it lands" language), **"Simulate the pol
 
 ---
 
+### Phase O — Landing-page positioning + visual refinement — DONE
+
+**Instruction (user, 2026-09-25):** refine the existing landing page — *do not redesign it*.
+"Preserve what is already visually strong", change the hierarchy, improve the copy, **replace the
+economic reference-data hero card with the policy-assessment workflow**, introduce subtle colour and
+Zimbabwean identity, make the government-initiative / Nzwisiso relationship clear, keep the
+department CTA as the main action, and **use the installed design skills** rather than only reading
+the repo.
+
+**Input caveat, stated rather than hidden:** the brief arrived with **§8–§16 truncated** (about 4,900
+characters, between the §7 hero heading and the §17 identity section). §1–§7 and §17–§23 were
+implemented in full. From the gap I inferred and did only what §23's closing paragraph and the
+visible sections require — copy refinement, section rhythm, the hero-card replacement. **If §8–§16
+specified anything further, it is not in this build**; it becomes the next increment once named.
+
+#### Positioning — the substantive change
+
+| Surface | Before | After |
+|---|---|---|
+| Landing `<h1>` | `National policy simulation workspace` (and, earlier this session, `Test the policy before you decide`) | **Zimbabwe AI Policy Intelligence Initiative** |
+| Masthead, right | `National policy simulation workspace` | **Zimbabwe AI Policy Intelligence** |
+| Masthead subtitle | `Nzwisiso AI Policy Dashboard` | **Policy Intelligence Platform** |
+| Hero eyebrow | `Test the policy before you decide` | **Understanding before action** — the service principle |
+| Hero credit | — | **Powered by Nzwisiso AI** |
+| `index.html` description + `og:description` | "…national policy simulation workspace for Zimbabwe's ministries…" | initiative wording; the retired phrase is gone from the served HTML too |
+| Hero card | Reference date, fiscal year, three reference rates, tagline | **How an assessment is produced** — a 6-step workflow (choose department → enter workspace → add the policy → run the simulation → read the assessment → take away the drafted policy) on a pale-green surface with a green rail, a short gold rule, closing on *"It informs the decision; it does not take it."* |
+
+`BRAND.workspaceLabel` is **deleted**: grep count **7 → 0**. Two new config values are *derived* so
+they cannot drift apart — `eyebrow` and `tagline` both come from one `PRINCIPLE` constant, and
+`initiativeShort` is `INITIATIVE` minus its trailing "Initiative". A hardcoded wordmark
+(`Nzwisiso<span className="text-gold"> AI</span>`, a pre-existing single-source violation in two
+places) now renders from `BRAND.name` via one `Wordmark` component.
+
+The three reference rates are **no longer on the public landing page**. That is the §23 instruction,
+and they were not lost from the product: they still render in the workspace header, the engine-vitals
+panel and the reference page, and the *frame* they are read against (reference date, fiscal year) is
+still stated on the landing page in the notice strip — asserted in both the unit and browser tests,
+so the honesty property ("no figure without its frame") survives the swap.
+
+#### Colour — measured, not eyeballed
+
+`better-colors` was used as a requirement, not a reference: *never report a contrast value you did
+not measure*. The existing palette was measured **first**, and **eight pairs failed** — two of them
+invisible by eye:
+
+| Pair actually rendered | Before | After | Fix |
+|---|---|---|---|
+| secondary copy on the canvas | **4.07:1** ✗ | 4.75:1 ✓ | `--muted-foreground` 46% → 42% lightness (hue unchanged) |
+| secondary copy on a card | **4.45:1** ✗ | 5.19:1 ✓ | same token — one change fixes both surfaces |
+| muted white on green, 9–10px masthead | **4.37:1** ✗ | 4.79:1 ✓ | `/70` → `/75` |
+| muted white on green, footer headings | **3.63:1** ✗ | 4.79:1 ✓ | `/60` → `/75` |
+| footer classification, 9px | **3.28:1** ✗ | 4.79:1 ✓ | `/55` → `/75` |
+| footer body copy | **4.37:1** ✗ | 5.69:1 ✓ | `/70` → `/85` |
+| gold hairline on white | **1.38:1** ✗ | 3.63:1 ✓ | new `--gold-rule: 43 74% 38%` role token |
+| terracotta as text on a card | **3.73:1** ✗ | **unchanged** | deliberately not fixed — see Known-red |
+
+Two tokens were **added**, each with a role and none unused: `--primary-tint: 120 50% 95%` (the pale
+green information surface) and `--gold-rule: 43 74% 38%` (gold as a **rule** on a light surface — the
+brand gold #FFD700 is a *fill* colour and measures 1.38:1 on white, i.e. invisible). Both are the
+**lightest value that passes** their threshold, so the visual change is the minimum that works.
+
+Colour is applied structurally: pale green for information surfaces (notice strip, hero workflow
+card, coverage panel), solid green for institutional bands and the primary action, gold only as short
+rules and the masthead. One pixel census of the whole rendered document (24,480 samples, topmost
+painted colour per sample):
+
+```
+warm / neutral white        69.4%     pale green tint surfaces    14.8%
+solid institutional green   15.8%     gold (hairlines only)       ~0.15%
+```
+
+Stated plainly: green totals ~30% because the **locked** masthead and footer bands are 15.8% of the
+page on their own and were not touched; the pale tint is the rest and reads as a near-white surface
+(luminance ≈0.97), not as colour. Gold is a true hairline accent — a 5% *pixel* share would be a
+large gold block, the opposite of the brief's "gold is an accent, not the dominant colour". The
+lever, if that reading is wrong, is the tinted surfaces: reverting them to `--card` puts green at
+~16% and neutral at ~84%.
+
+#### Typography and layout
+
+`better-typography` and `better-layout` were applied for real value, not decoration: the eyebrow moved
+from **10px to 12px** (the skill's floor — "rarely below 12px"), every other sub-12px label on the
+landing page moved to 11–12px, the h1 went to **30px mobile / 36px desktop** with `text-balance` and
+positive tracking so a 44-character name wraps as a headline rather than a paragraph, `text-pretty`
+was added to the two wrapping paragraphs, and the CTA/secondary-link gap widened to 24px (the skill's
+spacing for a borderless text control beside a bordered one).
+
+**Visual refinement happened after rendering (§21), not before it.** The first build's workflow card
+ran past the 820px fold and **clipped step 06 mid-sentence**. Tightening the six step bodies to one
+line each fixed it: the card is now ~535px against a ~530px left column, so the hero balances and the
+whole card, including its closing line, is visible without scrolling. Two renders were inspected
+(1440×820 and 390×844); on mobile the CTA sits above the fold and nothing is clipped.
+
+#### Adversarial pass (`interface-review` skill)
+
+Reviewed as a change, against `HEAD` = `614f33e` (the session's work was uncommitted at review time):
+
+| Severity | Domain | Status | Location | Before | After | Why |
+|---|---|---|---|---|---|---|
+| MEDIUM | Data | Introduced | `src/pages/Landing.tsx` hero card | Hero stated the reference frame inline | Frame now relies on the notice strip above it | A reader who deep-links to `#capabilities` still sees the strip on load, and the frame is asserted in two tests — but the hero card no longer carries it itself. Accepted, and asserted rather than assumed. |
+| LOW | Layout | Introduced | `Landing.tsx` mobile h1 | 2-word-per-line heading | 3 lines, last line one word (`INITIATIVE`) | Inherent to a 44-character name at 30px on a 390px viewport; `text-balance` is already applied and no better split exists above the readability floor. |
+| LOW | Consistency | Pre-existing | `src/components/HeaderBar.tsx:48` | — | — | The workspace bar hardcodes "National Policy Dashboard" while `BRAND.productName` is the same string's home elsewhere. Not this change's responsibility; left alone to keep the diff scoped to the landing page. |
+
+**Verdict: Approve.** No HIGH findings. The one MEDIUM is a deliberate, test-asserted trade (§23
+instructs the card to carry the workflow) rather than a defect.
+
+#### What I deliberately did NOT do
+
+- **No Zimbabwe-motif artwork was added.** §17 permits the existing Great Zimbabwe / Zimbabwe-inspired
+  asset "if such an asset already exists" — it does not (`public/` holds only the favicon, fonts,
+  robots.txt and a placeholder; `src/assets/` holds only the coat of arms). Adding an illustration
+  would need a new asset and "no new dependency/asset without approval", so identity is carried by
+  palette, the gold rules and the coat of arms instead.
+- **`--background` was not warmed.** The brief's "warm white" could be read as a global canvas change,
+  but that token is shared by all 16 department dashboards, and §19 says not to change unrelated
+  pages. The warmth/colour was added as scoped surfaces instead.
+- **Physical-direction utilities were not mass-converted to logical properties** (`ps-`/`pe-`). The app
+  is single-language LTR; converting ~100 class sites would be a large diff with no user-visible
+  effect. Reported as a finding, not silently skipped.
+
+---
+
 ## Verification log
 | Date | Command | Result |
 |---|---|---|
@@ -897,6 +1022,13 @@ lands"** (uses the page's own "test how it lands" language), **"Simulate the pol
 | 2026-09-25 | `npm test` (Phase N, after the swap) | PASS — **9 files, 145/145**. The heading test now asserts the `<h1>` is the workspace label, that the task line is a `<p>` of `text-[10px]` **preceding** the heading in DOM order (`compareDocumentPosition`), and that the heading is `text-[1.75rem]` |
 | 2026-09-25 | `npx playwright test` (Phase N, after the swap) | **PASS — 6/6**. New assertion compares the **real computed font size** of the task line against the `<h1>` and requires it to be strictly smaller — so the swap is proven as a size inversion in a real browser, not assumed from the class names |
 | 2026-09-25 | rendered `/` after the swap at 1440×820 and inspected the image | PASS — `TEST THE POLICY BEFORE YOU DECIDE` small and emerald above `NATIONAL POLICY SIMULATION WORKSPACE` at 40 px in two balanced lines, exactly as instructed; CTA still above the fold |
+| 2026-09-25 | **palette measured before any colour change was made** (Phase O) | **8 of 16 rendered pairs FAILED** — secondary copy 4.07:1 on the canvas and 4.45:1 on a card, muted white on green 3.28–4.37:1 at 9–11px, gold hairline on white **1.38:1**. None of these is visible as a failure by eye; all were computed from the declared tokens |
+| 2026-09-25 | `npm run validate` (Phase O) | **PASS — 10/10**, including a new **check 10** that measures the contrast of every token pair the app actually renders (alpha-composited where a muted colour sits on a dark one) and fails if any drops below its floor. All 14 pairs PASS; the one known-red pair is printed but not enforced |
+| 2026-09-25 | `npm test` (Phase O) | **PASS — 9 files, 147/147.** New/changed assertions: single `<h1>` is the initiative; the principle is a non-heading label stated **exactly once**; the credit line reads "Powered by Nzwisiso AI"; the hero card is an `<aside>` with **6 listitems** in the workspace's order ending at a structured assessment; the reference **rates are absent** from the landing page while the reference **date and fiscal year are still present**; the "How it works" list count is now scoped to its own section so the hero's list cannot mask it |
+| 2026-09-25 | `npx playwright test` (Phase O) | **PASS — 6/6 (6.6 s)**, 0 console errors, 0 off-origin requests. New assertions: h1 name, the credit line, the masthead initiative name and platform subtitle, the workflow card's heading + 6 steps + closing boundary statement, the reference frame text, and **real computed geometry** — the h1 renders in **≤3 lines** at **≥30px** and the principle renders **smaller** than it |
+| 2026-09-25 | `npm run build` (Phase O) | PASS — built in **495 ms** |
+| 2026-09-25 | renders inspected after the refinement (Phase O) | PASS at **1440×820** — 2-line balanced headline, hero card fully visible and balanced against the left column (535px vs 530px), CTA above the fold. PASS at **390×844** — single column, 3-line headline, CTA above the fold, nothing clipped. First build was inspected and **rejected** (card clipped step 06 mid-sentence) before the copy was tightened |
+| 2026-09-25 | full-document pixel census of the rendered page (Phase O) | PASS as a measurement — **69.4% warm/neutral, 14.8% pale green tint, 15.8% solid institutional green, ~0.15% gold** over 24,480 samples. Recorded with the honest reading that the 15.8% solid green is the locked masthead + footer, and that a 5% *pixel* share of gold would be a gold block, not an accent |
 | 2026-09-25 | dev-server port root cause confirmed (Phase M) | PASS — `vite.config.ts` sets `server.port = 8080` and `host: "::"`; `npm run dev` therefore serves at **http://localhost:8080/**, not 5173. This is why the user's browser still showed the old entry |
 
 ## Known-red / open items
@@ -944,6 +1076,21 @@ lands"** (uses the page's own "test how it lands" language), **"Simulate the pol
   the baseline build PASSED, so this is not blocking.
 - Node 26.8.1 defines an experimental global `localStorage` that shadows jsdom's. Handled in the
   test environment (see Phase B bug 3). No production impact — browsers provide a real one.
+- **Phase O — `--destructive` as RISK TEXT on `--card` measures 3.73:1, below the 4.5:1 AA floor.**
+  A real gap, and it is **not fixed**, deliberately: `--destructive` is the workspace risk-state
+  colour *and* the fill behind destructive buttons app-wide, so changing it restyles every dashboard
+  — outside "this task is specifically about the landing page and its supporting content/config".
+  It is printed by `npm run validate` on every run under `KNOWN-RED (not enforced)` so it cannot be
+  forgotten. Fixing it is one token edit (4 90% 58% → ~4 80% 48% measures 4.85:1, white-on-it 4.85:1)
+  plus a render check of the ~16 dashboards that use it.
+- **Phase O — `index.html` duplicates `BRAND.summary` by hand.** A static HTML file cannot import
+  TypeScript, so the description and `og:description` are written twice. Both were updated to the new
+  wording this session (the retired "national policy simulation workspace" phrase is gone from the
+  served HTML), but they can drift from `brand.ts` silently. Not solvable without a build-time step;
+  recorded rather than hidden.
+- **Phase O — the brief's §8–§16 were truncated in transmission.** Phase O implemented §1–§7 and
+  §17–§23 plus what §23's closing paragraph names. Anything specified in the missing sections is
+  **not** in the build.
 
 ## Files touched in Phase 0
 `.clinerules/00*..05*.md`, `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md`,
@@ -1102,6 +1249,23 @@ relative path so it does not duplicate the source of truth).
 
 ---
 
+## Files touched in Phase O (landing positioning + visual refinement)
+
+| File | Change |
+|---|---|
+| `src/config/brand.ts` | `PRINCIPLE` + `INITIATIVE` constants; new `platformLabel`, `initiative`, `initiativeShort` (derived), `eyebrow` (derived), rewritten `summary`; **`workspaceLabel` deleted** |
+| `src/index.css` | `--muted-foreground` 46% → 42%; **added** `--primary-tint`, `--gold-rule` (each documented with its role and its measured ratios) |
+| `tailwind.config.ts` | Added `primary-tint` and `gold-rule` colour mappings (additive only) |
+| `src/pages/Landing.tsx` | New hero copy (principle / initiative / credit / summary); `WORKFLOW` (6 steps) replacing the reference-rate panel; the workflow `<aside>` with green rail + gold rule + closing boundary line; `SectionRule` gold rules opening four sections; coverage panel moved to the tint surface; eyebrow 10px → 12px; micro-labels 10px → 11–12px; `text-pretty`; CTA gap 20px → 24px; dead `reference.ts` import removed |
+| `src/components/public/PublicPageShell.tsx` | Masthead: entity 9px → 11px, product subtitle → `platformLabel` 11px, right label → `initiativeShort` 11px; new `Wordmark` component replacing two hardcoded wordmarks; notice strip on `primary-tint` with a white badge; 12 muted-white alphas raised to the measured `/75` floor; strip text 11px → 12px |
+| `src/components/HeaderBar.tsx` | Three `text-primary-foreground/70` → `/75`. **Cross-cutting on purpose**: it is the same measured AA failure, and excluding this file from the new validator would have been a scoped-down check |
+| `index.html` | Description + `og:description` moved off the retired phrase |
+| `scripts/validate.mjs` | **New check 10** — measured rendered-pair contrast + an app-wide muted-white-on-green alpha floor + a printed known-red |
+| `e2e/journey.spec.ts` | h1 name, credit line, masthead labels, workflow card (heading, 6 steps, closing line), reference frame, h1 line-count ≤ 3 and size ≥ 30px, principle smaller than h1 |
+| `src/test/landing.test.tsx` | Heading/principle/credit assertions; workflow-card test; rates-absent test; reference-frame-still-present test; scoped list count |
+| `src/test/routes.test.tsx` | Two landing-heading assertions |
+| `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md` | Phase O record, verification rows, known-red entries, identity section |
+
 ## RESUME HERE
 
 - **Branch:** `feature/unified-platform` · **HEAD:** the `feat(phase-m)` commit — run `git rev-parse HEAD`.
@@ -1110,9 +1274,18 @@ relative path so it does not duplicate the source of truth).
   Phases E–G = the commit whose message begins `feat(phase-e)` ·
   Phase H = the commit whose message begins `test(phase-h)` ·
   Phase M = the commit whose message begins `feat(phase-m)` ·
-  Phase N = the commit whose message begins `feat(phase-n)`.
+  Phase N = the commit whose message begins `feat(phase-n)` ·
+  Phase O = the commit whose message begins `feat(phase-o)`.
   `git log --oneline -10 | cat` is the second opinion on state.
   (This shell's git rejects `--no-pager`; use plain `git log --oneline | cat`.)
+- **Phase O is the current state of the public landing page.** Positioning is now the **Zimbabwe AI
+  Policy Intelligence Initiative** (h1 and masthead), *Powered by Nzwisiso AI*, with the service
+  principle **Understanding before action** as the eyebrow, and the hero's right-hand card holding a
+  **6-step policy-assessment workflow** instead of the economic reference rates. `BRAND.workspaceLabel`
+  no longer exists. A validator (check 10) now fails the build if any rendered colour pair drops below
+  its contrast floor. **Read `## Phase O` above before touching `Landing.tsx`, `brand.ts`,
+  `index.css` or `PublicPageShell.tsx`.** If the brief's §8–§16 are supplied, they are the next
+  increment — Phase O could not implement sections that never arrived.
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
   restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
 - **`main` is untouched at `7451db0`, and the agent has never pushed to it.** The feature branch

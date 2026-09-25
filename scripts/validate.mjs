@@ -150,6 +150,109 @@ if (!existsSync(reportFile)) {
   check("@media print rules present", /@media\s+print/.test(css) ? [] : ["no @media print block found in src/index.css"]);
 }
 
+// 10 — contrast of the token pairs the app actually renders. MEASURED, not estimated:
+//      computed from the declared tokens in src/index.css with the WCAG 2.x
+//      relative-luminance formula, and alpha-composited where a muted colour is used
+//      over a dark one. This exists because the two worst offenders in the palette
+//      looked fine by eye: secondary copy measured 4.45:1 on white and brand gold
+//      hairlines measured 1.38:1 — both invisible as failures until computed.
+const MUTED_WHITE_FLOOR = 75;
+const cssPath = join(ROOT, "src/index.css");
+if (!existsSync(cssPath)) {
+  console.log("SKIP  rendered-pair contrast — src/index.css not found");
+} else {
+  const cssText = readFileSync(cssPath, "utf8");
+  const declared = {};
+  for (const m of cssText.matchAll(/--([a-z-]+):\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%/g)) {
+    declared[m[1]] = [Number(m[2]), Number(m[3]), Number(m[4])];
+  }
+  const toRgb = ([h, s, l]) => {
+    const sat = s / 100;
+    const lig = l / 100;
+    const k = (n) => (n + h / 30) % 12;
+    const a = sat * Math.min(lig, 1 - lig);
+    const f = (n) => lig - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return [f(0), f(8), f(4)].map((c) => Math.round(Math.max(0, Math.min(1, c)) * 255));
+  };
+  const luminance = ([r, g, b]) => {
+    const channel = (c) => {
+      const v = c / 255;
+      return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+    };
+    return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+  };
+  const contrastOf = (a, b) => {
+    const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (light + 0.05) / (dark + 0.05);
+  };
+  const over = (fg, bg, alpha) => fg.map((c, i) => Math.round(c * alpha + bg[i] * (1 - alpha)));
+
+  // [label, foreground token, foreground alpha, background token, minimum ratio]
+  const PAIRS = [
+    ["body text on the page canvas", "foreground", 1, "background", 4.5],
+    ["secondary copy on the page canvas", "muted-foreground", 1, "background", 4.5],
+    ["body text on a card", "foreground", 1, "card", 4.5],
+    ["secondary copy on a card", "muted-foreground", 1, "card", 4.5],
+    ["green label on a card", "primary", 1, "card", 4.5],
+    ["green label on the tinted surface", "primary", 1, "primary-tint", 4.5],
+    ["body text on the tinted surface", "foreground", 1, "primary-tint", 4.5],
+    ["secondary copy on the tinted surface", "muted-foreground", 1, "primary-tint", 4.5],
+    ["white on green (masthead, primary CTA)", "primary-foreground", 1, "primary", 4.5],
+    ["muted white on green at the floor", "primary-foreground", MUTED_WHITE_FLOOR / 100, "primary", 4.5],
+    ["gold rule on a card", "gold-rule", 1, "card", 3],
+    ["gold rule on the tinted surface", "gold-rule", 1, "primary-tint", 3],
+    ["gold rule on the page canvas", "gold-rule", 1, "background", 3],
+    ["brand gold on green (masthead rule, wordmark)", "gold", 1, "primary", 3],
+  ];
+  const contrastHits = [];
+  const measured = [];
+  for (const [label, fgKey, alpha, bgKey, min] of PAIRS) {
+    const fg = declared[fgKey];
+    const bg = declared[bgKey];
+    if (!fg || !bg) {
+      contrastHits.push(`token pair missing for "${label}" (--${fgKey} on --${bgKey})`);
+      continue;
+    }
+    const fgRgb = alpha === 1 ? toRgb(fg) : over(toRgb(fg), toRgb(bg), alpha);
+    const ratio = contrastOf(fgRgb, toRgb(bg));
+    const ok = ratio >= min - 0.001;
+    if (!ok) contrastHits.push(`${label}: ${ratio.toFixed(2)}:1 is below the ${min}:1 floor`);
+    measured.push(`${ok ? "ok  " : "LOW "} ${ratio.toFixed(2).padStart(5)}:1  (min ${min})  ${label}`);
+  }
+
+  // Muted white on green is the only place the app renders white at an opacity, so a
+  // floor is enforced against the source rather than only against the token.
+  for (const file of srcFiles) {
+    lines(file).forEach((line, i) => {
+      for (const m of line.matchAll(/text-primary-foreground\/(\d+)/g)) {
+        if (Number(m[1]) < MUTED_WHITE_FLOOR) {
+          contrastHits.push(
+            `${rel(file)}:${i + 1}  text-primary-foreground/${m[1]} — below the measured AA floor /${MUTED_WHITE_FLOOR}`,
+          );
+        }
+      }
+    });
+  }
+
+  check("rendered-pair contrast (measured from tokens)", contrastHits);
+  notes.push(
+    `INFO  contrast measured from src/index.css:\n` +
+      measured.map((line) => `    ${line}`).join("\n"),
+  );
+
+  // Known-red, deliberately NOT enforced: recorded so it stays visible every run
+  // without the landing-page work silently taking ownership of the whole app's
+  // danger colour. See PROJECT_STATUS.md "Known-red".
+  if (declared.destructive && declared.card) {
+    notes.push(
+      `INFO  KNOWN-RED (not enforced)  --destructive as text on --card measures ` +
+        `${contrastOf(toRgb(declared.destructive), toRgb(declared.card)).toFixed(2)}:1 (needs 4.5:1). ` +
+        `Out of scope for the landing page: it is the workspace risk-state colour and also drives ` +
+        `destructive buttons app-wide.`,
+    );
+  }
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

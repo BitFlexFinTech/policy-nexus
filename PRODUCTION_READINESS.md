@@ -100,18 +100,21 @@ client is registered.
   from `src/config/departments.ts`, three "how it works" steps, and an official footer carrying
   **"A Project by the Ministry of IT"** with **"For Internal Use Only"** beneath it in smaller text
   (asserted against the **real computed font size**: 11px vs 9px).
-- **Phase N** redesigned its hero, after the user questioned it, and then swapped its line roles on the
-  user's instruction. Final state: the prominent `<h1>` is **"National policy simulation workspace"**
-  (read from `BRAND.workspaceLabel`) and the small line above it is **"Test the policy before you
-  decide"**; both are rendered in CAPITALS by CSS (`uppercase` + positive tracking) with the DOM text
-  left in normal case. The hero is a two-column grid whose right column is a bordered **"Reference date
-  and inputs"** panel (reference date, fiscal year, ZiG exchange rate, policy rate, annual inflation —
-  all read from `src/config/reference.ts`); the tagline closes that panel. `npm test` → **9 files,
-  145 tests**, including a test that pins every panel value to configuration, one that asserts the panel
-  heading is unique on the page, one that asserts the caps are styling rather than typed capitals, and
-  one that asserts the small task line precedes the heading and is smaller than it. `npx playwright
-  test` additionally compares the **real computed font sizes** of the two lines, so the size inversion
-  is proven in a browser.
+- **Phase O** re-positioned and refined that page on the user's instruction (refine, do not redesign).
+  Final state: the prominent `<h1>` is **"Zimbabwe AI Policy Intelligence Initiative"**, credited
+  *Powered by Nzwisiso AI*; the eyebrow is the service principle **"Understanding before action"**;
+  the masthead right reads **"Zimbabwe AI Policy Intelligence"** and the subtitle is **"Policy
+  Intelligence Platform"**. The hero's right column is now a pale-green **"How an assessment is
+  produced"** card holding a 6-step workflow with a green rail and a short gold rule, replacing the
+  economic reference-rate panel (the rates remain in the workspace beside the engine; the reference
+  date and fiscal year are still stated in the notice strip). `BRAND.workspaceLabel` was **deleted**.
+  `npm test` → **9 files, 147 tests**; `npx playwright test` → **6/6**, now also asserting the
+  workflow's 6 steps, the closing boundary line, the h1 rendering in ≤3 lines at ≥30px, and the
+  principle rendering smaller than the h1. `npm run validate` → **10/10**, including a new check that
+  **measures** the contrast of every rendered colour pair and fails the build if one drops below its
+  floor. That check exists because the palette it inherited had eight failing pairs, two of which are
+  invisible by eye (secondary copy 4.45:1 on white; gold hairlines **1.38:1**). All now pass at AA;
+  one known-red is recorded rather than fixed (see PROJECT_STATUS.md → Known-red).
 - **Phase M** split that entry into **two** public screens, because a landing page that also contains
   the department picker is not a landing page:
   - `/` — **pure landing page**. Asserts it holds **no department picker**.

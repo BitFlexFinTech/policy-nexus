@@ -93,7 +93,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await page.goto("/");
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "National policy simulation workspace" }),
+      page.getByRole("heading", { level: 1, name: "Zimbabwe AI Policy Intelligence Initiative" }),
     ).toBeVisible();
 
     // The landing page is pure: it must NOT carry the department picker.
@@ -137,10 +137,15 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
   test("homepage presents the platform and carries the official footer", async ({ page }) => {
     await page.goto("/");
 
-    // Government-aesthetic structure.
+    // Government-aesthetic structure: the initiative is the capability, the product
+    // is credited beneath it, and the masthead names the initiative — not the
+    // platform's internal workspace label.
     await expect(
-      page.getByRole("heading", { level: 1, name: "National policy simulation workspace" }),
+      page.getByRole("heading", { level: 1, name: "Zimbabwe AI Policy Intelligence Initiative" }),
     ).toBeVisible();
+    await expect(page.getByText("Powered by Nzwisiso AI", { exact: true })).toBeVisible();
+    await expect(page.getByText("Zimbabwe AI Policy Intelligence", { exact: true })).toBeVisible();
+    await expect(page.getByText("Policy Intelligence Platform", { exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "What this platform does", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "How it works", exact: true })).toBeVisible();
 
@@ -151,10 +156,12 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
       const node = document.querySelector("h1");
       if (!node) return null;
       const style = getComputedStyle(node);
+      const lineHeight = parseFloat(style.lineHeight);
       return {
         textTransform: style.textTransform,
         letterSpacing: parseFloat(style.letterSpacing),
         fontSize: parseFloat(style.fontSize),
+        lines: Math.round(node.getBoundingClientRect().height / lineHeight),
         text: node.textContent?.trim() ?? "",
       };
     });
@@ -162,23 +169,35 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     expect(headline?.textTransform).toBe("uppercase");
     // Caps need positive tracking; the sentence-case display setting was negative.
     expect(headline?.letterSpacing ?? -1).toBeGreaterThan(0);
-    expect(headline?.text).toBe("National policy simulation workspace");
+    expect(headline?.text).toBe("Zimbabwe AI Policy Intelligence Initiative");
+    // A 44-character name at display size must still wrap as a headline, not as a
+    // paragraph: at most three lines, and never so small it stops being a heading.
+    expect(headline?.lines).toBeLessThanOrEqual(3);
+    expect(headline?.fontSize ?? 0).toBeGreaterThanOrEqual(30);
 
-    // The swap must be real, not just reordered text: the task line renders SMALLER
-    // than the heading. This compares real computed font sizes in a real browser.
-    const taskSize = await page
-      .getByText("Test the policy before you decide", { exact: true })
+    // The principle is a label ABOVE the heading and renders SMALLER than it. This
+    // compares real computed font sizes in a real browser rather than class names.
+    const principleSize = await page
+      .getByText("Understanding before action", { exact: true })
       .evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
-    expect(Number.isNaN(taskSize)).toBe(false);
-    expect(taskSize).toBeLessThan(headline?.fontSize ?? Number.NaN);
+    expect(Number.isNaN(principleSize)).toBe(false);
+    expect(principleSize).toBeLessThan(headline?.fontSize ?? Number.NaN);
 
-    // The hero states the frame its figures are computed in, read from configuration.
-    const frame = page.locator("aside[aria-labelledby='landing-reference-heading']");
+    // The hero carries the policy-assessment workflow, in the workspace's order, and
+    // states where the route ends. The economic reference rates are not repeated here
+    // — they are stated in the workspace, beside the engine that consumes them — but
+    // the reference frame a run is read against is still on the page, in the notice
+    // strip above the hero, so no figure is left unreadable against its own frame.
+    const workflow = page.locator("aside[aria-labelledby='landing-workflow-heading']");
     await expect(
-      frame.getByRole("heading", { name: "Reference date and inputs", exact: true }),
+      workflow.getByRole("heading", { name: "How an assessment is produced", exact: true }),
     ).toBeVisible();
-    await expect(frame.getByText("24 September 2026", { exact: true })).toBeVisible();
-    await expect(frame.getByText("13.56 ZiG per USD", { exact: true })).toBeVisible();
+    await expect(workflow.getByRole("listitem")).toHaveCount(6);
+    await expect(workflow.getByText("Choose your department", { exact: true })).toBeVisible();
+    await expect(workflow.getByText("Take away the drafted policy", { exact: true })).toBeVisible();
+    await expect(workflow.getByText(/It informs the decision; it does not take it\./)).toBeVisible();
+    await expect(page.getByText(/Reference date\s+24 September 2026/).first()).toBeVisible();
+    await expect(page.getByText(/Fiscal year\s+2026/).first()).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Ready to test a policy draft?", exact: true }),
     ).toBeVisible();

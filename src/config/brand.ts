@@ -6,21 +6,46 @@
  * (see .clinerules/03-single-source-of-truth.md)
  */
 
+/**
+ * The service's guiding principle. Stated ONCE here and rendered in two forms:
+ * `eyebrow` (the label above the homepage heading — a label, so no full stop)
+ * and `tagline` (the same words as a sentence, for document footers). One is
+ * derived from the other, so the two cannot drift apart.
+ */
+const PRINCIPLE = "Understanding before action";
+
+/**
+ * The national initiative this dashboard delivers. The initiative is the
+ * government capability; Nzwisiso AI is the technology platform that delivers
+ * it. `initiativeShort` is the same name without the trailing "Initiative",
+ * derived rather than retyped so the two can never disagree.
+ */
+const INITIATIVE = "Zimbabwe AI Policy Intelligence Initiative";
+
 export const BRAND = {
   /** Short product name used in the header bar and document headers. */
   name: "Nzwisiso AI",
   /** Full product name used on the homepage, the browser title, and reports. */
   productName: "Nzwisiso AI Policy Dashboard",
+  /** What kind of platform Nzwisiso AI is — the subtitle under the product name. */
+  platformLabel: "Policy Intelligence Platform",
+  /** The national initiative. The prominent heading on the public landing page. */
+  initiative: INITIATIVE,
+  /** Short form of the initiative name, for the masthead. */
+  initiativeShort: INITIATIVE.replace(/ Initiative$/, ""),
   /** Accountable entity shown in the footer of every generated document. */
   entity: "Government of Zimbabwe",
   /** Issuing ministry for the sovereign compute statement. */
   entityCustodian: "Ministry of Information Communication Technology, Postal and Courier Services",
-  tagline: "Understanding before action.",
+  /** The principle as a label above the homepage heading. */
+  eyebrow: PRINCIPLE,
+  /** The same principle as a sentence. */
+  tagline: `${PRINCIPLE}.`,
   /** Short description used for the homepage sub-heading and meta description. */
   summary:
-    "A national policy simulation workspace for Zimbabwe's ministries, departments and agencies.",
-  /** Section label for the workspace, shown on the homepage. */
-  workspaceLabel: "National policy simulation workspace",
+    "A Government of Zimbabwe initiative for AI-assisted policy intelligence. It examines how a " +
+    "proposed measure would land before it is implemented, and sets out the assessment behind that " +
+    "reading.",
   /**
    * Official attribution line, required on the homepage footer. The wording is
    * fixed by the commissioning ministry and must not be softened or reworded.

@@ -18,11 +18,21 @@
     --primary: 120 100% 20%;
     --primary-foreground: 0 0% 100%;
 
+    /* Pale green INFORMATION SURFACE (role: tinted panel/strip on the public
+       screens). Distinct from --primary (the solid institutional fill) and from
+       --card (the plain surface). Measured: foreground on it 17.28:1,
+       muted-foreground 5.08:1, primary 6.59:1 — all AA. */
+    --primary-tint: 120 50% 95%;
+
     --secondary: 120 5% 96%;
     --secondary-foreground: 120 6% 25%;
 
     --muted: 120 5% 92%;
-    --muted-foreground: 120 4% 46%;
+    /* Darkened from 46% so secondary copy passes AA on BOTH surfaces it actually
+       renders on — measured 4.75:1 on --background and 5.19:1 on --card (46%
+       measured 4.07:1 and 4.45:1, both below the 4.5:1 floor). Lightness only:
+       the hue is unchanged. */
+    --muted-foreground: 120 4% 42%;
 
     --accent: 120 5% 96%;
     --accent-foreground: 120 6% 25%;
@@ -45,6 +55,13 @@
     /* Gold token */
     --gold: 51 100% 50%;
     --gold-foreground: 0 0% 10%;
+
+    /* Gold as a RULE on a light surface (role: hairline / thin rule). The brand
+       gold #FFD700 is a fill colour for dark surfaces — it measures 1.38:1 on
+       white, i.e. invisible. This darker step keeps the same hue at the lightest
+       value that clears 3:1 on every surface it is drawn on (card 3.63:1,
+       background 3.32:1, --primary-tint 3.30:1). */
+    --gold-rule: 43 74% 38%;
 
     --border: 120 6% 83%;
     --input: 120 6% 83%;
