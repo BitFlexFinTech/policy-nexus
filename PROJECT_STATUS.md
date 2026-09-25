@@ -529,6 +529,65 @@ Determinism: both documents are seeded from the run's seed string (`<seed>::long
 external AI call — and the editable text is local state only; whatever is in the box is exactly what
 Print / Save as PDF / Download Word / Share export.
 
+### Phase L — Homepage redesign (government aesthetic)
+**Status: DONE — verified this session.** (Requested by the user this session.)
+
+Requirement: a professional, modern homepage with a **government aesthetic** that **highlights what the
+platform does**, benchmarked against European government platforms, whose footer carries exactly
+**"A Project by the Ministry of IT"**, with **"For Internal Use Only"** beneath it in smaller text.
+
+Research done this session against live public-sector design systems (see the sources named in the
+chat): **GOV.UK Design System** (dark masthead + state lockup, thin accent rule, "phase banner" notice
+strip, restricted type scale, "start using a service" pattern, dark multi-column footer ending in an
+attribution/licence line) · **European Commission** (explicit official-attribution line — "This site is
+managed by: <DG>" — plus legal/accessibility links) · **e-Estonia** (proposition headline supported by a
+**statistics-as-evidence** strip) · **Rijksoverheid NL** (task-first grouping, restrained colour, no
+marketing imagery).
+
+Applied inside the LOCKED rules: emerald/gold tokens only (no new colour literals), Inter + JetBrains
+Mono, existing shadcn primitives, **no new dependency**, and `.clinerules/03`'s ban on gradients,
+glassmorphism, giant hero sections and marketing-card language.
+
+Deliverables:
+| Item | File | Status |
+|---|---|---|
+| Attribution + classification identity strings (single source of truth) | `src/config/brand.ts` | DONE |
+| Redesigned homepage | `src/pages/Home.tsx` | DONE |
+| Tests: footer strings, capability/step sections, computed coverage, **preserved entry contract** | `src/test/home.test.tsx` | DONE |
+| Browser verification of the preserved journey from the new page | `e2e/journey.spec.ts` | DONE |
+
+**The homepage, as built** (all within the locked palette/typography — no new colour literals, no new
+dependency, no gradients or glassmorphism):
+1. **Official masthead** — emerald field, coat of arms, `Government of Zimbabwe` in letterspaced small
+   caps over the `Nzwisiso AI` wordmark, closing with a **3px gold national rule**.
+2. **Service notice strip** — an `Internal service` marker, a plain-language statement that results are
+   modelled, and the fixed `Reference date 24 September 2026` / `Fiscal year 2026` frame.
+3. **Proposition block** — the tagline as the single `<h1>`, the product summary, a plain-language
+   explanation of what a run does, and a primary **Start a simulation** action that jumps to the
+   department selector (the GOV.UK "start using a service" pattern).
+4. **"What this platform does"** — four capability cards (model the national picture · simulate before
+   you commit · read the assessment · draft the policy itself), each with a line icon.
+5. **"Platform coverage"** — an evidence strip whose four figures are **computed from the
+   configuration** (`DEPARTMENT_COUNT`, `STAKEHOLDER_SEGMENTS.length`, and the indicator/draft totals
+   across `DEPARTMENTS`), so the page can never overstate what the platform holds.
+6. **"How it works"** — three numbered steps, naming all three outputs including the Phase K report and
+   drafted policy.
+7. **"Deterministic, local, and reproducible"** — a left-ruled inset panel stating the reproducibility
+   guarantee and the scenario-mode (Mock) locality.
+8. **"Start: choose your department"** — the department selector in a bordered panel (guidance, the
+   `Department session active` banner when signed in, `16` real department buttons, the disclaimer and
+   the `Enter <department>` action).
+9. **Official footer** — four columns (identity · Platform anchors · Reference frame · Administration,
+   naming `BRAND.entityCustodian`), the retained sovereignty statement, then the required attribution
+   **"A Project by the Ministry of IT"** with **"For Internal Use Only"** beneath it in smaller
+   letterspaced small caps.
+
+**Byte-for-byte functional contract preserved on `/`** (rules 03 + 06): the department group keeps its
+name `Select a department — 16 available`, exactly 16 real buttons, the `Selected: <full name>` /
+`No department selected` line, the `Enter <department>` primary action (disabled name `Enter workspace`
+before a choice), and the `Continue to workspace` route when a session exists. The tagline stays the
+`<h1>` and the reference date stays its own element.
+
 ---
 
 ---
@@ -611,6 +670,13 @@ Print / Save as PDF / Download Word / Share export.
 | 2026-09-25 | `npx tsc -b --pretty false` (Phase K) | PASS — no output |
 | 2026-09-25 | `npm run lint` (Phase K) | PASS — 0 errors, 7 pre-existing react-refresh warnings |
 | 2026-09-25 | `npm run build` (Phase K) | PASS — built in ~336 ms; 475.27 kB JS / 142.39 kB gzip |
+| 2026-09-25 | `npx vitest run src/test/home.test.tsx` (Phase L) | PASS — **14/14**: the 6 original entry-contract tests plus 8 new (single `<h1>` = the tagline; the four named capability headings; three steps; **coverage figures read from the config** matched exactly against `DEPARTMENT_COUNT` / `STAKEHOLDER_SEGMENTS.length` / indicator + draft totals; CTA `href="#start"` and `#start` present; sovereignty statement retained; attribution inside `contentinfo`; **classification text size strictly smaller** than the attribution; classification rendered exactly once) |
+| 2026-09-25 | `npm test` (Phase L, all files) | PASS — **8 files, 141 tests** |
+| 2026-09-25 | `npx playwright test` (Phase L) — real Chromium vs `vite preview` | **PASS — 6/6**. New: the homepage test asserts the h1, the "What this platform does"/"How it works"/"Start: choose your department" headings, both footer strings inside `<footer>`, and reads the **real computed font size** — attribution **11px** vs classification **9px** — then clicks the CTA and confirms the `#start` panel holds all **16** department buttons. Runtime invariants still hold: **0 console errors, 0 page errors, 0 off-origin requests** |
+| 2026-09-25 | `npm run validate` (Phase L) | PASS — all 9 checks green (no new colour literals; no external URLs) |
+| 2026-09-25 | `npx tsc -b --pretty false` (Phase L) | PASS — exit 0 |
+| 2026-09-25 | `npm run lint` (Phase L) | PASS — 0 errors, 7 pre-existing react-refresh warnings |
+| 2026-09-25 | `npm run build` (Phase L) | PASS — built in 341 ms |
 
 ## Known-red / open items
 - **DEPLOYMENT — two facts a cold session must not get wrong.** (a) The host in the deployment
@@ -739,6 +805,16 @@ dependencies, `src/components/ui/**` (still byte-identical stock primitives), `L
 `src/config/brand.ts`, `src/config/reference.ts`, `src/routes/RequireSession.tsx`,
 and all palette tokens in `src/index.css` (`:root` unchanged — palette-lock test still green).
 
+## Files touched in Phase L (homepage redesign)
+**Modified:** `src/pages/Home.tsx` (full redesign; the department-entry contract is unchanged) ·
+`src/config/brand.ts` (added `workspaceLabel`, `attribution`, `classification` — identity strings stay
+in their single source of truth) · `src/test/home.test.tsx` (8 new tests) · `e2e/journey.spec.ts` (new
+homepage browser test) · `PROJECT_STATUS.md`.
+
+**Unaltered (locked):** `src/index.css` palette, `tailwind.config.ts` fonts, `src/components/ui/**`,
+`DepartmentGrid`, `src/session/**`, all other pages, `package.json` dependencies (no new dependency),
+`LICENSE`/`NOTICE`, `main` branch.
+
 ## Files touched in Phase K (long-form report + drafted policy)
 **Added:** `src/services/assessment/documents.ts` · `src/components/assessment/GeneratedDocumentView.tsx` ·
 `src/pages/AssessmentReport.tsx` · `src/pages/PolicyDraft.tsx` · `src/test/documents.test.ts`.
@@ -790,10 +866,13 @@ relative path so it does not duplicate the source of truth).
   (`/app/assessments/:id`), **Open full report** (`/app/assessments/:id/report`, the long-form
   narrative record), and **Draft the policy** (`/app/assessments/:id/policy-draft`, the instrument
   itself, editable) → **Open full assessment** (`/app/assessments/:id/full`) → Print / Save as PDF /
-  Download Word / Share. `npx playwright test` → **5/5**, and every test asserts **0 console errors +
+  Download Word / Share. `npx playwright test` → **6/6**, and every test asserts **0 console errors +
   0 off-origin requests**. The session also survives a genuine page reload (asserted against
   `localStorage["nzwisiso.session.v1"]`). Same inputs always reproduce the same run *and* the same
-  two generated documents.
+  two generated documents. **The entry screen itself is now the redesigned government homepage**
+  (Phase L): official masthead + gold rule, service notice strip, tagline `<h1>`, four capability
+  cards, a coverage strip computed from the configuration, three steps, the department "Start" panel,
+  and the official footer carrying "A Project by the Ministry of IT" / "For Internal Use Only".
 - **Determinism is enforced by real tests, not by inspection:** `src/test/assessment.test.ts`
   asserts a `JSON.stringify`-identical run for identical input, whitespace/case insensitivity, a
   different id for changed text, and coverage of every segment + priority for all 16 departments.
@@ -801,10 +880,10 @@ relative path so it does not duplicate the source of truth).
   Word export is HTML-based `application/msword`), the remote assessment service client (registered
   in `CLIENTS` but deliberately unimplemented — the mock-first seam), and Government SSO. Playwright
   click-through is **no longer** on this list: it is built and green (Phase H).
-- **Next action: no phase is outstanding — the build is complete and verified (Phases 0–K).** The
-  full suite is green (validate, typecheck, lint, test, build, **and `npx playwright test` 5/5**).
+- **Next action: no phase is outstanding — the build is complete and verified (Phases 0–L).** The
+  full suite is green (validate, typecheck, lint, test, build, **and `npx playwright test` 6/6**).
   Remaining work, in priority order:
-  1. **Redeploy `dist/`** to publish Phases E–K to the live host (Phase J's FTPS command; **never
+  1. **Redeploy `dist/`** to publish Phases E–L to the live host (Phase J's FTPS command; **never
      `--delete`**), then re-run the live route checks. The live build is still **Phase D**.
   2. **Open the Pull Request** (GitHub link in Phase I) for review before any merge to `main`.
   3. Non-credential backlog in `PRODUCTION_READINESS.md`: server-side PDF/DOCX extraction, a real

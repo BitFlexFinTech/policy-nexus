@@ -19,6 +19,18 @@ export const BRAND = {
   /** Short description used for the homepage sub-heading and meta description. */
   summary:
     "A national policy simulation workspace for Zimbabwe's ministries, departments and agencies.",
+  /** Section label for the workspace, shown on the homepage. */
+  workspaceLabel: "National policy simulation workspace",
+  /**
+   * Official attribution line, required on the homepage footer. The wording is
+   * fixed by the commissioning ministry and must not be softened or reworded.
+   */
+  attribution: "A Project by the Ministry of IT",
+  /**
+   * Classification marking. Rendered smaller than `attribution` — the two are a
+   * pair: the attribution names the owner, the classification states who may see it.
+   */
+  classification: "For Internal Use Only",
 } as const;
 
 /**

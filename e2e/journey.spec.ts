@@ -115,6 +115,50 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     expectCleanRuntime();
   });
 
+  test("homepage presents the platform and carries the official footer", async ({ page }) => {
+    await page.goto("/");
+
+    // Government-aesthetic structure.
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Understanding before action." }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "What this platform does", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "How it works", exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Start: choose your department", exact: true }),
+    ).toBeVisible();
+
+    // Required footer strings, at the bottom of the page.
+    const footer = page.locator("footer");
+    await expect(footer.getByText("A Project by the Ministry of IT")).toBeVisible();
+    await expect(footer.getByText("For Internal Use Only")).toBeVisible();
+
+    // "For Internal Use Only" must render in strictly SMALLER text. This reads the
+    // real computed font size, which is the only way to prove the visual requirement.
+    const sizes = await page.evaluate(() => {
+      const read = (text: string) => {
+        const node = Array.from(document.querySelectorAll("footer p")).find(
+          (candidate) => candidate.textContent?.trim() === text,
+        );
+        return node ? parseFloat(getComputedStyle(node).fontSize) : Number.NaN;
+      };
+      return {
+        attribution: read("A Project by the Ministry of IT"),
+        classification: read("For Internal Use Only"),
+      };
+    });
+    expect(Number.isNaN(sizes.attribution)).toBe(false);
+    expect(Number.isNaN(sizes.classification)).toBe(false);
+    expect(sizes.classification).toBeLessThan(sizes.attribution);
+
+    // The primary call to action reaches the real department selector.
+    await page.getByRole("link", { name: "Start a simulation" }).first().click();
+    await expect(page.locator("#start")).toBeVisible();
+    await expect(departmentGroup(page).getByRole("button")).toHaveCount(DEPARTMENT_COUNT);
+
+    expectCleanRuntime();
+  });
+
   test("department context survives navigation and a full reload", async ({ page }) => {
     await page.goto("/");
     await enterWorkspace(page);
