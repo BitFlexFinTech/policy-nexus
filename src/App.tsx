@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "./pages/Home.tsx";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import { RequireSession } from "./routes/RequireSession.tsx";
 
 const queryClient = new QueryClient();
 
@@ -17,7 +18,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/app" element={<Index />} />
+          {/* Everything under /app requires a department session. */}
+          <Route element={<RequireSession />}>
+            <Route path="/app" element={<Index />} />
+          </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
