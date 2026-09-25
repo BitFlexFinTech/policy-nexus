@@ -8,6 +8,21 @@ const PRESETS = [
   "Incentive program for the Mugove/Umqele/Isabelo National AI Fund.",
 ];
 
+const formatFileSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1048576).toFixed(1)} MB`;
+};
+
+interface PuterAiClient {
+  ai?: { chat: (prompt: string) => Promise<string | { message?: { content?: string } }> };
+}
+
+const getPuterAi = () =>
+  typeof window !== "undefined"
+    ? (window as unknown as { puter?: PuterAiClient }).puter?.ai
+    : undefined;
+
 export function PolicyInput() {
   const [draft, setDraft] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -23,8 +38,9 @@ export function PolicyInput() {
     setAiSummary("");
 
     try {
-      if (typeof window !== "undefined" && (window as any).puter?.ai) {
-        const response = await (window as any).puter.ai.chat(
+      const ai = getPuterAi();
+      if (ai) {
+        const response = await ai.chat(
           `You are a policy analysis AI for the Nzwisiso National Policy Simulation Engine (Zimbabwe context, 2026). Analyze the following policy draft and provide:
 1) Key stakeholders affected (use Zimbabwe-specific categories: Kombi Operators, A1/A2 Farmers, Civil Service Unions, Diaspora Remittance Group)
 2) ZiG Currency Impact — predicted effect on ZiG stability
@@ -43,12 +59,6 @@ Be concise and structured.\n\nPolicy Draft:\n${draft}`
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / 1048576).toFixed(1)} MB`;
   };
 
   const handleFileUpload = useCallback((files: FileList | null) => {

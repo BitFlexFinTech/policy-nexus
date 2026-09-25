@@ -63,7 +63,7 @@ export function AgentFeed() {
       setStreamIdx((i) => i + 1);
     }, 3000 + Math.random() * 2000);
     return () => clearTimeout(timer);
-  }, [streamIdx, messages]);
+  }, [streamIdx]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
