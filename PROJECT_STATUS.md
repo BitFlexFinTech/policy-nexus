@@ -54,31 +54,60 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
 ## WORK ITEMS
 
 ### Phase 0 — Safety + scaffolding + baseline gate
-**Status: IN PROGRESS**
+**Status: DONE — verified this session (commit `a2a5b7c`)**
 
 - Branch `feature/unified-platform` + tag `baseline-pre-unified-platform`: **DONE** — verified
   `git branch --show-current` → `feature/unified-platform`; tag → `7451db0ed3879d94977a79813672e5a2778c232c`.
 - `.clinerules/` 6 rules (00 continuity, 01 minimal context, 02 role router, 03 preserve UI,
   04 determinism+validation, 05 bug-fix-forward): **DONE** — 6 files created.
 - `PRODUCTION_READINESS.md`, `docs/ENGINEERING_PRINCIPLES.md`: **DONE** — files created.
-- `scripts/validate.mjs` + `npm run validate` / `typecheck` / `e2e` scripts: **IN PROGRESS**.
+- `scripts/validate.mjs` + `npm run validate` / `typecheck` / `e2e` scripts: **DONE** — the
+  validator runs and correctly reports the RED baseline (it fails loudly, as intended).
 - `package.json` `name` → `nzwisiso-policy-dashboard`: **DONE** (line 2, verified).
 - **BUG FIXED (bug-fix-forward rule)**: `npm install` failed `ERESOLVE` —
   `lovable-tagger@1.1.13` requires peer `vite >=5.0.0 <8.0.0` while the project pins
   `vite ^8.0.0` (and `@vitejs/plugin-react@6` requires `vite ^8`, so downgrading vite would
   break the build). Root-cause fix applied: `lovable-tagger` bumped `^1.1.13` → `^1.3.4`
   (peer `vite >=5.0.0 <9.0.0`, verified via `npm view`). Not fixed with `--legacy-peer-deps`.
-- Global skills install: **IN PROGRESS** — resolved exact sources: `jakubkrehel/skills`
+- Global skills install: **DONE** — 26 skills installed globally to `~/.agents/skills/` and
+  registered for **Cline** (verified with `npx skills ls -g`); resolved exact sources: `jakubkrehel/skills`
   (11 skills: better-accessibility, better-colors, better-interface, better-layout,
   better-typography, better-ui, better-writing, break, explain-interface, interface-review,
   variant), `jakubkrehel/make-interfaces-feel-better` (1), `jakubkrehel/oklch-skill` (1),
   `emilkowalski/skills` (13: animate, animate-expo, animation-vocabulary, apple-design,
   ask-sonner, emil-design-eng, find-animation-opportunities, improve-animations,
   mobile-native, pick-ui-library, prototype, review-animations, write-swift).
-- `npm install`: **IN PROGRESS** (attempt 2 after the fix; log `/tmp/nzw-npm-install2.log`).
-- **Baseline gate** (`typecheck` + `build` + `test` + `lint` on the UNMODIFIED app):
-  **NOT STARTED** — must be green before any feature code.
-- Commit scaffolding: **NOT STARTED**.
+- `npm install`: **DONE** — 472 packages in 2m (attempt 2 after the fix);
+  `lovable-tagger@1.3.4` verified via `require()`.
+- **Baseline gate: DONE — GREEN.** `typecheck` EXIT=0; `build` EXIT=0 (1668 modules, 429ms;
+  `tailwindcss-animate` still active — `accordion-down` present in the built CSS); `test` EXIT=0
+  (5 tests); `lint` EXIT=0 after repair.
+- **OTHER BUGS FOUND + FIXED in the baseline (bug-fix-forward rule)**:
+  1. `npm run lint` FAILED with **5 pre-existing errors** / 7 warnings: `no-explicit-any` x2 in
+     `PolicyInput.tsx` (untyped `window.puter`), `no-empty-object-type` in `ui/command.tsx` and
+     `ui/textarea.tsx` (empty interfaces), `no-require-imports` in `tailwind.config.ts`. Fixed at
+     root cause (typed Puter accessor; `type` aliases; ESM import). No rule downgrades, no
+     `@ts-ignore`, no `eslint-disable`.
+  2. `react-hooks/exhaustive-deps` was only `warn`; now **`error`** (rule 06 requirement). The
+     newly surfaced violations were fixed properly — `formatFileSize` hoisted to module scope in
+     `PolicyInput`; unused `messages` dep removed from `AgentFeed`. NOTE (honest caveat): the
+     `AgentFeed` streaming timer no longer restarts on every appended message — a timing nuance
+     only; that component is replaced by the deterministic engine in Phase D/F.
+  3. `playwright.config.ts` / `playwright-fixture.ts` imported the non-existent
+     `lovable-agent-playwright-config` (Playwright could not run at all). Replaced with a standard
+     `@playwright/test` config (`testDir: e2e`, webServer = `vite preview` on 127.0.0.1:4173,
+     screenshot on failure).
+  4. `src/test/example.test.ts` (`expect(true).toBe(true)`) — a test that cannot fail — deleted
+     and replaced by `src/test/palette-lock.test.ts` (5 assertions on the LOCKED palette),
+     **mutation-verified**: mutating `--primary` to `120 100% 21%` made it FAIL with
+     `AssertionError: expected '120 100% 21%' to be '120 100% 20%'`, then the file was restored
+     exactly (`RESTORED_OK`).
+  5. `tsc -b` leaked untracked `*.tsbuildinfo` files into the tree — added to `.gitignore`.
+- `npm run validate` baseline: **RED as designed** — 18 vendor-term, 2 non-determinism,
+  4 network violations; 2 checks PASS; 5 SKIP (files not yet created).
+- Commit scaffolding: **DONE** — `a2a5b7c`; `git status --short` empty at that commit.
+- Playwright Chromium binary: **NOT installed yet** (`npx playwright install chromium` before
+  Phase H). No `e2e/` specs exist yet.
 
 ### Phase A — Audit
 **Status: DONE** — completed in the planning session; findings summarised here.
@@ -134,38 +163,54 @@ Verified audit facts (by command, not assumption):
 | 2026-09-24 | `npm install` attempt 1 | **FAIL (ERESOLVE)** — lovable-tagger 1.1.13 vs vite 8 |
 | 2026-09-24 | `npm install` attempt 2 (after bump to `^1.3.4`) | PASS — *added 472 packages in 2m*; installed `lovable-tagger@1.3.4` verified via require() |
 | 2026-09-24 | `npx skills add … -g -a cline` (4 sources) | PASS — 26 skills in `~/.agents/skills/`, `skills ls -g` reports **Cline** among registered agents |
-| 2026-09-24 | baseline `typecheck`/`build`/`test`/`lint` | see next entry (in progress) |
+| 2026-09-24 | baseline `npm run typecheck` | PASS — EXIT=0 |
+| 2026-09-24 | baseline `npm run build` | PASS — EXIT=0; 1668 modules; 429ms; `accordion-down` in built CSS (tailwind plugin active) |
+| 2026-09-24 | baseline `npm test` | PASS — EXIT=0; 5/5 palette-lock tests |
+| 2026-09-24 | baseline `npm run lint` (attempt 1) | **FAIL** — 5 errors, 7 warnings (all pre-existing) |
+| 2026-09-24 | `npm run lint` after repair + hooks-as-error | PASS — EXIT=0; 0 errors; 7 pre-existing react-refresh warnings |
+| 2026-09-24 | `npm run validate` | **FAIL (expected)** — 18 vendor-term, 2 non-determinism, 4 network; 2 PASS; 5 SKIP |
+| 2026-09-24 | mutation test of palette-lock test | PASS — mutating `--primary` made the test fail; file restored (`RESTORED_OK`) |
+| 2026-09-24 | Phase 0 commit | PASS — `a2a5b7c`; `git status --short` empty |
 
 ## Known-red / open items
-- `npm run validate` is expected to be **RED until Phase D**: the existing UI still contains
-  vendor terminology (`OASIS`, `GraphRAG`, `Puter`), `Math.random()` in two components, and
-  external CDN URLs in `index.html`. Those are the Phase B–D scrub targets, not regressions.
-- Playwright currently **cannot run** until `playwright.config.ts` / `playwright-fixture.ts` are
-  repaired (they import `lovable-agent-playwright-config`, which is not a dependency).
-  Scheduled before Phase H. `@playwright/test` itself IS installed (devDependency).
+- `npm run validate` is **RED until Phase D** (expected, not a regression): 18 vendor-term hits
+  (`OASIS`/`GraphRAG` in `AgentFeed`/`EngineStatus`/`HeaderBar`, `puter` in `PolicyInput`,
+  `Vultr` in `SovereignFooter`, the Puter `<script>` in `index.html`), 2 `Math.random()` hits
+  (`AgentFeed`, `PolicyInput` parse progress), and 4 network URLs in `index.html` (Google Fonts
+  x3 + Puter). This list IS the Phase B–E work.
+- Playwright config is repaired but the **Chromium binary is not installed** yet
+  (`npx playwright install chromium` before Phase H). No `e2e/` specs exist yet.
+- 7 residual `react-refresh/only-export-components` **warnings** in stock shadcn/ui files
+  (badge, button, form, navigation-menu, sidebar, sonner, toggle) — pre-existing, non-blocking;
+  changing them buys nothing and risks the preserve-UI constraint.
 - `npm install` reported 3 unapproved install scripts (`fsevents`, `esbuild`). esbuild's
-  postinstall (`node install.js`) is a fallback path — `@esbuild/darwin-arm64` ships the binary
-  via optional deps. The baseline `build` result is the real proof; if the build fails, that
-  script must be approved before anything else.
+  postinstall is a fallback path (`@esbuild/darwin-arm64` ships the binary via optional deps);
+  the baseline build PASSED, so this is not blocking.
 
-## Files touched this session
+## Files touched in Phase 0
 `.clinerules/00*..05*.md`, `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md`,
-`docs/ENGINEERING_PRINCIPLES.md`, `scripts/validate.mjs`, `package.json`, `.gitignore`
+`docs/ENGINEERING_PRINCIPLES.md`, `scripts/validate.mjs`, `package.json`, `package-lock.json`,
+`eslint.config.js`, `playwright.config.ts`, `playwright-fixture.ts`, `tailwind.config.ts`,
+`.gitignore`, `src/components/AgentFeed.tsx`, `src/components/PolicyInput.tsx`,
+`src/components/ui/command.tsx`, `src/components/ui/textarea.tsx`,
+`src/test/palette-lock.test.ts` (added), `src/test/example.test.ts` (deleted)
 
 ---
 
 ## RESUME HERE
-- Branch: `feature/unified-platform` · Baseline tag: `baseline-pre-unified-platform` (`7451db0`)
-- Tree at last checkpoint: **dirty** (Phase 0 scaffolding not yet committed — expected).
-- Next action: run the **baseline gate** on the unmodified app and record results:
-  `npm run typecheck`, `npm run build`, `npm test`, `npm run lint`, then `npm run validate`
-  (validate is expected RED — capture the counts as the Phase B–D work list).
-  Then fix `playwright.config.ts` / `playwright-fixture.ts`, approve esbuild scripts if needed,
-  and commit the Phase 0 scaffolding.
-- Read next: this file, then `package.json`, then `scripts/validate.mjs`.
+- Branch: `feature/unified-platform` · HEAD after Phase 0: `a2a5b7c` (tree clean at that commit).
+- Baseline tag: `baseline-pre-unified-platform` (`7451db0`) — the original app, always restorable
+  with `git checkout main` or `git checkout baseline-pre-unified-platform`.
+- Next action: **Phase B** — create `src/config/brand.ts`, `src/config/reference.ts`,
+  `src/config/departments.ts` (all 16 departments with the exact stable IDs), self-host Inter +
+  JetBrains Mono, remove the Puter + Google Fonts CDN references from `index.html`, and build
+  `src/pages/Home.tsx` + `src/components/departments/DepartmentGrid.tsx` (16 keyboard-accessible
+  buttons). Then re-run `npm run validate` (expect vendor + network counts to reach 0) and wire
+  the routes in `src/App.tsx`.
+- Read next: this file, then `src/index.css`, `tailwind.config.ts`, `index.html`, `src/App.tsx`,
+  `src/components/HeaderBar.tsx` (the visual language to preserve).
 - Exact commands:
 ```bash
-npm run typecheck; npm run build; npm test; npm run lint; npm run validate
-npx playwright install chromium
-git add -A && git commit -m "chore(phase-0): rules, status file, validators, dependency fix"
+npm run validate; npm run typecheck; npm run lint; npm test; npm run build
+git add -A && git commit -m "feat(phase-b): homepage, 16-department config, self-hosted fonts"
 ```
