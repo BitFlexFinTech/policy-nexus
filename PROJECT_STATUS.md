@@ -593,7 +593,9 @@ picker) · `src/components/HeaderBar.tsx` (*Change department* → `/start`, *Si
    with `exact: true` and a scoped locator, not by loosening the assertion.
 
 **Evidence this session:** `npm run validate` PASS · `npm run typecheck` PASS · `npm run lint` PASS ·
-`npm test` PASS — **143/143 tests, 10 files** · `npm run build` PASS · `npx playwright test`
+`npm test` PASS — **143/143 tests, 9 files** (palette-lock 5 · departments 14 · assessment 22 ·
+documents 40 · routes 9 · workspace 29 · choose-department 6 · journey 9 · landing 9) · `npm run build`
+PASS — 1,703 modules, 492 ms · `npx playwright test`
 **6/6 passed (7.4s)** including *"the landing page hands off to the chooser, which lists all 16
 departments"* and the full upload → run → assessment → report → policy-draft journey entered through
 the new two-step flow. Both new screens were also rendered in the production preview
@@ -995,7 +997,7 @@ relative path so it does not duplicate the source of truth).
 - **What is still NOT built:** server-side PDF/DOCX text extraction, a real `.docx` renderer (the
   Word export is HTML-based `application/msword`), the remote assessment service client (registered
   in `CLIENTS` but deliberately unimplemented — the mock-first seam), and Government SSO. Playwright
-  click-through is **no longer** on this list: it is built and green (Phase H).
+  click-through is **no longer** on this list: it is built and green (Phases H→M).
 - **Next action: no phase is outstanding — the build is complete and verified (Phases 0–M).** The
   full suite is green (validate, typecheck, lint, test **143/143**, build, **and `npx playwright test`
   6/6**).
