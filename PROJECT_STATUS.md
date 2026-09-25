@@ -112,7 +112,9 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
   4 network violations; 2 checks PASS; 5 SKIP (files not yet created).
 - Commit scaffolding: **DONE** — `a2a5b7c`; `git status --short` empty at that commit.
 - Playwright Chromium binary: **NOT installed yet** (`npx playwright install chromium` before
-  Phase H). No `e2e/` specs exist yet.
+  Phase H). No `e2e/` specs exist yet. *(Historical — **resolved in Phase H**: a Chrome binary was
+  already in the Playwright cache, `e2e/journey.spec.ts` now exists, and `npx playwright test` is
+  4/4 green.)*
 
 ### Phase A — Audit
 **Status: DONE** — completed in the planning session; findings summarised here.
@@ -379,8 +381,37 @@ real-browser visual/pixel check yet (Playwright Chromium is not installed; that 
   allowed to flow). Screen layout untouched; palette tokens unchanged (palette-lock test still green).
 - `src/App.tsx` — the three new routes nested inside `RequireSession` → `WorkspaceLayout`.
 
-### Phase H — Verification (full suite + Playwright journey for all 16 departments)
-**Status: NOT STARTED**
+### Phase H — Verification (real-browser journey + runtime invariants)
+**Status: DONE — verified this session** (browser journey runs as `fin`; all-16-department render
+coverage is the jsdom `workspace.test.tsx` suite, not the browser test)
+
+- `e2e/journey.spec.ts` — the real in-browser journey, 4 tests, run by `npx playwright test`
+  against the **production `vite preview` build** (config already pointed at `127.0.0.1:4173`):
+  1. **home lists all 16 departments and one-click entry opens the workspace** — asserts the
+     department group renders exactly `DEPARTMENT_COUNT` (16) buttons, every department's
+     `shortName` is addressable, selection shows `Selected: <name>`, entry lands on `/app`, and
+     the workspace is labelled with the department and the visible `Entry: one-click (Mock)` marker.
+  2. **department context survives navigation and a full reload** — navigates via the workspace nav,
+     then `page.reload()` (a genuine re-run of the app), and asserts the session is still there and
+     `localStorage["nzwisiso.session.v1"]` contains `"fin"`.
+  3. **paste a draft, run it, then read and export the assessment** — the full journey: paste →
+     **Run Simulation** → `/app/simulations/:id` → rounds reveal → **Assessment Complete** →
+     executive summary → a metric card opens to its detail (`aria-expanded`) → **Print** and
+     **Save as PDF** both invoke `window.print()` → **Download Word** produces a real
+     `…-executive-summary.doc` download → **Share** reports its clipboard fallback → full assessment
+     opens with the method-and-limitations note.
+  4. **upload a policy document and run it from the file input** — `setInputFiles` on the real
+     `<input type="file">`, the file is listed, **Run Simulation** records `source upload`
+     (it does not imply the file was parsed), and the run reaches **Assessment Complete**.
+- **Runtime invariants asserted for every test** — the two things only a real browser can prove:
+  - **zero console errors** and **zero uncaught page errors**, and
+  - **zero off-origin requests** (every request URL must start with `http://127.0.0.1:4173`),
+    so the built bundle provably makes **no external network call** at runtime.
+- `e2e/` now exists; Chromium was already present in the Playwright cache
+  (`chromium-1208` / `chromium-1234`), so no install step was needed.
+- Playwright prints `DEP0205 module.register() deprecated` on Node 26 — a harness notice, not an
+  app issue; all 4 tests pass regardless.
+
 
 ### Phase I — Push + review zip
 **Status: NOT STARTED** (push ONLY when every suite is green; never to `main`).
@@ -420,10 +451,13 @@ real-browser visual/pixel check yet (Playwright Chromium is not installed; that 
 - **Upload evidence:** `Total: 2 directories, 10 files, 0 symlinks / New: 10 files` in 189 s;
   remote `find` afterwards lists `./.htaccess`, `./index.html`, `./assets/*`, `./fonts/*`,
   `./favicon.ico`, `./placeholder.svg`, `./robots.txt`.
-- **NOT verified — stated plainly, not claimed:** the **in-browser end-to-end journey**
-  (homepage → pick department → `/app` → registers → sign-out). No Playwright Chromium binary is
-  installed and no `e2e/` spec exists, so **no real browser interaction was run**. Server-level
-  responses and bundle content are verified; click-through behaviour is **unverified**.
+- **NOT verified at deploy time — stated plainly, not claimed:** the **in-browser end-to-end journey**
+  (homepage → pick department → `/app` → registers → sign-out). No Playwright Chromium binary was
+  installed and no `e2e/` spec existed, so **no real browser interaction was run** in Phase J.
+  Server-level responses and bundle content were verified; click-through behaviour was **unverified**.
+  **Now closed by Phase H:** `npx playwright test` → 4/4 against the local production preview. The
+  *live* host still serves the **Phase D** bundle, so the Phase H journey verified the Phases E–H
+  build locally, not the deployed one.
 - **⚠ SECURITY ACTION REQUIRED:** the FTP password was supplied in plaintext in chat. It is live
   and grants **full write access to the web root**. **Rotate it** in cPanel → FTP Accounts after
   this session. Nothing was written into the repo — it was passed only via the `LFTP_PASSWORD`
@@ -493,7 +527,7 @@ lftp --env-password -u 'nzwisiso@nzwisiso.bitflex.app' ftp://ftp.bitflex.app \
 | 2026-09-25 | autoindex removed check on `/` | PASS — `grep -ci autoindex` → **0** (was 3 on the pre-deploy `Index of /` page) |
 | 2026-09-25 | deployed-bundle identity grep | PASS — bundle contains `Nzwisiso`(2), `Understanding before action`(1), `Policy Register`(1), `2026-09-24`(1), `one-click`(1) |
 | 2026-09-25 | full suite re-run AFTER adding `public/.htaccess` | PASS — `SUITE_EXIT=0`; `VALIDATE: PASS`; 0 errors; **62/62 tests**; built in 484 ms |
-| 2026-09-25 | in-browser end-to-end journey (Playwright) | **NOT RUN — Chromium binary not installed, no `e2e/` spec exists.** Click-through behaviour is **unverified**, not claimed working |
+| 2026-09-25 | in-browser end-to-end journey (Playwright) | **NOT RUN at that time — Chromium binary not installed, no `e2e/` spec existed.** Row kept as a historical record; **superseded by the Phase H row below**, where the journey runs and passes |
 | 2026-09-25 | `npm run validate` (Phases E–G) | PASS — **all 9 checks green, zero SKIPs** (`@media print` and the disclaimer are now detected because the report files exist) |
 | 2026-09-25 | `npx tsc -b --pretty false` (Phases E–G) | PASS — no output, exit 0 |
 | 2026-09-25 | `npm run lint` (Phases E–G) | PASS — 0 errors, 7 pre-existing react-refresh warnings |
@@ -502,6 +536,13 @@ lftp --env-password -u 'nzwisiso@nzwisiso.bitflex.app' ftp://ftp.bitflex.app \
 | 2026-09-25 | determinism replay — `src/test/assessment.test.ts` | PASS — same request ⇒ `JSON.stringify`-identical run; whitespace/case changes ⇒ same id; a real text change ⇒ different id; all 16 departments cover every modelled segment and priority; values in range |
 | 2026-09-25 | run-store round-trip — `src/test/assessment.test.ts` | PASS — `buildRun` persists nothing; `run` records exactly one row; re-running identical inputs replaces rather than duplicates; per-department filtering correct |
 | 2026-09-25 | journey render — `src/test/journey.test.tsx` | PASS — submit a preset → `/app/simulations/:id` → every round reveals → **Assessment Complete** → executive summary and full assessment render every metric, reaction, impact and risk; unknown reference shows the explicit panel; `/app/simulations/:id` redirects to `/` with no session |
+| 2026-09-25 | `npx playwright test` (Phase H) — real Chromium against `vite preview` | **PASS — 4/4 tests** in 6.5 s: home/16-department listing + one-click entry · session survives navigation **and a full reload** · paste → run → **Assessment Complete** → executive summary → metric drill-down → Print/Save-as-PDF invoke `window.print()` → real `…-executive-summary.doc` download → Share clipboard fallback → full assessment · upload → run records `source upload` |
+| 2026-09-25 | Phase H runtime invariants, asserted in every browser test | **PASS — 0 console errors, 0 page errors, 0 off-origin requests.** The production bundle provably makes no runtime network call |
+| 2026-09-25 | `npm run validate` (Phase H) | PASS — all 9 checks green, zero SKIPs |
+| 2026-09-25 | `npx tsc -b --pretty false` (Phase H) | PASS — no output, exit 0 |
+| 2026-09-25 | `npm run lint` (Phase H, now including `e2e/`) | PASS — 0 errors, 7 pre-existing react-refresh warnings |
+| 2026-09-25 | `npm test` (Phase H) | PASS — 7 files, **90/90 tests** |
+| 2026-09-25 | `npm run build` (Phase H) | PASS — built in 502 ms; 456.53 kB JS / 61.21 kB CSS |
 
 ## Known-red / open items
 - **DEPLOYMENT — two facts a cold session must not get wrong.** (a) The host in the deployment
@@ -523,9 +564,11 @@ lftp --env-password -u 'nzwisiso@nzwisiso.bitflex.app' ftp://ftp.bitflex.app \
 - **Recorded correction:** the Phase 0 verification log claimed `npm run typecheck` was PASS.
   That was wrong — the test files failed to typecheck at HEAD. It has been fixed (see Phase B
   bug 1) and the log row is retained with a note rather than quietly deleted.
-- Playwright config is repaired but the **Chromium binary is not installed** yet
-  (`npx playwright install chromium` before Phase H). No `e2e/` specs exist yet. This is why
-  Phase B's visual/reload behaviour is recorded as unverified rather than done.
+- **Playwright is GREEN as of Phase H.** Chromium is present (`chromium-1208` / `chromium-1234` in
+  the Playwright cache), `e2e/journey.spec.ts` exists, and `npx playwright test` → **4/4 passing**
+  against the production preview build. The browser journey, the reload-persistence check, and the
+  **0 console-error / 0 off-origin-request** invariants are now *verified*, not assumed. Phase B's
+  old "no real-browser render check" caveat is closed by this run.
 - 7 residual `react-refresh/only-export-components` **warnings** in stock shadcn/ui files
   (badge, button, form, navigation-menu, sidebar, sonner, toggle) — pre-existing, non-blocking;
   changing them buys nothing and risks the preserve-UI constraint.
@@ -617,49 +660,62 @@ dependencies, `src/components/ui/**` (still byte-identical stock primitives), `L
 `src/config/brand.ts`, `src/config/reference.ts`, `src/routes/RequireSession.tsx`,
 and all palette tokens in `src/index.css` (`:root` unchanged — palette-lock test still green).
 
+## Files touched in Phase H
+**Added:** `e2e/journey.spec.ts` (the 4-test real-browser journey; imports the department config by
+relative path so it does not duplicate the source of truth).
+
+**Modified:** `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md`.
+
+**Unaltered:** every file under `src/**`, `index.html`, `src/index.css`, `tailwind.config.ts`,
+`package.json` dependencies, `playwright.config.ts` (already correct), `src/components/ui/**`,
+`LICENSE`/`NOTICE`. No new dependency: `@playwright/test` was already a devDependency.
+
 ---
 
 ## RESUME HERE
 
-- **Branch:** `feature/unified-platform` · **HEAD:** the Phases E–G commit — run `git rev-parse HEAD`.
+- **Branch:** `feature/unified-platform` · **HEAD:** the Phase H commit — run `git rev-parse HEAD`.
   `tree:` clean. Functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C ·
   Phase D = the commit whose message begins `feat(phase-d)` · Phase J = `feat(phase-j)` ·
-  Phases E–G = the commit whose message begins `feat(phase-e)`.
+  Phases E–G = the commit whose message begins `feat(phase-e)` ·
+  Phase H = the commit whose message begins `test(phase-h)`.
   `git log --oneline -10 | cat` is the second opinion on state.
   (This shell's git rejects `--no-pager`; use plain `git log --oneline | cat`.)
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
   restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
 - **`main` is untouched. Nothing has been pushed to any git remote.** (The app *is* **live in
   production** — see Phase J — but that was an FTP upload of `dist/`, not a git push. The live
-  build is therefore the **Phase D** bundle; redeploy to publish Phases E–G.)
+  build is therefore the **Phase D** bundle; redeploy to publish Phases E–H.)
 - **LIVE NOW:** `https://nzwisiso.bitflex.app/` serves the **Phase D** build (Phase J, verified by
-  live HTTPS checks). To publish Phases E–G: `npm run build`, then the `lftp mirror -R` FTPS command
+  live HTTPS checks). To publish Phases E–H: `npm run build`, then the `lftp mirror -R` FTPS command
   written in Phase J. **Do not use `--delete`** (it would remove the server's SSL validation token).
-- **The whole journey now works, verified by tests this session:** `/` → pick one of 16 departments
-  → `/app` (department-labelled workspace) → type or pick a preset draft → **Run Simulation** →
+- **The whole journey works in a REAL browser, verified this session (Phase H):** `/` → pick one of
+  the 16 departments (count asserted) → one-click entry → `/app` (department-labelled workspace,
+  `Entry: one-click (Mock)` visible) → paste or upload a draft → **Run Simulation** →
   `/app/simulations/:id` replays the seeded rounds and reaches **Assessment Complete** →
   **Open executive summary** (`/app/assessments/:id`) → **Open full assessment**
-  (`/app/assessments/:id/full`) → Print / Save as PDF / Download Word / Share. The register and the
-  workspace history table list the recorded run and link to its assessment. Same inputs always
-  reproduce the same run.
+  (`/app/assessments/:id/full`) → Print / Save as PDF / Download Word / Share. `npx playwright test`
+  → **4/4**, and every test asserts **0 console errors + 0 off-origin requests**. The session also
+  survives a genuine page reload (asserted against `localStorage["nzwisiso.session.v1"]`). Same
+  inputs always reproduce the same run.
 - **Determinism is enforced by real tests, not by inspection:** `src/test/assessment.test.ts`
   asserts a `JSON.stringify`-identical run for identical input, whitespace/case insensitivity, a
   different id for changed text, and coverage of every segment + priority for all 16 departments.
-- **What is still NOT built:** Playwright click-through (Phase H — Chromium binary is not installed
-  and no `e2e/` spec exists, so **in-browser interaction is unverified**), server-side PDF/DOCX text
-  extraction, a real `.docx` renderer, the remote assessment client (registered but not implemented),
-  and Government SSO.
-- **Next action: Phase H — verification.** `npx playwright install chromium`, add an `e2e/` spec for
-  the journey above (including a **0 network requests** assertion and a **0 console errors**
-  assertion) and run it against `vite preview`. If Chromium cannot be installed, record Phase H as
-  BLOCKED with that exact reason rather than claiming the journey verified.
-- **Read next:** this file, then `src/services/assessment/AssessmentService.ts` (the seam),
-  `src/services/assessment/scenario.ts` (the engine), `src/pages/SimulationRun.tsx`, and
-  `src/test/journey.test.tsx` (what is already asserted).
+- **What is still NOT built:** server-side PDF/DOCX text extraction, a real `.docx` renderer (the
+  Word export is HTML-based `application/msword`), the remote assessment service client (registered
+  in `CLIENTS` but deliberately unimplemented — the mock-first seam), and Government SSO. Playwright
+  click-through is **no longer** on this list: it is built and green (Phase H).
+- **Next action: Phase I — push + review zip.** The full suite is green (validate, typecheck, lint,
+  test, build, **and `npx playwright test` 4/4**). Push the feature branch when ready — **never to
+  `main`** — then export the review zip. Optionally redeploy `dist/` to publish Phases E–H, then
+  re-run the live route checks.
+- **Read next:** this file, then `e2e/journey.spec.ts` (what the browser journey actually asserts),
+  `src/services/assessment/AssessmentService.ts` (the seam), `src/services/assessment/scenario.ts`
+  (the engine), and `src/pages/SimulationRun.tsx`.
 - **Exact commands:**
 ```bash
 npm run validate; npm run typecheck; npm run lint; npm test; npm run build
-git add -A && git commit -m "feat(phase-e-g): assessment seam, deterministic engine, live simulation, executive + full assessment, document actions"
+npx playwright test   # 4/4 — real browser vs vite preview; asserts 0 console errors, 0 off-origin requests
 ```
 
 ### Traps a cold session must not re-discover the hard way

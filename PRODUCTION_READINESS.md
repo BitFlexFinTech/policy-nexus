@@ -59,12 +59,26 @@ client is registered.
 - Real `.docx` / native PDF rendering.
 - Remote assessment service endpoint + client construction in `CLIENTS` (`src/services/assessment/AssessmentService.ts`).
 - Government SSO integration.
-- Playwright Chromium binary is not installed and no `e2e/` spec exists yet — Phase H.
+- ~~Playwright Chromium binary is not installed and no `e2e/` spec exists yet — Phase H.~~
+  **DONE (Phase H):** `e2e/journey.spec.ts` exists and `npx playwright test` passes **4/4** against
+  the production `vite preview` build, asserting **0 console errors** and **0 off-origin requests**.
 
 ## 6b. Verified clean in Phase D
 - `npm run validate` → **PASS — all checks green** (banned copy, predictive phrasing, vendor
   terminology, determinism, network URLs, 16 department ids, reference date, disclaimer).
 - Zero runtime network references in the built output (`grep -roE 'https?://' dist/index.html dist/assets/*.css` → 0).
+
+## 6c. Verified in a real browser (Phase H)
+- `npx playwright test` → **4/4 PASS** against the production `vite preview` build: home lists all
+  16 departments · one-click entry · session survives navigation **and a full reload** · paste →
+  Run Simulation → **Assessment Complete** → executive summary → metric drill-down →
+  Print / Save-as-PDF / Download-Word (a real `…-executive-summary.doc`) / Share · upload → the run
+  records `source upload`.
+- Every browser test asserts **0 console errors, 0 uncaught page errors, and 0 off-origin requests** —
+  the built bundle provably makes **no runtime network call**, which is the strongest available form
+  of the mock-first / no-CDN guarantee.
+- Stated plainly: the journey was verified against the **local** production preview. The live host
+  still serves the older **Phase D** bundle until `dist/` is redeployed.
 
 ## 7. Disabled by default (deliberate)
 - Puter CDN script and `puter.ai.chat()`: **fully removed.** Phase B deleted the
