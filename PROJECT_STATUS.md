@@ -666,6 +666,68 @@ before a choice), and the `Continue to workspace` route when a session exists. T
 
 ---
 
+### Phase N — Hero redesign on the landing page
+**Status: DONE — verified this session.** (The user asked, verbatim: *"don't you think the Hero section
+could be better designed? what do you think?"*)
+
+Four real defects were found by reading the rendered page rather than the code, and each is fixed at
+the cause:
+
+1. **The `<h1>` was doing the tagline's job, not the page's.** "Understanding before action." is brand
+   voice; a first-time user learned a mood, not a task. A government service leads with the task
+   (GOV.UK's *start* pattern). The `<h1>` is now
+   **"Test the policy before the measure is finalised."**, and the tagline is retained on the page —
+   demoted to the brand line closing the new hero panel, where it reads as voice rather than as the
+   proposition.
+2. **A third of the hero was dead space.** Body text stopped around 880 px inside a 1152 px container
+   while every other section on the page is a bordered card, so the page began as a floating text
+   column and then abruptly became a card system. The hero is now a **two-column grid**
+   (`lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]`), collapsing to one column below `lg`.
+3. **The hero was the only unframed block on the page.** The dead space is now a bordered
+   `<aside>` using the same card vocabulary (`rounded-lg border bg-card p-5`) as every other section.
+4. **The figures had no stated frame.** For a *policy simulation*, "which reference date / fiscal year /
+   rates is this computed against" is material to trusting a number, and it existed only as small
+   right-aligned text in the notice strip. The panel is headed **"Reference date and inputs"** and
+   renders the reference date, the fiscal year and all three reference rates — **read from
+   `src/config/reference.ts`, none written into the markup.**
+
+Consequential typographic decisions, inside the locked rules: `text-balance` on the `<h1>` (Tailwind
+3.4, present) so the two-line headline is not lopsided; `leading-[1.1]` on the headline; `max-w-xl`
+measures on both body paragraphs at 18 px and 14 px so neither runs past ~70 characters; the disclaimer
+micro-copy raised from 10 px to 11 px to match the notice strip's body size.
+
+**A duplicate-heading bug was found and fixed during verification, not worked around:** the footer
+already contained an `<h2>` "Reference frame", so the new panel produced **two identically-named
+headings on one page** — the `landing.test.tsx` failure reported exactly that. The panel was renamed
+**"Reference date and inputs"** (precise about its own contents) and the test now asserts that the
+heading appears **exactly once**, so the collision cannot be reintroduced silently.
+
+**A value/unit bug was also caught before it shipped:** the rate rows initially rendered the value and
+its unit with no separating space (`textContent` read `"13.56ZiG per USD"`), which is wrong for
+copy-paste and for screen readers. Fixed with an explicit space, and the test asserts the rendered
+string as `"13.56 ZiG per USD"`.
+
+**Files:** `src/pages/Landing.tsx` (hero section restructured; `reference.ts` imported) ·
+`src/test/landing.test.tsx` (h1 test rewritten; the coverage-figures test **scoped to its own section**
+because the page now legitimately holds two definition lists; +1 new test pinning the reference panel
+to configuration) · `src/test/routes.test.tsx` (2 landing-h1 assertions) · `e2e/journey.spec.ts`
+(2 h1 assertions + 3 new assertions that the hero panel renders in a real browser).
+
+**Not changed:** palette, typography families, `package.json` dependencies, the workspace, `/start`, the
+footer, the coverage section. No new colour literal.
+
+**Evidence this session:** `npm run validate` PASS (9/9) · `npm run typecheck` PASS · `npm run lint`
+PASS (0 errors, 7 pre-existing warnings) · `npm test` **9 files, 144/144** (was 143; the new
+reference-panel test) · `npm run build` PASS (built in 525 ms) · `npx playwright test` **6/6 (7.1 s)**,
+now also asserting the hero panel's heading, reference date and `13.56 ZiG per USD` in real Chromium
+with 0 console errors / 0 off-origin requests. Rendered at **1440×900** (two columns, CTA above the
+fold) and **390×844** (single column, panel below the CTA, nothing clipped) and inspected as images.
+
+**Deliberately reversible:** the `<h1>` wording is an opinion, not a user instruction. Reverting to the
+tagline as `<h1>` is a two-line change to `Landing.tsx` plus the three test assertions that name it.
+
+---
+
 ## Verification log
 | Date | Command | Result |
 |---|---|---|
@@ -759,6 +821,12 @@ before a choice), and the `Continue to workspace` route when a session exists. T
 | 2026-09-25 | `npx playwright test` (Phase M) — real Chromium vs `vite preview` | **PASS — 6/6 in 7.4 s**, now entering through the **two-step** flow. New/rewritten: *"the landing page hands off to the chooser, which lists all 16 departments"* (asserts the landing holds **no** picker, then that `/start` lists all 16), plus the homepage test rewritten for the pure landing. The other four journeys (paste → run → assessment → export; upload → run; long-form report + policy draft; session survives reload) all pass unchanged through the new entry. Runtime invariants hold: **0 console errors, 0 page errors, 0 off-origin requests** |
 | 2026-09-25 | `npm run preview` + rendered `/` and `/start` to images and inspected them (Phase M) | PASS — `/` = pure landing (proposition, **Choose your Department** CTA, 4 capability cards, coverage 16 / 63 / 48, 3 steps, deterministic panel, footer attribution + classification); **no department grid, no session banner**. `/start` = all **16** department cards, `No department selected`, *Enter workspace* disabled until a pick is made, *Overview* back-link to `/` |
 | 2026-09-25 | Playwright strict-mode bug found and fixed at root (Phase M) | PASS — `getByRole("button", { name: "Choose your Department" })` substring-matched **two** CTAs (hero + closing) → strict-mode violation. Fixed by scoping the locator and adding `exact: true`; the assertion was not loosened |
+| 2026-09-25 | `npm run validate` (Phase N) | PASS — 9/9 green; no new colour literal, no new external URL |
+| 2026-09-25 | `npm test` (Phase N, all files) | PASS — **9 files, 144/144**. The first run was **1 failed** and it was a real defect: two `<h2>` elements both named "Reference frame" (hero panel vs footer column). Fixed by renaming the panel, plus a new assertion that its heading appears exactly once |
+| 2026-09-25 | `npm run typecheck` / `npm run lint` (Phase N) | PASS — typecheck silent; lint 0 errors, 7 pre-existing react-refresh warnings |
+| 2026-09-25 | `npm run build` (Phase N) | PASS — built in 525 ms |
+| 2026-09-25 | `npx playwright test` (Phase N) — real Chromium vs `vite preview` | **PASS — 6/6 in 7.1 s**, with 3 new assertions that the hero panel renders (`Reference date and inputs`, `24 September 2026` exact, `13.56 ZiG per USD` exact). Runtime invariants hold: 0 console errors, 0 page errors, 0 off-origin requests |
+| 2026-09-25 | rendered `/` at 1440×900 and 390×844 (Phase N) and inspected the images | PASS — desktop: two columns, headline in two balanced lines, CTA above the fold, panel card in the page's own card vocabulary; mobile: single column with the panel below the CTA, nothing clipped, no horizontal overflow |
 | 2026-09-25 | dev-server port root cause confirmed (Phase M) | PASS — `vite.config.ts` sets `server.port = 8080` and `host: "::"`; `npm run dev` therefore serves at **http://localhost:8080/**, not 5173. This is why the user's browser still showed the old entry |
 
 ## Known-red / open items
@@ -889,6 +957,19 @@ dependencies, `src/components/ui/**` (still byte-identical stock primitives), `L
 `src/config/brand.ts`, `src/config/reference.ts`, `src/routes/RequireSession.tsx`,
 and all palette tokens in `src/index.css` (`:root` unchanged — palette-lock test still green).
 
+## Files touched in Phase N (hero)
+
+- `src/pages/Landing.tsx` — hero section only: two-column grid, task-led `<h1>`, `text-balance`,
+  measures, 11 px micro-copy, new "Reference date and inputs" `<aside>`, tagline relocated into it.
+  `src/config/reference.ts` newly imported. Nothing else on the page changed.
+- `src/test/landing.test.tsx` — h1 test rewritten; coverage-figures test scoped to its own section;
+  +1 test pinning the reference panel to `REFERENCE_DATE_LABEL` / `REFERENCE_FISCAL_YEAR` /
+  `REFERENCE_RATES`, and asserting the heading appears exactly once.
+- `src/test/routes.test.tsx` — 2 landing-`<h1>` assertions updated.
+- `e2e/journey.spec.ts` — 2 landing-`<h1>` assertions updated; 3 new assertions on the hero panel.
+
+---
+
 ## Files touched in Phase M (landing / chooser split)
 
 **New**
@@ -958,7 +1039,8 @@ relative path so it does not duplicate the source of truth).
   Phase D = the commit whose message begins `feat(phase-d)` · Phase J = `feat(phase-j)` ·
   Phases E–G = the commit whose message begins `feat(phase-e)` ·
   Phase H = the commit whose message begins `test(phase-h)` ·
-  Phase M = the commit whose message begins `feat(phase-m)`.
+  Phase M = the commit whose message begins `feat(phase-m)` ·
+  Phase N = the commit whose message begins `feat(phase-n)`.
   `git log --oneline -10 | cat` is the second opinion on state.
   (This shell's git rejects `--no-pager`; use plain `git log --oneline | cat`.)
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
@@ -983,11 +1065,16 @@ relative path so it does not duplicate the source of truth).
   0 off-origin requests**. The session also survives a genuine page reload (asserted against
   `localStorage["nzwisiso.session.v1"]`). Same inputs always reproduce the same run *and* the same
   two generated documents. **The public entry is now two screens** (Phase M): `/` is a pure landing
-  page — official masthead + gold rule, service notice strip, tagline `<h1>`, four capability cards,
+  page — official masthead + gold rule, service notice strip, task-led `<h1>`, four capability cards,
   a coverage strip computed from the configuration, three steps, closing CTA, and the official footer
   carrying "A Project by the Ministry of IT" / "For Internal Use Only" — and it holds **no department
   picker**. `/start` is the department chooser. Both render through
   `src/components/public/PublicPageShell.tsx`, so their chrome cannot drift apart.
+  **(Phase N)** the landing hero is a two-column grid: proposition + mechanism + sole primary action on
+  the left, and a bordered **"Reference date and inputs"** panel on the right carrying the reference
+  date, fiscal year and three reference rates read from `src/config/reference.ts` — so a figure is
+  never shown without the frame it was computed in. The brand tagline closes that panel instead of
+  being the `<h1>`.
 - **Dev server port:** `npm run dev` serves at **http://localhost:8080/** (`vite.config.ts` sets
   `server.port = 8080`), *not* Vite's default 5173. A stale tab on 5173 shows an old build — this is
   the confirmed root cause of the "I still see the old page" report in Phase M.
@@ -998,8 +1085,8 @@ relative path so it does not duplicate the source of truth).
   Word export is HTML-based `application/msword`), the remote assessment service client (registered
   in `CLIENTS` but deliberately unimplemented — the mock-first seam), and Government SSO. Playwright
   click-through is **no longer** on this list: it is built and green (Phases H→M).
-- **Next action: no phase is outstanding — the build is complete and verified (Phases 0–M).** The
-  full suite is green (validate, typecheck, lint, test **143/143**, build, **and `npx playwright test`
+- **Next action: no phase is outstanding — the build is complete and verified (Phases 0–N).** The
+  full suite is green (validate, typecheck, lint, test **144/144**, build, **and `npx playwright test`
   6/6**).
   Remaining work, in priority order:
   1. **Redeploy `dist/`** to publish Phases E–M to the live host (Phase J's FTPS command; **never

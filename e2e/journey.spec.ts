@@ -92,7 +92,9 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
   test("the landing page hands off to the chooser, which lists all 16 departments", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { level: 1, name: "Understanding before action." })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Test the policy before the measure is finalised." }),
+    ).toBeVisible();
 
     // The landing page is pure: it must NOT carry the department picker.
     await expect(departmentGroup(page)).toHaveCount(0);
@@ -137,10 +139,17 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
 
     // Government-aesthetic structure.
     await expect(
-      page.getByRole("heading", { level: 1, name: "Understanding before action." }),
+      page.getByRole("heading", { level: 1, name: "Test the policy before the measure is finalised." }),
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "What this platform does", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "How it works", exact: true })).toBeVisible();
+    // The hero states the frame its figures are computed in, read from configuration.
+    const frame = page.locator("aside[aria-labelledby='landing-reference-heading']");
+    await expect(
+      frame.getByRole("heading", { name: "Reference date and inputs", exact: true }),
+    ).toBeVisible();
+    await expect(frame.getByText("24 September 2026", { exact: true })).toBeVisible();
+    await expect(frame.getByText("13.56 ZiG per USD", { exact: true })).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Ready to test a policy draft?", exact: true }),
     ).toBeVisible();

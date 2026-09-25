@@ -3,6 +3,7 @@ import { ArrowRight, ClipboardCheck, FileText, Play, ShieldCheck, Users } from "
 import { Button } from "@/components/ui/button";
 import { PublicPageShell } from "@/components/public/PublicPageShell";
 import { BRAND, DISCLAIMER, VOCABULARY } from "@/config/brand";
+import { REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR, REFERENCE_RATES } from "@/config/reference";
 import { COVERAGE } from "@/lib/coverage";
 
 /** What the platform does — four capabilities, in the order a user meets them. */
@@ -54,46 +55,98 @@ const STEPS = [
 export default function Landing() {
   return (
     <PublicPageShell>
-      <section aria-labelledby="landing-proposition">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
-          {BRAND.workspaceLabel}
-        </span>
-        <h1
-          id="landing-proposition"
-          className="mt-3 max-w-4xl text-3xl font-bold tracking-tight text-foreground sm:text-5xl"
-        >
-          {BRAND.tagline}
-        </h1>
-        <p className="mt-5 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-          {BRAND.summary}
-        </p>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-          Bring a policy draft, and the{" "}
-          <span className="font-medium text-foreground">{VOCABULARY.simulationCore}</span> models how
-          stakeholder groups respond, what the fiscal and currency effects look like, and where the
-          risks sit — before the measure is finalised. Every run then produces an assessment and a
-          drafted policy you can edit.
-        </p>
-
-        <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
-          <Button asChild size="lg" className="h-11 px-5 text-sm">
-            <Link to="/start">
-              Choose your Department
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </Button>
-          <Link
-            to="/#capabilities"
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+      <section
+        aria-labelledby="landing-proposition"
+        className="grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:items-start lg:gap-10"
+      >
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
+            {BRAND.workspaceLabel}
+          </p>
+          <h1
+            id="landing-proposition"
+            className="mt-3 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-5xl"
           >
-            See what the platform does
-          </Link>
+            Test the policy before the measure is finalised.
+          </h1>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            {BRAND.summary}
+          </p>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
+            Bring a draft, and the{" "}
+            <span className="font-medium text-foreground">{VOCABULARY.simulationCore}</span> models how
+            stakeholder groups respond, what the fiscal and currency effects look like, and where the
+            risks sit — before the measure is finalised. Every run produces an assessment and a drafted
+            policy you can edit.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
+            <Button asChild size="lg" className="h-11 px-5 text-sm">
+              <Link to="/start">
+                Choose your Department
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </Button>
+            <Link
+              to="/#capabilities"
+              className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              See what the platform does
+            </Link>
+          </div>
+
+          <p className="mt-5 max-w-xl text-[11px] leading-relaxed text-muted-foreground">
+            {DISCLAIMER.short} You will choose the department you are preparing policy for on the next
+            screen.
+          </p>
         </div>
 
-        <p className="mt-5 text-[10px] leading-relaxed text-muted-foreground">
-          {DISCLAIMER.short} You will choose the department you are preparing policy for on the next
-          screen.
-        </p>
+        {/* The reference frame. A simulated figure is only meaningful against the
+            frame it was computed in, so the frame is stated beside the proposition
+            rather than buried in the notice strip. Every value is read from
+            `src/config/reference.ts` — none is written here by hand. */}
+        <aside aria-labelledby="landing-reference-heading" className="rounded-lg border bg-card p-5">
+          <h2
+            id="landing-reference-heading"
+            className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground"
+          >
+            Reference date and inputs
+          </h2>
+          <dl className="mt-4">
+            <div className="flex items-baseline justify-between gap-4 border-b pb-2.5">
+              <dt className="text-xs text-muted-foreground">Reference date</dt>
+              <dd className="font-mono text-xs font-semibold text-foreground">
+                {REFERENCE_DATE_LABEL}
+              </dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-4 border-b py-2.5">
+              <dt className="text-xs text-muted-foreground">Fiscal year</dt>
+              <dd className="font-mono text-xs font-semibold text-foreground">
+                {REFERENCE_FISCAL_YEAR}
+              </dd>
+            </div>
+            {REFERENCE_RATES.map((rate) => (
+              <div
+                key={rate.id}
+                className="flex items-baseline justify-between gap-4 border-b py-2.5 last:border-b-0"
+              >
+                <dt className="text-xs text-muted-foreground">{rate.label}</dt>
+                <dd className="font-mono text-xs font-semibold text-foreground">
+                  {rate.value}{" "}
+                  <span className="font-sans text-[10px] font-normal text-muted-foreground">
+                    {rate.unit}
+                  </span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-3 text-[10px] leading-relaxed text-muted-foreground">
+            Reference inputs, not live market data.
+          </p>
+          <p className="mt-4 border-l-2 border-l-gold pl-3 text-sm font-medium tracking-tight text-foreground">
+            {BRAND.tagline}
+          </p>
+        </aside>
       </section>
 
       <section id="capabilities" aria-labelledby="capabilities-heading" className="mt-16 scroll-mt-6">

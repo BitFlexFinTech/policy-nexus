@@ -96,10 +96,17 @@ client is registered.
 
 ## 6e. Verified in a real browser (Phases L + M — public entry split)
 - **Phase L** rebuilt the public entry as a government-styled page: official masthead + 3px gold rule,
-  coat of arms, service notice strip, tagline `<h1>`, four capability cards, a coverage strip computed
+  coat of arms, service notice strip, tagline, four capability cards, a coverage strip computed
   from `src/config/departments.ts`, three "how it works" steps, and an official footer carrying
   **"A Project by the Ministry of IT"** with **"For Internal Use Only"** beneath it in smaller text
   (asserted against the **real computed font size**: 11px vs 9px).
+- **Phase N** redesigned its hero, after the user questioned it: the `<h1>` is now the **task**
+  ("Test the policy before the measure is finalised.") rather than the brand tagline; the hero is a
+  two-column grid whose right column is a bordered **"Reference date and inputs"** panel (reference
+  date, fiscal year, ZiG exchange rate, policy rate, annual inflation — all read from
+  `src/config/reference.ts`); the tagline closes that panel. `npm test` → **9 files, 144 tests**,
+  including a test that pins every panel value to configuration and one that asserts the panel heading
+  is unique on the page.
 - **Phase M** split that entry into **two** public screens, because a landing page that also contains
   the department picker is not a landing page:
   - `/` — **pure landing page**. Asserts it holds **no department picker**.
@@ -111,6 +118,9 @@ client is registered.
   16 departments"*. Runtime invariants still hold: **0 console errors, 0 page errors, 0 off-origin
   requests**.
 - `npm test` → **9 files, 143 tests**. `npm run validate` → all 9 checks green.
+- **Phases L+M+N together:** `npx playwright test` → **6/6**; `npm test` → **9 files, 144 tests**;
+  `npm run validate` → all 9 checks green. The landing page has been rendered at 1440×900 and
+  390×844 and inspected as images (two columns / single column, CTA above the fold, nothing clipped).
 - **Operational note (cost a real debugging cycle):** `npm run dev` serves at
   **http://localhost:8080/** — `vite.config.ts` pins `server.port = 8080`. Opening 5173 shows a stale
   build. This, not the code, was why the new landing page appeared missing.

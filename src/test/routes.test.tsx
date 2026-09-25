@@ -28,7 +28,7 @@ describe("routes smoke-render and the workspace guard", () => {
 
   it("renders the public landing page at / — and it holds no department picker", () => {
     renderAt("/");
-    expect(landingHeading()).toHaveTextContent("Understanding before action.");
+    expect(landingHeading()).toHaveTextContent("Test the policy before the measure is finalised.");
     expect(screen.queryByRole("group", { name: /select a department/i })).toBeNull();
   });
 
@@ -77,7 +77,7 @@ describe("routes smoke-render and the workspace guard", () => {
     signInToDepartment("health");
     renderAt("/app");
     fireEvent.click(screen.getByRole("button", { name: /Sign out/ }));
-    expect(landingHeading()).toHaveTextContent("Understanding before action.");
+    expect(landingHeading()).toHaveTextContent("Test the policy before the measure is finalised.");
     expect(getSessionDepartmentId()).toBeNull();
   });
 

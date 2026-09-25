@@ -3,8 +3,8 @@ import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Landing from "@/pages/Landing";
 import { DEPARTMENT_COUNT, DEPARTMENTS } from "@/config/departments";
-import { STAKEHOLDER_SEGMENTS } from "@/config/reference";
-import { SOVEREIGNTY_STATEMENT } from "@/config/brand";
+import { STAKEHOLDER_SEGMENTS, REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR, REFERENCE_RATES } from "@/config/reference";
+import { BRAND, SOVEREIGNTY_STATEMENT } from "@/config/brand";
 
 const renderLanding = () =>
   render(
@@ -19,12 +19,15 @@ const renderLanding = () =>
  * the department picker — that is asserted below as a real, failable guard.
  */
 describe("Landing — the pure public landing page", () => {
-  it("presents the tagline as the single level-one heading", () => {
+  it("leads with the proposition as the single level-one heading, not the brand tagline", () => {
     renderLanding();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Understanding before action.",
+      "Test the policy before the measure is finalised.",
     );
+    // The tagline is brand voice, not the page's proposition — it must still be
+    // present on the page, or it has been silently dropped rather than moved.
+    expect(screen.getByText(BRAND.tagline)).toBeInTheDocument();
   });
 
   it("does NOT carry the department picker — that belongs to /start", () => {
@@ -63,7 +66,31 @@ describe("Landing — the pure public landing page", () => {
       String(DEPARTMENTS.reduce((total, d) => total + d.indicators.length, 0)),
       String(DEPARTMENTS.reduce((total, d) => total + d.policyTemplates.length, 0)),
     ];
-    expect(screen.getAllByRole("definition").map((node) => node.textContent)).toEqual(expected);
+    const coverage = screen.getByRole("heading", { name: "Platform coverage" }).closest("section");
+    expect(coverage).not.toBeNull();
+    expect(
+      within(coverage as HTMLElement)
+        .getAllByRole("definition")
+        .map((node) => node.textContent),
+    ).toEqual(expected);
+  });
+
+  it("states the reference frame from configuration, so no figure on the page is invented", () => {
+    renderLanding();
+    // The footer column is also called "Reference frame", so this heading must be
+    // distinct — two identically-named headings on one page read as a mistake.
+    expect(screen.getAllByRole("heading", { name: "Reference date and inputs" })).toHaveLength(1);
+    const frame = screen.getByRole("heading", { name: "Reference date and inputs" }).closest("aside");
+    expect(frame).not.toBeNull();
+    expect(
+      within(frame as HTMLElement)
+        .getAllByRole("definition")
+        .map((node) => node.textContent?.trim()),
+    ).toEqual([
+      REFERENCE_DATE_LABEL,
+      REFERENCE_FISCAL_YEAR,
+      ...REFERENCE_RATES.map((rate) => `${rate.value} ${rate.unit}`),
+    ]);
   });
 
   it("explains the three steps of a run and anchors the sections", () => {
