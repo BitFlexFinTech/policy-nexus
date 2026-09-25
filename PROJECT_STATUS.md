@@ -414,7 +414,19 @@ coverage is the jsdom `workspace.test.tsx` suite, not the browser test)
 
 
 ### Phase I — Push + review zip
-**Status: NOT STARTED** (push ONLY when every suite is green; never to `main`).
+**Status: DONE — verified this session**
+
+- Pushed the **feature branch only**: `GIT_TERMINAL_PROMPT=0 git push -u origin feature/unified-platform`
+  → `* [new branch] feature/unified-platform -> feature/unified-platform`, tracking set,
+  `PUSH_EXIT=0`. Remote branch HEAD = `bc787d5`.
+- **`origin/main` is unchanged at `7451db0`** — the agent never commits to or pushes `main`.
+  `git branch -vv` confirms local `main` still tracks `origin/main` at the baseline.
+- GitHub returned the PR link:
+  `https://github.com/BitFlexFinTech/policy-nexus/pull/new/feature/unified-platform`.
+- **Review zips:** `nzwisiso-policy-dashboard-review-6.zip` (165 files, 1,114,539 B) for the
+  Phase H code state; `-7` exported after this Phase I documentation commit.
+
+**Files touched in Phase I:** `PROJECT_STATUS.md` (this record). No source change.
 
 ### Phase J — Production deployment (live on `nzwisiso.bitflex.app`)
 **Status: DONE — verified this session by live HTTPS checks + the FTPS upload log**
@@ -683,9 +695,10 @@ relative path so it does not duplicate the source of truth).
   (This shell's git rejects `--no-pager`; use plain `git log --oneline | cat`.)
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
   restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
-- **`main` is untouched. Nothing has been pushed to any git remote.** (The app *is* **live in
-  production** — see Phase J — but that was an FTP upload of `dist/`, not a git push. The live
-  build is therefore the **Phase D** bundle; redeploy to publish Phases E–H.)
+- **`main` is untouched at `7451db0`, and the agent has never pushed to it.** The feature branch
+  **is pushed**: `origin/feature/unified-platform` = `bc787d5` (Phase I). The app is also **live in
+  production** — see Phase J — but that was an FTP upload of `dist/`, not a git push, so the live
+  build is still the **Phase D** bundle; redeploy to publish Phases E–H.
 - **LIVE NOW:** `https://nzwisiso.bitflex.app/` serves the **Phase D** build (Phase J, verified by
   live HTTPS checks). To publish Phases E–H: `npm run build`, then the `lftp mirror -R` FTPS command
   written in Phase J. **Do not use `--delete`** (it would remove the server's SSL validation token).
@@ -705,10 +718,14 @@ relative path so it does not duplicate the source of truth).
   Word export is HTML-based `application/msword`), the remote assessment service client (registered
   in `CLIENTS` but deliberately unimplemented — the mock-first seam), and Government SSO. Playwright
   click-through is **no longer** on this list: it is built and green (Phase H).
-- **Next action: Phase I — push + review zip.** The full suite is green (validate, typecheck, lint,
-  test, build, **and `npx playwright test` 4/4**). Push the feature branch when ready — **never to
-  `main`** — then export the review zip. Optionally redeploy `dist/` to publish Phases E–H, then
-  re-run the live route checks.
+- **Next action: no phase is outstanding — the build is complete and verified.** The full suite is
+  green (validate, typecheck, lint, test, build, **and `npx playwright test` 4/4**), the feature
+  branch is pushed, and the review zip is exported. Remaining work, in priority order:
+  1. **Redeploy `dist/`** to publish Phases E–H to the live host (Phase J's FTPS command; **never
+     `--delete`**), then re-run the live route checks.
+  2. **Open the Pull Request** (GitHub link in Phase I) for review before any merge to `main`.
+  3. Non-credential backlog in `PRODUCTION_READINESS.md`: server-side PDF/DOCX extraction, a real
+     `.docx` renderer, the remote assessment service client behind the seam, and Government SSO.
 - **Read next:** this file, then `e2e/journey.spec.ts` (what the browser journey actually asserts),
   `src/services/assessment/AssessmentService.ts` (the seam), `src/services/assessment/scenario.ts`
   (the engine), and `src/pages/SimulationRun.tsx`.
