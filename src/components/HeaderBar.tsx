@@ -48,6 +48,12 @@ export function HeaderBar() {
         <StatusPill label="ZiG Rate" status="warning" value="13.56/USD" />
         {department && (
           <>
+            {/* Mock-first rule: the entry mode must be unmistakable in the UI. */}
+            {session?.mode === "oneclick" && (
+              <span className="rounded border border-primary-foreground/30 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-primary-foreground/70">
+                Entry: one-click (Mock)
+              </span>
+            )}
             <Button
               variant="secondary"
               size="sm"

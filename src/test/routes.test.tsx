@@ -56,6 +56,12 @@ describe("routes smoke-render and the workspace guard", () => {
     expect(screen.queryByText("MoF")).not.toBeInTheDocument();
   });
 
+  it("visibly marks the one-click entry mode as a mock (mock-first rule)", () => {
+    signInToDepartment("zida");
+    renderAt("/app");
+    expect(screen.getByText("Entry: one-click (Mock)")).toBeInTheDocument();
+  });
+
   it("signs out back to the selector and clears the stored session", () => {
     signInToDepartment("health");
     renderAt("/app");

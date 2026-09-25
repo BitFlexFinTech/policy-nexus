@@ -221,11 +221,34 @@ render check yet — Playwright's Chromium binary is not installed (Phase H).**
    component's real scroll call is untouched.
 
 ### Phase C — One-click department session (persistence + route guard)
-**Status: IN PROGRESS — the session module is already built and tested as part of Phase B
-(`src/session/session.ts`, `src/session/useSession.ts`), so that Home's department choice
-actually persists rather than only appearing to. Still outstanding for this phase: the route
-guard (redirect to `/` when there is no session), a visible department context in the workspace
-header, and a sign-out action.**
+**Status: DONE (verified this session, commit `6b69dfb`). Caveat: persistence across a real
+browser reload is still jsdom-tested only — the browser journey is Phase H.**
+
+- `src/session/session.ts` + `src/session/useSession.ts`: **DONE** — built during Phase B (see
+  above) because Home's department choice has to persist for that screen to be functional.
+- `src/routes/RequireSession.tsx`: **DONE** — `/app/**` refuses entry without a department
+  session and redirects to `/` (replacing the history entry, carrying the attempted path in
+  router state). A direct URL visit or a reload after sign-out therefore returns to the
+  selector instead of rendering an unassigned dashboard.
+- `src/App.tsx`: **DONE** — `/app` is now nested inside the guard, so every future `/app/*`
+  route inherits it without repeating the check.
+- `src/components/HeaderBar.tsx`: **DONE** — the workspace header now shows the session's
+  department (abbreviation badge + full name at `xl`) with a **Change department** action
+  (navigates to `/`, keeping the session so the selector pre-selects it) and a **Sign out**
+  action (clears the session, then returns to `/`). Per the preserve-UI rule this was an
+  additive change: with no session the header renders exactly what it rendered before.
+  The `OASIS Engine` / `GraphRAG` pills are **deliberately untouched** — removing them is
+  Phase D work, and doing it here would have silently rolled Phase D into Phase C.
+- **Mock marker (mock-first rule):** the header renders `Entry: one-click (Mock)` whenever
+  `session.mode === "oneclick"`, so the simulated sign-in is unmistakable in the interface
+  rather than implied. `PRODUCTION_READINESS.md` §2 was also corrected: it previously claimed a
+  `VITE_AUTH_MODE` environment switch that **does not exist**.
+- Tests: `src/test/routes.test.tsx` grew from 3 to 8 tests — the guard refuses `/app` with no
+  session, the workspace renders labelled `MoF` for a Finance session and `MoA` for an
+  Agriculture session (proving the department is not hardcoded), the mock marker is visible,
+  sign-out clears the stored session, and switching department keeps it. Suite now **33 tests**.
+- `npm run validate` after Phase C: unchanged — still exactly 16 vendor-term + 2
+  non-determinism hits, all in the five Phase D/E components. No new red, no new pass claim.
 
 ### Phase D — Dashboard simplification (department-aware, terminology scrub, secondary nav)
 **Status: NOT STARTED**
@@ -273,6 +296,14 @@ header, and a sign-out action.**
 | 2026-09-25 | network refs in built output (`grep -roE 'https?://' dist/index.html dist/assets/*.css`) | PASS — **zero** matches |
 | 2026-09-25 | `npm run validate` | **FAIL (expected, scoped)** — 16 vendor-term + 2 non-determinism only; **network URLs PASS (0, was 4)**; banned copy PASS; 16-dept ids PASS; reference date PASS; disclaimer PASS |
 | 2026-09-25 | mutation test of fixed validator checks | PASS — comment-only file naming `new Date()`/`Math.random()`/`OASIS` gives 0 hits; real code hits and trailing comments still caught; scratch files removed |
+| 2026-09-25 | import `src/config/departments.ts` in Node and sum the arrays | PASS — 16 departments, 64 priorities, 63 indicators, 48 templates, 49 documents (corrected two counts previously written from guesswork) |
+| 2026-09-25 | Phase B commit | PASS — `3a22ba2`; `git status --short` empty |
+| 2026-09-25 | `npx tsc -b --pretty false` (Phase C) | PASS — `TSC=0` |
+| 2026-09-25 | `npm test` (Phase C) | PASS — 4 files, **33/33 tests** (5 palette-lock, 14 departments, 8 routes incl. guard + mock marker, 6 Home) |
+| 2026-09-25 | `npm run lint` (Phase C) | PASS — 0 errors, 7 pre-existing react-refresh warnings |
+| 2026-09-25 | `npm run build` (Phase C) | PASS — 441 ms; 413.97 kB JS / 59.85 kB CSS |
+| 2026-09-25 | `npm run validate` (Phase C) | **FAIL (expected)** — unchanged: 16 vendor-term + 2 non-determinism, all in Phase D/E files; no new violations |
+| 2026-09-25 | Phase C commit | PASS — `6b69dfb`; `git status --short` empty |
 
 ## Known-red / open items
 - `npm run validate` is **RED until Phase D/E** (expected, not a regression). After Phase B the
@@ -319,22 +350,65 @@ header, and a sign-out action.**
 **Not touched (locked):** `src/index.css`, `tailwind.config.ts`, `package.json` dependencies,
 `src/components/ui/**` (still byte-identical stock primitives), `LICENSE` / `NOTICE`
 
+## Files touched in Phase C
+**Added:** `src/routes/RequireSession.tsx`
+
+**Modified:** `src/App.tsx`, `src/components/HeaderBar.tsx`, `src/test/routes.test.tsx`
+
+**Deliberately not touched:** the `OASIS Engine` / `GraphRAG` / `Vultr` strings in
+`HeaderBar.tsx`, `EngineStatus.tsx`, `AgentFeed.tsx`, `PolicyInput.tsx`, `SovereignFooter.tsx`,
+and the two `Math.random()` calls — all Phase D/E, so that Phase C did not silently absorb them.
+
 ---
 
 ## RESUME HERE
-- Branch: `feature/unified-platform` · HEAD after Phase 0: `a2a5b7c` (tree clean at that commit).
-- Baseline tag: `baseline-pre-unified-platform` (`7451db0`) — the original app, always restorable
-  with `git checkout main` or `git checkout baseline-pre-unified-platform`.
-- Next action: **Phase B** — create `src/config/brand.ts`, `src/config/reference.ts`,
-  `src/config/departments.ts` (all 16 departments with the exact stable IDs), self-host Inter +
-  JetBrains Mono, remove the Puter + Google Fonts CDN references from `index.html`, and build
-  `src/pages/Home.tsx` + `src/components/departments/DepartmentGrid.tsx` (16 keyboard-accessible
-  buttons). Then re-run `npm run validate` (expect vendor + network counts to reach 0) and wire
-  the routes in `src/App.tsx`.
-- Read next: this file, then `src/index.css`, `tailwind.config.ts`, `index.html`, `src/App.tsx`,
-  `src/components/HeaderBar.tsx` (the visual language to preserve).
-- Exact commands:
+
+- **Branch:** `feature/unified-platform` · **HEAD:** the commit that added this file scan
+  (run `git rev-parse HEAD`; it is a docs-only commit) · **tree:** clean.
+  Functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C.
+  `git --no-pager log --oneline -6` is the second opinion on state.
+- **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
+  restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
+- **`main` is untouched. Nothing has been pushed.**
+- **What actually works right now, end to end:** `npm run dev` → `/` shows all 16 departments as
+  keyboard-accessible buttons → choose one → **Enter &lt;department&gt;** stores the session →
+  `/app` renders the workspace labelled with that department → **Change department** / **Sign
+  out** work → visiting `/app` with no session redirects to `/` → an unknown path still shows
+  `404`. All 16 departments render, and two different sessions were verified to show two
+  different department labels.
+- **What is NOT built yet:** the policy register, the simulation register, the live simulation
+  view, the assessment/executive-summary screens, the full assessment, PDF/Word/print/share,
+  the service layer (`src/services/assessment/**`), the deterministic PRNG, and the policy
+  input wired to a real service. The `/app` workspace still shows the *original* dashboard
+  layout with hardcoded content, still contains vendor terminology, and still calls
+  `Math.random()` twice.
+- **Next action: Phase D** — make the workspace department-aware and scrub vendor terminology.
+  Concretely: `KPICards`, `EngineStatus`, `HistoryTable`, `DocumentLibrary`, `AgentFeed` and
+  `SovereignFooter` must read the session department from `DEPARTMENTS`/`REFERENCE_RATES`
+  instead of the hardcoded arrays currently at the top of each file; remove `OASIS`/`GraphRAG`
+  from `HeaderBar`/`EngineStatus`/`AgentFeed` in favour of `VOCABULARY` from
+  `src/config/brand.ts`; remove `Vultr` from `SovereignFooter` in favour of
+  `SOVEREIGNTY_STATEMENT`; and add the secondary navigation for `/app/policies`,
+  `/app/simulations`, `/app/documents`, `/app/reference`. After Phase D the only remaining
+  red should be the 2 `Math.random()` hits, which are Phase E/F.
+- **Read next:** this file, then `src/pages/Index.tsx` and the six workspace components, then
+  `src/config/departments.ts` (what the workspace must now read from).
+- **Exact commands:**
 ```bash
 npm run validate; npm run typecheck; npm run lint; npm test; npm run build
-git add -A && git commit -m "feat(phase-b): homepage, 16-department config, self-hosted fonts"
+git add -A && git commit -m "feat(phase-d): department-aware workspace, terminology scrub, secondary nav"
 ```
+
+### Traps a cold session must not re-discover the hard way
+1. `npm run validate` is **expected RED** until Phase E: 16 vendor-term + 2 non-determinism,
+   all inside the five workspace components. It is not a regression — do not "fix" it by
+   loosening `scripts/validate.mjs`.
+2. `scripts/validate.mjs` ignores **comment-only lines** for the vendor-term and determinism
+   checks, and does not treat `.prototype` as prose. Both were deliberate fixes verified by
+   mutation. Do not re-tighten them without re-running that mutation check.
+3. `src/test/setup.ts` installs a real `Storage` shim and a `scrollTo` stub. They exist because
+   Node 26's experimental global `localStorage` shadows jsdom's and jsdom has no element
+   scrolling. Removing them silently disables session testing.
+4. `package.json` dependencies must stay unchanged. Fonts are vendored files in
+   `public/fonts/`, not a package.
+5. Never run `bun install` — `bun.lock` is stale and must stay untouched; this project uses npm.

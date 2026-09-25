@@ -17,9 +17,11 @@ implementation must require zero UI code changes.
 ## 2. Authentication / session
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
-| Sign-in | One-click department session (`VITE_AUTH_MODE=oneclick`, default) — no credentials, no network | Government SSO / identity provider | `.env` → `VITE_AUTH_MODE=<real mode>`; `src/session/` |
-| Session identity | `localStorage["nzwisiso.session.v1"] = { departmentId, mode, signedInAt: REFERENCE_DATE }` | Server session / token | Same seam |
-| Mock marker | `mode: "oneclick"` is stored in session state and is visibly labelled in the workspace | Removed by real auth | Same seam |
+| Sign-in | One-click department session — no credentials, no network call. **`src/session/session.ts` is the seam**: `signInToDepartment` / `getSession` / `clearSession`. There is **no** `VITE_AUTH_MODE` environment switch yet; an earlier draft of this file claimed one and it does not exist. | Government SSO / identity provider | Replace the three functions in `src/session/session.ts`; callers use `sessionActions` from `src/session/useSession.ts` and need no change |
+| Session identity | `localStorage["nzwisiso.session.v1"] = { departmentId, mode, signedInAt }` where `mode: "oneclick"` and `signedInAt = REFERENCE_DATE` | Server session / token | Same seam |
+| Storage fallback | If the browser refuses local storage, the session falls back to memory for the visit. `isSessionPersistent()` reports which is in use. | Unchanged | Same seam |
+| Mock marker | `mode: "oneclick"` is stored in state **and visibly labelled in the workspace header as `Entry: one-click (Mock)`** | Removed by real auth | Same seam |
+| Route guard | `src/routes/RequireSession.tsx` — `/app/**` redirects to `/` without a session | Unchanged (a real guard would also check the token) | Same seam |
 
 ## 3. Policy ingestion
 | Item | Current implementation | Real replacement | Where it is switched |
