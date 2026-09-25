@@ -1,15 +1,15 @@
 import { Link } from "react-router-dom";
 import { findDepartment } from "@/config/departments";
+import { VOCABULARY } from "@/config/brand";
 import { REFERENCE_DATE_LABEL, getTimeHorizon } from "@/config/reference";
 import { useSession } from "@/session/useSession";
 
 /**
- * Simulation history for the signed-in department. No simulation has been run in
- * scenario mode yet, so this renders the department's prepared policy drafts as
- * register rows (status: Draft) with an explicit note that results appear once a
- * draft is run. It never shows a fabricated approval figure.
+ * Simulation Register — the department's scenario register. No simulation has
+ * been run yet in scenario mode, so this is an explicit empty state plus the
+ * register of prepared drafts. It never shows a fabricated result figure.
  */
-export function HistoryTable() {
+export default function Simulations() {
   const session = useSession();
   const department = findDepartment(session?.departmentId);
 
@@ -18,18 +18,23 @@ export function HistoryTable() {
   const drafts = department.policyTemplates;
 
   return (
-    <div className="flex flex-col border-t bg-card">
-      <div className="flex items-center justify-between border-b px-4 py-2.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Simulation History</span>
-        <span className="text-xs text-muted-foreground">
-          0 runs · {drafts.length} prepared drafts
-        </span>
-      </div>
-      <div className="overflow-x-auto">
+    <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+      <header>
+        <h2 className="text-sm font-semibold tracking-tight text-foreground">Simulation Register</h2>
+        <p className="text-xs text-muted-foreground">
+          {department.name} · {drafts.length} prepared drafts · 0 runs
+        </p>
+        <p className="mt-1 max-w-3xl text-xs text-muted-foreground">
+          No simulation has been run for this department yet. Each row below is a policy draft prepared for the{" "}
+          {VOCABULARY.simulationCore}; results appear in this register once a draft is run.
+        </p>
+      </header>
+
+      <div className="overflow-x-auto rounded-lg border bg-card">
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b bg-muted/50">
-              {["Reference", "Policy", "Horizon", "Stakeholders", "Result", "Status"].map((h) => (
+              {["Reference", "Policy", "Horizon", "Stakeholders", "Status"].map((h) => (
                 <th
                   key={h}
                   className="whitespace-nowrap px-3 py-2 text-left font-semibold uppercase tracking-wide text-muted-foreground"
@@ -50,7 +55,6 @@ export function HistoryTable() {
                   {getTimeHorizon(draft.timeHorizon).label}
                 </td>
                 <td className="px-3 py-1.5 text-right font-mono text-foreground">{draft.segments.length}</td>
-                <td className="px-3 py-1.5 text-muted-foreground">—</td>
                 <td className="px-3 py-1.5">
                   <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
                     Draft
@@ -61,14 +65,13 @@ export function HistoryTable() {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-1 border-t px-4 py-2">
-        <span className="text-[10px] text-muted-foreground">
-          No simulation has been run for {department.shortName} yet. Reference date {REFERENCE_DATE_LABEL}.
-        </span>
-        <Link to="/app/simulations" className="text-[10px] font-medium text-primary hover:underline">
-          Open the simulation register →
+
+      <p className="text-[10px] text-muted-foreground">
+        Reference date {REFERENCE_DATE_LABEL}.{" "}
+        <Link to="/app/policies" className="font-medium text-primary hover:underline">
+          Review the policy register →
         </Link>
-      </div>
+      </p>
     </div>
   );
 }

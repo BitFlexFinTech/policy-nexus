@@ -97,6 +97,13 @@ export const TIME_HORIZONS = [
 
 export type TimeHorizonId = (typeof TIME_HORIZONS)[number]["id"];
 
+/** Look-up helper so callers never index into the array by position. */
+export const getTimeHorizon = (id: TimeHorizonId) => {
+  const horizon = TIME_HORIZONS.find((h) => h.id === id);
+  if (!horizon) throw new Error(`Unknown time horizon: ${id}`);
+  return horizon;
+};
+
 /** Formats an ISO date string for display without touching the system clock. */
 export const formatReferenceDate = (iso: string) => {
   const months = [

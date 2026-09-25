@@ -251,7 +251,73 @@ browser reload is still jsdom-tested only — the browser journey is Phase H.**
   non-determinism hits, all in the five Phase D/E components. No new red, no new pass claim.
 
 ### Phase D — Dashboard simplification (department-aware, terminology scrub, secondary nav)
-**Status: NOT STARTED**
+**Status: DONE (verified this session). Caveat: rendering is jsdom-verified only — there is no
+real-browser visual/pixel check yet (Playwright Chromium is not installed; that is Phase H).**
+
+- **Department-aware workspace (no hardcoded arrays left).** Every workspace panel now reads the
+  signed-in department from `findDepartment(session.departmentId)`:
+  - `src/components/KPICards.tsx` — renders `department.indicators` (all of them, 3 or 4 — never
+    a subset) as the strip, one card per indicator, `gridTemplateColumns` sized to the count.
+    **Interactivity-check fix (rule 06 #5):** each card is now a real `<button>` with
+    `aria-expanded` that opens to the indicator's plain-language note and `Source: …`; before
+    this it was a static number with no drill-down.
+  - `src/components/EngineStatus.tsx` — the four vitals are now real config figures (modelled
+    segments, reference indicators, policy templates) plus the `REFERENCE_RATES` ZiG input. The
+    header pills are `VOCABULARY.simulationCore` and `VOCABULARY.knowledgeMap`, status `idle`,
+    value `Scenario mode` / `<n> documents` — honest, because no engine is running.
+  - `src/components/HistoryTable.tsx` — renders the department's `policyTemplates` as register
+    rows (`<ABBR>-01…`, policy title, horizon, stakeholder count), result `—`, status `Draft`,
+    with an explicit line "No simulation has been run for `<department>` yet" and a link to the
+    simulation register. Keeps the locked simulation-history table visual identity; it does not
+    invent approval percentages.
+  - `src/components/DocumentLibrary.tsx` — renders all of `department.documents` (name, size,
+    `formatReferenceDate(date)`), each row carrying its `note` as a tooltip.
+  - `src/components/AgentFeed.tsx` — fully rewritten: entries are built deterministically from
+    `department.segments` (`getStakeholderSegment`) plus two system lines using `VOCABULARY` and
+    `REFERENCE_DATE_LABEL`. Timestamps are derived from position (`timestampFor`), never the
+    clock. The random streaming timer is gone. Agent tag tones cycle through existing palette
+    tokens by first appearance, so the locked "timestamp + coloured tag" row identity is kept.
+  - `src/components/SovereignFooter.tsx` — now renders `SOVEREIGNTY_STATEMENT`; the host/node
+    name is gone.
+  - `src/components/HeaderBar.tsx` — `OASIS Engine` / `GraphRAG` pills replaced by
+    `VOCABULARY.scenarioEngine` (`Scenario mode`), and the rate pill now reads
+    `getReferenceRate("zig-usd")`. The department badge, `Change department`, `Sign out` and the
+    `Entry: one-click (Mock)` marker are unchanged.
+- **Determinism fixed at root cause (both `Math.random()` calls removed).**
+  `AgentFeed.tsx` no longer schedules a random-time stream (the feed is built, not streamed), and
+  `PolicyInput.tsx` parse progress advances by a fixed `PARSE_STEP`/`PARSE_TICK_MS`. No
+  `// eslint-disable`, no rule downgrade, no seeded value hardcoded to hide the call.
+- **PolicyInput scrub.** `PuterAiClient`/`getPuterAi`/`puter.ai.chat` deleted. Presets now come
+  from `department.policyTemplates`. The action button was renamed **`Review scope`** — calling
+  it "Run Simulation" would imply a simulation runs, and no engine exists yet (name-implies-
+  capability rule). Its output is a deterministic stakeholder-scope preview, and the panel is
+  titled `Scenario engine — scenario scope (Mock)` per the mock-first rule.
+- **Shared workspace shell + secondary navigation.**
+  - `src/layouts/WorkspaceLayout.tsx` — one `h-screen flex-col overflow-hidden` shell
+    (HeaderBar → WorkspaceNav → Outlet → SovereignFooter); every `/app/**` route renders inside
+    it, so the shell exists once instead of per screen.
+  - `src/components/WorkspaceNav.tsx` — five `NavLink` sections (Overview, Policy Register,
+    Simulation Register, Documents, Reference) with `aria-label="Workspace sections"` and
+    `end` on Overview.
+  - `src/pages/Index.tsx` — now the dashboard body only (the shell moved to the layout).
+  - `src/App.tsx` — `/app`, `/app/policies`, `/app/simulations`, `/app/documents`,
+    `/app/reference` all nested inside `RequireSession` → `WorkspaceLayout`. The nav links are
+    therefore **not dead links**: each route has a real, department-scoped screen.
+- **New secondary screens (real config data, no placeholders):**
+  `src/pages/Policies.tsx` (all prepared drafts with text, horizon, segment chips),
+  `src/pages/Simulations.tsx` (explicit 0-run empty state + the draft register table),
+  `src/pages/Documents.tsx` (all `department.documents` with kind/size/date/purpose),
+  `src/pages/Reference.tsx` (reference inputs, all 16 `STAKEHOLDER_SEGMENTS`, `VOCABULARY`,
+  `DISCLAIMER.long`, `SOVEREIGNTY_STATEMENT`).
+- `src/config/reference.ts`: **added `getTimeHorizon`** so horizon labels have one look-up
+  helper instead of two inline `.find()` duplicates (single-source-of-truth rule).
+- **Tests:** new `src/test/workspace.test.tsx` — **29 tests**: every one of the 16 departments
+  renders `/app` and every indicator is present (dataset completeness), a KPI card opens to its
+  source, all four secondary routes smoke-render their heading, the nav has exactly 5 links,
+  the document screen lists every declared document, the policy register lists every draft, the
+  reference screen shows all 16 segments and all 3 rates, and all four secondary routes are
+  guarded without a session. Suite is now **62 tests** (was 33).
+- **`npm run validate` is now FULLY GREEN** (was 18 hits). See the verification log.
 
 ### Phase E — Policy input (Upload / Paste wired to the service)
 **Status: NOT STARTED**
@@ -303,16 +369,21 @@ browser reload is still jsdom-tested only — the browser journey is Phase H.**
 | 2026-09-25 | `npm run lint` (Phase C) | PASS — 0 errors, 7 pre-existing react-refresh warnings |
 | 2026-09-25 | `npm run build` (Phase C) | PASS — 441 ms; 413.97 kB JS / 59.85 kB CSS |
 | 2026-09-25 | `npm run validate` (Phase C) | **FAIL (expected)** — unchanged: 16 vendor-term + 2 non-determinism, all in Phase D/E files; no new violations |
-| 2026-09-25 | Phase C commit | PASS — `6b69dfb`; `git status --short` empty |
+| 2026-09-25 | `npm run validate` (Phase D) | **PASS — all checks green** — banned copy, predictive phrasing, vendor terminology, determinism, network URLs, 16 dept ids, reference date, disclaimer; 2 SKIP (report files not created yet); 1 excluded `ui/sidebar.tsx` hit reported as INFO |
+| 2026-09-25 | `npm run typecheck` (Phase D) | PASS — `TSC_EXIT=0` |
+| 2026-09-25 | `npm run lint` (Phase D) | PASS — 0 errors, 7 pre-existing react-refresh warnings |
+| 2026-09-25 | `npm test` (Phase D) | PASS — 5 files, **62/62 tests** (5 palette-lock, 14 departments, 8 routes, 6 Home, **29 workspace**) |
+| 2026-09-25 | `npm run build` (Phase D) | PASS — 1,683 modules, 423 ms; 426.16 kB JS / 60.27 kB CSS |
+| 2026-09-25 | network refs in dist (Phase D) | PASS — `grep -roE 'https?://' dist/index.html dist/assets/*.css` → **0** |
+| 2026-09-25 | vendor/random grep in app source (Phase D) | PASS — 1 hit, and it is the comment-only doc line in `src/config/reference.ts` (correctly ignored by the validator) |
 
 ## Known-red / open items
-- `npm run validate` is **RED until Phase D/E** (expected, not a regression). After Phase B the
-  remaining red is **exactly 18 hits, all inside five untouched dashboard components**:
-  16 vendor-term hits (`OASIS`/`GraphRAG` in `AgentFeed.tsx`, `EngineStatus.tsx`, `HeaderBar.tsx`;
-  `puter` + `OASIS` in `PolicyInput.tsx`; `Vultr` in `SovereignFooter.tsx`) and 2
-  `Math.random()` hits (`AgentFeed.tsx:64` stream delay, `PolicyInput.tsx:86` parse progress).
-  **`index.html` no longer contributes anything** — the 4 network URLs and the Puter `<script>`
-  are gone. This remaining list IS the Phase D/E work.
+- `npm run validate` is **GREEN as of Phase D** — all nine checks (plus the two SKIPs for
+  not-yet-created report files) pass with zero violations. The 18 hits that used to be listed
+  here (16 vendor-term + 2 non-determinism) were the Phase D work and are fixed at root cause.
+  One *excluded* hit remains inside stock `src/components/ui/sidebar.tsx`
+  (`Math.random()` in an unused helper) — it is reported as INFO, not a violation, and must stay
+  excluded (do not "fix" it and do not widen the check).
 - **Recorded correction:** the Phase 0 verification log claimed `npm run typecheck` was PASS.
   That was wrong — the test files failed to typecheck at HEAD. It has been fixed (see Phase B
   bug 1) and the log row is retained with a note rather than quietly deleted.
@@ -359,14 +430,32 @@ browser reload is still jsdom-tested only — the browser journey is Phase H.**
 `HeaderBar.tsx`, `EngineStatus.tsx`, `AgentFeed.tsx`, `PolicyInput.tsx`, `SovereignFooter.tsx`,
 and the two `Math.random()` calls — all Phase D/E, so that Phase C did not silently absorb them.
 
+## Files touched in Phase D
+**Added:** `src/layouts/WorkspaceLayout.tsx`, `src/components/WorkspaceNav.tsx`,
+`src/pages/Policies.tsx`, `src/pages/Simulations.tsx`, `src/pages/Documents.tsx`,
+`src/pages/Reference.tsx`, `src/test/workspace.test.tsx`
+
+**Modified:** `src/App.tsx`, `src/pages/Index.tsx`, `src/components/HeaderBar.tsx`,
+`src/components/KPICards.tsx`, `src/components/EngineStatus.tsx`, `src/components/AgentFeed.tsx`,
+`src/components/HistoryTable.tsx`, `src/components/DocumentLibrary.tsx`,
+`src/components/SovereignFooter.tsx`, `src/components/PolicyInput.tsx`,
+`src/config/reference.ts` (added `getTimeHorizon` only), `PROJECT_STATUS.md`,
+`PRODUCTION_READINESS.md`
+
+**Not touched (locked / unchanged):** `src/index.css`, `tailwind.config.ts`, `package.json`
+dependencies, `src/components/ui/**` (still byte-identical stock primitives), `LICENSE`/`NOTICE`,
+`src/session/session.ts`, `src/session/useSession.ts`, `src/config/departments.ts`,
+`src/config/brand.ts`, `src/routes/RequireSession.tsx`
+
 ---
 
 ## RESUME HERE
 
-- **Branch:** `feature/unified-platform` · **HEAD:** the commit that added this file scan
-  (run `git rev-parse HEAD`; it is a docs-only commit) · **tree:** clean.
-  Functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C.
-  `git --no-pager log --oneline -6` is the second opinion on state.
+- **Branch:** `feature/unified-platform` · **HEAD:** the Phase D commit — run `git rev-parse HEAD`.
+  `tree:` clean. Functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C ·
+  Phase D = the commit whose message begins `feat(phase-d)`.
+  `git log --oneline -8 | cat` is the second opinion on state.
+  (This shell's git rejects `--no-pager`; use plain `git log --oneline | cat`.)
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
   restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
 - **`main` is untouched. Nothing has been pushed.**
@@ -376,33 +465,36 @@ and the two `Math.random()` calls — all Phase D/E, so that Phase C did not sil
   out** work → visiting `/app` with no session redirects to `/` → an unknown path still shows
   `404`. All 16 departments render, and two different sessions were verified to show two
   different department labels.
-- **What is NOT built yet:** the policy register, the simulation register, the live simulation
-  view, the assessment/executive-summary screens, the full assessment, PDF/Word/print/share,
-  the service layer (`src/services/assessment/**`), the deterministic PRNG, and the policy
-  input wired to a real service. The `/app` workspace still shows the *original* dashboard
-  layout with hardcoded content, still contains vendor terminology, and still calls
-  `Math.random()` twice.
-- **Next action: Phase D** — make the workspace department-aware and scrub vendor terminology.
-  Concretely: `KPICards`, `EngineStatus`, `HistoryTable`, `DocumentLibrary`, `AgentFeed` and
-  `SovereignFooter` must read the session department from `DEPARTMENTS`/`REFERENCE_RATES`
-  instead of the hardcoded arrays currently at the top of each file; remove `OASIS`/`GraphRAG`
-  from `HeaderBar`/`EngineStatus`/`AgentFeed` in favour of `VOCABULARY` from
-  `src/config/brand.ts`; remove `Vultr` from `SovereignFooter` in favour of
-  `SOVEREIGNTY_STATEMENT`; and add the secondary navigation for `/app/policies`,
-  `/app/simulations`, `/app/documents`, `/app/reference`. After Phase D the only remaining
-  red should be the 2 `Math.random()` hits, which are Phase E/F.
-- **Read next:** this file, then `src/pages/Index.tsx` and the six workspace components, then
-  `src/config/departments.ts` (what the workspace must now read from).
+- **Workspace after Phase D (all verified by tests this session):** the workspace is fully
+  department-aware and vendor-free. A secondary nav (Overview · Policy Register · Simulation
+  Register · Documents · Reference) sits under the header and every link resolves to a real
+  department-scoped screen. `npm run validate` is **fully green**. Nothing is hand-waved: the
+  register and document screens list the department's own config, and the simulation register
+  says plainly that **0 runs** exist because the engine is not built yet.
+- **What is NOT built yet:** the service layer (`src/services/assessment/**`), the deterministic
+  PRNG (`src/lib/prng.ts`), the live simulation view (`/app/simulations/:id`), the assessment /
+  executive-summary / full-assessment screens, PDF/Word/print/share document actions, and the
+  policy input wired to a real service.
+- **Next action: Phase E** — build the service seam and wire the policy input to it. Concretely:
+  create `src/services/assessment/types.ts` (canonical result schema),
+  `src/services/assessment/AssessmentService.ts` (interface + factory, the mock→real seam),
+  `src/services/assessment/scenario.ts` (deterministic implementation) and `src/lib/prng.ts`
+  (`mulberry32` over a string hash of `departmentId + normalised policy text + template id`);
+  then replace `PolicyInput`'s deterministic `Review scope` action with `AssessmentService.run()`
+  and rename the button back to `Run Simulation`. Re-run the whole suite — validate must stay green.
+- **Read next:** this file, then `src/layouts/WorkspaceLayout.tsx`, `src/components/PolicyInput.tsx`,
+  and `src/config/departments.ts` + `src/config/reference.ts` (what the service layer reads from).
 - **Exact commands:**
 ```bash
 npm run validate; npm run typecheck; npm run lint; npm test; npm run build
-git add -A && git commit -m "feat(phase-d): department-aware workspace, terminology scrub, secondary nav"
+git add -A && git commit -m "feat(phase-e): assessment service seam, deterministic PRNG, policy input wired"
 ```
 
 ### Traps a cold session must not re-discover the hard way
-1. `npm run validate` is **expected RED** until Phase E: 16 vendor-term + 2 non-determinism,
-   all inside the five workspace components. It is not a regression — do not "fix" it by
-   loosening `scripts/validate.mjs`.
+1. `npm run validate` is **GREEN** as of Phase D. If it goes red, that is a real regression — fix
+   the cause. Never loosen `scripts/validate.mjs` to make it pass. The single `Math.random()` hit
+   in `src/components/ui/sidebar.tsx` is intentionally excluded stock code; keep it excluded and
+   do not "fix" it.
 2. `scripts/validate.mjs` ignores **comment-only lines** for the vendor-term and determinism
    checks, and does not treat `.prototype` as prose. Both were deliberate fixes verified by
    mutation. Do not re-tighten them without re-running that mutation check.

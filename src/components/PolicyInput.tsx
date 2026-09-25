@@ -1,12 +1,10 @@
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-
-const PRESETS = [
-  "Adjustment of ZiG mandatory tax settlement for exporters.",
-  "Implementation of the 2026 National Digital Regulatory Framework.",
-  "Incentive program for the Mugove/Umqele/Isabelo National AI Fund.",
-];
+import { findDepartment } from "@/config/departments";
+import { VOCABULARY } from "@/config/brand";
+import { REFERENCE_FISCAL_YEAR, getStakeholderSegment } from "@/config/reference";
+import { useSession } from "@/session/useSession";
 
 const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return `${bytes} B`;
@@ -14,52 +12,41 @@ const formatFileSize = (bytes: number) => {
   return `${(bytes / 1048576).toFixed(1)} MB`;
 };
 
-interface PuterAiClient {
-  ai?: { chat: (prompt: string) => Promise<string | { message?: { content?: string } }> };
-}
+/** Deterministic parsing steps — no clock, no randomness, same every run. */
+const PARSE_STEP = 8;
+const PARSE_TICK_MS = 250;
 
-const getPuterAi = () =>
-  typeof window !== "undefined"
-    ? (window as unknown as { puter?: PuterAiClient }).puter?.ai
-    : undefined;
-
+/**
+ * Policy ingestion for the signed-in department. Presets come from the
+ * department's own prepared drafts, the parsing indicator advances in fixed
+ * steps, and the scope review is a clearly-marked scenario preview of which
+ * stakeholder groups the draft touches. It never claims a simulation has run.
+ */
 export function PolicyInput() {
+  const session = useSession();
+  const department = findDepartment(session?.departmentId);
+
   const [draft, setDraft] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [aiSummary, setAiSummary] = useState("");
+  const [scope, setScope] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: string }[]>([]);
   const [parseProgress, setParseProgress] = useState(0);
   const [isParsing, setIsParsing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleAnalyze = async () => {
-    if (!draft.trim()) return;
-    setIsProcessing(true);
-    setAiSummary("");
-
-    try {
-      const ai = getPuterAi();
-      if (ai) {
-        const response = await ai.chat(
-          `You are a policy analysis AI for the Nzwisiso National Policy Simulation Engine (Zimbabwe context, 2026). Analyze the following policy draft and provide:
-1) Key stakeholders affected (use Zimbabwe-specific categories: Kombi Operators, A1/A2 Farmers, Civil Service Unions, Diaspora Remittance Group)
-2) ZiG Currency Impact — predicted effect on ZiG stability
-3) Predicted public sentiment
-4) Risk factors
-5) Collective Well-being Impact (Ubuntu Analysis) — assess social cohesion rather than just GDP
-
-Be concise and structured.\n\nPolicy Draft:\n${draft}`
-        );
-        setAiSummary(typeof response === "string" ? response : response?.message?.content || "Analysis complete.");
-      } else {
-        setAiSummary("⚠ puter.js not loaded. In production, this triggers the OASIS simulation engine for full multi-agent analysis.");
-      }
-    } catch {
-      setAiSummary("Error during analysis. Please try again.");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  const handleReviewScope = useCallback(() => {
+    if (!department || !draft.trim()) return;
+    const segments = department.segments
+      .map((segmentId) => getStakeholderSegment(segmentId))
+      .map((segment) => `• ${segment.label} — ${segment.note}.`)
+      .join("\n");
+    setScope(
+      `Draft length: ${draft.trim().length} characters.\n` +
+        `Modelled stakeholder groups for ${department.name}:\n${segments}\n\n` +
+        `Scenario scope (Mock): this preview lists the population groups the draft ` +
+        `touches. The full deterministic assessment is produced by the ` +
+        `${VOCABULARY.simulationCore} when the draft is run.`,
+    );
+  }, [department, draft]);
 
   const handleFileUpload = useCallback((files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -78,19 +65,19 @@ Be concise and structured.\n\nPolicy Draft:\n${draft}`
 
     if (newFiles.length > 0) {
       setUploadedFiles((prev) => [...prev, ...newFiles]);
-      // Simulate parsing progress
       setIsParsing(true);
       setParseProgress(0);
-      let p = 0;
+      let progress = 0;
       const interval = setInterval(() => {
-        p += Math.random() * 15 + 5;
-        if (p >= 100) {
-          p = 100;
+        progress += PARSE_STEP;
+        if (progress >= 100) {
           clearInterval(interval);
-          setTimeout(() => setIsParsing(false), 500);
+          setParseProgress(100);
+          setTimeout(() => setIsParsing(false), 300);
+        } else {
+          setParseProgress(progress);
         }
-        setParseProgress(Math.min(p, 100));
-      }, 300);
+      }, PARSE_TICK_MS);
     }
   }, []);
 
@@ -100,8 +87,12 @@ Be concise and structured.\n\nPolicy Draft:\n${draft}`
       setIsDragOver(false);
       handleFileUpload(e.dataTransfer.files);
     },
-    [handleFileUpload]
+    [handleFileUpload],
   );
+
+  if (!department) return null;
+
+  const presets = department.policyTemplates;
 
   return (
     <div className="flex h-full flex-col border-r bg-card">
@@ -109,36 +100,39 @@ Be concise and structured.\n\nPolicy Draft:\n${draft}`
         <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Policy Ingestion Hub</span>
         <Button
           size="sm"
-          onClick={handleAnalyze}
-          disabled={isProcessing || !draft.trim()}
-          className="h-7 text-xs bg-primary hover:bg-primary/90"
+          onClick={handleReviewScope}
+          disabled={!draft.trim()}
+          className="h-7 bg-primary text-xs hover:bg-primary/90"
         >
-          {isProcessing ? "Analyzing…" : "Run Simulation"}
+          Review scope
         </Button>
       </div>
 
       {/* Presets */}
-      <div className="border-b px-3 py-2 space-y-1">
-        <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Policy Presets (2026)</span>
+      <div className="space-y-1 border-b px-3 py-2">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+          Policy presets ({REFERENCE_FISCAL_YEAR})
+        </span>
         <div className="flex flex-wrap gap-1.5">
-          {PRESETS.map((preset, i) => (
+          {presets.map((preset) => (
             <button
-              key={i}
-              onClick={() => setDraft(preset)}
-              className="rounded-md border bg-muted/50 px-2 py-1 text-[10px] text-foreground hover:bg-primary/10 hover:border-primary/30 transition-colors text-left leading-tight"
+              key={preset.id}
+              onClick={() => setDraft(preset.policyText)}
+              title={preset.summary}
+              className="rounded-md border bg-muted/50 px-2 py-1 text-left text-[10px] leading-tight text-foreground transition-colors hover:border-primary/30 hover:bg-primary/10"
             >
-              {preset}
+              {preset.title}
             </button>
           ))}
         </div>
       </div>
 
       {/* Text area */}
-      <div className="flex-1 p-3 min-h-0">
+      <div className="min-h-0 flex-1 p-3">
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder={"Draft your policy text here…\n\nExample: \"Adjustment of ZiG mandatory tax settlement for exporters with revenue allocated to the Mugove/Umqele/Isabelo National AI Fund…\""}
+          placeholder={`Draft the policy text for ${department.shortName} here…\n\nOr choose one of the department's prepared presets above.`}
           className="h-full w-full resize-none rounded-md border bg-background p-3 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
@@ -146,14 +140,17 @@ Be concise and structured.\n\nPolicy Draft:\n${draft}`
       {/* Drag & Drop Upload Zone */}
       <div className="border-t px-3 py-2">
         <div
-          onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragOver(true);
+          }}
           onDragLeave={() => setIsDragOver(false)}
           onDrop={handleDrop}
           className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-4 transition-colors ${
             isDragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25 bg-muted/30"
           }`}
         >
-          <span className="text-xs text-muted-foreground mb-1">Drag & Drop PDF, DOCX, or TXT files</span>
+          <span className="mb-1 text-xs text-muted-foreground">Drag & Drop PDF, DOCX, or TXT files</span>
           <label className="cursor-pointer text-xs font-medium text-primary hover:underline">
             or browse files
             <input
@@ -169,7 +166,9 @@ Be concise and structured.\n\nPolicy Draft:\n${draft}`
         {/* Parse progress */}
         {isParsing && (
           <div className="mt-2 space-y-1">
-            <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Document Parsing & Knowledge Graph Extraction</span>
+            <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              Document Parsing & Knowledge Map Extraction
+            </span>
             <Progress value={parseProgress} className="h-1.5" />
           </div>
         )}
@@ -178,24 +177,27 @@ Be concise and structured.\n\nPolicy Draft:\n${draft}`
         {uploadedFiles.length > 0 && (
           <div className="mt-2 space-y-0.5">
             {uploadedFiles.map((f, i) => (
-              <div key={i} className="flex items-center justify-between text-[10px] text-foreground px-1">
+              <div key={i} className="flex items-center justify-between px-1 text-[10px] text-foreground">
                 <span className="truncate">{f.name}</span>
-                <span className="text-muted-foreground ml-2">{f.size}</span>
+                <span className="ml-2 text-muted-foreground">{f.size}</span>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* AI Summary */}
-      {aiSummary && (
+      {/* Scenario scope preview */}
+      {scope && (
         <div className="border-t p-3">
-          <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-2">OASIS Analysis</div>
-          <div className="max-h-40 overflow-y-auto rounded-md border bg-background p-3 text-xs leading-relaxed text-foreground font-mono-code whitespace-pre-wrap">
-            {aiSummary}
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
+            {VOCABULARY.scenarioEngine} — scenario scope (Mock)
+          </div>
+          <div className="font-mono-code max-h-40 overflow-y-auto whitespace-pre-wrap rounded-md border bg-background p-3 text-xs leading-relaxed text-foreground">
+            {scope}
           </div>
         </div>
       )}
     </div>
   );
 }
+

@@ -7,9 +7,9 @@ deliberate scenario-mode implementations behind swappable seams.
 ## 1. Simulation / assessment engine
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
-| Assessment engine | `src/services/assessment/scenario.ts` — deterministic seeded generator (PRNG over `departmentId + policy text`) | MiroFish backend (HTTP service) | `.env` → `VITE_ASSESSMENT_MODE=mirofish`; factory in `src/services/assessment/AssessmentService.ts` |
+| Assessment engine / `src/services/assessment/**` | **NOT BUILT YET — Phase E/F.** There is no `AssessmentService`, no `scenario.ts` and no PRNG in this tree. Because of that, Phase D renders only authored configuration data in the workspace and never presents a generated result as a run. | MiroFish backend (HTTP service) | `.env` → `VITE_ASSESSMENT_MODE=mirofish`; factory in `src/services/assessment/AssessmentService.ts` (to be created in Phase E) |
 | Decision-support disclaimer | Static string in `src/config/brand.ts` | Stays (always present) | `src/config/brand.ts` |
-| Simulation visualisation | Deterministic SVG knowledge map + feed ticks (presentation only) | Live streaming from the backend over the same `AssessmentService` contract | No UI change required (seam requirement) |
+| Simulation visualisation | **NOT BUILT YET — Phase E/F.** The agent feed is now a deterministic rendering of the department's own modelled segments (`src/components/AgentFeed.tsx`), not a live visualisation. | Live streaming from the backend over the same `AssessmentService` contract | No UI change required (seam requirement) |
 
 **Seam rule:** no component may import `scenario.ts` directly; only the factory. Swapping the
 implementation must require zero UI code changes.
@@ -26,9 +26,10 @@ implementation must require zero UI code changes.
 ## 3. Policy ingestion
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
-| `.txt` upload | Real `FileReader` read — content genuinely drives the simulation | unchanged | n/a |
-| `.pdf` / `.docx` upload | File accepted, name/size recorded; **text extraction is NOT implemented** — falls back to the department template text with an explicit on-screen note (`XX-PENDING-EXTRACTION`) | Server-side document extraction | Backend service call behind `AssessmentService.extractPolicyText()` |
-| Parse progress | Deterministic tick-based progress (seeded) | Real progress from the backend | Same seam |
+| `.txt` / `.pdf` / `.docx` upload | File accepted, name and size recorded only. **No text extraction and no `FileReader` read is wired yet** — an earlier draft of this file claimed the `.txt` content drives the simulation; it does not (there is no engine yet). | Server-side document extraction | Backend service call behind `AssessmentService.extractPolicyText()` (Phase E) |
+| Preset chips | Department-aware: read from `department.policyTemplates` (`src/config/departments.ts`) | unchanged | n/a |
+| Parse progress | Deterministic fixed-step progress (`PARSE_STEP` / `PARSE_TICK_MS` in `src/components/PolicyInput.tsx`) — no `Math.random` | Real progress from the backend | Same seam |
+| Scope review action | **Mock, and labelled as such.** The button is `Review scope`, not "Run Simulation", because no simulation runs. It lists the department's modelled stakeholder segments for the draft and the output panel is titled `Scenario engine — scenario scope (Mock)`. | The button becomes "Run Simulation" and calls `AssessmentService.run()` (Phase E) | `src/components/PolicyInput.tsx` → `AssessmentService` seam |
 
 ## 4. Document actions
 | Item | Current implementation | Real replacement | Where it is switched |
@@ -43,21 +44,35 @@ implementation must require zero UI code changes.
 |---|---|---|---|
 | Department content (16 departments) | Authored deterministic config: `src/config/departments.ts` — **built in Phase B**, verified by importing the module: 16 departments, 64 priorities, 63 indicators, 48 policy templates, 49 documents | CMS / ministry content service | Config loader |
 | Brand identity, disclaimer, engine vocabulary | `src/config/brand.ts` — **built in Phase B** | Stays (identity and disclaimer are permanent) | `src/config/brand.ts` |
-| Simulation history / policy register | Seeded deterministic records derived from department config | Database | `AssessmentService.listRuns()` |
+| Simulation history / policy register | **Phase D:** config-derived, department-scoped. `/app/policies` and `/app/simulations` list the department's prepared drafts (`department.policyTemplates`) with an explicit empty state for runs and no fabricated result figures. They are not seeded run records. | Database of real runs | `AssessmentService.listRuns()` (Phase E) |
 | `REFERENCE_DATE = "2026-09-24"` | Fixed reference date for all dates shown — **built in Phase B** | Real clock | `src/config/reference.ts` |
 | Reference rates (ZiG, policy rate, inflation) | Static config value in `REFERENCE_RATES`, labelled as a reference input | Live data feed | `src/config/reference.ts` |
 | Stakeholder segments | 16 canonical segments in `STAKEHOLDER_SEGMENTS`; departments may reference these ids only | CMS / segmentation service | `src/config/reference.ts` |
 
 ## 6. Non-credential work still outstanding (no credential can fix these)
+- Build `src/services/assessment/**` (interface + factory + deterministic scenario implementation) — Phase E.
+- Build the live simulation view and the assessment / executive-summary / full-assessment screens — Phase F.
+- PDF / Word / print / share document actions (`src/components/assessment/DocumentActions.tsx`) — Phase F.
 - Robust PDF/DOCX text extraction (server-side).
 - Real `.docx` / native PDF rendering.
-- MiroFish service endpoint + contract implementation (`AssessmentService` interface exists).
+- MiroFish service endpoint + contract implementation (`AssessmentService` interface does not exist yet).
 - Government SSO integration.
+- Playwright Chromium binary is not installed and no `e2e/` spec exists yet — Phase H.
+
+## 6b. Verified clean in Phase D
+- `npm run validate` → **PASS — all checks green** (banned copy, predictive phrasing, vendor
+  terminology, determinism, network URLs, 16 department ids, reference date, disclaimer).
+- Zero runtime network references in the built output (`grep -roE 'https?://' dist/index.html dist/assets/*.css` → 0).
 
 ## 7. Disabled by default (deliberate)
-- Puter CDN script and `puter.ai.chat()`: **removed**, not just disabled. Phase B deleted the
-  `<script src="https://js.puter.com/v2/">` tag from `index.html`; the remaining `puter` reads in
-  `PolicyInput.tsx` are dead code and are removed in Phase E. No third-party AI call can occur.
+- Puter CDN script and `puter.ai.chat()`: **fully removed.** Phase B deleted the
+  `<script src="https://js.puter.com/v2/">` tag from `index.html`; **Phase D deleted the
+  remaining dead `puter` reads from `PolicyInput.tsx`**, so no third-party AI call can occur
+  and the vendor-term validator reports zero hits.
+- Non-determinism: **fully removed in Phase D.** The two `Math.random()` calls (agent-feed
+  stream delay, parse progress) are gone; `npm run validate` now passes the determinism check
+  with zero hits in app source (one hit remains in stock `src/components/ui/sidebar.tsx`, which
+  is excluded as non-app stock code).
 - Google Fonts CDN: **removed** in Phase B. Inter and JetBrains Mono are now self-hosted from
   `public/fonts/` via `src/fonts.css`. Verified: `grep -roE 'https?://' dist/index.html
   dist/assets/*.css` returns zero matches, so the built application makes no runtime network

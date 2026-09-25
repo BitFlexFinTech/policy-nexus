@@ -1,18 +1,20 @@
-import { HeaderBar } from "@/components/HeaderBar";
+import { KPICards } from "@/components/KPICards";
 import { PolicyInput } from "@/components/PolicyInput";
 import { AgentFeed } from "@/components/AgentFeed";
 import { EngineStatus } from "@/components/EngineStatus";
-import { KPICards } from "@/components/KPICards";
 import { HistoryTable } from "@/components/HistoryTable";
 import { DocumentLibrary } from "@/components/DocumentLibrary";
-import { SovereignFooter } from "@/components/SovereignFooter";
 
+/**
+ * The department workspace body. The header, secondary navigation and sovereign
+ * footer are supplied by `WorkspaceLayout`, so this component only renders the
+ * dashboard itself and keeps the original fixed-viewport composition.
+ */
 const Index = () => {
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
-      <HeaderBar />
+    <>
       <KPICards />
-      <div className="flex flex-1 min-h-0">
+      <div className="flex min-h-0 flex-1">
         {/* Left: Document Library */}
         <DocumentLibrary />
         {/* Center: Policy Ingestion Hub — flexible */}
@@ -20,9 +22,9 @@ const Index = () => {
           <PolicyInput />
         </div>
         {/* Right: Engine Status + Agent Feed */}
-        <div className="flex flex-1 flex-col min-h-0">
+        <div className="flex min-h-0 flex-1 flex-col">
           <EngineStatus />
-          <div className="flex-1 min-h-0">
+          <div className="min-h-0 flex-1">
             <AgentFeed />
           </div>
         </div>
@@ -31,8 +33,7 @@ const Index = () => {
       <div className="max-h-[28%] overflow-y-auto">
         <HistoryTable />
       </div>
-      <SovereignFooter />
-    </div>
+    </>
   );
 };
 

@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { StatusPill } from "./StatusPill";
 import { Button } from "@/components/ui/button";
 import { findDepartment } from "@/config/departments";
+import { VOCABULARY } from "@/config/brand";
+import { getReferenceRate } from "@/config/reference";
 import { sessionActions, useSession } from "@/session/useSession";
 import coatOfArms from "@/assets/zimbabwe-coat-of-arms.png";
 
@@ -16,6 +18,7 @@ export function HeaderBar() {
   const session = useSession();
   const navigate = useNavigate();
   const department = findDepartment(session?.departmentId);
+  const zigRate = getReferenceRate("zig-usd");
 
   const signOut = () => {
     sessionActions.clearSession();
@@ -43,9 +46,8 @@ export function HeaderBar() {
         )}
       </div>
       <div className="flex items-center gap-2">
-        <StatusPill label="OASIS Engine" status="online" value="Ready" />
-        <StatusPill label="GraphRAG" status="online" value="128 nodes" />
-        <StatusPill label="ZiG Rate" status="warning" value="13.56/USD" />
+        <StatusPill label={VOCABULARY.scenarioEngine} status="idle" value="Scenario mode" />
+        <StatusPill label={zigRate.label} status="warning" value={`${zigRate.value}/USD`} />
         {department && (
           <>
             {/* Mock-first rule: the entry mode must be unmistakable in the UI. */}

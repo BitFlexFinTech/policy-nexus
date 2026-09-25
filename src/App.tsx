@@ -5,8 +5,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "./pages/Home.tsx";
 import Index from "./pages/Index.tsx";
+import Documents from "./pages/Documents.tsx";
+import Policies from "./pages/Policies.tsx";
+import Reference from "./pages/Reference.tsx";
+import Simulations from "./pages/Simulations.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { RequireSession } from "./routes/RequireSession.tsx";
+import { WorkspaceLayout } from "./layouts/WorkspaceLayout.tsx";
 
 const queryClient = new QueryClient();
 
@@ -18,9 +23,16 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* Everything under /app requires a department session. */}
+          {/* Everything under /app requires a department session, and shares one
+              workspace shell (header + secondary nav + sovereign footer). */}
           <Route element={<RequireSession />}>
-            <Route path="/app" element={<Index />} />
+            <Route element={<WorkspaceLayout />}>
+              <Route path="/app" element={<Index />} />
+              <Route path="/app/policies" element={<Policies />} />
+              <Route path="/app/simulations" element={<Simulations />} />
+              <Route path="/app/documents" element={<Documents />} />
+              <Route path="/app/reference" element={<Reference />} />
+            </Route>
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
