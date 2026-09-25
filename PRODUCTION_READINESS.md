@@ -100,13 +100,14 @@ client is registered.
   from `src/config/departments.ts`, three "how it works" steps, and an official footer carrying
   **"A Project by the Ministry of IT"** with **"For Internal Use Only"** beneath it in smaller text
   (asserted against the **real computed font size**: 11px vs 9px).
-- **Phase N** redesigned its hero, after the user questioned it: the `<h1>` is now the **task**
-  ("Test the policy before the measure is finalised.") rather than the brand tagline; the hero is a
+- **Phase N** redesigned its hero, after the user questioned it: the `<h1>` is now the researched task
+  line **"Test the policy before you decide"**, rendered in CAPITALS by CSS (`uppercase` + positive
+  tracking) with the DOM text kept in sentence case, rather than the brand tagline; the hero is a
   two-column grid whose right column is a bordered **"Reference date and inputs"** panel (reference
   date, fiscal year, ZiG exchange rate, policy rate, annual inflation — all read from
-  `src/config/reference.ts`); the tagline closes that panel. `npm test` → **9 files, 144 tests**,
-  including a test that pins every panel value to configuration and one that asserts the panel heading
-  is unique on the page.
+  `src/config/reference.ts`); the tagline closes that panel. `npm test` → **9 files, 145 tests**,
+  including a test that pins every panel value to configuration, one that asserts the panel heading is
+  unique on the page, and one that asserts the caps are styling rather than typed capitals.
 - **Phase M** split that entry into **two** public screens, because a landing page that also contains
   the department picker is not a landing page:
   - `/` — **pure landing page**. Asserts it holds **no department picker**.

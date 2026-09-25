@@ -23,11 +23,30 @@ describe("Landing — the pure public landing page", () => {
     renderLanding();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Test the policy before the measure is finalised.",
+      "Test the policy before you decide",
     );
     // The tagline is brand voice, not the page's proposition — it must still be
     // present on the page, or it has been silently dropped rather than moved.
     expect(screen.getByText(BRAND.tagline)).toBeInTheDocument();
+  });
+
+  it("renders the headline in capitals by styling, not by hard-coding capital letters", () => {
+    renderLanding();
+    const heading = screen.getByRole("heading", { level: 1 });
+    const text = heading.textContent?.trim() ?? "";
+
+    // The visible requirement: all caps.
+    expect(heading.className).toContain("uppercase");
+    // The implementation requirement: the DOM text stays sentence case, so the
+    // accessible name, search indexing and copy-paste are normal words and do not
+    // depend on how a screen reader treats all-capital strings. No trailing full
+    // stop, matching every other capitalised string in this design.
+    expect(text).toBe("Test the policy before you decide");
+    expect(text).not.toBe(text.toUpperCase());
+    // Caps lose the ascender/descender word-shape cues, so they need POSITIVE
+    // tracking — the negative tracking used for sentence-case display type is wrong here.
+    expect(heading.className).toContain("tracking-[0.02em]");
+    expect(heading.className).not.toContain("tracking-tight");
   });
 
   it("does NOT carry the department picker — that belongs to /start", () => {

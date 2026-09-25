@@ -675,10 +675,10 @@ the cause:
 
 1. **The `<h1>` was doing the tagline's job, not the page's.** "Understanding before action." is brand
    voice; a first-time user learned a mood, not a task. A government service leads with the task
-   (GOV.UK's *start* pattern). The `<h1>` is now
-   **"Test the policy before the measure is finalised."**, and the tagline is retained on the page —
-   demoted to the brand line closing the new hero panel, where it reads as voice rather than as the
-   proposition.
+   (GOV.UK's *start* pattern). The `<h1>` is now the researched, task-led line
+   **"Test the policy before you decide"** (rendered in capitals — see below), and the tagline is
+   retained on the page — demoted to the brand line closing the new hero panel, where it reads as
+   voice rather than as the proposition.
 2. **A third of the hero was dead space.** Body text stopped around 880 px inside a 1152 px container
    while every other section on the page is a bordered card, so the page began as a floating text
    column and then abruptly became a card system. The hero is now a **two-column grid**
@@ -692,9 +692,39 @@ the cause:
    `src/config/reference.ts`, none written into the markup.**
 
 Consequential typographic decisions, inside the locked rules: `text-balance` on the `<h1>` (Tailwind
-3.4, present) so the two-line headline is not lopsided; `leading-[1.1]` on the headline; `max-w-xl`
-measures on both body paragraphs at 18 px and 14 px so neither runs past ~70 characters; the disclaimer
-micro-copy raised from 10 px to 11 px to match the notice strip's body size.
+3.4, present) so the two-line headline is not lopsided; `max-w-xl` measures on both body paragraphs at
+18 px and 14 px so neither runs past ~70 characters; the disclaimer micro-copy raised from 10 px to
+11 px to match the notice strip's body size.
+
+**Headline wording — researched, then set in capitals on the user's instruction.** The user asked for
+*"deeper research on the best wording for this section and it should be in all caps"*. Primary sources
+were fetched and read (not recalled):
+
+| Source | What it actually says | Effect on the wording |
+|---|---|---|
+| GOV.UK Design System, *Headings* | **"Write all headings in sentence case."** — an explicit rule | **Conflicts with the caps instruction.** The instruction was followed; this conflict is recorded rather than hidden |
+| GOV.UK Service Manual, *Naming your service* | Good names *"use the words users use"*, *"describe a task, not a technology"*, *"are verbs, not nouns"*, *"do not include government department or agency names"*, *"are not brand-driven or focused on marketing"*. Examples: *Register to vote · Get help with court fees · Renew your passport · Find an apprenticeship* | Verb-first. **"Test"**, not "Simulate" — simulating is the *mechanism*, testing is the *task*, and the rule says name the task. No department or brand name. 6 words, short enough to work as a name |
+| GOV.UK Design System, *Type scale* | 48 px/50 px is `govuk-heading-xl`, the largest heading step | 48 px was defensible, but caps render optically far larger at the same px, so the headline sits at **40 px** (`sm:text-[2.5rem]`) |
+| Nielsen Norman Group, *Legibility, Readability, and Comprehension* | Headlines carry the load for scanning and *"the first few words are even more important"*; users read ~28 % of words | The key words are front-loaded: **TEST THE POLICY** first, so the first scan pass carries the meaning |
+
+Chosen: **"Test the policy before you decide"** — "before you decide" deliberately echoes the platform's
+own purpose language (*"Prepared for decision support"*).
+
+**How the capitals are set — styling, not typed capitals.** `uppercase` is applied as a CSS class while
+the DOM text stays sentence case. Consequences, all deliberate: the accessible name is normal words
+rather than an all-capital string that some assistive technology may read as an initialism and spell
+out; search indexing and copy-paste return sentence case; and the tests can assert the sentence-case
+content *and* the uppercase styling separately. Caps also lose the ascender/descender word-shape cues,
+so the heading was switched from **negative** tracking (`tracking-tight`) to **positive**
+(`tracking-[0.02em]`), with `leading-[1.15]`. The trailing full stop was removed — a terminal period is
+visual noise in all-caps display type and every other capitalised string in this design (the eyebrow,
+`INTERNAL SERVICE`, `PLATFORM COVERAGE`, `REFERENCE DATE AND INPUTS`) has none.
+
+**Honest limitation:** the caps-readability claim (caps cost word-shape recognition, so a caps line must
+stay short) is established typographic craft, **not** a rule quoted from a primary source in this
+session — the search engines were bot-blocked and the two pages I tried for it 404'd. The one hard
+citation available is the GDS rule above, which points the other way. What *is* verified is that the
+chosen line is short enough for caps (6 words / 34 characters), which is the mitigation.
 
 **A duplicate-heading bug was found and fixed during verification, not worked around:** the footer
 already contained an `<h2>` "Reference frame", so the new panel produced **two identically-named
@@ -717,14 +747,20 @@ to configuration) · `src/test/routes.test.tsx` (2 landing-h1 assertions) · `e2
 footer, the coverage section. No new colour literal.
 
 **Evidence this session:** `npm run validate` PASS (9/9) · `npm run typecheck` PASS · `npm run lint`
-PASS (0 errors, 7 pre-existing warnings) · `npm test` **9 files, 144/144** (was 143; the new
-reference-panel test) · `npm run build` PASS (built in 525 ms) · `npx playwright test` **6/6 (7.1 s)**,
-now also asserting the hero panel's heading, reference date and `13.56 ZiG per USD` in real Chromium
-with 0 console errors / 0 off-origin requests. Rendered at **1440×900** (two columns, CTA above the
-fold) and **390×844** (single column, panel below the CTA, nothing clipped) and inspected as images.
+PASS (0 errors, 7 pre-existing warnings) · `npm test` **9 files, 145/145** (was 143 at the start of
+Phase N) · `npm run build` PASS (built in 593 ms) · `npx playwright test` **6/6 (7.0 s)**, now also
+asserting the hero panel's heading, reference date and `13.56 ZiG per USD`, **and reading the real
+computed style of the `<h1>`** to prove `text-transform: uppercase`, positive `letter-spacing` and
+sentence-case content in real Chromium — with 0 console errors / 0 off-origin requests. Rendered at
+**1440×820** (two columns, CTA above the fold) and **390×844** (single column, panel below the CTA,
+nothing clipped) and inspected as images.
 
-**Deliberately reversible:** the `<h1>` wording is an opinion, not a user instruction. Reverting to the
-tagline as `<h1>` is a two-line change to `Landing.tsx` plus the three test assertions that name it.
+**Deliberately reversible:** the `<h1>` wording is an opinion informed by research, not a user
+instruction — only the *caps* were instructed. The wording is a one-line change in `Landing.tsx` plus
+the five assertions that name it. Alternatives that also satisfy the service-naming rules:
+**"Test a policy draft before you decide"** (most concrete about the artefact), **"See how the policy
+lands"** (uses the page's own "test how it lands" language), **"Simulate the policy before you decide"**
+(the product's internal verb), **"Test before you decide"** (shortest; pairs with the tagline).
 
 ---
 
@@ -827,6 +863,11 @@ tagline as `<h1>` is a two-line change to `Landing.tsx` plus the three test asse
 | 2026-09-25 | `npm run build` (Phase N) | PASS — built in 525 ms |
 | 2026-09-25 | `npx playwright test` (Phase N) — real Chromium vs `vite preview` | **PASS — 6/6 in 7.1 s**, with 3 new assertions that the hero panel renders (`Reference date and inputs`, `24 September 2026` exact, `13.56 ZiG per USD` exact). Runtime invariants hold: 0 console errors, 0 page errors, 0 off-origin requests |
 | 2026-09-25 | rendered `/` at 1440×900 and 390×844 (Phase N) and inspected the images | PASS — desktop: two columns, headline in two balanced lines, CTA above the fold, panel card in the page's own card vocabulary; mobile: single column with the panel below the CTA, nothing clipped, no horizontal overflow |
+| 2026-09-25 | researched the headline wording (Phase N, on the user's instruction) | PASS — read **GOV.UK Design System *Headings*** (*"Write all headings in sentence case."*), **GOV.UK Service Manual *Naming your service*** (verb-led, task not technology, no department or brand names, examples given), **GOV.UK *Type scale*** (48 px = `govuk-heading-xl`), **NN/g *Legibility, Readability, and Comprehension*** (front-load the first words). Two further pages 404'd and both search engines were bot-blocked — recorded as a limitation rather than papered over |
+| 2026-09-25 | `npm test` (Phase N, caps change) | PASS — **9 files, 145/145**. New test asserts the caps come from `uppercase` styling while the DOM text stays sentence case, and that tracking is positive rather than the old `tracking-tight` |
+| 2026-09-25 | `npx playwright test` (Phase N, caps change) | **PASS — 6/6**. The homepage test now reads the **real computed style** of the `<h1>`: `text-transform: uppercase`, `letter-spacing > 0`, and sentence-case `textContent` — a visual requirement proven in a real browser, not asserted from the source |
+| 2026-09-25 | `npm run validate` / `typecheck` / `lint` / `build` (Phase N, caps change) | PASS — validate 9/9; typecheck silent; lint 0 errors, 7 pre-existing warnings; built in 593 ms |
+| 2026-09-25 | rendered `/` at 1440×820 and 390×844 after the caps change and inspected the images | PASS — `TEST THE POLICY / BEFORE YOU DECIDE` in two balanced lines, no trailing full stop, positive tracking; CTA still above the fold at 820 px viewport height; mobile clean at 390 px |
 | 2026-09-25 | dev-server port root cause confirmed (Phase M) | PASS — `vite.config.ts` sets `server.port = 8080` and `host: "::"`; `npm run dev` therefore serves at **http://localhost:8080/**, not 5173. This is why the user's browser still showed the old entry |
 
 ## Known-red / open items
@@ -1074,7 +1115,9 @@ relative path so it does not duplicate the source of truth).
   the left, and a bordered **"Reference date and inputs"** panel on the right carrying the reference
   date, fiscal year and three reference rates read from `src/config/reference.ts` — so a figure is
   never shown without the frame it was computed in. The brand tagline closes that panel instead of
-  being the `<h1>`.
+  being the `<h1>`. The headline is **"Test the policy before you decide"**, rendered in CAPITALS by
+  the `uppercase` class with positive tracking — the DOM text stays sentence case, so the accessible
+  name, search and copy-paste are unaffected.
 - **Dev server port:** `npm run dev` serves at **http://localhost:8080/** (`vite.config.ts` sets
   `server.port = 8080`), *not* Vite's default 5173. A stale tab on 5173 shows an old build — this is
   the confirmed root cause of the "I still see the old page" report in Phase M.
@@ -1086,7 +1129,7 @@ relative path so it does not duplicate the source of truth).
   in `CLIENTS` but deliberately unimplemented — the mock-first seam), and Government SSO. Playwright
   click-through is **no longer** on this list: it is built and green (Phases H→M).
 - **Next action: no phase is outstanding — the build is complete and verified (Phases 0–N).** The
-  full suite is green (validate, typecheck, lint, test **144/144**, build, **and `npx playwright test`
+  full suite is green (validate, typecheck, lint, test **145/145**, build, **and `npx playwright test`
   6/6**).
   Remaining work, in priority order:
   1. **Redeploy `dist/`** to publish Phases E–M to the live host (Phase J's FTPS command; **never

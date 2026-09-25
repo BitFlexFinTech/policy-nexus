@@ -65,9 +65,9 @@ export default function Landing() {
           </p>
           <h1
             id="landing-proposition"
-            className="mt-3 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-5xl"
+            className="mt-3 text-balance text-[1.75rem] font-bold uppercase leading-[1.15] tracking-[0.02em] text-foreground sm:text-[2.5rem]"
           >
-            Test the policy before the measure is finalised.
+            Test the policy before you decide
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             {BRAND.summary}

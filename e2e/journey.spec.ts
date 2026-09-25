@@ -93,7 +93,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await page.goto("/");
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "Test the policy before the measure is finalised." }),
+      page.getByRole("heading", { level: 1, name: "Test the policy before you decide" }),
     ).toBeVisible();
 
     // The landing page is pure: it must NOT carry the department picker.
@@ -139,10 +139,31 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
 
     // Government-aesthetic structure.
     await expect(
-      page.getByRole("heading", { level: 1, name: "Test the policy before the measure is finalised." }),
+      page.getByRole("heading", { level: 1, name: "Test the policy before you decide" }),
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "What this platform does", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "How it works", exact: true })).toBeVisible();
+
+    // The headline must RENDER in capitals. This reads the real computed style, which
+    // is the only way to prove a visual requirement — and it also proves the caps come
+    // from styling rather than from capital letters typed into the content.
+    const headline = await page.evaluate(() => {
+      const node = document.querySelector("h1");
+      if (!node) return null;
+      const style = getComputedStyle(node);
+      return {
+        textTransform: style.textTransform,
+        letterSpacing: parseFloat(style.letterSpacing),
+        fontSize: parseFloat(style.fontSize),
+        text: node.textContent?.trim() ?? "",
+      };
+    });
+    expect(headline).not.toBeNull();
+    expect(headline?.textTransform).toBe("uppercase");
+    // Caps need positive tracking; the sentence-case display setting was negative.
+    expect(headline?.letterSpacing ?? -1).toBeGreaterThan(0);
+    expect(headline?.text).toBe("Test the policy before you decide");
+
     // The hero states the frame its figures are computed in, read from configuration.
     const frame = page.locator("aside[aria-labelledby='landing-reference-heading']");
     await expect(
