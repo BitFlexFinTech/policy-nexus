@@ -78,3 +78,37 @@
     font-family: 'JetBrains Mono', monospace;
   }
 }
+
+/**
+ * Print rules for assessment documents. Everything is inside `@media print`, so
+ * the on-screen layout is untouched (see .clinerules/03-preserve-existing-ui-and-no-break.md).
+ * The workspace chrome and any control marked `data-print="hide"` are removed
+ * from the page, and the fixed-viewport shell is allowed to flow onto paper.
+ */
+@media print {
+  nav,
+  footer,
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  .h-screen {
+    height: auto !important;
+  }
+
+  .overflow-hidden,
+  .overflow-y-auto,
+  .overflow-auto {
+    overflow: visible !important;
+  }
+
+  .max-h-40,
+  .max-h-48 {
+    max-height: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+}
+

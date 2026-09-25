@@ -4,6 +4,12 @@ import { findDepartment, type Department } from "@/config/departments";
 import { VOCABULARY } from "@/config/brand";
 import { REFERENCE_DATE_LABEL, getStakeholderSegment } from "@/config/reference";
 import { useSession } from "@/session/useSession";
+import {
+  FEED_SYSTEM_TONE,
+  FEED_TAG_TONES,
+  FEED_TYPE_ICONS,
+  feedTimestamp,
+} from "@/components/feedStyles";
 
 interface AgentMessage {
   id: number;
@@ -14,37 +20,6 @@ interface AgentMessage {
   /** Tailwind tone classes for the agent tag. */
   tone: string;
 }
-
-/** Tag tones, cycled by agent. Every class is an existing palette token. */
-const AGENT_TONES = [
-  "bg-primary text-primary-foreground",
-  "bg-gold text-gold-foreground",
-  "bg-success text-success-foreground",
-  "bg-warning text-warning-foreground",
-  "bg-destructive text-destructive-foreground",
-] as const;
-
-const SYSTEM_TONE = "bg-muted text-muted-foreground";
-
-const typeIcons: Record<string, string> = {
-  info: "ℹ",
-  action: "▶",
-  result: "✓",
-  warning: "⚠",
-  system: "⚙",
-};
-
-/**
- * Deterministic timestamps. The feed is a record of scenario preparation, so the
- * clock is derived from position, never from the system clock — the same
- * department always produces the same feed.
- */
-const timestampFor = (index: number) => {
-  const totalSeconds = index * 3;
-  const minutes = 23 + Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `14:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-};
 
 /**
  * Build the department's stakeholder agent feed from its own configuration:
@@ -84,20 +59,20 @@ const buildFeed = (department: Department): AgentMessage[] => {
   let toneIndex = 0;
 
   return entries.map((entry, index) => {
-    let tone = SYSTEM_TONE;
+    let tone = FEED_SYSTEM_TONE;
     if (entry.agent !== "System") {
       const existing = toneByAgent.get(entry.agent);
       if (existing) {
         tone = existing;
       } else {
-        tone = AGENT_TONES[toneIndex % AGENT_TONES.length];
+        tone = FEED_TAG_TONES[toneIndex % FEED_TAG_TONES.length];
         toneByAgent.set(entry.agent, tone);
         toneIndex += 1;
       }
     }
     return {
       id: index + 1,
-      timestamp: timestampFor(index),
+      timestamp: feedTimestamp(index),
       agent: entry.agent,
       type: entry.type,
       message: entry.message,
@@ -136,7 +111,7 @@ export function AgentFeed() {
             <span className={cn("shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase", msg.tone)}>
               {msg.agent}
             </span>
-            <span className="shrink-0 text-xs text-muted-foreground">{typeIcons[msg.type]}</span>
+            <span className="shrink-0 text-xs text-muted-foreground">{FEED_TYPE_ICONS[msg.type]}</span>
             <span className="font-mono-code text-xs leading-relaxed text-foreground">{msg.message}</span>
           </div>
         ))}

@@ -9,6 +9,9 @@ import Documents from "./pages/Documents.tsx";
 import Policies from "./pages/Policies.tsx";
 import Reference from "./pages/Reference.tsx";
 import Simulations from "./pages/Simulations.tsx";
+import SimulationRun from "./pages/SimulationRun.tsx";
+import Assessment from "./pages/Assessment.tsx";
+import FullAssessment from "./pages/FullAssessment.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { RequireSession } from "./routes/RequireSession.tsx";
 import { WorkspaceLayout } from "./layouts/WorkspaceLayout.tsx";
@@ -30,6 +33,9 @@ const App = () => (
               <Route path="/app" element={<Index />} />
               <Route path="/app/policies" element={<Policies />} />
               <Route path="/app/simulations" element={<Simulations />} />
+              <Route path="/app/simulations/:id" element={<SimulationRun />} />
+              <Route path="/app/assessments/:id" element={<Assessment />} />
+              <Route path="/app/assessments/:id/full" element={<FullAssessment />} />
               <Route path="/app/documents" element={<Documents />} />
               <Route path="/app/reference" element={<Reference />} />
             </Route>

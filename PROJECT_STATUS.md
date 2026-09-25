@@ -46,8 +46,13 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
 - `src/config/brand.ts` — product name, entity, tagline, disclaimer.
 - `src/config/departments.ts` — the 16 departments + all authored department content.
 - `src/config/reference.ts` — `REFERENCE_DATE`, reference rates, segment lists.
+- `src/lib/prng.ts` — `hashString` (FNV-1a) + `mulberry32` (`createRng`) + `normaliseSeedText`.
 - `src/services/assessment/types.ts` — canonical assessment result schema.
-- `src/services/assessment/AssessmentService.ts` — interface + factory (mock→real seam).
+- `src/services/assessment/seed.ts` — `seedForRequest` / `runIdFor` (pure function of the request).
+- `src/services/assessment/AssessmentService.ts` — interface + factory (mock→real seam) + `CLIENTS`.
+- `src/services/assessment/scenario.ts` — the deterministic engine (the only place a result is built).
+- `src/services/assessment/runStore.ts` — the persisted register of run **inputs** (`localStorage["nzwisiso.runs.v1"]`).
+- `src/components/feedStyles.ts` — the one definition of feed tones/timestamps, shared by both feeds.
 
 ---
 
@@ -319,14 +324,60 @@ real-browser visual/pixel check yet (Playwright Chromium is not installed; that 
   guarded without a session. Suite is now **62 tests** (was 33).
 - **`npm run validate` is now FULLY GREEN** (was 18 hits). See the verification log.
 
-### Phase E — Policy input (Upload / Paste wired to the service)
-**Status: NOT STARTED**
+### Phase E — Assessment service seam (PRNG, schema, deterministic engine, register)
+**Status: DONE — verified this session**
+
+- `src/lib/prng.ts` — FNV-1a `hashString` + `mulberry32` `createRng` + `normaliseSeedText`. No clock,
+  no entropy. `int`/`pick`/`bool` helpers; `toSeedHex` for identifiers.
+- `src/services/assessment/types.ts` — canonical `AssessmentRequest` / `AssessmentRun` schema
+  (rounds, reactions, impacts, risks, recommendations, metrics). One definition only.
+- `src/services/assessment/seed.ts` — `seedForRequest` (`departmentId::normalisedText::template::horizon`)
+  and `runIdFor`; a pure function of the request, so identical inputs are one run, not two.
+- `src/services/assessment/scenario.ts` — the deterministic engine. Reactions for **every** segment the
+  department models, impacts for **every** stated priority, seeded risks/recommendations/metrics, and
+  a seeded round narrative. Same request ⇒ byte-identical run.
+- `src/services/assessment/AssessmentService.ts` — the interface, the `CLIENTS` registry, the factory
+  and the singleton `assessmentService`. `service` mode is registered as *not registered yet* and
+  degrades to the scenario engine (mock-first) rather than throwing.
+- `src/services/assessment/runStore.ts` — persists run **inputs** only, in
+  `localStorage["nzwisiso.runs.v1"]`, with an in-memory fallback and a `useSyncExternalStore` snapshot.
+  Results are recomputed from the stored inputs, so a stored run cannot drift from what produced it.
+- `src/components/PolicyInput.tsx` — the `Review scope` preview was **removed** (superseded by the real
+  run view) and the action is now **`Run Simulation`**: it records the request and navigates to
+  `/app/simulations/:id`. Selecting a preset chip also records its `templateId`.
 
 ### Phase F — Simulation (deterministic visualisation + progress + Assessment Complete)
-**Status: NOT STARTED**
+**Status: DONE — verified this session**
 
-### Phase G — Assessment (Executive Summary, Full Assessment, PDF/Word/Print/Email)
-**Status: NOT STARTED**
+- `src/pages/SimulationRun.tsx` (route `/app/simulations/:id`) — reveals the run's own rounds one at a
+  time (the timer affects *cadence only*; the content is fixed by the seed), with a progress bar, the
+  seed shown in full, and an explicit `Scenario mode (Mock) — computed locally, no external request`
+  line. Ends at **Assessment Complete** with the metric strip and links to the assessment.
+- `src/components/HistoryTable.tsx` and `src/pages/Simulations.tsx` now list **real recorded runs**
+  (reference, policy, horizon, stakeholder count, result, `Complete` → assessment) and fall back to the
+  prepared-draft register with its explicit 0-run state when nothing has been run.
+- `src/components/EngineStatus.tsx` — added a real `Recorded runs` metric and the engine pill now reads
+  `Scenario (Mock)`.
+- `src/components/feedStyles.ts` — the feed tones/timestamp helper moved out of `AgentFeed` so the two
+  feeds share one definition (single-source rule); `AgentFeed` imports it.
+
+### Phase G — Assessment (Executive Summary, Full Assessment, PDF/Word/Print/Share)
+**Status: DONE — verified this session**
+
+- `src/pages/Assessment.tsx` (`/app/assessments/:id`) — executive summary: disclaimer first, document
+  actions, the five headline metrics (each opens to its meaning), the modelled summary, all reactions,
+  all impacts and all risks.
+- `src/pages/FullAssessment.tsx` (`/app/assessments/:id/full`) — adds the recommended next steps, the
+  exact run inputs (reference date, horizon, source, seed, engine, uploaded files, submitted text) and
+  a method-and-limitations note pointing at the reference page.
+- `src/components/assessment/AssessmentSections.tsx` + `tone.ts` — shared sections so both pages render
+  identical findings from one definition; `MetricCards` are real buttons with `aria-expanded`.
+- `src/components/assessment/DocumentActions.tsx` — **Print** (`window.print()`), **Save as PDF**
+  (print dialogue), **Download Word** (real `application/msword` Blob download), **Share**
+  (`navigator.share`, else clipboard). No new dependency; no network call.
+- `src/index.css` — `@media print` block added (chrome + `[data-print="hide"]` hidden, viewport shell
+  allowed to flow). Screen layout untouched; palette tokens unchanged (palette-lock test still green).
+- `src/App.tsx` — the three new routes nested inside `RequireSession` → `WorkspaceLayout`.
 
 ### Phase H — Verification (full suite + Playwright journey for all 16 departments)
 **Status: NOT STARTED**
@@ -443,6 +494,14 @@ lftp --env-password -u 'nzwisiso@nzwisiso.bitflex.app' ftp://ftp.bitflex.app \
 | 2026-09-25 | deployed-bundle identity grep | PASS — bundle contains `Nzwisiso`(2), `Understanding before action`(1), `Policy Register`(1), `2026-09-24`(1), `one-click`(1) |
 | 2026-09-25 | full suite re-run AFTER adding `public/.htaccess` | PASS — `SUITE_EXIT=0`; `VALIDATE: PASS`; 0 errors; **62/62 tests**; built in 484 ms |
 | 2026-09-25 | in-browser end-to-end journey (Playwright) | **NOT RUN — Chromium binary not installed, no `e2e/` spec exists.** Click-through behaviour is **unverified**, not claimed working |
+| 2026-09-25 | `npm run validate` (Phases E–G) | PASS — **all 9 checks green, zero SKIPs** (`@media print` and the disclaimer are now detected because the report files exist) |
+| 2026-09-25 | `npx tsc -b --pretty false` (Phases E–G) | PASS — no output, exit 0 |
+| 2026-09-25 | `npm run lint` (Phases E–G) | PASS — 0 errors, 7 pre-existing react-refresh warnings |
+| 2026-09-25 | `npm test` (Phases E–G) | PASS — 7 files, **90/90 tests** (5 palette-lock, 14 departments, 8 routes, 6 Home, 29 workspace, **22 assessment**, **6 journey**) |
+| 2026-09-25 | `npm run build` (Phases E–G) | PASS — 1,696 modules, 509 ms; 456.53 kB JS / 61.21 kB CSS |
+| 2026-09-25 | determinism replay — `src/test/assessment.test.ts` | PASS — same request ⇒ `JSON.stringify`-identical run; whitespace/case changes ⇒ same id; a real text change ⇒ different id; all 16 departments cover every modelled segment and priority; values in range |
+| 2026-09-25 | run-store round-trip — `src/test/assessment.test.ts` | PASS — `buildRun` persists nothing; `run` records exactly one row; re-running identical inputs replaces rather than duplicates; per-department filtering correct |
+| 2026-09-25 | journey render — `src/test/journey.test.tsx` | PASS — submit a preset → `/app/simulations/:id` → every round reveals → **Assessment Complete** → executive summary and full assessment render every metric, reaction, impact and risk; unknown reference shows the explicit panel; `/app/simulations/:id` redirects to `/` with no session |
 
 ## Known-red / open items
 - **DEPLOYMENT — two facts a cold session must not get wrong.** (a) The host in the deployment
@@ -455,12 +514,12 @@ lftp --env-password -u 'nzwisiso@nzwisiso.bitflex.app' ftp://ftp.bitflex.app \
   the server also holds files the build does not produce — `cgi-bin/` and
   `.well-known/pki-validation/<token>.txt`. **Never deploy with `mirror --delete`**; that would
   delete the live SSL validation token.
-- `npm run validate` is **GREEN as of Phase D** — all nine checks (plus the two SKIPs for
-  not-yet-created report files) pass with zero violations. The 18 hits that used to be listed
-  here (16 vendor-term + 2 non-determinism) were the Phase D work and are fixed at root cause.
-  One *excluded* hit remains inside stock `src/components/ui/sidebar.tsx`
-  (`Math.random()` in an unused helper) — it is reported as INFO, not a violation, and must stay
-  excluded (do not "fix" it and do not widen the check).
+- `npm run validate` is **GREEN as of Phases E–G** — all nine checks pass with zero violations and
+  **no remaining SKIPs** (the disclaimer and `@media print` checks are now live because the report
+  files exist). The 18 hits that used to be listed here (16 vendor-term + 2 non-determinism) were
+  the Phase D work and are fixed at root cause. One *excluded* hit remains inside stock
+  `src/components/ui/sidebar.tsx` (`Math.random()` in an unused helper) — it is reported as INFO,
+  not a violation, and must stay excluded (do not "fix" it and do not widen the check).
 - **Recorded correction:** the Phase 0 verification log claimed `npm run typecheck` was PASS.
   That was wrong — the test files failed to typecheck at HEAD. It has been fixed (see Phase B
   bug 1) and the log row is retained with a note rather than quietly deleted.
@@ -537,55 +596,74 @@ dependencies, `src/components/ui/**` (still byte-identical stock primitives), `L
 **Unaltered:** `src/index.css`, `tailwind.config.ts`, `package.json` deps, `src/components/ui/**`,
 `LICENSE`/`NOTICE`, all `src/**` app code (no app source changed for the deploy itself).
 
+## Files touched in Phases E–G
+**Added:** `src/lib/prng.ts`, `src/services/assessment/types.ts`,
+`src/services/assessment/seed.ts`, `src/services/assessment/scenario.ts`,
+`src/services/assessment/AssessmentService.ts`, `src/services/assessment/runStore.ts`,
+`src/services/assessment/useAssessmentRuns.ts`, `src/components/feedStyles.ts`,
+`src/pages/SimulationRun.tsx`, `src/pages/Assessment.tsx`, `src/pages/FullAssessment.tsx`,
+`src/components/assessment/DocumentActions.tsx`, `src/components/assessment/AssessmentSections.tsx`,
+`src/components/assessment/tone.ts`, `src/test/assessment.test.ts`, `src/test/journey.test.tsx`
+
+**Modified:** `src/components/PolicyInput.tsx` (scope preview removed; `Run Simulation` wired),
+`src/components/AgentFeed.tsx` (now imports the shared feed styles),
+`src/components/EngineStatus.tsx`, `src/components/HistoryTable.tsx`, `src/pages/Simulations.tsx`,
+`src/App.tsx` (three routes), `src/index.css` (added a `@media print` block only),
+`PROJECT_STATUS.md`, `PRODUCTION_READINESS.md`
+
+**Not touched (locked / unchanged):** `tailwind.config.ts`, `package.json` dependencies,
+`src/components/ui/**` (still byte-identical stock primitives), `LICENSE`/`NOTICE`,
+`src/session/session.ts`, `src/session/useSession.ts`, `src/config/departments.ts`,
+`src/config/brand.ts`, `src/config/reference.ts`, `src/routes/RequireSession.tsx`,
+and all palette tokens in `src/index.css` (`:root` unchanged — palette-lock test still green).
+
 ---
 
 ## RESUME HERE
 
-- **Branch:** `feature/unified-platform` · **HEAD:** the Phase D commit — run `git rev-parse HEAD`.
+- **Branch:** `feature/unified-platform` · **HEAD:** the Phases E–G commit — run `git rev-parse HEAD`.
   `tree:` clean. Functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C ·
-  Phase D = the commit whose message begins `feat(phase-d)`.
-  `git log --oneline -8 | cat` is the second opinion on state.
+  Phase D = the commit whose message begins `feat(phase-d)` · Phase J = `feat(phase-j)` ·
+  Phases E–G = the commit whose message begins `feat(phase-e)`.
+  `git log --oneline -10 | cat` is the second opinion on state.
   (This shell's git rejects `--no-pager`; use plain `git log --oneline | cat`.)
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
   restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
 - **`main` is untouched. Nothing has been pushed to any git remote.** (The app *is* **live in
-  production** — see Phase J — but that was an FTP upload of `dist/`, not a git push.)
-- **LIVE NOW:** `https://nzwisiso.bitflex.app/` serves this build (Phase J, verified by live HTTPS
-  checks). To redeploy: `npm run build`, then the `lftp mirror -R` FTPS command written in Phase J.
-  **Do not use `--delete`** (it would remove the server's SSL validation token).
-- **What actually works right now, end to end:** `npm run dev` → `/` shows all 16 departments as
-  keyboard-accessible buttons → choose one → **Enter &lt;department&gt;** stores the session →
-  `/app` renders the workspace labelled with that department → **Change department** / **Sign
-  out** work → visiting `/app` with no session redirects to `/` → an unknown path still shows
-  `404`. All 16 departments render, and two different sessions were verified to show two
-  different department labels.
-- **Workspace after Phase D (all verified by tests this session):** the workspace is fully
-  department-aware and vendor-free. A secondary nav (Overview · Policy Register · Simulation
-  Register · Documents · Reference) sits under the header and every link resolves to a real
-  department-scoped screen. `npm run validate` is **fully green**. Nothing is hand-waved: the
-  register and document screens list the department's own config, and the simulation register
-  says plainly that **0 runs** exist because the engine is not built yet.
-- **What is NOT built yet:** the service layer (`src/services/assessment/**`), the deterministic
-  PRNG (`src/lib/prng.ts`), the live simulation view (`/app/simulations/:id`), the assessment /
-  executive-summary / full-assessment screens, PDF/Word/print/share document actions, and the
-  policy input wired to a real service.
-- **Next action: Phase E** — build the service seam and wire the policy input to it. Concretely:
-  create `src/services/assessment/types.ts` (canonical result schema),
-  `src/services/assessment/AssessmentService.ts` (interface + factory, the mock→real seam),
-  `src/services/assessment/scenario.ts` (deterministic implementation) and `src/lib/prng.ts`
-  (`mulberry32` over a string hash of `departmentId + normalised policy text + template id`);
-  then replace `PolicyInput`'s deterministic `Review scope` action with `AssessmentService.run()`
-  and rename the button back to `Run Simulation`. Re-run the whole suite — validate must stay green.
-- **Read next:** this file, then `src/layouts/WorkspaceLayout.tsx`, `src/components/PolicyInput.tsx`,
-  and `src/config/departments.ts` + `src/config/reference.ts` (what the service layer reads from).
+  production** — see Phase J — but that was an FTP upload of `dist/`, not a git push. The live
+  build is therefore the **Phase D** bundle; redeploy to publish Phases E–G.)
+- **LIVE NOW:** `https://nzwisiso.bitflex.app/` serves the **Phase D** build (Phase J, verified by
+  live HTTPS checks). To publish Phases E–G: `npm run build`, then the `lftp mirror -R` FTPS command
+  written in Phase J. **Do not use `--delete`** (it would remove the server's SSL validation token).
+- **The whole journey now works, verified by tests this session:** `/` → pick one of 16 departments
+  → `/app` (department-labelled workspace) → type or pick a preset draft → **Run Simulation** →
+  `/app/simulations/:id` replays the seeded rounds and reaches **Assessment Complete** →
+  **Open executive summary** (`/app/assessments/:id`) → **Open full assessment**
+  (`/app/assessments/:id/full`) → Print / Save as PDF / Download Word / Share. The register and the
+  workspace history table list the recorded run and link to its assessment. Same inputs always
+  reproduce the same run.
+- **Determinism is enforced by real tests, not by inspection:** `src/test/assessment.test.ts`
+  asserts a `JSON.stringify`-identical run for identical input, whitespace/case insensitivity, a
+  different id for changed text, and coverage of every segment + priority for all 16 departments.
+- **What is still NOT built:** Playwright click-through (Phase H — Chromium binary is not installed
+  and no `e2e/` spec exists, so **in-browser interaction is unverified**), server-side PDF/DOCX text
+  extraction, a real `.docx` renderer, the remote assessment client (registered but not implemented),
+  and Government SSO.
+- **Next action: Phase H — verification.** `npx playwright install chromium`, add an `e2e/` spec for
+  the journey above (including a **0 network requests** assertion and a **0 console errors**
+  assertion) and run it against `vite preview`. If Chromium cannot be installed, record Phase H as
+  BLOCKED with that exact reason rather than claiming the journey verified.
+- **Read next:** this file, then `src/services/assessment/AssessmentService.ts` (the seam),
+  `src/services/assessment/scenario.ts` (the engine), `src/pages/SimulationRun.tsx`, and
+  `src/test/journey.test.tsx` (what is already asserted).
 - **Exact commands:**
 ```bash
 npm run validate; npm run typecheck; npm run lint; npm test; npm run build
-git add -A && git commit -m "feat(phase-e): assessment service seam, deterministic PRNG, policy input wired"
+git add -A && git commit -m "feat(phase-e-g): assessment seam, deterministic engine, live simulation, executive + full assessment, document actions"
 ```
 
 ### Traps a cold session must not re-discover the hard way
-1. `npm run validate` is **GREEN** as of Phase D. If it goes red, that is a real regression — fix
+1. `npm run validate` is **GREEN** as of Phases E–G. If it goes red, that is a real regression — fix
    the cause. Never loosen `scripts/validate.mjs` to make it pass. The single `Math.random()` hit
    in `src/components/ui/sidebar.tsx` is intentionally excluded stock code; keep it excluded and
    do not "fix" it.
@@ -609,3 +687,19 @@ git add -A && git commit -m "feat(phase-e): assessment service seam, determinist
    Always `npm run build` immediately before mirroring.
 8. **`mirror --delete` is forbidden here** — it would wipe `cgi-bin/` and the live
    `.well-known/pki-validation/<token>.txt` SSL validation file.
+9. **The engine must stay pure.** `src/services/assessment/scenario.ts` builds a result and does
+   nothing else — it must never import the run store. Persisting is the service's job:
+   `assessmentService.buildRun()` is pure and persists nothing; `assessmentService.run()` records
+   the request and returns the same run. No component may import `scenario.ts` directly; they use
+   `assessmentService` from `AssessmentService.ts` (the seam). `src/test/assessment.test.ts` fails
+   if `buildRun` starts writing.
+10. **`runStore.ts` persists run *inputs*, not results.** Reading a run recomputes it from the
+    stored request, which is what makes "the stored run can never drift from its inputs" true.
+    Do not start caching generated output in local storage.
+11. **The simulation reveal test needs one `act()` flush per tick.** `SimulationRun` reveals one
+    round per `setTimeout`, so a single `vi.advanceTimersByTime(30000)` fires only the first round;
+    `src/test/journey.test.tsx` loops `act(() => vi.advanceTimersByTime(400))`. If that test starts
+    failing on "Assessment Complete", check the loop before touching the component.
+12. **`src/index.css` now has a `@media print` block at the end.** The `:root` palette block above
+    it must stay byte-identical — `src/test/palette-lock.test.ts` fails on any change to
+    `--primary`, `--gold`, `--warning` or `--success`, and they are locked project constraints.

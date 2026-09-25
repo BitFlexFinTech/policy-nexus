@@ -7,12 +7,14 @@ deliberate scenario-mode implementations behind swappable seams.
 ## 1. Simulation / assessment engine
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
-| Assessment engine / `src/services/assessment/**` | **NOT BUILT YET — Phase E/F.** There is no `AssessmentService`, no `scenario.ts` and no PRNG in this tree. Because of that, Phase D renders only authored configuration data in the workspace and never presents a generated result as a run. | MiroFish backend (HTTP service) | `.env` → `VITE_ASSESSMENT_MODE=mirofish`; factory in `src/services/assessment/AssessmentService.ts` (to be created in Phase E) |
-| Decision-support disclaimer | Static string in `src/config/brand.ts` | Stays (always present) | `src/config/brand.ts` |
-| Simulation visualisation | **NOT BUILT YET — Phase E/F.** The agent feed is now a deterministic rendering of the department's own modelled segments (`src/components/AgentFeed.tsx`), not a live visualisation. | Live streaming from the backend over the same `AssessmentService` contract | No UI change required (seam requirement) |
+| Assessment engine / `src/services/assessment/**` | **BUILT — Phase E.** `AssessmentService` interface + factory (`AssessmentService.ts`), deterministic engine (`scenario.ts`), seeded PRNG (`src/lib/prng.ts`), canonical schema (`types.ts`), and a persistent register of run inputs (`runStore.ts`). The same request always reproduces a byte-identical `AssessmentRun`; nothing reaches the network. **Visibly labelled**: the workspace pill reads `Scenario (Mock)` and runs state `Seed … — computed locally, no external request`. | Remote backend (HTTP service) | `.env` → `VITE_ASSESSMENT_MODE=service`; register the client in `CLIENTS` in `src/services/assessment/AssessmentService.ts` |
+| Decision-support disclaimer | Static string in `src/config/brand.ts`, rendered on the executive summary and the full assessment and carried into every export | Stays (always present) | `src/config/brand.ts` |
+| Simulation visualisation | **BUILT — Phase F.** `/app/simulations/:id` reveals the run's own rounds one at a time (a deterministic replay; only the reveal cadence is timed) and ends at **Assessment Complete**. The workspace `AgentFeed` remains the pre-run scenario-preparation view. | Live streaming from the backend over the same `AssessmentService` contract | No UI change required (seam requirement) |
 
-**Seam rule:** no component may import `scenario.ts` directly; only the factory. Swapping the
-implementation must require zero UI code changes.
+**Seam rule:** no component may import `scenario.ts` directly; only `assessmentService` from the
+factory. Swapping the implementation must require zero UI code changes. The store persists run
+**inputs** (`runStore.ts`), never generated output, so a stored run is always recomputed by whatever
+client is registered.
 
 ## 2. Authentication / session
 | Item | Current implementation | Real replacement | Where it is switched |
@@ -26,36 +28,36 @@ implementation must require zero UI code changes.
 ## 3. Policy ingestion
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
-| `.txt` / `.pdf` / `.docx` upload | File accepted, name and size recorded only. **No text extraction and no `FileReader` read is wired yet** — an earlier draft of this file claimed the `.txt` content drives the simulation; it does not (there is no engine yet). | Server-side document extraction | Backend service call behind `AssessmentService.extractPolicyText()` (Phase E) |
-| Preset chips | Department-aware: read from `department.policyTemplates` (`src/config/departments.ts`) | unchanged | n/a |
+| `.txt` / `.pdf` / `.docx` upload | File accepted, name and size recorded. **No text extraction** — when only files are supplied the recorded file list *is* the policy text and the run's `source` states `upload` plainly, so the UI never implies the file was parsed. | Server-side document extraction | Backend service call behind `AssessmentService` (`extractPolicyText`) |
+| Preset chips | Department-aware: read from `department.policyTemplates` (`src/config/departments.ts`); selecting a chip also records its `templateId`, so the run's reference and horizon come from the department's own draft | unchanged | n/a |
 | Parse progress | Deterministic fixed-step progress (`PARSE_STEP` / `PARSE_TICK_MS` in `src/components/PolicyInput.tsx`) — no `Math.random` | Real progress from the backend | Same seam |
-| Scope review action | **Mock, and labelled as such.** The button is `Review scope`, not "Run Simulation", because no simulation runs. It lists the department's modelled stakeholder segments for the draft and the output panel is titled `Scenario engine — scenario scope (Mock)`. | The button becomes "Run Simulation" and calls `AssessmentService.run()` (Phase E) | `src/components/PolicyInput.tsx` → `AssessmentService` seam |
+| Run Simulation action | **Real, deterministic, and labelled.** The button is `Run Simulation`; it calls `assessmentService.run()`, records the request and opens `/app/simulations/:id`. The engine is the scenario engine (Mock) — the UI says so on the run, the register and the assessment. | Unchanged button; the service behind it changes | `src/components/PolicyInput.tsx` → `AssessmentService` seam |
 
 ## 4. Document actions
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
-| Download PDF | Print-optimised report via the browser print dialog ("Save as PDF") — no `jspdf` dependency | Native server-side PDF renderer | Backend endpoint behind `DocumentActions` |
-| Download Word | `.doc` file generated from print-clean HTML Blob (opens in Word) — **HTML-based, not OOXML `.docx`** | Server-side real `.docx` | Backend endpoint behind `DocumentActions` |
-| Print | Real `window.print()` with `@media print` hiding app chrome | unchanged | n/a |
-| Share by email | Real `mailto:` with pre-filled subject/body | Server-side email dispatch | Backend endpoint behind `DocumentActions` |
+| Save as PDF | Opens the browser print dialogue via `window.print()` — choose "Save as PDF" as the destination. No `jspdf` dependency and no new dependency added. | Native server-side PDF renderer | Backend endpoint behind `DocumentActions` (`src/components/assessment/DocumentActions.tsx`) |
+| Download Word | Real downloadable `.doc` built from a Word-compatible HTML Blob (`application/msword`) — **HTML-based, not OOXML `.docx`** | Server-side real `.docx` | Backend endpoint behind `DocumentActions` |
+| Print | Real `window.print()`; `@media print` in `src/index.css` hides the workspace chrome and any `data-print="hide"` control, so the printed page is the assessment alone | unchanged | n/a |
+| Share | `navigator.share` where the platform provides a share sheet, otherwise the clipboard (`navigator.clipboard.writeText`). The shared text is the plain-text rendering of the run plus the disclaimer. **No network call and no email client is invoked.** | Server-side email / link dispatch | Backend endpoint behind `DocumentActions` |
 
 ## 5. Data
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
 | Department content (16 departments) | Authored deterministic config: `src/config/departments.ts` — **built in Phase B**, verified by importing the module: 16 departments, 64 priorities, 63 indicators, 48 policy templates, 49 documents | CMS / ministry content service | Config loader |
 | Brand identity, disclaimer, engine vocabulary | `src/config/brand.ts` — **built in Phase B** | Stays (identity and disclaimer are permanent) | `src/config/brand.ts` |
-| Simulation history / policy register | **Phase D:** config-derived, department-scoped. `/app/policies` and `/app/simulations` list the department's prepared drafts (`department.policyTemplates`) with an explicit empty state for runs and no fabricated result figures. They are not seeded run records. | Database of real runs | `AssessmentService.listRuns()` (Phase E) |
+| Simulation history / policy register | **Phase E/F:** `/app/policies` and `/app/simulations` list the department's prepared drafts, and the register and the workspace history table list **real recorded runs** for that department (reference, result, and a link to the assessment). `src/services/assessment/runStore.ts` persists the run *requests* in `localStorage["nzwisiso.runs.v1"]`; results are recomputed from them, so a stored run can never drift from its inputs. | Database of real runs | `AssessmentService.listRuns()` — already the call site |
 | `REFERENCE_DATE = "2026-09-24"` | Fixed reference date for all dates shown — **built in Phase B** | Real clock | `src/config/reference.ts` |
 | Reference rates (ZiG, policy rate, inflation) | Static config value in `REFERENCE_RATES`, labelled as a reference input | Live data feed | `src/config/reference.ts` |
 | Stakeholder segments | 16 canonical segments in `STAKEHOLDER_SEGMENTS`; departments may reference these ids only | CMS / segmentation service | `src/config/reference.ts` |
 
 ## 6. Non-credential work still outstanding (no credential can fix these)
-- Build `src/services/assessment/**` (interface + factory + deterministic scenario implementation) — Phase E.
-- Build the live simulation view and the assessment / executive-summary / full-assessment screens — Phase F.
-- PDF / Word / print / share document actions (`src/components/assessment/DocumentActions.tsx`) — Phase F.
+- ~~Build `src/services/assessment/**`~~ — **DONE (Phase E):** interface + factory + deterministic engine + PRNG + run store.
+- ~~Build the live simulation view and the assessment / executive-summary / full-assessment screens~~ — **DONE (Phase F/G):** `/app/simulations/:id`, `/app/assessments/:id`, `/app/assessments/:id/full`.
+- ~~PDF / Word / print / share document actions (`src/components/assessment/DocumentActions.tsx`)~~ — **DONE (Phase G)**, with the caveats in §4 above (print-dialogue PDF, HTML-based `.doc`).
 - Robust PDF/DOCX text extraction (server-side).
 - Real `.docx` / native PDF rendering.
-- MiroFish service endpoint + contract implementation (`AssessmentService` interface does not exist yet).
+- Remote assessment service endpoint + client construction in `CLIENTS` (`src/services/assessment/AssessmentService.ts`).
 - Government SSO integration.
 - Playwright Chromium binary is not installed and no `e2e/` spec exists yet — Phase H.
 

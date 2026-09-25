@@ -1,9 +1,11 @@
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { findDepartment } from "@/config/departments";
-import { VOCABULARY } from "@/config/brand";
-import { REFERENCE_FISCAL_YEAR, getStakeholderSegment } from "@/config/reference";
+import { REFERENCE_FISCAL_YEAR } from "@/config/reference";
+import { assessmentService } from "@/services/assessment/AssessmentService";
+import type { AssessmentRequest } from "@/services/assessment/types";
 import { useSession } from "@/session/useSession";
 
 const formatFileSize = (bytes: number) => {
@@ -19,34 +21,42 @@ const PARSE_TICK_MS = 250;
 /**
  * Policy ingestion for the signed-in department. Presets come from the
  * department's own prepared drafts, the parsing indicator advances in fixed
- * steps, and the scope review is a clearly-marked scenario preview of which
- * stakeholder groups the draft touches. It never claims a simulation has run.
+ * steps, and **Run Simulation** hands the draft to the assessment service and
+ * opens the live deterministic run. It performs no network call.
  */
 export function PolicyInput() {
   const session = useSession();
   const department = findDepartment(session?.departmentId);
+  const navigate = useNavigate();
 
   const [draft, setDraft] = useState("");
-  const [scope, setScope] = useState("");
+  const [templateId, setTemplateId] = useState<string | undefined>(undefined);
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: string }[]>([]);
   const [parseProgress, setParseProgress] = useState(0);
   const [isParsing, setIsParsing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleReviewScope = useCallback(() => {
-    if (!department || !draft.trim()) return;
-    const segments = department.segments
-      .map((segmentId) => getStakeholderSegment(segmentId))
-      .map((segment) => `• ${segment.label} — ${segment.note}.`)
-      .join("\n");
-    setScope(
-      `Draft length: ${draft.trim().length} characters.\n` +
-        `Modelled stakeholder groups for ${department.name}:\n${segments}\n\n` +
-        `Scenario scope (Mock): this preview lists the population groups the draft ` +
-        `touches. The full deterministic assessment is produced by the ` +
-        `${VOCABULARY.simulationCore} when the draft is run.`,
-    );
-  }, [department, draft]);
+  const handleRunSimulation = useCallback(() => {
+    if (!department) return;
+    const fileNames = uploadedFiles.map((file) => file.name);
+    const text = draft.trim();
+    if (!text && fileNames.length === 0) return;
+    // No text extraction exists in scenario mode: when only files were supplied
+    // the recorded file list is the policy text, and the source says `upload`
+    // plainly rather than implying the file was parsed.
+    const policyText = text || `Uploaded policy document(s): ${fileNames.join(", ")}`;
+    const template = department.policyTemplates.find((item) => item.id === templateId);
+    const request: AssessmentRequest = {
+      departmentId: department.id,
+      policyText,
+      source: text ? (template ? "preset" : "paste") : "upload",
+      templateId: text ? templateId : undefined,
+      timeHorizon: template?.timeHorizon,
+      fileNames,
+    };
+    const run = assessmentService.run(request);
+    navigate(`/app/simulations/${encodeURIComponent(run.id)}`);
+  }, [department, draft, templateId, uploadedFiles, navigate]);
 
   const handleFileUpload = useCallback((files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -100,11 +110,11 @@ export function PolicyInput() {
         <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Policy Ingestion Hub</span>
         <Button
           size="sm"
-          onClick={handleReviewScope}
-          disabled={!draft.trim()}
+          onClick={handleRunSimulation}
+          disabled={!draft.trim() && uploadedFiles.length === 0}
           className="h-7 bg-primary text-xs hover:bg-primary/90"
         >
-          Review scope
+          Run Simulation
         </Button>
       </div>
 
@@ -117,7 +127,10 @@ export function PolicyInput() {
           {presets.map((preset) => (
             <button
               key={preset.id}
-              onClick={() => setDraft(preset.policyText)}
+              onClick={() => {
+                setDraft(preset.policyText);
+                setTemplateId(preset.id);
+              }}
               title={preset.summary}
               className="rounded-md border bg-muted/50 px-2 py-1 text-left text-[10px] leading-tight text-foreground transition-colors hover:border-primary/30 hover:bg-primary/10"
             >
@@ -131,7 +144,10 @@ export function PolicyInput() {
       <div className="min-h-0 flex-1 p-3">
         <textarea
           value={draft}
-          onChange={(e) => setDraft(e.target.value)}
+          onChange={(e) => {
+            setDraft(e.target.value);
+            setTemplateId(undefined);
+          }}
           placeholder={`Draft the policy text for ${department.shortName} here…\n\nOr choose one of the department's prepared presets above.`}
           className="h-full w-full resize-none rounded-md border bg-background p-3 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
         />
@@ -185,18 +201,6 @@ export function PolicyInput() {
           </div>
         )}
       </div>
-
-      {/* Scenario scope preview */}
-      {scope && (
-        <div className="border-t p-3">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
-            {VOCABULARY.scenarioEngine} — scenario scope (Mock)
-          </div>
-          <div className="font-mono-code max-h-40 overflow-y-auto whitespace-pre-wrap rounded-md border bg-background p-3 text-xs leading-relaxed text-foreground">
-            {scope}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
