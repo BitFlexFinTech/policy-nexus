@@ -19,29 +19,37 @@ const renderLanding = () =>
  * the department picker — that is asserted below as a real, failable guard.
  */
 describe("Landing — the pure public landing page", () => {
-  it("leads with the proposition as the single level-one heading, not the brand tagline", () => {
+  it("leads with the service name as the single level-one heading, task line as small text above it", () => {
     renderLanding();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Test the policy before you decide",
-    );
+    const heading = screen.getByRole("heading", { level: 1 });
+    expect(heading).toHaveTextContent(BRAND.workspaceLabel);
+
+    // The task line is SMALL text, sits ABOVE the heading, and is not itself a heading.
+    const taskLine = screen.getByText("Test the policy before you decide");
+    expect(taskLine.tagName).toBe("P");
+    expect(
+      heading.compareDocumentPosition(taskLine) & Node.DOCUMENT_POSITION_PRECEDING,
+    ).toBeTruthy();
+    expect(taskLine.className).toContain("text-[10px]");
+    expect(heading.className).toContain("text-[1.75rem]");
+
     // The tagline is brand voice, not the page's proposition — it must still be
     // present on the page, or it has been silently dropped rather than moved.
     expect(screen.getByText(BRAND.tagline)).toBeInTheDocument();
   });
 
-  it("renders the headline in capitals by styling, not by hard-coding capital letters", () => {
+  it("renders the heading in capitals by styling, not by hard-coding capital letters", () => {
     renderLanding();
     const heading = screen.getByRole("heading", { level: 1 });
     const text = heading.textContent?.trim() ?? "";
 
     // The visible requirement: all caps.
     expect(heading.className).toContain("uppercase");
-    // The implementation requirement: the DOM text stays sentence case, so the
-    // accessible name, search indexing and copy-paste are normal words and do not
-    // depend on how a screen reader treats all-capital strings. No trailing full
-    // stop, matching every other capitalised string in this design.
-    expect(text).toBe("Test the policy before you decide");
+    // The implementation requirement: the DOM text stays normal case, so the accessible
+    // name, search indexing and copy-paste are normal words and do not depend on how a
+    // screen reader treats all-capital strings.
+    expect(text).toBe(BRAND.workspaceLabel);
     expect(text).not.toBe(text.toUpperCase());
     // Caps lose the ascender/descender word-shape cues, so they need POSITIVE
     // tracking — the negative tracking used for sentence-case display type is wrong here.

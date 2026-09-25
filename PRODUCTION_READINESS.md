@@ -100,14 +100,18 @@ client is registered.
   from `src/config/departments.ts`, three "how it works" steps, and an official footer carrying
   **"A Project by the Ministry of IT"** with **"For Internal Use Only"** beneath it in smaller text
   (asserted against the **real computed font size**: 11px vs 9px).
-- **Phase N** redesigned its hero, after the user questioned it: the `<h1>` is now the researched task
-  line **"Test the policy before you decide"**, rendered in CAPITALS by CSS (`uppercase` + positive
-  tracking) with the DOM text kept in sentence case, rather than the brand tagline; the hero is a
-  two-column grid whose right column is a bordered **"Reference date and inputs"** panel (reference
-  date, fiscal year, ZiG exchange rate, policy rate, annual inflation — all read from
-  `src/config/reference.ts`); the tagline closes that panel. `npm test` → **9 files, 145 tests**,
-  including a test that pins every panel value to configuration, one that asserts the panel heading is
-  unique on the page, and one that asserts the caps are styling rather than typed capitals.
+- **Phase N** redesigned its hero, after the user questioned it, and then swapped its line roles on the
+  user's instruction. Final state: the prominent `<h1>` is **"National policy simulation workspace"**
+  (read from `BRAND.workspaceLabel`) and the small line above it is **"Test the policy before you
+  decide"**; both are rendered in CAPITALS by CSS (`uppercase` + positive tracking) with the DOM text
+  left in normal case. The hero is a two-column grid whose right column is a bordered **"Reference date
+  and inputs"** panel (reference date, fiscal year, ZiG exchange rate, policy rate, annual inflation —
+  all read from `src/config/reference.ts`); the tagline closes that panel. `npm test` → **9 files,
+  145 tests**, including a test that pins every panel value to configuration, one that asserts the panel
+  heading is unique on the page, one that asserts the caps are styling rather than typed capitals, and
+  one that asserts the small task line precedes the heading and is smaller than it. `npx playwright
+  test` additionally compares the **real computed font sizes** of the two lines, so the size inversion
+  is proven in a browser.
 - **Phase M** split that entry into **two** public screens, because a landing page that also contains
   the department picker is not a landing page:
   - `/` — **pure landing page**. Asserts it holds **no department picker**.

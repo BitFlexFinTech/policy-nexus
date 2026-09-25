@@ -56,18 +56,20 @@ export default function Landing() {
   return (
     <PublicPageShell>
       <section
-        aria-labelledby="landing-proposition"
+        aria-labelledby="landing-heading"
         className="grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:items-start lg:gap-10"
       >
         <div>
+          {/* The task line, as small text above the heading. */}
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
-            {BRAND.workspaceLabel}
+            Test the policy before you decide
           </p>
+          {/* The service name, as the prominent heading. */}
           <h1
-            id="landing-proposition"
+            id="landing-heading"
             className="mt-3 text-balance text-[1.75rem] font-bold uppercase leading-[1.15] tracking-[0.02em] text-foreground sm:text-[2.5rem]"
           >
-            Test the policy before you decide
+            {BRAND.workspaceLabel}
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             {BRAND.summary}

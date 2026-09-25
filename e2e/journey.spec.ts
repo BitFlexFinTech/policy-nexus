@@ -93,7 +93,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await page.goto("/");
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "Test the policy before you decide" }),
+      page.getByRole("heading", { level: 1, name: "National policy simulation workspace" }),
     ).toBeVisible();
 
     // The landing page is pure: it must NOT carry the department picker.
@@ -139,7 +139,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
 
     // Government-aesthetic structure.
     await expect(
-      page.getByRole("heading", { level: 1, name: "Test the policy before you decide" }),
+      page.getByRole("heading", { level: 1, name: "National policy simulation workspace" }),
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "What this platform does", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "How it works", exact: true })).toBeVisible();
@@ -162,7 +162,15 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     expect(headline?.textTransform).toBe("uppercase");
     // Caps need positive tracking; the sentence-case display setting was negative.
     expect(headline?.letterSpacing ?? -1).toBeGreaterThan(0);
-    expect(headline?.text).toBe("Test the policy before you decide");
+    expect(headline?.text).toBe("National policy simulation workspace");
+
+    // The swap must be real, not just reordered text: the task line renders SMALLER
+    // than the heading. This compares real computed font sizes in a real browser.
+    const taskSize = await page
+      .getByText("Test the policy before you decide", { exact: true })
+      .evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
+    expect(Number.isNaN(taskSize)).toBe(false);
+    expect(taskSize).toBeLessThan(headline?.fontSize ?? Number.NaN);
 
     // The hero states the frame its figures are computed in, read from configuration.
     const frame = page.locator("aside[aria-labelledby='landing-reference-heading']");

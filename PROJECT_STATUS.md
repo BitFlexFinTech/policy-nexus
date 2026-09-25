@@ -726,6 +726,30 @@ session — the search engines were bot-blocked and the two pages I tried for it
 citation available is the GDS rule above, which points the other way. What *is* verified is that the
 chosen line is short enough for caps (6 words / 34 characters), which is the mitigation.
 
+**Line roles swapped on the user's instruction (final state).** The user then instructed, in their own
+words: *"the text 'National policy simulation workspace' is the small text at the top and the text 'Test
+the policy before you decide' is the big text. you just need to swap them so 'Test the policy before you
+decide' is the small text on top and 'National policy simulation workspace' is the BIg text"*. So:
+
+| Position | Before | After (final) |
+|---|---|---|
+| Small line, top | `NATIONAL POLICY SIMULATION WORKSPACE` (10 px, emerald, wide tracking) | **`TEST THE POLICY BEFORE YOU DECIDE`** |
+| `<h1>` | `TEST THE POLICY BEFORE YOU DECIDE` (40 px, bold, black) | **`NATIONAL POLICY SIMULATION WORKSPACE`** |
+
+Styling stayed with the **position**, not the text — a pure swap of the two strings, nothing else in the
+hero moved. `National Policy Simulation Workspace` continues to come from `BRAND.workspaceLabel` in
+`src/config/brand.ts` (it also appears top-right in the masthead, exactly as it did before this change),
+and the `<h1>` id was renamed `landing-proposition` → `landing-heading` because it no longer labels the
+proposition.
+
+**This deliberately reverses the research decision above**, and that is recorded openly rather than
+quietly erased: the prominent line is now a **noun label naming the workspace**, which is the pattern
+GOV.UK's *Naming your service* rule warns against (*"describe a task, not a technology"*, *"are verbs,
+not nouns"*). The task line — the GDS-aligned wording — is now the smallest text in the hero, at 10 px.
+The instruction was followed as given; the trade-off is documented so a future session does not "correct"
+it back on the assumption it was a mistake. The user was offered a raised size for the small line and did
+not take it, so 10 px is the deliberate choice of record.
+
 **A duplicate-heading bug was found and fixed during verification, not worked around:** the footer
 already contained an `<h2>` "Reference frame", so the new panel produced **two identically-named
 headings on one page** — the `landing.test.tsx` failure reported exactly that. The panel was renamed
@@ -748,16 +772,17 @@ footer, the coverage section. No new colour literal.
 
 **Evidence this session:** `npm run validate` PASS (9/9) · `npm run typecheck` PASS · `npm run lint`
 PASS (0 errors, 7 pre-existing warnings) · `npm test` **9 files, 145/145** (was 143 at the start of
-Phase N) · `npm run build` PASS (built in 593 ms) · `npx playwright test` **6/6 (7.0 s)**, now also
-asserting the hero panel's heading, reference date and `13.56 ZiG per USD`, **and reading the real
-computed style of the `<h1>`** to prove `text-transform: uppercase`, positive `letter-spacing` and
-sentence-case content in real Chromium — with 0 console errors / 0 off-origin requests. Rendered at
+Phase N) · `npm run build` PASS (built in 569 ms) · `npx playwright test` **6/6 (7.1 s)**, now also
+asserting the hero panel's heading, reference date and `13.56 ZiG per USD`, **reading the real computed
+style of the `<h1>`** to prove `text-transform: uppercase` and positive `letter-spacing`, **and comparing
+the real computed font size of the small task line against the `<h1>`** to prove the swap is a genuine
+size inversion rather than reordered text — with 0 console errors / 0 off-origin requests. Rendered at
 **1440×820** (two columns, CTA above the fold) and **390×844** (single column, panel below the CTA,
-nothing clipped) and inspected as images.
+nothing clipped) and inspected as images, before and after the swap.
 
-**Deliberately reversible:** the `<h1>` wording is an opinion informed by research, not a user
-instruction — only the *caps* were instructed. The wording is a one-line change in `Landing.tsx` plus
-the five assertions that name it. Alternatives that also satisfy the service-naming rules:
+**Deliberately reversible:** the *wording* of the task line is an opinion informed by research, not a
+user instruction — only the caps and the swap were instructed. Changing it is a one-line edit in
+`Landing.tsx` plus the assertions that name it. Alternatives that satisfy the service-naming rules:
 **"Test a policy draft before you decide"** (most concrete about the artefact), **"See how the policy
 lands"** (uses the page's own "test how it lands" language), **"Simulate the policy before you decide"**
 (the product's internal verb), **"Test before you decide"** (shortest; pairs with the tagline).
@@ -868,6 +893,10 @@ lands"** (uses the page's own "test how it lands" language), **"Simulate the pol
 | 2026-09-25 | `npx playwright test` (Phase N, caps change) | **PASS — 6/6**. The homepage test now reads the **real computed style** of the `<h1>`: `text-transform: uppercase`, `letter-spacing > 0`, and sentence-case `textContent` — a visual requirement proven in a real browser, not asserted from the source |
 | 2026-09-25 | `npm run validate` / `typecheck` / `lint` / `build` (Phase N, caps change) | PASS — validate 9/9; typecheck silent; lint 0 errors, 7 pre-existing warnings; built in 593 ms |
 | 2026-09-25 | rendered `/` at 1440×820 and 390×844 after the caps change and inspected the images | PASS — `TEST THE POLICY / BEFORE YOU DECIDE` in two balanced lines, no trailing full stop, positive tracking; CTA still above the fold at 820 px viewport height; mobile clean at 390 px |
+| 2026-09-25 | line roles swapped on the user's instruction (Phase N final state) | PASS — small line (10 px, emerald, wide tracking) is now `TEST THE POLICY BEFORE YOU DECIDE` and the `<h1>` (40 px, bold, black) is `BRAND.workspaceLabel`. Styling stayed with the position, not the text |
+| 2026-09-25 | `npm test` (Phase N, after the swap) | PASS — **9 files, 145/145**. The heading test now asserts the `<h1>` is the workspace label, that the task line is a `<p>` of `text-[10px]` **preceding** the heading in DOM order (`compareDocumentPosition`), and that the heading is `text-[1.75rem]` |
+| 2026-09-25 | `npx playwright test` (Phase N, after the swap) | **PASS — 6/6**. New assertion compares the **real computed font size** of the task line against the `<h1>` and requires it to be strictly smaller — so the swap is proven as a size inversion in a real browser, not assumed from the class names |
+| 2026-09-25 | rendered `/` after the swap at 1440×820 and inspected the image | PASS — `TEST THE POLICY BEFORE YOU DECIDE` small and emerald above `NATIONAL POLICY SIMULATION WORKSPACE` at 40 px in two balanced lines, exactly as instructed; CTA still above the fold |
 | 2026-09-25 | dev-server port root cause confirmed (Phase M) | PASS — `vite.config.ts` sets `server.port = 8080` and `host: "::"`; `npm run dev` therefore serves at **http://localhost:8080/**, not 5173. This is why the user's browser still showed the old entry |
 
 ## Known-red / open items
@@ -1115,9 +1144,12 @@ relative path so it does not duplicate the source of truth).
   the left, and a bordered **"Reference date and inputs"** panel on the right carrying the reference
   date, fiscal year and three reference rates read from `src/config/reference.ts` — so a figure is
   never shown without the frame it was computed in. The brand tagline closes that panel instead of
-  being the `<h1>`. The headline is **"Test the policy before you decide"**, rendered in CAPITALS by
-  the `uppercase` class with positive tracking — the DOM text stays sentence case, so the accessible
-  name, search and copy-paste are unaffected.
+  being the `<h1>`. **In the final state the line roles are swapped on the user's instruction**: the
+  prominent `<h1>` is `BRAND.workspaceLabel` (National Policy Simulation Workspace) and the small line
+  above it is `TEST THE POLICY BEFORE YOU DECIDE`. Both render in CAPITALS via the `uppercase` class
+  with positive tracking — the DOM text stays in normal case, so the accessible name, search and
+  copy-paste are unaffected. This is a deliberate instruction that runs against the GDS naming research
+  recorded in Phase N; do not "fix" it back.
 - **Dev server port:** `npm run dev` serves at **http://localhost:8080/** (`vite.config.ts` sets
   `server.port = 8080`), *not* Vite's default 5173. A stale tab on 5173 shows an old build — this is
   the confirmed root cause of the "I still see the old page" report in Phase M.
