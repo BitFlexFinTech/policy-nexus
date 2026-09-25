@@ -36,6 +36,15 @@ const walk = (dir, exts) => {
 const rel = (p) => relative(ROOT, p);
 const lines = (p) => readFileSync(p, "utf8").split("\n");
 
+/**
+ * Comment-only lines. Determinism and vendor-terminology checks are about code
+ * that actually runs and copy a user can actually see, so documentation that
+ * *names* a forbidden call (e.g. "never call `new Date()`") is not a violation.
+ * A trailing comment on a line of code does not start with a comment marker, so
+ * it is still scanned.
+ */
+const commentLine = (line) => /^\s*(\/\/|\*|\/\*)/.test(line);
+
 const srcFiles = [...walk(join(ROOT, "src"), [".ts", ".tsx"]), join(ROOT, "index.html")].filter(existsSync);
 const appFiles = srcFiles.filter((p) => !p.includes("/components/ui/"));
 const uiFiles = srcFiles.filter((p) => p.includes("/components/ui/"));
@@ -63,9 +72,11 @@ const scan = (files, patterns, { ignoreLine } = {}) => {
 };
 
 // 1 — banned user-facing copy. "placeholder" is a legitimate HTML/Tailwind token, so those lines are skipped.
+//    "prototype" is excluded when it is a member expression (`Element.prototype` in
+//    code) — the banned sense is the product-status word in prose, not a JS property.
 const attrLine = (line) => /placeholder\s*[:=]/.test(line) || /placeholder\.svg/.test(line);
 check("banned user-facing copy", scan(appFiles, [
-  ["banned-copy", /\b(lorem ipsum|coming soon|reset demo|demo mode|prototype|fake data|placeholder data|demonstration build)\b/i],
+  ["banned-copy", /(?<!\.)\b(lorem ipsum|coming soon|reset demo|demo mode|prototype|fake data|placeholder data|demonstration build)\b/i],
 ], { ignoreLine: attrLine }));
 
 // 2 — no claims about real public opinion or certainty
@@ -76,7 +87,7 @@ check("forbidden predictive phrasing", scan(appFiles, [
 // 3 — vendor / implementation terminology must never be user-visible
 check("vendor terminology scrubbed", scan(appFiles, [
   ["vendor-term", /\b(MiroFish|OASIS|GraphRAG|Graphiti|Zep|Puter|puter|Vultr|Neo4j|DeepSeek)\b/],
-]));
+], { ignoreLine: commentLine }));
 
 // 4 — determinism inside app logic (ui/** is stock shadcn; its unused helper is excluded explicitly)
 const determinism = [
@@ -84,11 +95,11 @@ const determinism = [
   ["non-determinism", /\bDate\.now\s*\(/],
   ["non-determinism", /\bnew Date\s*\(/],
 ];
-const uiHits = scan(uiFiles, determinism);
+const uiHits = scan(uiFiles, determinism, { ignoreLine: commentLine });
 if (uiHits.length) {
   notes.push(`INFO  excluded ${uiHits.length} hit(s) inside src/components/ui/** (stock shadcn primitives, not app logic):\n` + uiHits.map((h) => `    ${h}`).join("\n"));
 }
-check("determinism (no Math.random/Date.now/new Date)", scan(appFiles, determinism));
+check("determinism (no Math.random/Date.now/new Date)", scan(appFiles, determinism, { ignoreLine: commentLine }));
 
 // 5 — no runtime network calls
 check("no runtime network URLs", scan(srcFiles, [

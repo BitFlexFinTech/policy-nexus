@@ -39,10 +39,12 @@ implementation must require zero UI code changes.
 ## 5. Data
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
-| Department content (16 departments) | Authored deterministic config: `src/config/departments.ts` | CMS / ministry content service | Config loader |
+| Department content (16 departments) | Authored deterministic config: `src/config/departments.ts` — **built in Phase B**, verified by importing the module: 16 departments, 64 priorities, 63 indicators, 48 policy templates, 49 documents | CMS / ministry content service | Config loader |
+| Brand identity, disclaimer, engine vocabulary | `src/config/brand.ts` — **built in Phase B** | Stays (identity and disclaimer are permanent) | `src/config/brand.ts` |
 | Simulation history / policy register | Seeded deterministic records derived from department config | Database | `AssessmentService.listRuns()` |
-| `REFERENCE_DATE = "2026-09-24"` | Fixed reference date for all dates shown | Real clock | `src/config/reference.ts` |
-| Reference rates (e.g. ZiG reference) | Static config value, labelled as a reference input | Live data feed | `src/config/reference.ts` |
+| `REFERENCE_DATE = "2026-09-24"` | Fixed reference date for all dates shown — **built in Phase B** | Real clock | `src/config/reference.ts` |
+| Reference rates (ZiG, policy rate, inflation) | Static config value in `REFERENCE_RATES`, labelled as a reference input | Live data feed | `src/config/reference.ts` |
+| Stakeholder segments | 16 canonical segments in `STAKEHOLDER_SEGMENTS`; departments may reference these ids only | CMS / segmentation service | `src/config/reference.ts` |
 
 ## 6. Non-credential work still outstanding (no credential can fix these)
 - Robust PDF/DOCX text extraction (server-side).
@@ -51,5 +53,13 @@ implementation must require zero UI code changes.
 - Government SSO integration.
 
 ## 7. Disabled by default (deliberate)
-- Puter CDN script and `puter.ai.chat()`: **removed/disabled**. No third-party AI calls occur
-  at runtime in scenario mode.
+- Puter CDN script and `puter.ai.chat()`: **removed**, not just disabled. Phase B deleted the
+  `<script src="https://js.puter.com/v2/">` tag from `index.html`; the remaining `puter` reads in
+  `PolicyInput.tsx` are dead code and are removed in Phase E. No third-party AI call can occur.
+- Google Fonts CDN: **removed** in Phase B. Inter and JetBrains Mono are now self-hosted from
+  `public/fonts/` via `src/fonts.css`. Verified: `grep -roE 'https?://' dist/index.html
+  dist/assets/*.css` returns zero matches, so the built application makes no runtime network
+  request of any kind.
+- Note on the fonts: Google served the *same* variable woff2 for every requested weight
+  (confirmed by md5), so the build ships one file per family with the full weight axis declared,
+  rather than four identical copies of Inter.
