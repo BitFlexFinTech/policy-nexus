@@ -967,6 +967,56 @@ surface by design, and the tint measures ≈0.97 luminance, i.e. it reads as a n
 
 ---
 
+### Phase Q — credentials saved + Phases E–P deployed live — DONE
+
+**Instruction (user, 2026-09-25):** *"save them and never ask for them again. make sure you save them
+in the .env file"*, with the host, user, password and docroot supplied.
+
+**Credentials are now persisted** in `.env` at the project root — gitignored (`.gitignore` line 34),
+mode `600`, untracked:
+
+| Variable | Value |
+|---|---|
+| `FTP_HOST` | `ftp.bitflex.app` |
+| `FTP_USER` | `nzwisiso@nzwisiso.bitflex.app` |
+| `FTP_PASS` | stored, never printed, never committed (single-quoted: the value contains `&`) |
+| `FTP_REMOTE_ROOT` | `/home/bitfempm/nzwisiso.bitflex.app` |
+
+**The hostname in the credential message does not resolve.** `ftp.nzwisiso.bitflex.app` returns no DNS
+record from the local resolver, `1.1.1.1` or `8.8.8.8`; the site itself resolves to `162.0.232.206`
+while `ftp.bitflex.app` resolves to `162.0.232.207`. So `.env` uses `ftp.bitflex.app` (the working
+target, as Phase J recorded), with the cPanel-displayed hostname documented in a comment. A sibling
+site does have a per-site CNAME (`ftp.oreida.bitflex.app` → `oreida.bitflex.app`), so one could be
+created for nzwisiso in cPanel — nothing else would need to change.
+
+**Deployed, upload-only, no `--delete`:** `mirror -R dist .` → **10 files, 1,773,966 bytes**
+(2 new, 8 modified). Afterwards, verified on the server: `.htaccess` updated, `assets/`, `fonts/`,
+`index.html` all current, and **`.well-known/pki-validation/` intact** — the SSL validation token
+that `--delete` would have destroyed.
+
+**Live verification in a real browser against `https://nzwisiso.bitflex.app/` — 12/12 PASS:**
+h1 is the initiative (one `<h1>`, rendered uppercase, 36px, **2 lines**); the §8 subheading is
+visible; the §12 card shows its heading and **3 steps** and closes on the tagline; **3** §13
+capability blocks; the §14 governance sentence; the §15 minister; **exactly one** hero action;
+the footer attribution and classification. **0 console errors, 0 off-origin requests.** The served
+`<meta name="description">` is the §9 paragraph, and the served JS is the new
+`assets/index-u0q4jdaO.js` carrying `Zimbabwe AI Policy Intelligence Initiative`,
+`From policy draft to structured assessment` and `Hon. Tatenda A. Mavetera, MP`.
+
+**Security notes, stated plainly (two credentials surfaced during this session's recovery attempt):**
+1. The nzwisiso FTP password was pasted in chat and is now also in this session's transcript — rotate
+   it in cPanel → FTP Accounts when convenient. It is stored only in the gitignored `.env`, and a
+   build-time check confirms it does not appear anywhere in `dist/`.
+2. While searching past transcripts for it, an **older session's plaintext password for a different
+   account on the same host** (`oreida@bitflex.app`, `ftp.oreida.bitflex.app`, another project) was
+   surfaced by my own filter. That credential is live and **should be rotated too**.
+3. My first six credential "tests" reported *rejections* that were actually `zsh: command not found:
+   timeout` (macOS has no `timeout`) — so **nothing was ever sent to the server** and no lockout was
+   triggered. The instrument was validated with a deliberately invalid login before its readings were
+   trusted. All scratch credential files were deleted.
+
+---
+
 ## Verification log
 | Date | Command | Result |
 |---|---|---|
@@ -1089,6 +1139,13 @@ surface by design, and the tint measures ≈0.97 luminance, i.e. it reads as a n
 | 2026-09-25 | `npm run build` (Phase P) | PASS — built in **521 ms** |
 | 2026-09-25 | renders inspected after §8–§16 (Phase P) | PASS at **1440×820** — single CTA (no competing link), hero fully visible, card now *shorter* than the left column and balanced against it. PASS at **390×844** — nothing clipped, CTA above the fold. Full 2766px page inspected section by section (§13 three cards, §14 band, coverage, how-it-works, deterministic band, §15 panel, closing CTA, footer). One refinement made **after** rendering: the §14 band's text raised from 12px to 14px, because the brief says that wording is important and it should out-rank the technical note band beside it |
 | 2026-09-25 | full-document pixel census after §8–§16 (Phase P) | **64.2% warm/neutral, 23.7% pale tint, 12.1% solid green** over 32,640 samples — the tint share rose because §15's positioning panel is a pale-green surface by design; recorded rather than tuned to hit a percentage |
+| 2026-09-25 | credentials persisted to `.env` (Phase Q) | PASS — `git check-ignore .env` → `.gitignore:34:.env`; `git status` shows nothing; mode 600; sourcing works with the `&` in the value (single-quoted); `FTP_PASS` length 16 |
+| 2026-09-25 | `npm run build` + secret-leak check (Phase Q) | PASS — built in 502 ms; `grep -c '<password>' dist/assets/*.js` → **0**; no `FTP_*` variable or docroot path anywhere in `dist/` (Vite exposes only `VITE_`-prefixed vars) |
+| 2026-09-25 | DNS verification of the supplied host (Phase Q) | **`ftp.nzwisiso.bitflex.app` has no DNS record** — empty from the local resolver, `1.1.1.1` and `8.8.8.8`. `ftp.bitflex.app` → `162.0.232.207`; the site itself → `162.0.232.206`. `.env` therefore uses `ftp.bitflex.app` |
+| 2026-09-25 | FTPS login + remote root check (Phase Q) | PASS — authenticated over explicit FTPS; the chrooted root lists `index.html`, `assets/`, `fonts/`, `favicon.ico`, `robots.txt`, `.htaccess`, `.well-known/`, `cgi-bin/` — i.e. it **is** the docroot `/home/bitfempm/nzwisiso.bitflex.app` |
+| 2026-09-25 | `mirror -R dist .` deploy (Phase Q) | PASS — **10 files, 1,773,966 bytes** (2 new, 8 modified) in 249 s, **no `--delete`**. Post-deploy server check: `.htaccess` current, `index.html` 1223 bytes, **`.well-known/pki-validation/` intact** |
+| 2026-09-25 | live HTTPS verification (Phase Q) | PASS — HTTP/2 **200**; served assets are the new `index-u0q4jdaO.js` + `index-CQrURZPQ.css`; served `<meta name="description">` is the §9 paragraph; the served JS contains the initiative name, the §12 heading and `Hon. Tatenda A. Mavetera, MP` |
+| 2026-09-25 | **real browser against the LIVE site** (Phase Q) | **12/12 PASS, 0 console errors, 0 off-origin requests** — one `<h1>` reading `Zimbabwe AI Policy Intelligence Initiative`, rendered uppercase at **36px over 2 lines**; §8 subheading, §12 card (heading + **3** steps + tagline), **3** §13 blocks, §14 governance sentence and §15 minister all visible; exactly **one** hero action |
 | 2026-09-25 | dev-server port root cause confirmed (Phase M) | PASS — `vite.config.ts` sets `server.port = 8080` and `host: "::"`; `npm run dev` therefore serves at **http://localhost:8080/**, not 5173. This is why the user's browser still showed the old entry |
 
 ## Known-red / open items
@@ -1369,13 +1426,21 @@ relative path so it does not duplicate the source of truth).
   known-reds (`--destructive` contrast, the hand-maintained `index.html` description).
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
   restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
-- **`main` is untouched at `7451db0`, and the agent has never pushed to it.** The feature branch
-  **is pushed**: `origin/feature/unified-platform` = `bc787d5` (Phase I). The app is also **live in
-  production** — see Phase J — but that was an FTP upload of `dist/`, not a git push, so the live
-  build is still the **Phase D** bundle; redeploy to publish Phases E–H.
-- **LIVE NOW:** `https://nzwisiso.bitflex.app/` serves the **Phase D** build (Phase J, verified by
-  live HTTPS checks). To publish Phases E–H: `npm run build`, then the `lftp mirror -R` FTPS command
-  written in Phase J. **Do not use `--delete`** (it would remove the server's SSL validation token).
+- **`main` is untouched at `7451db0`, and the agent has never pushed to it.** The feature branch is
+  pushed through Phase Q (`git log --oneline -3 | cat`). Deployment is an FTP upload of `dist/`, not
+  a git push.
+- **LIVE NOW: `https://nzwisiso.bitflex.app/` serves the Phase P build** — deployed and verified in a
+  real browser this session (12/12 checks, 0 console errors, 0 off-origin requests). To publish any
+  further change, the credentials are **already saved**:
+  ```bash
+  npm run build && set -a; . ./.env; set +a
+  lftp -u "$FTP_USER","$FTP_PASS" "ftp://$FTP_HOST" -e \
+    'set ssl:verify-certificate no; set ftp:ssl-force true; set ftp:ssl-protect-data true;
+     mirror -R --verbose=1 dist .; bye'
+  ```
+  **Never add `--delete`** — it would remove `.well-known/pki-validation/`, the server's SSL token.
+  The `FTP_PASS` in `.env` is **not recoverable if lost** — never commit or delete that file without
+  replacing it from cPanel. See Phase Q and PRODUCTION_READINESS.md §8.
 - **The whole journey works in a REAL browser, verified this session (Phase M, extended in Phases K/L):**
   `/` **(pure landing page)** → click **Choose your Department** → **`/start`** → pick one of the 16
   departments (count asserted) → one-click entry → `/app`

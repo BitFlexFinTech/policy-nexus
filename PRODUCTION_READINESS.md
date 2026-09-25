@@ -173,11 +173,31 @@ client is registered.
 | Transport | Explicit **FTPS** (AUTH TLS), port 21 | No SSH/SFTP daemon exists (22/2222/990 closed) |
 | SPA routing | `public/.htaccess` → `RewriteRule . /index.html [L]` | Shipped by Vite into `dist/`. Without it, refresh on `/app/**` 404s |
 | Server files to preserve | `cgi-bin/`, `.well-known/pki-validation/<token>.txt` | Never deploy with `mirror --delete` |
+| Credentials | **`.env`** (gitignored, mode 600): `FTP_HOST`, `FTP_USER`, `FTP_PASS`, `FTP_REMOTE_ROOT` | Added Phase Q so a cold session never has to ask again |
 
-**Credential status:** the FTP password is a **real, live credential**, supplied in plaintext and
-therefore compromised — **rotate it in cPanel → FTP Accounts**. It is not stored anywhere in this
-repo. No API keys, tokens, or `.env` files ship in `dist/` (the build is a static SPA with zero
-runtime network calls).
+**Redeploy command (no questions asked, reads the gitignored `.env`):**
+```bash
+cd "policy-nexus" && npm run build
+set -a; . ./.env; set +a
+lftp -u "$FTP_USER","$FTP_PASS" "ftp://$FTP_HOST" -e \
+  'set ssl:verify-certificate no; set ftp:ssl-force true; set ftp:ssl-protect-data true;
+   mirror -R --verbose=1 dist .; bye'
+```
+
+**Credential status (updated in Phase Q):** the FTP credentials are stored in the **gitignored
+`.env`**, so the deploy is repeatable without asking. The password was supplied in plaintext in chat
+and has since appeared in transcripts more than once, so **rotating it in cPanel → FTP Accounts
+remains good practice** — but it is never committed, and a build-time check confirms it does **not**
+reach `dist/` (Vite exposes only `VITE_`-prefixed variables).
+
+**Live build (Phase Q):** the host serves the **Phase P** bundle — `assets/index-u0q4jdaO.js` +
+`assets/index-CQrURZPQ.css`. Deployed upload-only (10 files, 1.77 MB) with **no `--delete`**;
+`.well-known/pki-validation/` and `.htaccess` verified intact afterwards, and the live page verified
+in a real browser: **12/12 checks green, 0 console errors, 0 off-origin requests.**
+
+**Password handling rule for future sessions:** `ftp.nzwisiso.bitflex.app` (the hostname cPanel
+displays) has **no DNS record** — verified against two public resolvers. The working host is
+`ftp.bitflex.app`. Do not switch `.env` to the cPanel hostname unless a CNAME is created for it.
 
 **Non-credential work still outstanding for hosting:** none required for the current static
 build. If server-side PDF/DOCX extraction or the MiroFish backend is added later, that needs a
