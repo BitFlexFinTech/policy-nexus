@@ -122,3 +122,36 @@ export interface AssessmentRun {
   recommendations: AssessmentRecommendation[];
   metrics: AssessmentMetric[];
 }
+
+/* ------------------------------------------------------------------------- */
+/* Generated documents derived from a run                                      */
+/* ------------------------------------------------------------------------- */
+
+/**
+ * One section of a generated document. Documents are derived from a completed
+ * run and are deterministic — the same run always renders the same document.
+ */
+export interface GeneratedSection {
+  id: string;
+  heading: string;
+  /** Narrative paragraphs, in reading order. */
+  paragraphs: string[];
+  /** Optional list rendered under the paragraphs (numbered clauses, bullets). */
+  bullets?: string[];
+  /** How the optional list is rendered. Defaults to bullets. */
+  listStyle?: "bullets" | "clauses";
+}
+
+/**
+ * A document generated from one completed run: the long-form narrative report
+ * (`report`) or the drafted policy itself (`policy-draft`).
+ */
+export interface GeneratedDocument {
+  kind: "report" | "policy-draft";
+  title: string;
+  /** One line naming the run this document derives from. */
+  subtitle: string;
+  /** Suggested export filename stem, without an extension. */
+  fileStem: string;
+  sections: GeneratedSection[];
+}

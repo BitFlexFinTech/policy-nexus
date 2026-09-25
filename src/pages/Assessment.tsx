@@ -53,9 +53,19 @@ export default function Assessment() {
             Open full assessment
           </Link>
         </Button>
+        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+          <Link to={`/app/assessments/${encodeURIComponent(run.id)}/report`}>Full report</Link>
+        </Button>
+        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+          <Link to={`/app/assessments/${encodeURIComponent(run.id)}/policy-draft`}>
+            Draft the policy
+          </Link>
+        </Button>
         <span className="text-[10px] text-muted-foreground">
           The full assessment adds every modelled reaction, the exact run inputs and the recommended
-          next steps. {VOCABULARY.simulationCore} (Mock) — simulated result, computed locally.
+          next steps; the full report is the long-form narrative record; the drafted policy is the
+          instrument itself, ready to edit. {VOCABULARY.simulationCore} (Mock) — simulated result,
+          computed locally.
         </span>
       </div>
     </div>

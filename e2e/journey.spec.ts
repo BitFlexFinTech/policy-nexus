@@ -215,4 +215,46 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
 
     expectCleanRuntime();
   });
+
+  test("reads the long-form report and drafts the policy from the run", async ({ page }) => {
+    await page.goto("/");
+    await enterWorkspace(page);
+
+    await page
+      .getByPlaceholder(/Draft the policy text/)
+      .fill("A simulated policy draft used to verify the long report and the drafted policy.");
+    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
+      timeout: 30_000,
+    });
+
+    // The run screen now offers all three outputs, not just the summary.
+    await expect(page.getByRole("link", { name: "Open executive summary" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Open full report" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Draft the policy" })).toBeVisible();
+
+    // The long-form report (the "long version").
+    await page.getByRole("link", { name: "Open full report" }).click();
+    await expect(page.getByRole("heading", { name: "Full report", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Purpose and scope of this report" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Reproducibility and run inputs" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Limitations" })).toBeVisible();
+
+    // The drafted policy, including in-place editing.
+    await page.getByRole("link", { name: "Draft the policy" }).click();
+    await expect(page.getByRole("heading", { name: "Drafted policy", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Preamble", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "3. Policy measures", exact: true })).toBeVisible();
+
+    await page.getByRole("button", { name: "Edit draft wording" }).click();
+    const box = page.getByLabel("Drafted policy text");
+    await expect(box).toBeVisible();
+    await expect(box).toHaveValue(/Draft policy —/);
+    await box.fill("Officer-edited wording for the browser journey.");
+    await expect(box).toHaveValue("Officer-edited wording for the browser journey.");
+    await page.getByRole("button", { name: "Reset to generated" }).click();
+    await expect(page.getByRole("button", { name: "Edit draft wording" })).toBeVisible();
+
+    expectCleanRuntime();
+  });
 });

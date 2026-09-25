@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import App from "@/App";
 import { DISCLAIMER } from "@/config/brand";
 import { findDepartment } from "@/config/departments";
@@ -122,5 +122,54 @@ describe("journey — run a policy, then read its assessment", () => {
     clearSession();
     renderAt(`/app/simulations/${encodeURIComponent(run.id)}`);
     expect(window.location.pathname).toBe("/");
+  });
+
+  it("opens the long-form report with every group the run produced", () => {
+    const run = assessmentService.run(requestFor("fin"));
+    renderAt(`/app/assessments/${encodeURIComponent(run.id)}/report`);
+
+    expect(screen.getByRole("heading", { name: "Full report" })).toBeInTheDocument();
+    run.reactions.forEach((reaction) => {
+      expect(
+        screen.getAllByText(new RegExp(escapeRegex(reaction.label))).length,
+      ).toBeGreaterThan(0);
+    });
+    run.risks.forEach((risk) => {
+      expect(screen.getByText(new RegExp(escapeRegex(risk.label)))).toBeInTheDocument();
+    });
+    ["Print", "Save as PDF", "Download Word", "Share"].forEach((label) => {
+      expect(screen.getByRole("button", { name: label })).toBeInTheDocument();
+    });
+    expect(screen.getByRole("link", { name: "Draft the policy" })).toBeInTheDocument();
+  });
+
+  it("drafts the policy and lets the officer edit the wording before export", () => {
+    const run = assessmentService.run(requestFor("fin"));
+    renderAt(`/app/assessments/${encodeURIComponent(run.id)}/policy-draft`);
+
+    expect(screen.getByRole("heading", { name: "Drafted policy" })).toBeInTheDocument();
+    ["Preamble", "1. Objective", "2. Scope and application", "3. Policy measures"].forEach((heading) => {
+      expect(screen.getByRole("heading", { name: heading })).toBeInTheDocument();
+    });
+    ["Print", "Save as PDF", "Download Word", "Share"].forEach((label) => {
+      expect(screen.getByRole("button", { name: label })).toBeInTheDocument();
+    });
+
+    // The generated draft is editable, and editing is local to this screen.
+    fireEvent.click(screen.getByRole("button", { name: "Edit draft wording" }));
+    const box = screen.getByLabelText("Drafted policy text") as HTMLTextAreaElement;
+    expect(box.value).toContain(run.policyTitle);
+    fireEvent.change(box, { target: { value: "Officer-edited wording." } });
+    expect(box.value).toBe("Officer-edited wording.");
+    fireEvent.click(screen.getByRole("button", { name: "Reset to generated" }));
+    expect(screen.getByRole("button", { name: "Edit draft wording" })).toBeInTheDocument();
+  });
+
+  it("shows the explicit panel for an unknown reference on both new routes", () => {
+    renderAt("/app/assessments/no-such-run/report");
+    expect(screen.getByRole("heading", { name: "Full report" })).toBeInTheDocument();
+    cleanup();
+    renderAt("/app/assessments/no-such-run/policy-draft");
+    expect(screen.getByText(/No recorded run matches this reference/)).toBeInTheDocument();
   });
 });

@@ -10,6 +10,7 @@ deliberate scenario-mode implementations behind swappable seams.
 | Assessment engine / `src/services/assessment/**` | **BUILT — Phase E.** `AssessmentService` interface + factory (`AssessmentService.ts`), deterministic engine (`scenario.ts`), seeded PRNG (`src/lib/prng.ts`), canonical schema (`types.ts`), and a persistent register of run inputs (`runStore.ts`). The same request always reproduces a byte-identical `AssessmentRun`; nothing reaches the network. **Visibly labelled**: the workspace pill reads `Scenario (Mock)` and runs state `Seed … — computed locally, no external request`. | Remote backend (HTTP service) | `.env` → `VITE_ASSESSMENT_MODE=service`; register the client in `CLIENTS` in `src/services/assessment/AssessmentService.ts` |
 | Decision-support disclaimer | Static string in `src/config/brand.ts`, rendered on the executive summary and the full assessment and carried into every export | Stays (always present) | `src/config/brand.ts` |
 | Simulation visualisation | **BUILT — Phase F.** `/app/simulations/:id` reveals the run's own rounds one at a time (a deterministic replay; only the reveal cadence is timed) and ends at **Assessment Complete**. The workspace `AgentFeed` remains the pre-run scenario-preparation view. | Live streaming from the backend over the same `AssessmentService` contract | No UI change required (seam requirement) |
+| Generated documents — long-form report + drafted policy | **BUILT — Phase K.** `src/services/assessment/documents.ts` derives two documents from a completed run using the run's own seed (`<seed>::long-report`, `<seed>::policy-draft`), so the same inputs always produce byte-identical text. The drafted policy turns the submitted draft's **own sentences** into operative measures and turns the modelled risks / reactions / recommendations into mitigation, engagement and monitoring provisions. Deterministic and local. **Visibly labelled:** the drafted policy states it was generated locally by the *Nzwisiso simulation core (Mock)* and is a draft for review. | A backend drafting model behind the same function signatures | Replace `buildLongReport` / `buildPolicyDraft` in `src/services/assessment/documents.ts`; the pages and the export seam need no change |
 
 **Seam rule:** no component may import `scenario.ts` directly; only `assessmentService` from the
 factory. Swapping the implementation must require zero UI code changes. The store persists run
@@ -55,6 +56,9 @@ client is registered.
 - ~~Build `src/services/assessment/**`~~ — **DONE (Phase E):** interface + factory + deterministic engine + PRNG + run store.
 - ~~Build the live simulation view and the assessment / executive-summary / full-assessment screens~~ — **DONE (Phase F/G):** `/app/simulations/:id`, `/app/assessments/:id`, `/app/assessments/:id/full`.
 - ~~PDF / Word / print / share document actions (`src/components/assessment/DocumentActions.tsx`)~~ — **DONE (Phase G)**, with the caveats in §4 above (print-dialogue PDF, HTML-based `.doc`).
+- ~~Derive a long-form report and a drafted policy from a completed run~~ — **DONE (Phase K):**
+  `src/services/assessment/documents.ts` (deterministic), routes `/app/assessments/:id/report` and
+  `/app/assessments/:id/policy-draft`, editable draft text, exported through the Phase G seam.
 - Robust PDF/DOCX text extraction (server-side).
 - Real `.docx` / native PDF rendering.
 - Remote assessment service endpoint + client construction in `CLIENTS` (`src/services/assessment/AssessmentService.ts`).
@@ -79,6 +83,16 @@ client is registered.
   of the mock-first / no-CDN guarantee.
 - Stated plainly: the journey was verified against the **local** production preview. The live host
   still serves the older **Phase D** bundle until `dist/` is redeployed.
+
+## 6d. Verified in a real browser (Phase K — report + drafted policy)
+- `npx playwright test` → **5/5**: the 4 Phase H journeys plus one that opens **Open full report**
+  (asserts the purpose/reproducibility/limitations sections render) and **Draft the policy** (asserts
+  Preamble and "3. Policy measures", edits the wording in the textarea, then resets). Runtime
+  invariants still hold: **0 console errors, 0 page errors, 0 off-origin requests**.
+- `npm test` → **8 files, 133 tests**, including 40 generator tests proving byte-identical documents
+  for the same run and full coverage of every modelled group, priority, risk and recommendation.
+- Known limitation: the `.doc` export is HTML-based (`application/msword`), not OOXML — unchanged
+  from Phase G; and the drafted policy is a text an officer must review, not legal drafting advice.
 
 ## 7. Disabled by default (deliberate)
 - Puter CDN script and `puter.ai.chat()`: **fully removed.** Phase B deleted the

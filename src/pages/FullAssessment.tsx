@@ -73,6 +73,14 @@ export default function FullAssessment() {
           </Link>
         </Button>
         <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+          <Link to={`/app/assessments/${encodeURIComponent(run.id)}/report`}>Full report</Link>
+        </Button>
+        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+          <Link to={`/app/assessments/${encodeURIComponent(run.id)}/policy-draft`}>
+            Draft the policy
+          </Link>
+        </Button>
+        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
           <Link to="/app/simulations">Simulation register</Link>
         </Button>
       </div>

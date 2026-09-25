@@ -162,10 +162,24 @@ export default function SimulationRun() {
             ))}
           </div>
           <p className="text-[10px] text-muted-foreground">{DISCLAIMER.short}</p>
+          <p className="text-[10px] text-muted-foreground">
+            One run produces three documents: the executive summary (short), the full report (long),
+            and a drafted policy you can edit before circulating it.
+          </p>
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" className="h-7 text-xs">
               <Link to={`/app/assessments/${encodeURIComponent(run.id)}`}>
                 Open executive summary
+              </Link>
+            </Button>
+            <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+              <Link to={`/app/assessments/${encodeURIComponent(run.id)}/report`}>
+                Open full report
+              </Link>
+            </Button>
+            <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+              <Link to={`/app/assessments/${encodeURIComponent(run.id)}/policy-draft`}>
+                Draft the policy
               </Link>
             </Button>
             <Button asChild size="sm" variant="outline" className="h-7 text-xs">
