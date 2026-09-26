@@ -438,6 +438,94 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     expectCleanRuntime();
   });
 
+  test("the relationship graph grows with the run, and answers the pointer", async ({ page }) => {
+    // The reveal is deliberately long (one round at a time), and this test drives
+    // the graph while it runs, so it is given room rather than being rushed.
+    test.setTimeout(90_000);
+
+    await page.goto("/");
+    await enterWorkspace(page);
+    await page
+      .getByPlaceholder(/Draft the policy text/)
+      .fill("A draft used to watch the relationship graph build up during a run.");
+
+    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await expect(page).toHaveURL(/\/app\/simulations\//);
+
+    // The graph is a real part of the run view, named as the card it is.
+    await expect(
+      page.getByRole("region", { name: "Graph Relationship Visualization" }),
+    ).toBeVisible();
+
+    const entityCount = async () => {
+      const text = (await page.getByText(/\d+ \/ \d+ entities/).first().textContent()) ?? "";
+      const match = text.match(/(\d+) \/ (\d+) entities/);
+      return { drawn: Number(match?.[1] ?? -1), total: Number(match?.[2] ?? -1) };
+    };
+
+    // It starts incomplete: the marks are the run's own structure, so they can
+    // only appear as far as the run has actually got.
+    const opening = await entityCount();
+    expect(opening.total).toBeGreaterThan(1);
+    expect(opening.drawn).toBeLessThan(opening.total);
+
+    // And it grows, on its own, while the rounds are revealed.
+    await expect
+      .poll(async () => (await entityCount()).drawn, { timeout: 25_000 })
+      .toBeGreaterThan(opening.drawn);
+
+    // A mark can be chosen, and its relationships are then stated as text — the
+    // graph is never the only way to read it.
+    const graphCard = page.getByRole("region", { name: "Graph Relationship Visualization" });
+    const group = page.getByRole("button", { name: /Civil servants, Stakeholder group,/ }).first();
+    await expect(group).toBeVisible({ timeout: 20_000 });
+
+    // The mark declares how many relationships it carries; selecting it must state
+    // exactly that many, with something written on each one.
+    const declared = Number(
+      ((await group.getAttribute("aria-label")) ?? "").match(/(\d+) relationships/)?.[1] ?? -1,
+    );
+    expect(declared).toBeGreaterThan(0);
+
+    await group.click();
+    const rows = graphCard.getByRole("listitem");
+    await expect(rows).toHaveCount(declared);
+    await expect(rows.first()).not.toBeEmpty();
+    await expect(graphCard).toContainText("Civil servants");
+
+    // The relations on the edges are off by default and can be asked for.
+    const edgeLabels = page.getByRole("switch", { name: /edge labels/i });
+    await expect(edgeLabels).not.toBeChecked();
+    await edgeLabels.click();
+    await expect(edgeLabels).toBeChecked();
+    await edgeLabels.click();
+
+    // A mark can be dragged, and it stays where the pointer put it. The drag aims
+    // at the mark itself (the painted circle), not at the group's box centre,
+    // which can fall in the gap between the mark and its label.
+    const before = await group.getAttribute("transform");
+    const mark = group.locator("circle").last();
+    // Scrolled in first: a pointer event aimed below the fold lands nowhere, and
+    // this page is taller than the viewport.
+    await mark.scrollIntoViewIfNeeded();
+    const box = (await mark.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2 + 90, box.y + box.height / 2 + 70, { steps: 8 });
+    const during = await group.getAttribute("transform");
+    await page.mouse.up();
+    expect(during).not.toBe(before);
+
+    // The run still finishes, and the graph is complete when it does.
+    await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
+      timeout: 40_000,
+    });
+    const finished = await entityCount();
+    expect(finished.drawn).toBe(finished.total);
+
+    expectCleanRuntime();
+  });
+
   test("upload a policy document and run it from the file input", async ({ page }) => {
     await page.goto("/");
     await enterWorkspace(page);

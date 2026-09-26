@@ -7,6 +7,7 @@ import { clearSession, signInToDepartment } from "@/session/session";
 import { assessmentService } from "@/services/assessment/AssessmentService";
 import { clearRuns, listRunRequests } from "@/services/assessment/runStore";
 import type { AssessmentRequest } from "@/services/assessment/types";
+import { RUN_ROUND_TICK_MS } from "@/pages/SimulationRun";
 
 const renderAt = (path: string) => {
   window.history.pushState({}, "", path);
@@ -64,12 +65,21 @@ describe("journey — run a policy, then read its assessment", () => {
 
     expect(screen.getByText(/Running deterministic rounds/)).toBeInTheDocument();
     // Each round is revealed by its own timer, so the effect must flush between
-    // ticks: advance, let React commit, repeat until the run completes.
-    for (let tick = 0; tick < 40; tick += 1) {
+    // ticks: advance by exactly one round's pacing, let React commit, repeat.
+    //
+    // Both the step and the count are DERIVED from the pacing constant and the
+    // run's own round count rather than hardcoded. The reveal is deliberately
+    // slow — the run has to be long enough for the relationship graph to grow
+    // with it — so a fixed number of ticks would silently stop short the day the
+    // pacing changes.
+    for (let tick = 0; tick < run.rounds.length + 1; tick += 1) {
       act(() => {
-        vi.advanceTimersByTime(400);
+        vi.advanceTimersByTime(RUN_ROUND_TICK_MS);
       });
     }
+    expect(
+      screen.getByText(`${run.rounds.length} / ${run.rounds.length} rounds`),
+    ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Assessment Complete" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Open executive summary/ })).toBeInTheDocument();
   });

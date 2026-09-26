@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { EngineStatus } from "@/components/EngineStatus";
+import { RelationshipGraphCard } from "@/components/relationship/RelationshipGraphCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { StatusPill } from "@/components/StatusPill";
@@ -12,11 +14,19 @@ import {
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
 import { REFERENCE_DATE_LABEL } from "@/config/reference";
 import { cn } from "@/lib/utils";
+import { buildRelationshipGraph } from "@/services/assessment/network";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
 import type { SimulationRound } from "@/services/assessment/types";
 
-/** Presentation cadence only — the round content is fixed by the seed. */
-const ROUND_TICK_MS = 320;
+/**
+ * Presentation cadence only — the round content is fixed by the seed.
+ *
+ * Exported because the unit test drives the reveal with fake timers, and it has
+ * to derive its step count from this value rather than hardcoding one: the run
+ * is long enough on purpose, so that the relationship graph has time to grow
+ * with the rounds instead of appearing already complete.
+ */
+export const RUN_ROUND_TICK_MS = 1150;
 
 const toneClassFor = (round: SimulationRound, position: number) =>
   round.tone === "system"
@@ -46,13 +56,18 @@ export default function SimulationRun() {
     if (total === 0 || revealed >= total) return;
     const timer = window.setTimeout(
       () => setRevealed((count) => Math.min(count + 1, total)),
-      ROUND_TICK_MS,
+      RUN_ROUND_TICK_MS,
     );
     return () => window.clearTimeout(timer);
   }, [revealed, total]);
 
   const visibleRounds = useMemo(() => (run ? run.rounds.slice(0, revealed) : []), [run, revealed]);
   const isComplete = total > 0 && revealed >= total;
+  /**
+   * The graph behind this run. A pure function of the run, so it is recomputed
+   * only when the run changes — never per reveal.
+   */
+  const graph = useMemo(() => (run ? buildRelationshipGraph(run) : null), [run]);
 
   if (!run) {
     return (
@@ -92,10 +107,25 @@ export default function SimulationRun() {
       </header>
 
       <div className="space-y-1 rounded-lg border bg-card p-3">
-        <div className="flex items-center justify-between text-[10px] uppercase tracking-wide text-muted-foreground">
+        <div className="flex items-center justify-between gap-2 text-[10px] uppercase tracking-wide text-muted-foreground">
           <span>{isComplete ? "Assessment complete" : "Running deterministic rounds"}</span>
-          <span className="font-mono">
-            {revealed} / {total} rounds
+          <span className="flex items-center gap-2">
+            <span className="font-mono">
+              {revealed} / {total} rounds
+            </span>
+            {/* A long reveal is better watched than waited through, so the officer
+                can hand the next ~13 seconds back to themselves. */}
+            {!isComplete && total > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-6 text-[10px]"
+                onClick={() => setRevealed(total)}
+              >
+                Skip to results
+              </Button>
+            )}
           </span>
         </div>
         <Progress value={progressValue} className="h-1.5" />
@@ -105,38 +135,57 @@ export default function SimulationRun() {
         </p>
       </div>
 
-      <div className="rounded-lg border bg-card">
-        <div className="flex items-center justify-between border-b px-4 py-2.5">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            {VOCABULARY.agentFeed}
-          </span>
-          <span className="font-mono text-xs text-muted-foreground">{visibleRounds.length} events</span>
-        </div>
-        <div className="space-y-0.5 p-2">
-          {visibleRounds.map((round) => (
-            <div
-              key={round.index}
-              className="animate-slide-up-fade flex items-start gap-2 rounded-md px-2 py-1.5"
-            >
-              <span className="mt-0.5 w-16 shrink-0 font-mono text-xs text-muted-foreground">
-                {feedTimestamp(round.index - 1)}
+      {/* Left: the relationship graph, growing in step with the revealed rounds.
+          Right: the engine vitals and the run's own agent feed. */}
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start">
+        {graph && (
+          <RelationshipGraphCard graph={graph} seed={run.seed} revealedRounds={revealed} />
+        )}
+
+        <div className="space-y-4">
+          {/* The engine vitals panel, exactly as the workspace renders it. Every
+              figure on it is a real count from the department's own configuration
+              or a recorded run, so it reads the same here as on the dashboard. */}
+          <div className="overflow-hidden rounded-lg border">
+            <EngineStatus />
+          </div>
+
+          <div className="rounded-lg border bg-card">
+            <div className="flex items-center justify-between border-b px-4 py-2.5">
+              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {VOCABULARY.agentFeed}
               </span>
-              <span
-                className={cn(
-                  "shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase",
-                  toneClassFor(round, round.index),
-                )}
-              >
-                {round.actor}
-              </span>
-              <span className="shrink-0 text-xs text-muted-foreground">
-                {FEED_TYPE_ICONS[round.tone]}
-              </span>
-              <span className="font-mono-code text-xs leading-relaxed text-foreground">
-                {round.message}
+              <span className="font-mono text-xs text-muted-foreground">
+                {visibleRounds.length} events
               </span>
             </div>
-          ))}
+            <div className="max-h-[24rem] space-y-0.5 overflow-y-auto p-2">
+              {visibleRounds.map((round) => (
+                <div
+                  key={round.index}
+                  className="animate-slide-up-fade flex items-start gap-2 rounded-md px-2 py-1.5"
+                >
+                  <span className="mt-0.5 w-16 shrink-0 font-mono text-xs text-muted-foreground">
+                    {feedTimestamp(round.index - 1)}
+                  </span>
+                  <span
+                    className={cn(
+                      "shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase",
+                      toneClassFor(round, round.index),
+                    )}
+                  >
+                    {round.actor}
+                  </span>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {FEED_TYPE_ICONS[round.tone]}
+                </span>
+                <span className="font-mono-code text-xs leading-relaxed text-foreground">
+                  {round.message}
+                </span>
+              </div>
+            ))}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -1084,6 +1084,102 @@ with `min-h-[4rem]` + `items-end` on the figure; re-measured — one distinct la
 
 ---
 
+### Phase S — Graph Relationship Visualization (grows with the run, drawn as a school) — DONE
+
+**Instruction (user, 2026-09-25):** build a **Graph Relationship Visualization** card that *grows
+during a simulation run*, with **drag-able nodes** whose movement behaves like a **school of fish**,
+and put a **compact form of the same graph** on the public page, in the block labelled
+*Simulated population*. No new dependency (locked rule), so both the layout physics and the
+renderer are hand-written.
+
+**Built.**
+
+| Piece | Where |
+|---|---|
+| The graph behind a run: draft + stakeholder groups + stated priorities + the department's reference documents, with the round each mark appears on read from the run's own event record | `src/services/assessment/network.ts` (**new**) |
+| The public schematic, built from **one** documented representative department (`opc`) and fully grown at once — it holds no run, so it claims no modelled sentiment | same file (`buildPreviewRelationshipGraph`, `PREVIEW_DEPARTMENT_ID`) |
+| The force model: pairwise repulsion, springs along the edges, centring, soft walls, and a **schooling** term (cohesion toward each node's neighbours' centroid + alignment with their mean direction) → the "school of fish" | `src/lib/graph/swarm.ts` (**new**) |
+| The card: settled-on-first-paint SVG, growth by round, node selection with the relationships stated as text, edge-label toggle, drag with a shove to the neighbours, reduced-motion path | `src/components/relationship/RelationshipGraphCard.tsx` (**new**) |
+| Run view: two columns — the graph on the left, engine vitals + agent feed on the right | `src/pages/SimulationRun.tsx` |
+| Pacing: `ROUND_TICK_MS` **320 → 1150 ms**, exported as `RUN_ROUND_TICK_MS` (the run now takes ~10–18 s, so the graph has time to grow *during* the run instead of appearing complete) | same file |
+| Compact graph replaces the dot field inside the *Simulated population* block (the field is kept, faintly, behind it — nothing was deleted) | `src/components/public/SimulationVisuals.tsx` |
+| One new keyframe, opacity-only, for the entrance of a mark | `tailwind.config.ts` |
+
+**No new dependency, and the seam is untouched.** `AssessmentRun` (`types.ts`) is **unchanged**: the
+graph is a pure function of the run, derived on read. The MiroFish swap seam therefore still only
+has to produce runs.
+
+**Determinism, as a property rather than a claim.** The layout comes from the seeded PRNG
+(`seed + "::swarm"`); motion advances in fixed `dt = 1/60` steps and never reads a clock; no
+`Math.random`, no `Date.now`, no `new Date` anywhere in the two new modules.
+`src/test/network.test.ts` asserts a `JSON.stringify`-identical graph for a repeated run, and
+`src/test/swarm.test.ts` asserts identical coordinates for a re-settled swarm plus a *different*
+arrangement under a different seed.
+
+**Three real defects found and fixed at root cause (bug-fix-forward, not worked around):**
+
+1. **The force model never rested, so no mark could ever be clicked.** A force layout relaxes
+   asymptotically: after settling, a symmetric ring keeps *rotating* by a fraction of a pixel per
+   second forever. Measured: max speed 0.05–0.21 units/step and 13.2 units of drift per 60 steps,
+   which made Playwright's actionability check ("element is not stable") retry for 30 s and time out
+   — i.e. a real user could not reliably click a node either. **Fixed in the model, not in the
+   test:** `SwarmState` now carries an explicit quiescence flag — below `restSpeed` (0.08/step) the
+   school is rested, velocities are zeroed and `stepSwarm` returns early; `impulseAt`/`wakeSwarm`
+   wake it. `settleSwarm` runs until rest (cap 4000 steps, a safety net: every graph this app draws
+   rests in 249–2570 steps). Guarded by "settles to a true rest — the marks stop moving entirely"
+   (600 further steps change nothing) and "rests at the same arrangement whichever cap it is settled
+   under".
+2. **The school dodged the pointer, so aiming at a mark could not work.** The pointer parts the water
+   on every move, so a node being hovered was pushed away from the cursor — a target nobody can
+   click, and an infinite retry loop in Playwright. **Fixed:** the pointer's push is skipped while it
+   is inside a mark's own grab radius (`node.radius + 30`); aiming at a node is not passing through
+   it.
+3. **Two of the four kinds were the same colour.** `--warning` and `--gold` are literally the same
+   value in the palette (`51 100% 50%`), so a reference document drawn in `warning` was
+   indistinguishable from a stakeholder group. **Fixed** by drawing documents in the neutral
+   `--muted-foreground` token, and guarded by a new test that the legend's four swatch tokens are
+   four *distinct* strings.
+
+**Two smaller fixes, both measured:** the compact form's labels rendered at ~7 px in the smaller
+card, so marks, labels and strokes are drawn at a `visualScale` of 1.6 there (asserted: the compact
+mark radius is greater than the full-size one); and node labels now carry a card-coloured halo
+(`paintOrder: stroke`), so an edge crossing a label no longer runs through the text.
+
+**Accessibility, stated plainly.** Kind is never carried by colour alone: each kind has a distinct
+size rank, its own legend entry *in words*, and the selected mark's kind is printed in the panel.
+Selecting a mark states **every** relationship it carries as text (counterpart + kind + relation) —
+the SVG's edge labels are `aria-hidden` because the panel carries the same information, read once.
+Every mark is a real `role="button"` with an accessible name, reachable and operable by keyboard
+(`Enter`/`Space`), and the reduced-motion path starts no animation while keeping drag interactive.
+
+**Evidence — all green, fresh this session:**
+- `npm run validate` → **PASS, all checks green** (the one `KNOWN-RED` line is the pre-existing
+  `--destructive` 3.73:1 item, untouched by this phase).
+- `npm run typecheck` → exit **0**; `npm run lint` → **0 errors** (the same 7 pre-existing
+  `react-refresh` warnings in `src/components/ui/**`).
+- `npm test` → **12 files, 190/190** (was 158: +32 guards — 10 network, 10 swarm, 12 card).
+- `npm run build` → **✓ built**; `npx playwright test` → **8/8** (was 7), including the new graph
+  test: the card is incomplete at the start, **grows on its own** while the rounds are revealed
+  (`expect.poll`), selecting a mark states exactly the number of relationships its own label
+  declares, edge labels are off until asked for, a **drag moves a mark**, and the graph is complete
+  when *Assessment Complete* appears — with the standard **0 console errors / 0 off-origin requests**
+  invariant.
+
+**A test I had to change, reported rather than hidden:** `src/test/journey.test.tsx` revealed rounds
+with a hardcoded `40 × 400 ms`. With the pacing at 1150 ms the run needs more time, so the loop now
+advances by **exactly one `RUN_ROUND_TICK_MS` per step, for `run.rounds.length + 1` steps** —
+derived from the pacing constant and the run's own round count, and *stronger* than before: it now
+also asserts the counter reads `n / n rounds`. No assertion was weakened and no rule disabled.
+
+**Deliberate limits (so a cold session does not read them as bugs):** the layout is computed in a
+fixed 1000×750 virtual space and the SVG scales it, so the arrangement is resolution-independent and
+the label sizes are consistent; growth is bound to the run's revealed rounds and nothing else; the
+public schematic is built at module scope from `opc`, which the caption states in words ("drawn from
+a representative departmental configuration"); and the compact form carries one control only (reset),
+because the block it sits in already names itself.
+
+---
+
 ## Verification log
 | Date | Command | Result |
 |---|---|---|
@@ -1223,6 +1319,13 @@ with `min-h-[4rem]` + `items-end` on the figure; re-measured — one distinct la
 | 2026-09-25 | jargon / over-claim check in the rendered section (Phase R) | **0 hits** for API, LLM, agent-based, knowledge graph, graph database, embedding, vector database, inference, PRNG, random seed, orchestration, predict, guarantee, knows how, simulates reality (§8, §24) |
 | 2026-09-25 | browser runtime on the new section (Phase R) | **0 console errors, 0 off-origin requests** at both viewports — the section is a pure static render from the config, no network, no new dependency |
 | 2026-09-25 | dev-server port root cause confirmed (Phase M) | PASS — `vite.config.ts` sets `server.port = 8080` and `host: "::"`; `npm run dev` therefore serves at **http://localhost:8080/**, not 5173. This is why the user's browser still showed the old entry |
+| 2026-09-25 | `npm run validate` (Phase S) | **PASS — all checks green.** New modules pass the determinism, banned-copy, vendor-term and network checks; the only `KNOWN-RED` line is the pre-existing `--destructive` 3.73:1 item |
+| 2026-09-25 | `npm run typecheck` / `npm run lint` (Phase S) | `tsc -b` exit **0**; eslint **0 errors** (7 pre-existing `react-refresh` warnings in `src/components/ui/**`, none in the new files) |
+| 2026-09-25 | `npm test` (Phase S) | **190 passed / 12 files** (was 158/9): +10 `network.test.ts` (structure, arrival rounds, growth, determinism, relation bank, sentiment, legend distinctness, the public schematic), +10 `swarm.test.ts` (identical settle, seed sensitivity, spacing inside the frame for 5 departments, true rest, cap independence, impulse→recohere, shove cannot escape the frame, pinned mark holds and pushes, single mark), +12 `graph-card.test.tsx` (first-paint settled, reproducible, growth + stable frame, relationships as text, keyboard, edge-label toggle, drag, no-rAF render, compact form + its scale, reduced motion) |
+| 2026-09-25 | `npx playwright test` (Phase S) | **8 passed** (was 7). New: *the relationship graph grows with the run, and answers the pointer* — incomplete at the start, grows on its own, selection states exactly the declared number of relationships, edge labels off until asked, a drag moves a mark, graph complete at *Assessment Complete*, 0 console errors, 0 off-origin requests |
+| 2026-09-25 | measured render of the graph (Phase S) | settled layouts for `opc/fin/agri/def/health` keep every pair of marks **≥ 88 units apart** (min 88, max 170) and inside the 1000×750 frame; rest reached in **249–2570 steps**; the compact schematic draws at `visualScale` 1.6 so its labels read in the smaller card |
+| 2026-09-25 | rest-state diagnosis, measured before the fix (Phase S) | max speed 0.212 units/step and **13.19 units of drift per 60 steps** after settling → Playwright's stability check could never pass → **root cause of "element is not stable"**, fixed in the model (quiescence flag), then re-measured: **600 further steps change nothing** |
+| 2026-09-25 | palette check behind the corpus-colour defect (Phase S) | `--gold: 51 100% 50%` and `--warning: 51 100% 50%` are **identical** — two kinds would have been one colour; documents now use `--muted-foreground`, and a test asserts four distinct legend swatches |
 
 ## Known-red / open items
 - **DEPLOYMENT — two facts a cold session must not get wrong.** (a) The host in the deployment
@@ -1482,8 +1585,32 @@ relative path so it does not duplicate the source of truth).
 | `e2e/journey.spec.ts` | Homepage test extended with the new section (by position, counts and verbatim copy); new phone-viewport test |
 | `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md` | Phase R record, verification rows, files-touched table |
 
+## Files touched in Phase S (graph relationship visualization)
+
+| File | Change |
+|---|---|
+| `src/services/assessment/network.ts` | **New.** `RelationshipNode`/`RelationshipEdge`/`RelationshipGraph` with a per-mark and per-edge arrival round; `RELATIONSHIP_KINDS` (one legend entry per kind), `RELATION_BANK` (every relation phrase in one place), `relationshipKindLabel`; `buildRelationshipGraph(run)` (pure function of the run) and `buildPreviewRelationshipGraph(departmentId)` + `PREVIEW_DEPARTMENT_ID` for the public schematic. `types.ts` untouched |
+| `src/lib/graph/swarm.ts` | **New.** The hand-written force model: `SwarmOptions`/`DEFAULT_SWARM`, `createSwarm`, `stepSwarm` (repulsion, springs, centring, schooling, soft walls, quiescence), `impulseAt`, `wakeSwarm`, `isSwarmAwake`, `settleSwarm` (until rest, capped), `positionsOf`, `layoutQuality`, `NODE_RADIUS`, `SWARM_WIDTH/HEIGHT` |
+| `src/components/relationship/RelationshipGraphCard.tsx` | **New.** The card: settled SVG on first paint, rAF enhancement, growth by revealed round, selection with relationships as text, edge labels, drag + neighbour shove, keyboard operation, reduced-motion path, `compact` form |
+| `src/pages/SimulationRun.tsx` | `ROUND_TICK_MS` → exported `RUN_ROUND_TICK_MS = 1150`; two-column layout (graph left; `EngineStatus` + agent feed right); the run's graph built once per run; "Skip to results" control in the progress row |
+| `src/components/public/SimulationVisuals.tsx` | The *Simulated population* block now draws the compact graph (`PREVIEW_STRUCTURE`) with the existing dot field kept faintly behind it, plus a one-line caption stating it is drawn from a representative departmental configuration |
+| `tailwind.config.ts` | `graph-node-in` keyframe + animation (opacity only — a CSS transform would override the SVG `transform` attribute and the mark would jump to the top-left corner) |
+| `src/test/network.test.ts`, `src/test/swarm.test.ts`, `src/test/graph-card.test.tsx` | **New.** 32 guards (see the verification log row) |
+| `src/test/journey.test.tsx` | The reveal loop now advances one `RUN_ROUND_TICK_MS` per step for `run.rounds.length + 1` steps, derived from the pacing constant instead of the old hardcoded `40 × 400 ms`, and additionally asserts `n / n rounds` |
+| `e2e/journey.spec.ts` | New browser test: the graph grows with the run and answers the pointer (selection as text, edge labels, drag, completion, runtime invariants) |
+| `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md` | Phase S record, verification rows, files-touched table, §6g |
+
 ## RESUME HERE
 
+- **Phase S is the current state of the run view and the public "Simulated population" block.**
+  Inside a run (`/app/simulations/:id`) the left column is the **Graph Relationship Visualization**
+  card: it is fully arranged on the first paint, grows one round at a time as the run is revealed
+  (the count reads `n / N entities · m / M relationships`), each mark is clickable and states its
+  relationships as text, edge labels are a toggle, and every mark can be dragged with the
+  surrounding nodes parting and closing again ("school of fish"). The right column is the engine
+  vitals panel and the run's own agent feed. The pacing constant `RUN_ROUND_TICK_MS` is **1150 ms**,
+  which is what makes the growth visible. On the public page the same graph appears in **compact**
+  form inside the *Simulated population* block, drawn from `opc` and captioned as such.
 - **Phase R is the current state of the public landing page** (it builds on Phase P; Phase O and
   earlier are superseded). The page now reads: hero (initiative, principle, ONE primary action) →
   **A new capability for policy assessment** (three cards) → **What happens behind the assessment**
@@ -1494,8 +1621,8 @@ relative path so it does not duplicate the source of truth).
   `src/components/public/SimulationVisuals.tsx` and `ENGINE_EXPLANATION` in `src/config/brand.ts`;
   the guards live in `src/test/landing.test.tsx` (`What happens behind the assessment`) and
   `e2e/journey.spec.ts` (homepage test + the 390px overflow test).
-- **The live host still serves the Phase P build** — Phase R has not been deployed yet. To publish
-  it: `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command in the bullet below.
+- **The live host still serves the Phase P build** — Phases R and S have not been deployed yet. To
+  publish them: `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command below.
 - **Branch:** `feature/unified-platform` · **HEAD:** the `feat(phase-m)` commit — run `git rev-parse HEAD`.
   `tree:` clean. Functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C ·
   Phase D = the commit whose message begins `feat(phase-d)` · Phase J = `feat(phase-j)` ·
@@ -1578,23 +1705,25 @@ relative path so it does not duplicate the source of truth).
   Word export is HTML-based `application/msword`), the remote assessment service client (registered
   in `CLIENTS` but deliberately unimplemented — the mock-first seam), and Government SSO. Playwright
   click-through is **no longer** on this list: it is built and green (Phases H→M).
-- **Next action: no phase is outstanding — the build is complete and verified (Phases 0–N).** The
-  full suite is green (validate, typecheck, lint, test **145/145**, build, **and `npx playwright test`
-  6/6**).
+- **Next action: no phase is outstanding — the build is complete and verified (Phases 0–S).** The
+  full suite is green: `npm run validate` **PASS**, `npm run typecheck` exit 0, `npm run lint`
+  0 errors, `npm test` **190/190** (12 files), `npm run build` ✓, `npx playwright test` **8/8**.
   Remaining work, in priority order:
-  1. **Redeploy `dist/`** to publish Phases E–M to the live host (Phase J's FTPS command; **never
+  1. **Redeploy `dist/`** to publish Phases E–S to the live host (Phase J's FTPS command; **never
      `--delete`**), then re-run the live route checks. The live build is still **Phase D**.
   2. **Open the Pull Request** (GitHub link in Phase I) for review before any merge to `main`.
   3. Non-credential backlog in `PRODUCTION_READINESS.md`: server-side PDF/DOCX extraction, a real
      `.docx` renderer, the remote assessment service client behind the seam, a backend drafting model
      behind `documents.ts`, and Government SSO.
-- **Read next:** this file, then `e2e/journey.spec.ts` (what the browser journey actually asserts),
-  `src/services/assessment/AssessmentService.ts` (the seam), `src/services/assessment/scenario.ts`
-  (the engine), and `src/pages/SimulationRun.tsx`.
+- **Read next:** this file, then `src/services/assessment/network.ts` (the graph derivation),
+  `src/lib/graph/swarm.ts` (the layout physics and its rest state),
+  `src/components/relationship/RelationshipGraphCard.tsx` (the surface),
+  `src/pages/SimulationRun.tsx` (the run view and `RUN_ROUND_TICK_MS`), and
+  `e2e/journey.spec.ts` (what the browser journey actually asserts).
 - **Exact commands:**
 ```bash
 npm run validate; npm run typecheck; npm run lint; npm test; npm run build
-npx playwright test   # 6/6 — real browser vs vite preview; asserts 0 console errors, 0 off-origin requests
+npx playwright test   # 8/8 — real browser vs vite preview; asserts 0 console errors, 0 off-origin requests
 npm run dev           # serves at http://localhost:8080/  (NOT 5173)
 ```
 
@@ -1632,10 +1761,25 @@ npm run dev           # serves at http://localhost:8080/  (NOT 5173)
 10. **`runStore.ts` persists run *inputs*, not results.** Reading a run recomputes it from the
     stored request, which is what makes "the stored run can never drift from its inputs" true.
     Do not start caching generated output in local storage.
-11. **The simulation reveal test needs one `act()` flush per tick.** `SimulationRun` reveals one
-    round per `setTimeout`, so a single `vi.advanceTimersByTime(30000)` fires only the first round;
-    `src/test/journey.test.tsx` loops `act(() => vi.advanceTimersByTime(400))`. If that test starts
-    failing on "Assessment Complete", check the loop before touching the component.
-12. **`src/index.css` now has a `@media print` block at the end.** The `:root` palette block above
+11. **The simulation reveal test needs one `act()` flush per round.** `SimulationRun` reveals one
+    round per `setTimeout` of `RUN_ROUND_TICK_MS` (1150 ms), so a single
+    `vi.advanceTimersByTime(30000)` fires only the first round. `src/test/journey.test.tsx` loops
+    `act(() => vi.advanceTimersByTime(RUN_ROUND_TICK_MS))` for `run.rounds.length + 1` steps —
+    derived from the exported constant, never hardcoded, because the pacing is deliberately slow so
+    the relationship graph can grow with the run. If that test starts failing on "Assessment
+    Complete", check the loop before touching the component.
+12. **The graph's force model must be able to REST — do not remove the quiescence state.**
+    `stepSwarm` returns early when `SwarmState.awake` is false, and rests the school once nothing
+    moves faster than `restSpeed`; `impulseAt`/`wakeSwarm` wake it. Without that, a settled layout
+    creeps forever (measured: 13.2 units per 60 steps) and no mark can hold still — Playwright's
+    "element is not stable" retry loop, and a genuinely unclickable node, both come straight back.
+    `src/test/swarm.test.ts` fails if it regresses.
+13. **The pointer's push skips a mark it is aiming at** (`node.radius + 30`). That is deliberate: a
+    school that dodges the cursor cannot be clicked. Keep it if you change `POINTER_PUSH`.
+14. **Do not draw a reference document in `--warning`.** `--warning` and `--gold` are the same value
+    in this palette, so the document kind would be invisible as a distinct kind. Documents are drawn
+    in `--muted-foreground`, and `src/test/network.test.ts` asserts the four legend swatches are
+    distinct.
+15. **`src/index.css` now has a `@media print` block at the end.** The `:root` palette block above
     it must stay byte-identical — `src/test/palette-lock.test.ts` fails on any change to
     `--primary`, `--gold`, `--warning` or `--success`, and they are locked project constraints.

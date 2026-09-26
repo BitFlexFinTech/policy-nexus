@@ -106,12 +106,20 @@ export default {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.4" },
         },
+        /* Entrance for a graph node. Opacity ONLY, deliberately: a CSS transform
+           would override the element's SVG `transform` attribute and the node
+           would jump to the top-left corner for the length of the animation. */
+        "graph-node-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "slide-up-fade": "slide-up-fade 0.15s ease-out",
         "pulse-dot": "pulse_dot 2s ease-in-out infinite",
+        "graph-node-in": "graph-node-in 0.45s ease-out",
       },
     },
   },

@@ -1,5 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
+import { RelationshipGraphCard } from "@/components/relationship/RelationshipGraphCard";
+import { buildPreviewRelationshipGraph } from "@/services/assessment/network";
 
 /**
  * The two visuals that explain what the assessment engine does with a policy
@@ -14,8 +16,10 @@ import type { ReactNode } from "react";
  * of them is a measured counter and none is invented here.
  *
  * Deterministic by construction: the dot field is a fixed-length render of a
- * static array — no Math.random, no Date.now, no new Date — so the diagram is
- * identical on every render and in every build.
+ * static array, and the compact relationship structure is derived from the
+ * representative department's configuration through the seeded PRNG — no
+ * Math.random, no Date.now, no new Date — so the diagram is identical on every
+ * render and in every build.
  * (see .clinerules/04-determinism-and-validation.md)
  */
 
@@ -136,6 +140,16 @@ function DiagramBlock({ label, children }: { label: string; children?: ReactNode
 }
 
 /**
+ * The compact relationship structure drawn inside the "Simulated population"
+ * block: the draft and the groups a run models around it, from ONE documented
+ * representative departmental configuration. Built once at module scope, so the
+ * schematic is identical on every visit and in every build — it is a picture of
+ * the structure, not of anyone's run.
+ */
+const PREVIEW_STRUCTURE = buildPreviewRelationshipGraph();
+const PREVIEW_STRUCTURE_SEED = "landing::structure";
+
+/**
  * The compact schematic: the policy becomes a knowledge map, the map becomes a
  * simulated population of thousands of agents, the agents interact, and the
  * result is a structured assessment. It exists so the size of the environment
@@ -179,19 +193,32 @@ export function AgentPopulationDiagram() {
         <p className="text-xs font-semibold uppercase tracking-wide text-foreground">
           Simulated population
         </p>
-        {/* One restrained entrance for the whole field — the marks settle into
-            place together rather than each one moving on its own. The animation
-            already ships with the app (the agent feed uses it); nothing new is
-            added, and reduced-motion turns it off entirely. */}
-        <div
-          aria-hidden="true"
-          className="mt-3 grid animate-slide-up-fade grid-cols-10 gap-1.5 motion-reduce:animate-none"
-        >
-          {AGENT_DOTS.map((dot) => (
-            <span key={dot} className="h-1.5 w-1.5 justify-self-center rounded-full bg-primary/45" />
-          ))}
+        {/* The graph is the point of the block now, with the field of marks kept
+            faintly behind it: the block still reads as a population of many
+            agents AND as the relationships between the groups modelled from it.
+            The field is decoration and stays hidden from assistive technology;
+            the graph states its own structure, and its labels are real text. */}
+        <div className="relative mt-2">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 grid animate-slide-up-fade grid-cols-10 content-center justify-items-center gap-1.5 opacity-30 motion-reduce:animate-none"
+          >
+            {AGENT_DOTS.map((dot) => (
+              <span key={dot} className="h-1 w-1 justify-self-center self-center rounded-full bg-primary/40" />
+            ))}
+          </div>
+          <RelationshipGraphCard
+            graph={PREVIEW_STRUCTURE}
+            seed={PREVIEW_STRUCTURE_SEED}
+            compact
+            className="relative"
+          />
         </div>
-        <p className="mt-3 flex items-baseline justify-center gap-2">
+        <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
+          The relationships between the modelled groups, drawn from a representative departmental
+          configuration.
+        </p>
+        <p className="mt-2 flex items-baseline justify-center gap-2">
           <span className="font-mono text-xl font-semibold leading-none text-foreground">
             {SIMULATED_AGENT_FIGURE}
           </span>

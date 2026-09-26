@@ -174,6 +174,42 @@ client is registered.
   `Engine … (Mock)` on the assessment and every export — and the notice strip still states that
   results are modelled and labelled as simulated. Nothing on the public page implies a live service.
 
+## 6g. Verified in a real browser (Phase S — the graph relationship visualization)
+- **What it is:** inside a run, the left column is the **Graph Relationship Visualization** card — the
+  draft, the stakeholder groups the run models, the stated priorities and the department's reference
+  documents, with the round each mark appears on read from the run's own event record. It is **fully
+  arranged on the first paint** (the layout is computed synchronously), then grows one round at a
+  time, and every mark can be **dragged**, with the surrounding nodes parting and closing again.
+  On the public page the same graph appears in **compact** form inside the *Simulated population*
+  block, drawn from the representative department `opc` and captioned in words as such.
+- **No new dependency and no schema change:** the graph is a **pure function of the run**
+  (`src/services/assessment/network.ts`); `AssessmentRun` in `types.ts` is untouched, so the
+  mock → real (MiroFish) swap still only has to produce runs. The layout physics and the SVG renderer
+  are hand-written (`src/lib/graph/swarm.ts`, `RelationshipGraphCard.tsx`).
+- **Determinism:** seeded layout, fixed `dt = 1/60` steps, no `Math.random`/`Date.now`/`new Date`; a
+  repeated run produces a byte-identical graph, and a re-settled swarm lands on identical
+  coordinates. Both are asserted, not assumed.
+- **Accessibility, verified in the DOM:** four kinds distinguished by size **and** a legend entry in
+  words (never colour alone — `--warning` and `--gold` are the same value in this palette, which is
+  why documents are drawn in `--muted-foreground`); every mark is a `role="button"` with an
+  accessible name, operable by keyboard; selecting a mark states **all** of its relationships as
+  text; the SVG's edge labels are `aria-hidden` because the panel is the same information, read once;
+  `prefers-reduced-motion` starts no animation and keeps drag interactive.
+- **Measured, not eyeballed:** settled layouts for five departments keep every pair of marks
+  **≥ 88 units** apart inside the 1000×750 virtual frame; the model reaches a **true rest** (600
+  further steps change nothing) in 249–2570 steps; the compact form draws at `visualScale` 1.6 so its
+  labels are legible in the smaller card.
+- **Runtime:** `npm run validate` **PASS**, `npm run typecheck` exit 0, `npm run lint` 0 errors,
+  `npm test` **190/190**, `npm run build` ✓, `npx playwright test` **8/8** with **0 console errors and
+  0 off-origin requests** — the new browser test asserts the graph is incomplete at the start, grows
+  on its own while the rounds run, states exactly the declared number of relationships on selection,
+  keeps edge labels off until asked, moves a mark by drag, and is complete when *Assessment Complete*
+  appears.
+- **Making the reveal longer is what makes the growth visible:** `ROUND_TICK_MS` went **320 → 1150 ms**
+  (exported as `RUN_ROUND_TICK_MS`), so a run now takes ~10–18 s. The unit test that drives the reveal
+  derives its step count from that exported constant instead of hardcoding one, and additionally
+  asserts the counter reaches `n / n rounds`.
+
 ## 7. Disabled by default (deliberate)
 - Puter CDN script and `puter.ai.chat()`: **fully removed.** Phase B deleted the
   `<script src="https://js.puter.com/v2/">` tag from `index.html`; **Phase D deleted the
