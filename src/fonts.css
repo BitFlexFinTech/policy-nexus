@@ -1,0 +1,22 @@
+/* Self-hosted fonts — replaces the previous Google Fonts CDN request.
+   Same faces as before: Inter (400/500/600/700) and JetBrains Mono (400/500),
+   now served from /fonts/ with zero runtime network requests.
+   Both families ship as a single variable woff2 covering the whole weight axis;
+   the four Inter URLs Google served were byte-identical (verified by md5). */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin-variable.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin-variable.woff2') format('woff2-variations');
+}
+

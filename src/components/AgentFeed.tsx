@@ -1,5 +1,15 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { findDepartment, type Department } from "@/config/departments";
+import { VOCABULARY } from "@/config/brand";
+import { REFERENCE_DATE_LABEL, getStakeholderSegment } from "@/config/reference";
+import { useSession } from "@/session/useSession";
+import {
+  FEED_SYSTEM_TONE,
+  FEED_TAG_TONES,
+  FEED_TYPE_ICONS,
+  feedTimestamp,
+} from "@/components/feedStyles";
 
 interface AgentMessage {
   id: number;
@@ -7,83 +17,102 @@ interface AgentMessage {
   agent: string;
   type: "info" | "action" | "result" | "warning" | "system";
   message: string;
+  /** Tailwind tone classes for the agent tag. */
+  tone: string;
 }
 
-const agentColors: Record<string, string> = {
-  "GraphRAG": "bg-primary text-primary-foreground",
-  "OASIS": "bg-gold text-gold-foreground",
-  "KombiOps": "bg-warning text-warning-foreground",
-  "A1A2Farmers": "bg-success text-success-foreground",
-  "CivilUnions": "bg-destructive text-destructive-foreground",
-  "Diaspora": "bg-primary text-primary-foreground",
-  "System": "bg-muted text-muted-foreground",
+/**
+ * Build the department's stakeholder agent feed from its own configuration:
+ * one entry per modelled segment, framed by the scenario opening and closing
+ * lines. No vendor terminology and no generated figures.
+ */
+const buildFeed = (department: Department): AgentMessage[] => {
+  const entries: Array<{ agent: string; type: AgentMessage["type"]; message: string }> = [
+    {
+      agent: "System",
+      type: "system",
+      message: `${VOCABULARY.simulationCore} prepared for ${department.name}. Scenario mode — every figure is simulated, not live data.`,
+    },
+    {
+      agent: "Corpus",
+      type: "info",
+      message: `${VOCABULARY.knowledgeMap} loaded: ${department.indicators.length} reference indicators and ${department.documents.length} department documents.`,
+    },
+  ];
+
+  department.segments.forEach((segmentId) => {
+    const segment = getStakeholderSegment(segmentId);
+    entries.push({
+      agent: segment.label,
+      type: "info",
+      message: `${VOCABULARY.agentMemory} initialised: ${segment.label} — ${segment.note}.`,
+    });
+  });
+
+  entries.push({
+    agent: "System",
+    type: "system",
+    message: `${VOCABULARY.scenarioEngine} ready. Prepared drafts: ${department.policyTemplates.length}. Reference date ${REFERENCE_DATE_LABEL}.`,
+  });
+
+  const toneByAgent = new Map<string, string>();
+  let toneIndex = 0;
+
+  return entries.map((entry, index) => {
+    let tone = FEED_SYSTEM_TONE;
+    if (entry.agent !== "System") {
+      const existing = toneByAgent.get(entry.agent);
+      if (existing) {
+        tone = existing;
+      } else {
+        tone = FEED_TAG_TONES[toneIndex % FEED_TAG_TONES.length];
+        toneByAgent.set(entry.agent, tone);
+        toneIndex += 1;
+      }
+    }
+    return {
+      id: index + 1,
+      timestamp: feedTimestamp(index),
+      agent: entry.agent,
+      type: entry.type,
+      message: entry.message,
+      tone,
+    };
+  });
 };
 
-const typeIcons: Record<string, string> = {
-  info: "ℹ",
-  action: "▶",
-  result: "✓",
-  warning: "⚠",
-  system: "⚙",
-};
-
-const initialMessages: AgentMessage[] = [
-  { id: 1, timestamp: "14:23:01", agent: "System", type: "system", message: "Nzwisiso OASIS engine initialized. v2.1.0 — Sovereign Compute Node active." },
-  { id: 2, timestamp: "14:23:02", agent: "GraphRAG", type: "info", message: "Knowledge graph loaded: 128 entities, 342 relations from Zimbabwe policy corpus." },
-  { id: 3, timestamp: "14:23:03", agent: "OASIS", type: "action", message: "Simulation parameters: population=10000, rounds=50, ZiG exchange model enabled." },
-  { id: 4, timestamp: "14:23:05", agent: "KombiOps", type: "info", message: "ASO initialized: Kombi Operators & Informal Traders — Urban Logistics/Pricing model loaded." },
-  { id: 5, timestamp: "14:23:06", agent: "A1A2Farmers", type: "info", message: "ASO initialized: A1/A2 Resettled Farmers — Agrarian Policy with El Niño variables." },
-  { id: 6, timestamp: "14:23:07", agent: "CivilUnions", type: "info", message: "ASO initialized: Civil Service Unions — Wage/Fiscal Policy impact model." },
-  { id: 7, timestamp: "14:23:08", agent: "Diaspora", type: "info", message: "ASO initialized: Diaspora Remittance Group — Capital Inflows via ZiG corridor." },
-  { id: 8, timestamp: "14:23:12", agent: "KombiOps", type: "result", message: "Round 5/50 — Fuel pricing impact: 62% of operators forecast fare increase under policy." },
-  { id: 9, timestamp: "14:23:15", agent: "GraphRAG", type: "info", message: "Dynamic temporal memory updated. 24 new interaction edges added to knowledge graph." },
-  { id: 10, timestamp: "14:23:18", agent: "A1A2Farmers", type: "warning", message: "Round 12/50 — Drought cascade: La Niña probability 68%, crop yield models adjusted." },
-];
-
-const streamMessages: AgentMessage[] = [
-  { id: 11, timestamp: "14:23:30", agent: "CivilUnions", type: "action", message: "Round 25/50 — Wage adjustment model: ZiG purchasing power decline triggers union response." },
-  { id: 12, timestamp: "14:23:35", agent: "OASIS", type: "info", message: "Resource allocation balanced. Vultr Harare Node: CPU 72%, Memory 4.8GB." },
-  { id: 13, timestamp: "14:23:40", agent: "GraphRAG", type: "result", message: "Subgraph analysis complete. 3 emergent stakeholder communities identified." },
-  { id: 14, timestamp: "14:23:45", agent: "Diaspora", type: "action", message: "Remittance corridor simulation: ZiG inflows projected at ZiG 2.4B quarterly." },
-  { id: 15, timestamp: "14:23:50", agent: "KombiOps", type: "warning", message: "Round 35/50 — Fuel subsidy removal impact: informal sector contraction risk 34%." },
-  { id: 16, timestamp: "14:23:55", agent: "A1A2Farmers", type: "result", message: "Updated prediction: maize output resilience at 54% under El Niño stress scenario." },
-  { id: 17, timestamp: "14:24:00", agent: "CivilUnions", type: "action", message: "Round 50/50 — Simulation complete. Ubuntu Analysis: Social cohesion maintained at 78%." },
-  { id: 18, timestamp: "14:24:05", agent: "System", type: "result", message: "Final report ready. Collective Well-being Impact (Ubuntu Analysis) included. 3 scenarios, 12 risk factors." },
-];
-
+/**
+ * Stakeholder agent feed. Replaces the previous hardcoded, randomly streamed
+ * vendor feed: the entries now derive from the department's modelled segments
+ * and are byte-identical for the same department on every render.
+ */
 export function AgentFeed() {
-  const [messages, setMessages] = useState<AgentMessage[]>(initialMessages);
-  const [streamIdx, setStreamIdx] = useState(0);
+  const session = useSession();
+  const department = findDepartment(session?.departmentId);
+  const messages = useMemo(() => (department ? buildFeed(department) : []), [department]);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (streamIdx >= streamMessages.length) return;
-    const timer = setTimeout(() => {
-      setMessages((prev) => [...prev, streamMessages[streamIdx]]);
-      setStreamIdx((i) => i + 1);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, [streamIdx, messages]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
+  if (!department) return null;
+
   return (
     <div className="flex h-full flex-col bg-card">
       <div className="flex items-center justify-between border-b px-4 py-2.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">ASO Agent Feed</span>
-        <span className="text-xs text-muted-foreground font-mono">{messages.length} events</span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{VOCABULARY.agentFeed}</span>
+        <span className="text-xs font-mono text-muted-foreground">{messages.length} events</span>
       </div>
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-2 space-y-0.5">
+      <div ref={scrollRef} className="flex-1 space-y-0.5 overflow-y-auto p-2">
         {messages.map((msg) => (
-          <div key={msg.id} className="flex items-start gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50 animate-slide-up-fade">
-            <span className="mt-0.5 text-xs text-muted-foreground font-mono shrink-0 w-16">{msg.timestamp}</span>
-            <span className={cn("shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase", agentColors[msg.agent] || "bg-muted text-muted-foreground")}>
+          <div key={msg.id} className="animate-slide-up-fade flex items-start gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50">
+            <span className="mt-0.5 w-16 shrink-0 font-mono text-xs text-muted-foreground">{msg.timestamp}</span>
+            <span className={cn("shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase", msg.tone)}>
               {msg.agent}
             </span>
-            <span className="text-xs text-muted-foreground shrink-0">{typeIcons[msg.type]}</span>
-            <span className="text-xs text-foreground leading-relaxed font-mono-code">{msg.message}</span>
+            <span className="shrink-0 text-xs text-muted-foreground">{FEED_TYPE_ICONS[msg.type]}</span>
+            <span className="font-mono-code text-xs leading-relaxed text-foreground">{msg.message}</span>
           </div>
         ))}
       </div>

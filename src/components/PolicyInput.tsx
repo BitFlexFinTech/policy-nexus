@@ -1,60 +1,94 @@
-import { useCallback, useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { SCENARIOS, type PolicyDocument, type ScenarioId } from "@/data/documents";
-import { setPendingSimulation } from "@/lib/policyStore";
-import { cn } from "@/lib/utils";
+import { findDepartment } from "@/config/departments";
+import { REFERENCE_FISCAL_YEAR } from "@/config/reference";
+import { assessmentService } from "@/services/assessment/AssessmentService";
+import type { AssessmentRequest } from "@/services/assessment/types";
+import { useSession } from "@/session/useSession";
 
-interface PolicyInputProps {
-  draft: string;
-  setDraft: (v: string) => void;
-  scenario: ScenarioId;
-  setScenario: (s: ScenarioId) => void;
-  selectedDoc?: PolicyDocument;
-}
+const formatFileSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1048576).toFixed(1)} MB`;
+};
 
-export function PolicyInput({ draft, setDraft, scenario, setScenario, selectedDoc }: PolicyInputProps) {
+/** Deterministic parsing steps — no clock, no randomness, same every run. */
+const PARSE_STEP = 8;
+const PARSE_TICK_MS = 250;
+
+/**
+ * Policy ingestion for the signed-in department. Presets come from the
+ * department's own prepared drafts, the parsing indicator advances in fixed
+ * steps, and **Run Simulation** hands the draft to the assessment service and
+ * opens the live deterministic run. It performs no network call.
+ */
+export function PolicyInput() {
+  const session = useSession();
+  const department = findDepartment(session?.departmentId);
   const navigate = useNavigate();
+
+  const [draft, setDraft] = useState("");
+  const [templateId, setTemplateId] = useState<string | undefined>(undefined);
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: string }[]>([]);
   const [parseProgress, setParseProgress] = useState(0);
   const [isParsing, setIsParsing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleRun = () => {
-    if (!draft.trim()) return;
-    setPendingSimulation({ policy: draft, scenario, documentId: selectedDoc?.id });
-    navigate("/simulation");
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / 1048576).toFixed(1)} MB`;
-  };
+  const handleRunSimulation = useCallback(() => {
+    if (!department) return;
+    const fileNames = uploadedFiles.map((file) => file.name);
+    const text = draft.trim();
+    if (!text && fileNames.length === 0) return;
+    // No text extraction exists in scenario mode: when only files were supplied
+    // the recorded file list is the policy text, and the source says `upload`
+    // plainly rather than implying the file was parsed.
+    const policyText = text || `Uploaded policy document(s): ${fileNames.join(", ")}`;
+    const template = department.policyTemplates.find((item) => item.id === templateId);
+    const request: AssessmentRequest = {
+      departmentId: department.id,
+      policyText,
+      source: text ? (template ? "preset" : "paste") : "upload",
+      templateId: text ? templateId : undefined,
+      timeHorizon: template?.timeHorizon,
+      fileNames,
+    };
+    const run = assessmentService.run(request);
+    navigate(`/app/simulations/${encodeURIComponent(run.id)}`);
+  }, [department, draft, templateId, uploadedFiles, navigate]);
 
   const handleFileUpload = useCallback((files: FileList | null) => {
     if (!files || files.length === 0) return;
-    const accepted = [".pdf", ".docx", ".txt"];
-    const newFiles = Array.from(files)
-      .filter((f) => accepted.some((ext) => f.name.toLowerCase().endsWith(ext)))
-      .map((f) => ({ name: f.name, size: formatFileSize(f.size) }));
+    const validTypes = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "text/plain",
+    ];
 
-    if (newFiles.length === 0) return;
-    setUploadedFiles((prev) => [...prev, ...newFiles]);
-
-    // Deterministic parse progress: fixed 10% steps every 120ms.
-    setIsParsing(true);
-    setParseProgress(0);
-    let p = 0;
-    const interval = setInterval(() => {
-      p += 10;
-      setParseProgress(p);
-      if (p >= 100) {
-        clearInterval(interval);
-        setTimeout(() => setIsParsing(false), 400);
+    const newFiles: { name: string; size: string }[] = [];
+    Array.from(files).forEach((file) => {
+      if (validTypes.includes(file.type) || file.name.endsWith(".txt") || file.name.endsWith(".pdf") || file.name.endsWith(".docx")) {
+        newFiles.push({ name: file.name, size: formatFileSize(file.size) });
       }
-    }, 120);
+    });
+
+    if (newFiles.length > 0) {
+      setUploadedFiles((prev) => [...prev, ...newFiles]);
+      setIsParsing(true);
+      setParseProgress(0);
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += PARSE_STEP;
+        if (progress >= 100) {
+          clearInterval(interval);
+          setParseProgress(100);
+          setTimeout(() => setIsParsing(false), 300);
+        } else {
+          setParseProgress(progress);
+        }
+      }, PARSE_TICK_MS);
+    }
   }, []);
 
   const handleDrop = useCallback(
@@ -63,70 +97,58 @@ export function PolicyInput({ draft, setDraft, scenario, setScenario, selectedDo
       setIsDragOver(false);
       handleFileUpload(e.dataTransfer.files);
     },
-    [handleFileUpload]
+    [handleFileUpload],
   );
+
+  if (!department) return null;
+
+  const presets = department.policyTemplates;
 
   return (
     <div className="flex h-full flex-col border-r bg-card">
       <div className="flex items-center justify-between border-b px-4 py-2.5">
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Policy Ingestion Hub
-        </span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Policy Ingestion Hub</span>
         <Button
           size="sm"
-          onClick={handleRun}
-          disabled={!draft.trim()}
-          className="h-7 text-xs bg-primary hover:bg-primary/90"
+          onClick={handleRunSimulation}
+          disabled={!draft.trim() && uploadedFiles.length === 0}
+          className="h-7 bg-primary text-xs hover:bg-primary/90"
         >
           Run Simulation
         </Button>
       </div>
 
-      {/* Scenario selector */}
-      <div className="border-b px-3 py-2 space-y-1">
+      {/* Presets */}
+      <div className="space-y-1 border-b px-3 py-2">
         <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-          Use Case Scenario
+          Policy presets ({REFERENCE_FISCAL_YEAR})
         </span>
-        <div className="grid grid-cols-2 gap-1.5">
-          {SCENARIOS.map((s) => (
+        <div className="flex flex-wrap gap-1.5">
+          {presets.map((preset) => (
             <button
-              key={s.id}
-              onClick={() => setScenario(s.id)}
-              className={cn(
-                "flex flex-col rounded-md border px-2 py-1 text-left transition-colors",
-                scenario === s.id
-                  ? "border-primary bg-primary/10"
-                  : "border-border bg-muted/40 hover:bg-muted"
-              )}
+              key={preset.id}
+              onClick={() => {
+                setDraft(preset.policyText);
+                setTemplateId(preset.id);
+              }}
+              title={preset.summary}
+              className="rounded-md border bg-muted/50 px-2 py-1 text-left text-[10px] leading-tight text-foreground transition-colors hover:border-primary/30 hover:bg-primary/10"
             >
-              <span className="font-mono text-[10px] font-bold text-primary">{s.code}</span>
-              <span className="text-[10px] font-medium leading-tight text-foreground">{s.short}</span>
+              {preset.title}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Selected source document */}
-      {selectedDoc && (
-        <div className="border-b bg-muted/30 px-3 py-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Source Document
-          </span>
-          <p className="text-[11px] font-medium text-foreground leading-tight">{selectedDoc.title}</p>
-          <p className="text-[10px] text-muted-foreground">
-            {selectedDoc.publisher} · {selectedDoc.year}
-          </p>
-        </div>
-      )}
-
       {/* Text area */}
-      <div className="flex-1 p-3 min-h-0">
+      <div className="min-h-0 flex-1 p-3">
         <textarea
           value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          placeholder={
-            "Select a document on the left, or draft your policy text here…\n\nExample: \"Adjustment of ZiG mandatory tax settlement for exporters with revenue allocated to the National AI Fund…\""
-          }
+          onChange={(e) => {
+            setDraft(e.target.value);
+            setTemplateId(undefined);
+          }}
+          placeholder={`Draft the policy text for ${department.shortName} here…\n\nOr choose one of the department's prepared presets above.`}
           className="h-full w-full resize-none rounded-md border bg-background p-3 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
@@ -140,10 +162,9 @@ export function PolicyInput({ draft, setDraft, scenario, setScenario, selectedDo
           }}
           onDragLeave={() => setIsDragOver(false)}
           onDrop={handleDrop}
-          className={cn(
-            "flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-4 transition-colors",
+          className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-4 transition-colors ${
             isDragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25 bg-muted/30"
-          )}
+          }`}
         >
           <span className="mb-1 text-xs text-muted-foreground">Drag & Drop PDF, DOCX, or TXT files</span>
           <label className="cursor-pointer text-xs font-medium text-primary hover:underline">
@@ -158,15 +179,17 @@ export function PolicyInput({ draft, setDraft, scenario, setScenario, selectedDo
           </label>
         </div>
 
+        {/* Parse progress */}
         {isParsing && (
           <div className="mt-2 space-y-1">
             <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-              Document Parsing & Knowledge Graph Extraction
+              Document Parsing & Knowledge Map Extraction
             </span>
             <Progress value={parseProgress} className="h-1.5" />
           </div>
         )}
 
+        {/* Uploaded files list */}
         {uploadedFiles.length > 0 && (
           <div className="mt-2 space-y-0.5">
             {uploadedFiles.map((f, i) => (
@@ -181,3 +204,4 @@ export function PolicyInput({ draft, setDraft, scenario, setScenario, selectedDo
     </div>
   );
 }
+

@@ -1,52 +1,39 @@
-import { useState } from "react";
-import { HeaderBar } from "@/components/HeaderBar";
+import { KPICards } from "@/components/KPICards";
 import { PolicyInput } from "@/components/PolicyInput";
 import { AgentFeed } from "@/components/AgentFeed";
 import { EngineStatus } from "@/components/EngineStatus";
-import { KPICards } from "@/components/KPICards";
 import { HistoryTable } from "@/components/HistoryTable";
 import { DocumentLibrary } from "@/components/DocumentLibrary";
-import { SovereignFooter } from "@/components/SovereignFooter";
-import type { PolicyDocument, ScenarioId } from "@/data/documents";
 
+/**
+ * The department workspace body. The header, secondary navigation and sovereign
+ * footer are supplied by `WorkspaceLayout`, so this component only renders the
+ * dashboard itself and keeps the original fixed-viewport composition.
+ */
 const Index = () => {
-  const [draft, setDraft] = useState("");
-  const [scenario, setScenario] = useState<ScenarioId>("public-opinion");
-  const [selectedDoc, setSelectedDoc] = useState<PolicyDocument | undefined>();
-
-  const handleSelectDocument = (doc: PolicyDocument) => {
-    setSelectedDoc(doc);
-    setScenario(doc.scenario);
-    setDraft(doc.excerpt);
-  };
-
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
-      <HeaderBar />
+    <>
       <KPICards />
-      <div className="flex flex-1 min-h-0">
-        <DocumentLibrary selectedId={selectedDoc?.id} onSelect={handleSelectDocument} />
-        <div className="w-[38%] min-w-[320px]">
-          <PolicyInput
-            draft={draft}
-            setDraft={setDraft}
-            scenario={scenario}
-            setScenario={setScenario}
-            selectedDoc={selectedDoc}
-          />
+      <div className="flex min-h-0 flex-1">
+        {/* Left: Document Library */}
+        <DocumentLibrary />
+        {/* Center: Policy Ingestion Hub — flexible */}
+        <div className="w-[38%] min-w-[300px]">
+          <PolicyInput />
         </div>
-        <div className="flex flex-1 flex-col min-h-0">
+        {/* Right: Engine Status + Agent Feed */}
+        <div className="flex min-h-0 flex-1 flex-col">
           <EngineStatus />
-          <div className="flex-1 min-h-0">
+          <div className="min-h-0 flex-1">
             <AgentFeed />
           </div>
         </div>
       </div>
+      {/* Bottom: History Table */}
       <div className="max-h-[28%] overflow-y-auto">
         <HistoryTable />
       </div>
-      <SovereignFooter />
-    </div>
+    </>
   );
 };
 

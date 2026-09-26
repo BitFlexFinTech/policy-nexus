@@ -1,0 +1,51 @@
+# Nzwisiso AI Policy Dashboard — production server config (Apache / LiteSpeed, cPanel)
+# Shipped into dist/ by Vite (public/ is copied verbatim to the build root).
+
+# --- SPA fallback -----------------------------------------------------------------
+# This is a client-side-routed React app. Any path that is not a real file must
+# serve /index.html, otherwise a deep link or a page refresh on /app/policies
+# (etc.) returns 404 from the web server before the app ever boots.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Let real files and real directories through untouched (assets, fonts, .well-known)
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Do not swallow ACME/SSL validation traffic
+  RewriteRule ^\.well-known/ - [L]
+
+  # Everything else is a client-side route
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# --- Never show a directory listing ------------------------------------------------
+<IfModule mod_autoindex.c>
+  Options -Indexes
+</IfModule>
+
+# --- Caching -----------------------------------------------------------------------
+# index.html must always be revalidated so new deploys are picked up immediately.
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header unset ETag
+  </FilesMatch>
+</IfModule>
+
+# Hashed build assets (assets/index-<hash>.js|css) and self-hosted fonts are immutable.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  <FilesMatch "\.(js|css|woff2|png|svg|ico)$">
+    ExpiresDefault "access plus 1 year"
+  </FilesMatch>
+</IfModule>
+
+# --- Correct MIME types (older Apache ships stale ones) ----------------------------
+<IfModule mod_mime.c>
+  AddType font/woff2 .woff2
+  AddType image/svg+xml .svg
+  AddType application/json .json
+</IfModule>

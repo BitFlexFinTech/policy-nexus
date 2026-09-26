@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -15,15 +16,12 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["Montserrat", "Inter", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       letterSpacing: {
         tight: "-0.02em",
       },
       colors: {
-        ink: { DEFAULT: "hsl(var(--ink))", foreground: "hsl(var(--ink-foreground))" },
-        terracotta: { DEFAULT: "hsl(var(--terracotta))", foreground: "hsl(var(--terracotta-foreground))" },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -33,6 +31,7 @@ export default {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        "primary-tint": "hsl(var(--primary-tint))",
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -73,6 +72,7 @@ export default {
           DEFAULT: "hsl(var(--gold))",
           foreground: "hsl(var(--gold-foreground))",
         },
+        "gold-rule": "hsl(var(--gold-rule))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -106,14 +106,22 @@ export default {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.4" },
         },
+        /* Entrance for a graph node. Opacity ONLY, deliberately: a CSS transform
+           would override the element's SVG `transform` attribute and the node
+           would jump to the top-left corner for the length of the animation. */
+        "graph-node-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "slide-up-fade": "slide-up-fade 0.15s ease-out",
         "pulse-dot": "pulse_dot 2s ease-in-out infinite",
+        "graph-node-in": "graph-node-in 0.45s ease-out",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;
