@@ -22,7 +22,10 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
   remove all Lovable traces. `package-lock.json` was regenerated with `npm install`; every other
   dependency is unchanged.)
 - `main` is never committed to or pushed to by an agent. Baseline tag
-  `baseline-pre-unified-platform` → `7451db0` (restore with `git checkout main`).
+  `baseline-pre-unified-platform` → `7451db0`. **One recorded exception:** in Phase W the user
+  reviewed PR #1 and explicitly instructed the agent to merge it, so the agent merged PR #1
+  (`gh pr merge 1 --merge` → merge commit `c09bfa3`) and fast-forwarded local `main`. That is the only
+  time an agent has written to `main`; the rule stands for everything else.
 - Branding: **Nzwisiso AI Policy Dashboard**, tagline **Understanding before action.**, national
   initiative **Zimbabwe AI Policy Intelligence Initiative** (short form **Zimbabwe AI Policy
   Intelligence**). All four live in `src/config/brand.ts` only — `eyebrow`/`tagline` derive from one
@@ -1345,6 +1348,8 @@ because the block it sits in already names itself.
 | 2026-09-26 | `git merge -s ours origin/main` (Phase V) | PASS — "Merge made by the 'ours' strategy"; `git diff --stat HEAD^1 HEAD` **empty** (tree byte-identical to the verified pre-merge commit); `git ls-tree -r \| grep -iE 'lovable\|jspdf'` → **(none)**; `jspdf` occurrences in `package.json`/`package-lock.json` → **0 / 0** |
 | 2026-09-26 | `gh pr view 1` after the push (Phase V) | **`mergeable: MERGEABLE`** (was `CONFLICTING`) — the divergence no longer blocks PR #1 |
 | 2026-09-26 | full suite after the Lovable removal (Phase V) | `npm run validate` **PASS**; `tsc -b` **0**; eslint **0 errors** (7 pre-existing warnings); **190/190** tests (12 files); `npm run build` ✓ 402 ms; `npx playwright test` **8/8**; `npm run dev` → **HTTP 200** on `:8080`. Whole-repo `grep -ril lovable` → **only `PROJECT_STATUS.md`** (the deliberate historical record) |
+| 2026-09-26 | `gh pr merge 1 --merge` (Phase W, **user-authorized**) | PASS — PR #1 **MERGED** 2026-09-26T18:11:19Z; merge commit **`c09bfa3`**; `origin/main` `7451db0` → `c09bfa3`; local `main` fast-forwarded to match |
+| 2026-09-26 | post-merge verification on the merged content (Phase W) | `git diff --stat origin/main origin/feature/unified-platform` **empty** (trees identical at merge time); `git ls-tree -r origin/main \| grep -iE 'lovable\|jspdf'` → **(none)**; `npm run validate` **PASS**; `tsc -b` **0**; eslint **0 errors**; **190/190** tests; `npm run build` ✓ 430 ms; `npx playwright test` **8/8**; live `https://nzwisiso.bitflex.app/` **200** serving the unchanged `index-qUyirbLr.js` + `index-tZ1V4AO9.css` |
 
 
 
@@ -1663,7 +1668,34 @@ parallel app the Lovable bot had generated, which made PR #1 `CONFLICTING`).
 `grep -ril lovable` → **only `PROJECT_STATUS.md`** (the deliberate historical audit record; the
 single-source-of-truth rule permits explicitly-historical records).
 
-## Files touched this session (redeploy of Phases R–S + PR opened + Lovable removal)
+## Phase W — PR #1 merged into `main` (user-authorized)
+
+**Status: DONE — verified this session.**
+
+The user reviewed PR #1 and instructed: *"ok so just merge and make sure nothing breaks."* The agent
+merged it. **This is a deliberate, user-authorized exception to the locked rule "`main` is never
+committed to or pushed to by an agent"** — the human review gate that rule protects was satisfied by
+the user's explicit instruction, and the exception is recorded here rather than hidden.
+
+**Merge:** `gh pr merge 1 --merge` → PR #1 **MERGED** at 2026-09-26T18:11:19Z, merge commit
+**`c09bfa3`** ("Merge pull request #1 from BitFlexFinTech/feature/unified-platform"). `origin/main`
+moved `7451db0` → `c09bfa3`; local `main` fast-forwarded to match.
+
+**Nothing broke — verified on the merged content:**
+
+| Check | Result |
+|---|---|
+| `git diff --stat origin/main origin/feature/unified-platform` | **empty** at merge time — `main`'s tree is byte-identical to the reviewed branch |
+| `git ls-tree -r origin/main \| grep -iE 'lovable\|jspdf'` | **(none)** — no Lovable file, no `.lovable/`, no `jspdf` on `main` |
+| `npm run validate` | **PASS** |
+| `npm run typecheck` | **0** |
+| `npm run lint` | **0 errors** (7 pre-existing warnings) |
+| `npm test` | **190 / 190** (12 files) |
+| `npm run build` | ✓ 430 ms |
+| `npx playwright test` | **8 / 8** (0 console errors, 0 off-origin requests) |
+| live `https://nzwisiso.bitflex.app/` | **200**, still serving `assets/index-qUyirbLr.js` + `assets/index-tZ1V4AO9.css` — the deployment is unaffected by the git merge |
+
+## Files touched this session (redeploy of Phases R–S + PR opened + Lovable removal + PR merged)
 
 **Repo — Lovable removal (Phase V), the only source change this session:** `vite.config.ts`
 (dropped the `lovable-tagger` import + plugin), `package.json` (dropped the `lovable-tagger`
@@ -1796,19 +1828,17 @@ on the server (not deleted, by design).
   Word export is HTML-based `application/msword`), the remote assessment service client (registered
   in `CLIENTS` but deliberately unimplemented — the mock-first seam), and Government SSO. Playwright
   click-through is **no longer** on this list: it is built and green (Phases H→M).
-- **Next action: no phase is outstanding — the build is complete and verified (Phases 0–S), and the
-  live host now serves it.** The full suite is green: `npm run validate` **PASS**, `npm run typecheck`
+- **Next action: nothing is outstanding — the build is complete and verified (Phases 0–S), the Lovable
+  traces are gone (Phase V), and PR #1 is merged so `main` carries it (Phase W).** The full suite is
+  green: `npm run validate` **PASS**, `npm run typecheck`
   exit 0, `npm run lint` 0 errors, `npm test` **190/190** (12 files), `npm run build` ✓,
   `npx playwright test` **8/8**. **Deployment done this session:** FTPS `mirror -R dist .` (no
   `--delete`) published Phases R–S to `https://nzwisiso.bitflex.app/`; the live origin was then
   verified in a real browser (2/2 checks, 0 console errors, 0 off-origin requests) with the SSL token
   and `cgi-bin/` intact.
   Remaining work, in priority order:
-  1. **Merge PR #1** — `https://github.com/BitFlexFinTech/policy-nexus/pull/1` (base `main`, head
-     `feature/unified-platform`). It is **`mergeable: MERGEABLE`** as of Phase V (the Lovable parallel
-     app was absorbed-and-discarded and the source traces removed), so merging it makes `main` equal
-     to this branch and removes the Lovable files from `main`. **The agent must not click Merge** —
-     never merge into or push `main`; this is the user's action.
+  1. **DONE (Phase W) — PR #1 merged.** `main` is now `c09bfa3` (identical to this branch's app;
+     the Lovable files are gone from `main`). No outstanding action.
   2. Non-credential backlog in `PRODUCTION_READINESS.md`: server-side PDF/DOCX extraction, a real
      `.docx` renderer, the remote assessment service client behind the seam, a backend drafting model
      behind `documents.ts`, and Government SSO.
