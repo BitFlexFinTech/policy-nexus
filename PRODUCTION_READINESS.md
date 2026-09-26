@@ -254,10 +254,13 @@ and has since appeared in transcripts more than once, so **rotating it in cPanel
 remains good practice** — but it is never committed, and a build-time check confirms it does **not**
 reach `dist/` (Vite exposes only `VITE_`-prefixed variables).
 
-**Live build (Phase Q):** the host serves the **Phase P** bundle — `assets/index-u0q4jdaO.js` +
-`assets/index-CQrURZPQ.css`. Deployed upload-only (10 files, 1.77 MB) with **no `--delete`**;
-`.well-known/pki-validation/` and `.htaccess` verified intact afterwards, and the live page verified
-in a real browser: **12/12 checks green, 0 console errors, 0 off-origin requests.**
+**Live build (current — 2026-09-26):** the host serves the **Phase S** bundle —
+`assets/index-qUyirbLr.js` + `assets/index-tZ1V4AO9.css`. Deployed upload-only (10 files, 1.41 MB,
+2 new / 8 modified) with **no `--delete`**; `.well-known/pki-validation/01a0d6ee-…f00d.txt` and
+`.htaccess` verified intact afterwards, and the live origin verified in a real browser: **2/2 checks
+green, 0 console errors, 0 off-origin requests** (homepage carries the Phase R section and the Phase S
+graph; chooser lists 16; one-click entry reaches the dashboard). Prior deployment (Phase Q) served the
+**Phase P** bundle — `assets/index-u0q4jdaO.js` + `assets/index-CQrURZPQ.css`.
 
 **Password handling rule for future sessions:** `ftp.nzwisiso.bitflex.app` (the hostname cPanel
 displays) has **no DNS record** — verified against two public resolvers. The working host is

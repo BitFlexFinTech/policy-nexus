@@ -1326,6 +1326,16 @@ because the block it sits in already names itself.
 | 2026-09-25 | measured render of the graph (Phase S) | settled layouts for `opc/fin/agri/def/health` keep every pair of marks **≥ 88 units apart** (min 88, max 170) and inside the 1000×750 frame; rest reached in **249–2570 steps**; the compact schematic draws at `visualScale` 1.6 so its labels read in the smaller card |
 | 2026-09-25 | rest-state diagnosis, measured before the fix (Phase S) | max speed 0.212 units/step and **13.19 units of drift per 60 steps** after settling → Playwright's stability check could never pass → **root cause of "element is not stable"**, fixed in the model (quiescence flag), then re-measured: **600 further steps change nothing** |
 | 2026-09-25 | palette check behind the corpus-colour defect (Phase S) | `--gold: 51 100% 50%` and `--warning: 51 100% 50%` are **identical** — two kinds would have been one colour; documents now use `--muted-foreground`, and a test asserts four distinct legend swatches |
+| 2026-09-26 | `npm run validate` (redeploy session) | **PASS** — all checks green; the single `Math.random()` in stock `sidebar.tsx` reported as INFO/excluded; the `KNOWN-RED` `--destructive` contrast line still printed (unchanged, still not fixed) |
+| 2026-09-26 | `npm run typecheck` / `npm run lint` | `tsc -b` exit **0**; eslint **0 errors** (7 pre-existing `react-refresh` warnings in `src/components/ui/**`) |
+| 2026-09-26 | `npm test` | **190 passed / 12 files** — identical to the Phase S baseline (no regression) |
+| 2026-09-26 | `npm run build` | PASS — 393 ms; `assets/index-qUyirbLr.js` (520,221 B) + `assets/index-tZ1V4AO9.css` (65,439 B) |
+| 2026-09-26 | `npx playwright test` | **8 passed (20.4 s)** — full browser journey against the production preview; 0 console errors, 0 off-origin requests |
+| 2026-09-26 | FTPS `mirror -R dist .` (no `--delete`) | PASS — **10 files, 1,408,915 bytes in 399 s** (2 new, 8 modified). `cls -l` afterwards: `.well-known/pki-validation/01a0d6ee-…f00d.txt` **intact**; old hashed bundles left in place by design |
+| 2026-09-26 | live-host asset check (`curl`) | PASS — live `index.html` references `assets/index-qUyirbLr.js` + `assets/index-tZ1V4AO9.css`, **identical to local `dist/`**; `/`, `/start`, `/app`, `/app/policies` all **200**; JS 520,221 B / CSS 65,439 B (byte-match) |
+| 2026-09-26 | live-host browser check (temporary Playwright spec, **deleted after the run**) | **2/2 PASS** — homepage renders the Phase R `#behind-the-assessment` section (5 terms, 8 pipeline stages, "The simulated environment") **and** the Phase S compact relationship graph (`role=group` "Relationship network: …"), plus the governance heading and champion; chooser lists **16** departments and one-click entry reaches `/app` (`Entry: one-click (Mock)`). **0 console errors, 0 page errors, 0 off-origin requests** on the live origin |
+
+
 
 ## Known-red / open items
 - **DEPLOYMENT — two facts a cold session must not get wrong.** (a) The host in the deployment
@@ -1600,6 +1610,21 @@ relative path so it does not duplicate the source of truth).
 | `e2e/journey.spec.ts` | New browser test: the graph grows with the run and answers the pointer (selection as text, edge labels, drag, completion, runtime invariants) |
 | `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md` | Phase S record, verification rows, files-touched table, §6g |
 
+## Files touched this session (redeploy of Phases R–S)
+
+**Repo:** **no source file changed.** The session re-verified the Phases 0–S baseline, rebuilt `dist/`,
+deployed it over FTPS, and verified the live origin in a real browser. Only `PROJECT_STATUS.md` and
+`PRODUCTION_READINESS.md` records changed.
+
+**Live server** (FTPS `mirror -R dist .`, **no `--delete`**): 10 files — `.htaccess`, `index.html`,
+`favicon.ico`, `placeholder.svg`, `robots.txt`, `fonts/inter-latin-variable.woff2`,
+`fonts/jetbrains-mono-latin-variable.woff2`, `assets/zimbabwe-coat-of-arms-Ch1vJiyp.png`, and the two
+new hashed bundles `assets/index-qUyirbLr.js` / `assets/index-tZ1V4AO9.css`. Old hashed bundles remain
+on the server (not deleted, by design).
+
+**Verified intact after the deploy:** `.well-known/pki-validation/01a0d6ee-8023-7203-9abc-a37b9060f00d.txt`,
+`cgi-bin/`.
+
 ## RESUME HERE
 
 - **Phase S is the current state of the run view and the public "Simulated population" block.**
@@ -1621,9 +1646,12 @@ relative path so it does not duplicate the source of truth).
   `src/components/public/SimulationVisuals.tsx` and `ENGINE_EXPLANATION` in `src/config/brand.ts`;
   the guards live in `src/test/landing.test.tsx` (`What happens behind the assessment`) and
   `e2e/journey.spec.ts` (homepage test + the 390px overflow test).
-- **The live host still serves the Phase P build** — Phases R and S have not been deployed yet. To
-  publish them: `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command below.
-- **Branch:** `feature/unified-platform` · **HEAD:** the `feat(phase-m)` commit — run `git rev-parse HEAD`.
+- **The live host now serves the Phase S build** — Phases R and S were deployed this session and
+  verified in a real browser against the live origin (2/2 checks, 0 console errors, 0 off-origin
+  requests, SSL token intact). To publish any further change: `npm run build`, then the `.env`-based
+  FTPS `mirror -R dist .` command below.
+- **Branch:** `feature/unified-platform` · **HEAD:** `4f3f90c` (`feat(phase-s)`) — run
+  `git rev-parse HEAD`. This redeploy session added **no source change**, so HEAD is unchanged.
   `tree:` clean. Functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C ·
   Phase D = the commit whose message begins `feat(phase-d)` · Phase J = `feat(phase-j)` ·
   Phases E–G = the commit whose message begins `feat(phase-e)` ·
@@ -1647,17 +1675,18 @@ relative path so it does not duplicate the source of truth).
   A validator (check 10) fails the build if any rendered colour pair drops below its contrast floor,
   and check 3 blocks `LLM/API` vocabulary in user-facing copy. **Read `### Phase P` (then Phase O)
   before touching `Landing.tsx`, `brand.ts`, `index.css` or `PublicPageShell.tsx`.**
-- **Nothing is outstanding on the landing page itself.** The only open items are: (a) the live host
-  still serving the Phase D bundle — see the deployment facts above; and (b) the two recorded
-  known-reds (`--destructive` contrast, the hand-maintained `index.html` description).
+- **Nothing is outstanding on the landing page itself.** The live host now serves the Phase S bundle
+  (verified this session). The only open items are the two recorded known-reds (`--destructive`
+  contrast, the hand-maintained `index.html` description).
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
   restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
 - **`main` is untouched at `7451db0`, and the agent has never pushed to it.** The feature branch is
-  pushed through Phase Q (`git log --oneline -3 | cat`). Deployment is an FTP upload of `dist/`, not
+  pushed through Phase S (`git log --oneline -3 | cat`). Deployment is an FTP upload of `dist/`, not
   a git push.
-- **LIVE NOW: `https://nzwisiso.bitflex.app/` serves the Phase P build** — deployed and verified in a
-  real browser this session (12/12 checks, 0 console errors, 0 off-origin requests). To publish any
-  further change, the credentials are **already saved**:
+- **LIVE NOW: `https://nzwisiso.bitflex.app/` serves the Phase S build** — Phases R and S deployed
+  and verified in a real browser against the live origin this session (2/2 checks, 0 console errors,
+  0 off-origin requests); the SSL validation token and `cgi-bin/` were confirmed intact afterwards.
+  To publish any further change, the credentials are **already saved**:
   ```bash
   npm run build && set -a; . ./.env; set +a
   lftp -u "$FTP_USER","$FTP_PASS" "ftp://$FTP_HOST" -e \
@@ -1705,14 +1734,16 @@ relative path so it does not duplicate the source of truth).
   Word export is HTML-based `application/msword`), the remote assessment service client (registered
   in `CLIENTS` but deliberately unimplemented — the mock-first seam), and Government SSO. Playwright
   click-through is **no longer** on this list: it is built and green (Phases H→M).
-- **Next action: no phase is outstanding — the build is complete and verified (Phases 0–S).** The
-  full suite is green: `npm run validate` **PASS**, `npm run typecheck` exit 0, `npm run lint`
-  0 errors, `npm test` **190/190** (12 files), `npm run build` ✓, `npx playwright test` **8/8**.
+- **Next action: no phase is outstanding — the build is complete and verified (Phases 0–S), and the
+  live host now serves it.** The full suite is green: `npm run validate` **PASS**, `npm run typecheck`
+  exit 0, `npm run lint` 0 errors, `npm test` **190/190** (12 files), `npm run build` ✓,
+  `npx playwright test` **8/8**. **Deployment done this session:** FTPS `mirror -R dist .` (no
+  `--delete`) published Phases R–S to `https://nzwisiso.bitflex.app/`; the live origin was then
+  verified in a real browser (2/2 checks, 0 console errors, 0 off-origin requests) with the SSL token
+  and `cgi-bin/` intact.
   Remaining work, in priority order:
-  1. **Redeploy `dist/`** to publish Phases E–S to the live host (Phase J's FTPS command; **never
-     `--delete`**), then re-run the live route checks. The live build is still **Phase D**.
-  2. **Open the Pull Request** (GitHub link in Phase I) for review before any merge to `main`.
-  3. Non-credential backlog in `PRODUCTION_READINESS.md`: server-side PDF/DOCX extraction, a real
+  1. **Open the Pull Request** (GitHub link in Phase I) for review before any merge to `main`.
+  2. Non-credential backlog in `PRODUCTION_READINESS.md`: server-side PDF/DOCX extraction, a real
      `.docx` renderer, the remote assessment service client behind the seam, a backend drafting model
      behind `documents.ts`, and Government SSO.
 - **Read next:** this file, then `src/services/assessment/network.ts` (the graph derivation),
