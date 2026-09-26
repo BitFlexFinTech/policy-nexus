@@ -120,5 +120,33 @@ export const GOVERNANCE = {
     "additional analytical lens to support informed human judgement.",
 } as const;
 
+/**
+ * The engine explanation — what Nzwisiso does with a policy draft, in the words the
+ * initiative's brief fixes. It exists because "upload a policy, receive an answer"
+ * is the wrong mental model: the point of the section is that one draft opens a
+ * knowledge map, a simulated population of thousands of interacting agents, and only
+ * then a structured assessment. `body` and `transition` are the brief's sentences
+ * verbatim and are asserted word for word by the landing tests.
+ *
+ * The register is deliberately plain — no implementation vocabulary, and no claim
+ * that the simulation predicts outcomes.
+ */
+export const ENGINE_EXPLANATION = {
+  /** The section heading on the public landing page. */
+  heading: "What happens behind the assessment",
+  /** The supporting statement under it. */
+  statement: "One policy draft can generate a much larger analytical environment.",
+  /** What the system does with the draft, step by step, in plain language. */
+  body:
+    "When a policy is submitted, Nzwisiso moves beyond a single AI response. The system " +
+    "constructs a structured representation of the policy, identifies relevant entities and " +
+    "relationships, creates a simulated population of thousands of interacting agents, and " +
+    "examines how different stakeholder perspectives may respond within the scenario.",
+  /** The hand-over to the officer's side of the process — "How it works". */
+  transition:
+    "From the officer's perspective, the process remains simple: provide the policy, run the " +
+    "assessment and review the findings.",
+} as const;
+
 export type Brand = typeof BRAND;
 export type Vocabulary = typeof VOCABULARY;

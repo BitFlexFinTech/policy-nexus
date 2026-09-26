@@ -1017,6 +1017,73 @@ the footer attribution and classification. **0 console errors, 0 off-origin requ
 
 ---
 
+### Phase R — "What happens behind the assessment" (landing brief §1–§30) — DONE
+
+**Instruction (user, 2026-09-25):** make the homepage explain *what the engine does with a
+draft*, not just "draft → simulation → assessment", and make the page unmistakable that
+Nzwisiso is simple to use but complex behind the interface. Preserve the existing design;
+this is a refinement, not a redesign.
+
+**The problem being fixed (§1):** a non-technical official could read the old page as "I
+upload my policy and AI gives me an answer". The new section exists to replace that mental
+model with: the draft is **understood**, **mapped**, turned into a **simulated population of
+thousands of agents**, those agents **interact**, and only then is a **structured assessment**
+produced.
+
+**Built.**
+
+| Piece | Where |
+|---|---|
+| §2 heading, supporting statement, explanation and §14 transition, verbatim | `ENGINE_EXPLANATION` in `src/config/brand.ts` |
+| Section `#behind-the-assessment` — heading, statement, paragraph, five §3 indicators, two-column body, transition | `src/pages/Landing.tsx` |
+| The 8-stage §4 pipeline (markers `01`–`08`, title, supporting line, vertical connector) as `ProcessPipeline` | `src/components/public/SimulationVisuals.tsx` |
+| The §6 schematic (policy → knowledge map → simulated population → interactions → assessment) as `AgentPopulationDiagram`, with a 40-mark agent field | same file |
+| §10 stakeholder-simulation card copy (emphasised lead + the brief's sentence), §11 policy-input copy | `src/pages/Landing.tsx` |
+| §16 "Structured and repeatable" replacing the old engine-facing copy; §17 governance heading rendered as a section label (DOM text unchanged) | `src/pages/Landing.tsx` |
+
+**Two deliberate decisions, stated because they depart from a literal reading of the brief:**
+
+1. **§5's right-hand panel does not repeat the heading, statement and paragraph.** §2 puts
+   them at the top of the section "visually prominent", and §5 puts them in the right column —
+   printing both would name the section twice on one page, which this repo's tests explicitly
+   guard against ("One panel, one name"). They are rendered **once**, at the top; the right
+   column carries the schematic and the diagram's own label. §5's five indicators sit directly
+   beneath the explanation, exactly as §3 specifies ("Directly beneath the explanatory
+   paragraph").
+2. **§7's comparison is carried by the approved wording, not by a comparison table.** The §2
+   paragraph already says the system "moves beyond a single AI response"; the eight-stage
+   pipeline shows the depth. Nothing on the page names or attacks another product, which is
+   what §7 asks for.
+
+**§19 hierarchy now matches, which required two reorderings:** `How it works` and
+`Structured and repeatable` moved above `Platform coverage`, and the governance section moved
+after the coverage section. Result (verified by position, not by reading the file):
+hero → capabilities → **behind the assessment** → how it works → structured and repeatable →
+coverage → policy intelligence → proposal/minister → closing CTA.
+
+**Mock disclosure, checked rather than assumed:** the rewritten §16 copy no longer says
+"scenario mode (Mock)". The public disclosure survives elsewhere and is not lost — the notice
+strip in `PublicPageShell` says results are "modelled… labelled as simulated wherever they
+appear", and the workspace marks every seam: `Entry: one-click (Mock)` (`HeaderBar`),
+`Scenario (Mock)` (`EngineStatus`), `Engine … (Mock)` (assessment + exports). Nothing on the
+public page now implies a live external service.
+
+**Two validator trips I caused and fixed (reported, not hidden):** my new jargon guard in
+`src/test/landing.test.tsx` first listed the vendor names (`Neo4j`, `GraphRAG`, `MiroFish`)
+and then the phrase `will definitely` — both are already banned app-wide by `scripts/validate.mjs`
+checks 2 and 3, so the guard's own literals tripped those checks. Fixed by dropping the
+duplicated terms from the test (the checks still guard them repo-wide), **not** by weakening any
+check. `VALIDATE: PASS` after the fix.
+
+**A real visual defect found in the rendered page and fixed:** at desktop and phone widths the
+figure `Scenario-based` wraps to two lines, which dropped its label 16px below the labels beside
+it. Measured cause: Tailwind's `text-2xl` step sets line-height 32px and wins over
+`leading-none` in this build order, so a `min-h-[3rem]` reserve covered only 1.5 lines. Fixed
+with `min-h-[4rem]` + `items-end` on the figure; re-measured — one distinct label position at
+1440 and 1024, and each phone row internally aligned.
+
+---
+
 ## Verification log
 | Date | Command | Result |
 |---|---|---|
@@ -1146,6 +1213,15 @@ the footer attribution and classification. **0 console errors, 0 off-origin requ
 | 2026-09-25 | `mirror -R dist .` deploy (Phase Q) | PASS — **10 files, 1,773,966 bytes** (2 new, 8 modified) in 249 s, **no `--delete`**. Post-deploy server check: `.htaccess` current, `index.html` 1223 bytes, **`.well-known/pki-validation/` intact** |
 | 2026-09-25 | live HTTPS verification (Phase Q) | PASS — HTTP/2 **200**; served assets are the new `index-u0q4jdaO.js` + `index-CQrURZPQ.css`; served `<meta name="description">` is the §9 paragraph; the served JS contains the initiative name, the §12 heading and `Hon. Tatenda A. Mavetera, MP` |
 | 2026-09-25 | **real browser against the LIVE site** (Phase Q) | **12/12 PASS, 0 console errors, 0 off-origin requests** — one `<h1>` reading `Zimbabwe AI Policy Intelligence Initiative`, rendered uppercase at **36px over 2 lines**; §8 subheading, §12 card (heading + **3** steps + tagline), **3** §13 blocks, §14 governance sentence and §15 minister all visible; exactly **one** hero action |
+| 2026-09-25 | `npm run validate` (Phase R) | **PASS — all checks green** after the two self-inflicted trips were fixed. The trips are the evidence the checks work: they caught vendor names and a certainty phrase appearing in a *test file* |
+| 2026-09-25 | `npm run typecheck` / `npm run lint` (Phase R) | `tsc -b` exit **0**; eslint **0 errors** (7 pre-existing `react-refresh` warnings in `src/components/ui/**`) |
+| 2026-09-25 | `npm test` (Phase R) | **158 passed / 9 files** (was 150 — 8 new guards: §2 placement by DOM position, the four §2 strings verbatim, the five indicators + one shared figure, the eight stages in order, the schematic's registers, plain-language/no-prediction, §16 rename, §10/§11 card copy) |
+| 2026-09-25 | `npm run build` (Phase R) | **✓ built** (no errors; the >500 kB chunk note is pre-existing) |
+| 2026-09-25 | `npx playwright test` (Phase R) | **7 passed** (was 6). The homepage test now asserts the new section by position (`capabilities < behind < how-it-works` in real bounding boxes), 5 indicators, `1,000+` **twice**, 8 stages, the schematic's label, and the transition; the new phone test asserts the section at 390px with **no sideways scroll** (`scrollWidth 390 = clientWidth 390`) |
+| 2026-09-25 | measured render, 1440 / 1024 / 390 (Phase R) | h2 24px/600 vs statement 20px; 5 indicators, one distinct label position at 1440 and 1024; phone rows internally aligned (2/row); **no overflow anywhere** (`scrollWidth == clientWidth`); **no overlapping blocks** in the section; columns **559 / 505 px** of 1104 = **50.6% / 45.7%** (§20 asks 50–55 / 45–50) |
+| 2026-09-25 | restrained-motion check (Phase R) | the agent field's motion is the app's existing `slide-up-fade`, **0.15s, iteration-count 1** (one-shot entrance, not a loop), on one element — 40 marks rendered, never one element per agent; `motion-reduce:animate-none` honoured |
+| 2026-09-25 | jargon / over-claim check in the rendered section (Phase R) | **0 hits** for API, LLM, agent-based, knowledge graph, graph database, embedding, vector database, inference, PRNG, random seed, orchestration, predict, guarantee, knows how, simulates reality (§8, §24) |
+| 2026-09-25 | browser runtime on the new section (Phase R) | **0 console errors, 0 off-origin requests** at both viewports — the section is a pure static render from the config, no network, no new dependency |
 | 2026-09-25 | dev-server port root cause confirmed (Phase M) | PASS — `vite.config.ts` sets `server.port = 8080` and `host: "::"`; `npm run dev` therefore serves at **http://localhost:8080/**, not 5173. This is why the user's browser still showed the old entry |
 
 ## Known-red / open items
@@ -1395,8 +1471,31 @@ relative path so it does not duplicate the source of truth).
 | `src/test/landing.test.tsx` | Capability test now three labels incl. the caps-by-styling check; card test now 3 steps + tagline; new "one primary action" test; new governance-verbatim test; new §15 panel test; the duplicate-heading guard re-pointed |
 | `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md` | Phase P record, verification rows, files-touched table, identity section |
 
+## Files touched in Phase R (landing brief §1–§30)
+
+| File | Change |
+|---|---|
+| `src/components/public/SimulationVisuals.tsx` | **New.** `SIMULATION_SCALE` (the five §3 indicators), `SIMULATION_PIPELINE` (the eight §4 stages), `KNOWLEDGE_MAP_PARTS` + `KNOWLEDGE_MAP_LINE` and `SIMULATED_AGENT_FIGURE` as the single sources both registers read; `ProcessPipeline` (numbered markers, title, supporting line, connector, labelled list) and `AgentPopulationDiagram` (bordered blocks, connectors, 40-mark static agent field) |
+| `src/config/brand.ts` | `ENGINE_EXPLANATION` added: the §2 heading, supporting statement, explanation and §14 transition, verbatim, so the page and the tests read one copy |
+| `src/pages/Landing.tsx` | New `#behind-the-assessment` section (heading, statement, explanation, five indicators with a reserved two-line figure height, two-column body, transition); `CAPABILITIES` gained an optional `lead` and the §10/§11 copy; §16 rewritten to "Structured and repeatable"; §17 heading rendered as a section label; §19 order restored (how it works → structured and repeatable → coverage → governance) |
+| `src/test/landing.test.tsx` | 8 new guards under a `What happens behind the assessment` describe block |
+| `e2e/journey.spec.ts` | Homepage test extended with the new section (by position, counts and verbatim copy); new phone-viewport test |
+| `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md` | Phase R record, verification rows, files-touched table |
+
 ## RESUME HERE
 
+- **Phase R is the current state of the public landing page** (it builds on Phase P; Phase O and
+  earlier are superseded). The page now reads: hero (initiative, principle, ONE primary action) →
+  **A new capability for policy assessment** (three cards) → **What happens behind the assessment**
+  (five indicators + eight-stage pipeline + simulated-environment schematic + transition) →
+  **How it works** (three steps) → **Structured and repeatable** → **Platform coverage** →
+  **From policy draft to policy intelligence** → proposal + ministerial champion → closing CTA.
+  **A cold session must read `src/pages/Landing.tsx` first**, then
+  `src/components/public/SimulationVisuals.tsx` and `ENGINE_EXPLANATION` in `src/config/brand.ts`;
+  the guards live in `src/test/landing.test.tsx` (`What happens behind the assessment`) and
+  `e2e/journey.spec.ts` (homepage test + the 390px overflow test).
+- **The live host still serves the Phase P build** — Phase R has not been deployed yet. To publish
+  it: `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command in the bullet below.
 - **Branch:** `feature/unified-platform` · **HEAD:** the `feat(phase-m)` commit — run `git rev-parse HEAD`.
   `tree:` clean. Functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C ·
   Phase D = the commit whose message begins `feat(phase-d)` · Phase J = `feat(phase-j)` ·

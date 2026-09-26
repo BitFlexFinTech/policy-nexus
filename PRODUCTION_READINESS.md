@@ -146,6 +146,34 @@ client is registered.
 - Stated plainly: this is verified against the **local** production preview. The live host still
   serves the **Phase D** bundle until `dist/` is redeployed.
 
+## 6f. Verified in a real browser (Phase R — what the engine does with a draft)
+- **Phase R** added the public **"What happens behind the assessment"** section (`#behind-the-assessment`),
+  between the capability cards and *How it works*, so the page cannot be read as "upload a document,
+  receive an answer". It states the brief's four strings verbatim (heading, supporting statement —
+  "One policy draft can generate a much larger analytical environment." — the explanation, and the
+  transition to the officer's journey), then **five approved scale indicators**, then a two-column
+  body: the **eight-stage process** (policy draft → policy understanding → knowledge map → simulated
+  population → agent interactions → scenario run → policy intelligence → policy assessment) and the
+  compact **simulated-environment schematic** with a 40-mark agent field.
+- **Measured in the browser, not eyeballed:** h2 24px/600 vs the statement's 20px; five indicators on
+  one aligned row at 1440 and 1024 (the `Scenario-based` figure wraps, so its height is reserved —
+  without the reserve its label sat 16px low, which the render caught); columns 559/505px of 1104
+  (**50.6% / 45.7%**); **no horizontal overflow** at 1440, 1024 or 390; no overlapping blocks; the
+  agent field's motion is the app's existing `slide-up-fade`, **0.15s, one iteration** (not a loop),
+  `motion-reduce:animate-none` honoured; **0 console errors and 0 off-origin requests**.
+- **Language guards:** the rendered section contains no API/LLM/agent-based/knowledge-graph/
+  embeddings/inference/PRNG/seed/orchestration vocabulary and no predictive claim (word-level test +
+  browser check). The five indicators are **conceptual**, not measured counters, and the population
+  figure is written once (`SIMULATED_AGENT_FIGURE`) and read by both the strip and the diagram.
+- `npm test` → **9 files, 158 tests**; `npx playwright test` → **7/7** (now including a 390px
+  no-sideways-scroll test); `npm run validate` → **PASS**.
+- **Public copy change to note:** the landing page no longer prints the words "scenario mode (Mock)"
+  (§16 rewrote that band to "Structured and repeatable… generated locally from the defined policy
+  scenario and reference configuration"). The mock marker is still visible where the connection is
+  shown — `Entry: one-click (Mock)` in the workspace header, `Scenario (Mock)` in engine status,
+  `Engine … (Mock)` on the assessment and every export — and the notice strip still states that
+  results are modelled and labelled as simulated. Nothing on the public page implies a live service.
+
 ## 7. Disabled by default (deliberate)
 - Puter CDN script and `puter.ai.chat()`: **fully removed.** Phase B deleted the
   `<script src="https://js.puter.com/v2/">` tag from `index.html`; **Phase D deleted the

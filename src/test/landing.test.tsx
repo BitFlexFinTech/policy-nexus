@@ -4,7 +4,13 @@ import { MemoryRouter } from "react-router-dom";
 import Landing from "@/pages/Landing";
 import { DEPARTMENT_COUNT, DEPARTMENTS } from "@/config/departments";
 import { STAKEHOLDER_SEGMENTS, REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR, REFERENCE_RATES } from "@/config/reference";
-import { BRAND, GOVERNANCE, SOVEREIGNTY_STATEMENT } from "@/config/brand";
+import { BRAND, ENGINE_EXPLANATION, GOVERNANCE, SOVEREIGNTY_STATEMENT } from "@/config/brand";
+import {
+  KNOWLEDGE_MAP_LINE,
+  SIMULATED_AGENT_FIGURE,
+  SIMULATION_PIPELINE,
+  SIMULATION_SCALE,
+} from "@/components/public/SimulationVisuals";
 
 const renderLanding = () =>
   render(
@@ -226,5 +232,181 @@ describe("Landing — the pure public landing page", () => {
   it("shows the classification exactly once, so it cannot be confused with the attribution", () => {
     renderLanding();
     expect(screen.getAllByText("For Internal Use Only")).toHaveLength(1);
+  });
+
+  /**
+   * The engine explanation. The whole point of this section is that one policy
+   * draft does NOT produce a single answer: it produces a knowledge map, a
+   * population of thousands of interacting agents, and then an assessment. The
+   * guards below fail if the section is quietly reduced back to "upload a
+   * document, read the answer".
+   */
+  describe("What happens behind the assessment", () => {
+    const section = () => {
+      const heading = screen.getByRole("heading", { name: ENGINE_EXPLANATION.heading });
+      const node = heading.closest("section");
+      expect(node).not.toBeNull();
+      return node as HTMLElement;
+    };
+
+    it("is named once, and sits between the capability cards and How it works", () => {
+      renderLanding();
+      const headings = screen.getAllByRole("heading", { name: ENGINE_EXPLANATION.heading });
+      expect(headings).toHaveLength(1);
+      expect(headings[0].tagName).toBe("H2");
+
+      // §2 is a structural requirement, so it is asserted structurally rather than
+      // by eyeballing the file: capabilities → behind the assessment → how it works.
+      const follows = (first: Node, second: Node) =>
+        Boolean(first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING);
+      const capabilities = screen.getByRole("heading", {
+        name: "A new capability for policy assessment",
+      });
+      const how = screen.getByRole("heading", { name: "How it works" });
+      expect(follows(capabilities, headings[0])).toBe(true);
+      expect(follows(headings[0], how)).toBe(true);
+
+      // §14 — the transition line belongs to this section and hands over to How it
+      // works, so the reader meets the complexity before the simple journey.
+      expect(follows(screen.getByText(ENGINE_EXPLANATION.transition), how)).toBe(true);
+    });
+
+    it("states the brief's explanation word for word", () => {
+      renderLanding();
+      expect(screen.getByText(ENGINE_EXPLANATION.statement)).toBeInTheDocument();
+      expect(screen.getByText(ENGINE_EXPLANATION.body)).toBeInTheDocument();
+      expect(screen.getByText(ENGINE_EXPLANATION.transition)).toBeInTheDocument();
+    });
+
+    it("shows exactly the five approved indicators, and reads one figure from one place", () => {
+      renderLanding();
+      const panel = section();
+      expect(within(panel).getAllByRole("term")).toHaveLength(5);
+      expect(
+        within(panel)
+          .getAllByRole("term")
+          .map((node) => node.textContent),
+      ).toEqual(SIMULATION_SCALE.map((indicator) => indicator.figure));
+      expect(
+        within(panel)
+          .getAllByRole("definition")
+          .map((node) => node.textContent),
+      ).toEqual(SIMULATION_SCALE.map((indicator) => indicator.label));
+
+      // The population figure is written once and read by both the indicator strip
+      // and the diagram, so the two cannot disagree — asserted as a count, which
+      // fails if either rendering stops reading the shared constant.
+      expect(within(panel).getAllByText(SIMULATED_AGENT_FIGURE)).toHaveLength(2);
+    });
+
+    it("walks the eight stages in order, with the brief's supporting lines", () => {
+      renderLanding();
+      // Read from the named pipeline list. The section holds a second list — the
+      // diagram's knowledge-map rows — so an unscoped listitem count would measure
+      // both and guard neither.
+      const stages = within(
+        screen.getByRole("list", { name: "The Nzwisiso process, stage by stage" }),
+      ).getAllByRole("listitem");
+      expect(stages).toHaveLength(SIMULATION_PIPELINE.length);
+      expect(stages).toHaveLength(8);
+
+      SIMULATION_PIPELINE.forEach((stage, index) => {
+        expect(stages[index]).toHaveTextContent(stage.title);
+        expect(stages[index]).toHaveTextContent(stage.body);
+        // Structured markers, in sequence: 01 … 08. Scoped to the stage, because the
+        // same two-digit markers are used by the hero card and the steps below.
+        expect(
+          within(stages[index]).getByText(String(index + 1).padStart(2, "0")),
+        ).toBeInTheDocument();
+      });
+
+      expect(stages[2]).toHaveTextContent(KNOWLEDGE_MAP_LINE);
+      expect(stages[2]).toHaveTextContent("Entities • relationships • institutions • interests");
+      expect(stages[3]).toHaveTextContent("Thousands of individual agents");
+      expect(stages[5]).toHaveTextContent("Interactions evolve across the simulated environment");
+      expect(stages[6]).toHaveTextContent("Patterns • tensions • risks • areas of support");
+      expect(stages[7]).toHaveTextContent("Structured findings for human review");
+    });
+
+    it("draws the simulated environment as real text, not as decoration", () => {
+      renderLanding();
+      const panel = section();
+      // The three registers in this section — the scale strip, the eight-stage
+      // pipeline and the schematic — deliberately share their vocabulary, which is
+      // what lets a reader map one onto the other. So the counts below are exact:
+      // a name appears once per register it belongs to, and the assertion fails if a
+      // register drops it or an unrelated block starts borrowing the name.
+      expect(within(panel).getAllByText("Policy")).toHaveLength(1); // schematic only
+      expect(within(panel).getAllByText("Knowledge map")).toHaveLength(2); // stage 03 + diagram
+      expect(within(panel).getAllByText("Simulated population")).toHaveLength(2); // stage 04 + diagram
+      expect(within(panel).getAllByText("Interactions")).toHaveLength(2); // indicator + diagram
+      expect(within(panel).getAllByText("Policy assessment")).toHaveLength(3); // indicator + stage 08 + diagram
+      // The diagram's knowledge-map rows read from the same array as the pipeline
+      // line, so "Entities" is present in both registers.
+      expect(within(panel).getAllByText("Entities")).toHaveLength(1);
+      expect(within(panel).getByText("agents")).toBeInTheDocument();
+    });
+
+    it("keeps to plain language — no implementation vocabulary, no prediction", () => {
+      renderLanding();
+      const text = section().textContent ?? "";
+
+      // The concepts a Government official is not expected to know (§8). Vendor and
+      // product names are deliberately NOT listed here: `scripts/validate.mjs` bans
+      // them across the whole app already, and repeating them would trip that check
+      // from this file.
+      [
+        /\bAPI\b/i,
+        /\bLLMs?\b/i,
+        /agent-based/i,
+        /knowledge graph/i,
+        /graph database/i,
+        /embeddings?/i,
+        /vector database/i,
+        /\binference\b/i,
+        /PRNG/i,
+        /random seed/i,
+        /orchestration/i,
+      ].forEach((pattern) => expect(text).not.toMatch(pattern));
+
+      // And it must not claim to know what will happen (§24). The certainty phrases
+      // the validator bans app-wide are not repeated verbatim here for the same
+      // reason as the vendor names above.
+      [/predict/i, /guarantee/i, /knows how/i, /simulates reality/i].forEach((pattern) =>
+        expect(text).not.toMatch(pattern),
+      );
+    });
+
+    it("names the process as structured and repeatable, without the old engine copy", () => {
+      renderLanding();
+      const heading = screen.getByRole("heading", { name: "Structured and repeatable" });
+      const panel = heading.closest("section");
+      expect(panel).not.toBeNull();
+      expect(panel).toHaveTextContent(
+        "The same defined assessment process is applied consistently to each policy scenario, providing a controlled environment for examining potential stakeholder responses.",
+      );
+      expect(panel).toHaveTextContent(
+        "Scenario results are generated locally from the defined policy scenario and reference configuration.",
+      );
+      // The previous heading and sentence are gone, not merely joined by a new one.
+      expect(screen.queryByText("Deterministic, local, and reproducible")).toBeNull();
+      expect(document.body.textContent ?? "").not.toMatch(/scenario mode/i);
+    });
+
+    it("carries the revised policy-input and stakeholder-simulation card copy", () => {
+      renderLanding();
+      expect(screen.getByText("Upload or enter the proposed policy.")).toBeInTheDocument();
+
+      const card = screen
+        .getByRole("heading", { name: "Stakeholder simulation" })
+        .closest("article");
+      expect(card).not.toBeNull();
+      expect(
+        within(card as HTMLElement).getByText("Thousands of simulated agents."),
+      ).toBeInTheDocument();
+      expect(card).toHaveTextContent(
+        "Nzwisiso creates a simulated population representing relevant stakeholder perspectives and examines how those agents interact within the policy scenario.",
+      );
+    });
   });
 });

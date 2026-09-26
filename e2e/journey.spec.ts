@@ -163,6 +163,56 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Policy assessment", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "How it works", exact: true })).toBeVisible();
+
+    // §2–§6 — what happens behind the assessment. The section that stops the page
+    // reading as "upload a document, receive an answer": the draft is understood and
+    // mapped, becomes a simulated population of thousands of agents, those agents
+    // interact, and only then is an assessment produced. It must sit between the
+    // capability cards and "How it works", so that ordering is asserted by position.
+    const behind = page.locator("#behind-the-assessment");
+    await expect(
+      behind.getByRole("heading", { name: "What happens behind the assessment", exact: true }),
+    ).toBeVisible();
+    await expect(
+      behind.getByText("One policy draft can generate a much larger analytical environment.", {
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(behind.getByText(/moves beyond a single AI response/)).toBeVisible();
+    const order = await page.evaluate(() => {
+      const positionOf = (selector: string) =>
+        document.querySelector(selector)?.getBoundingClientRect().top ?? -1;
+      return {
+        capabilities: positionOf("#capabilities"),
+        behind: positionOf("#behind-the-assessment"),
+        how: positionOf("#how-it-works"),
+      };
+    });
+    expect(order.capabilities).toBeGreaterThan(0);
+    expect(order.behind).toBeGreaterThan(order.capabilities);
+    expect(order.how).toBeGreaterThan(order.behind);
+
+    // The five approved indicators, and the population figure rendered in BOTH the
+    // strip and the schematic — one constant, two renderings, so the count is two.
+    await expect(behind.getByRole("term")).toHaveCount(5);
+    await expect(behind.getByText("Simulated agents", { exact: true })).toBeVisible();
+    await expect(behind.getByText("1,000+")).toHaveCount(2);
+
+    // The eight-stage pipeline, in order, with its supporting lines.
+    await expect(behind.locator("ol > li")).toHaveCount(8);
+    await expect(behind.getByText("Policy understanding", { exact: true })).toBeVisible();
+    await expect(
+      behind.getByText("Entities • relationships • institutions • interests", { exact: true }),
+    ).toBeVisible();
+    await expect(behind.getByText("Thousands of individual agents", { exact: true })).toBeVisible();
+    await expect(
+      behind.getByText("Structured findings for human review", { exact: true }).first(),
+    ).toBeVisible();
+    // The schematic's own surface, so the diagram is really on the page and not only
+    // described by it.
+    await expect(behind.getByText("The simulated environment", { exact: true })).toBeVisible();
+    // §14 — the hand-over to the officer's side of the same process.
+    await expect(behind.getByText(/From the officer's perspective/)).toBeVisible();
     // §14 — the governance position, word for word.
     await expect(
       page.getByRole("heading", { name: "From policy draft to policy intelligence", exact: true }),
@@ -269,6 +319,44 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await expect(page).toHaveURL(/\/start$/);
     await expect(page.getByRole("heading", { level: 1, name: "Choose your Department" })).toBeVisible();
     await expect(departmentGroup(page).getByRole("button")).toHaveCount(DEPARTMENT_COUNT);
+
+    expectCleanRuntime();
+  });
+
+  /**
+   * §20/§29 — the explanation has to work on a phone, and the page must not gain a
+   * sideways scrollbar. A real viewport at a real width is the only honest way to
+   * prove either: the classes compile whether or not they fit.
+   */
+  test("the engine explanation fits a phone viewport with no sideways scroll", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    const behind = page.locator("#behind-the-assessment");
+    await expect(
+      behind.getByRole("heading", { name: "What happens behind the assessment", exact: true }),
+    ).toBeVisible();
+    // The section stacks rather than shrinks: metrics, then the process, then the
+    // schematic, all still present at phone width.
+    await expect(behind.getByRole("term")).toHaveCount(5);
+    await expect(behind.locator("ol > li")).toHaveCount(8);
+    await expect(behind.getByText("1,000+").first()).toBeVisible();
+    await expect(behind.getByText("The simulated environment", { exact: true })).toBeVisible();
+
+    const width = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth,
+      client: document.documentElement.clientWidth,
+    }));
+    expect(width.scroll).toBeLessThanOrEqual(width.client + 1);
+
+    // And nothing inside the section may poke out past the viewport: a child can
+    // overflow while the document still measures clean.
+    const box = await behind.evaluate((node) => {
+      const rect = node.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, limit: document.documentElement.clientWidth };
+    });
+    expect(box.left).toBeGreaterThanOrEqual(-1);
+    expect(box.right).toBeLessThanOrEqual(box.limit + 1);
 
     expectCleanRuntime();
   });
