@@ -1650,8 +1650,9 @@ on the server (not deleted, by design).
   verified in a real browser against the live origin (2/2 checks, 0 console errors, 0 off-origin
   requests, SSL token intact). To publish any further change: `npm run build`, then the `.env`-based
   FTPS `mirror -R dist .` command below.
-- **Branch:** `feature/unified-platform` · **HEAD:** `4f3f90c` (`feat(phase-s)`) — run
-  `git rev-parse HEAD`. This redeploy session added **no source change**, so HEAD is unchanged.
+- **Branch:** `feature/unified-platform` · **HEAD:** `37f8a23` (`docs(phase-t)` — the redeploy record;
+  `4f3f90c` is `feat(phase-s)`, the last code change) — run `git rev-parse HEAD`. This session added
+  **no source change** — only the two status documents.
   `tree:` clean. Functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C ·
   Phase D = the commit whose message begins `feat(phase-d)` · Phase J = `feat(phase-j)` ·
   Phases E–G = the commit whose message begins `feat(phase-e)` ·
