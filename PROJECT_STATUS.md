@@ -1334,10 +1334,29 @@ because the block it sits in already names itself.
 | 2026-09-26 | FTPS `mirror -R dist .` (no `--delete`) | PASS — **10 files, 1,408,915 bytes in 399 s** (2 new, 8 modified). `cls -l` afterwards: `.well-known/pki-validation/01a0d6ee-…f00d.txt` **intact**; old hashed bundles left in place by design |
 | 2026-09-26 | live-host asset check (`curl`) | PASS — live `index.html` references `assets/index-qUyirbLr.js` + `assets/index-tZ1V4AO9.css`, **identical to local `dist/`**; `/`, `/start`, `/app`, `/app/policies` all **200**; JS 520,221 B / CSS 65,439 B (byte-match) |
 | 2026-09-26 | live-host browser check (temporary Playwright spec, **deleted after the run**) | **2/2 PASS** — homepage renders the Phase R `#behind-the-assessment` section (5 terms, 8 pipeline stages, "The simulated environment") **and** the Phase S compact relationship graph (`role=group` "Relationship network: …"), plus the governance heading and champion; chooser lists **16** departments and one-click entry reaches `/app` (`Entry: one-click (Mock)`). **0 console errors, 0 page errors, 0 off-origin requests** on the live origin |
+| 2026-09-26 | `gh pr create` (PR opened) | PASS — PR **#1** opened: `https://github.com/BitFlexFinTech/policy-nexus/pull/1` (base `main`, head `feature/unified-platform`; 25 commits, 92 files, +16,510 / −3,933) |
+| 2026-09-26 | `gh pr view 1` + `git merge-tree` (mergeability) | **BLOCKER — `mergeable: CONFLICTING`.** `origin/main` is `00fae15`, **3 commits ahead of local `main` (`7451db0`)**, carrying a parallel Lovable/`gpt-engineer-app[bot]` app; `git merge-tree --write-tree` reports **7 conflicting files**. Corrects the stale Phase I claim that `origin/main` was unchanged at `7451db0` |
 
 
 
 ## Known-red / open items
+- **BLOCKER — `origin/main` and the feature branch are two different implementations of the same
+  product, and PR #1 is `CONFLICTING` because of it.** Local `main` is `7451db0`; **`origin/main` is
+  `00fae15`** ("Added NZwisiso branding", a *merge* commit, **3 ahead** of local `main`:
+  `4651e80`, `cd8e409`, `00fae15` — the `gpt-engineer-app[bot]` / Lovable line). That line contains a
+  parallel app the feature branch never saw: `src/lib/engine.ts`, `src/lib/store.ts`,
+  `src/lib/simulation.ts`, `src/lib/policyStore.ts`, `src/lib/reportPdf.ts` (which brings
+  **`jspdf@^4.2.1`** — a dependency the locked constraints forbid), `src/data/documents.ts`,
+  `src/components/ApprovalTracker.tsx`, `src/pages/Simulation.tsx`, `src/pages/Compare.tsx`, its own
+  **124-line** `src/config/departments.ts` (the feature branch's is 1,078), 45 lines of
+  `src/index.css` changes, and `.lovable/plan/…`. GitHub reports PR **#1** (`base main`,
+  `head feature/unified-platform`) as **`mergeable: CONFLICTING`**, with **7 conflicting files**:
+  `index.html`, `src/App.tsx`, `src/components/AgentFeed.tsx`,
+  `src/components/DocumentLibrary.tsx`, `src/components/PolicyInput.tsx`,
+  `src/config/departments.ts` (add/add), `src/pages/Index.tsx`. **A human must choose which line of
+  work wins** (merge `origin/main` into the branch and resolve 7 files; rebase; or close PR #1 and keep
+  the Lovable app). The agent must **not** resolve this unilaterally — merging would mix two apps and
+  pull `jspdf` in against a locked constraint.
 - **DEPLOYMENT — two facts a cold session must not get wrong.** (a) The host in the deployment
   brief, `ftp.nzwisiso.bitflex.app`, **does not exist in DNS**. The real FTP host is
   **`ftp.bitflex.app`**, user **`nzwisiso@nzwisiso.bitflex.app`**, over **explicit FTPS on port
@@ -1610,11 +1629,15 @@ relative path so it does not duplicate the source of truth).
 | `e2e/journey.spec.ts` | New browser test: the graph grows with the run and answers the pointer (selection as text, edge labels, drag, completion, runtime invariants) |
 | `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md` | Phase S record, verification rows, files-touched table, §6g |
 
-## Files touched this session (redeploy of Phases R–S)
+## Files touched this session (redeploy of Phases R–S + PR opened)
 
 **Repo:** **no source file changed.** The session re-verified the Phases 0–S baseline, rebuilt `dist/`,
-deployed it over FTPS, and verified the live origin in a real browser. Only `PROJECT_STATUS.md` and
-`PRODUCTION_READINESS.md` records changed.
+deployed it over FTPS, verified the live origin in a real browser, and opened **PR #1**. Only
+`PROJECT_STATUS.md` and `PRODUCTION_READINESS.md` records changed.
+
+**GitHub:** PR **#1** opened — `https://github.com/BitFlexFinTech/policy-nexus/pull/1`
+(`base main` ← `head feature/unified-platform`). It reports **`mergeable: CONFLICTING`**; the cause and
+the 7 conflicting files are recorded in the BLOCKER entry above. **Not** merged.
 
 **Live server** (FTPS `mirror -R dist .`, **no `--delete`**): 10 files — `.htaccess`, `index.html`,
 `favicon.ico`, `placeholder.svg`, `robots.txt`, `fonts/inter-latin-variable.woff2`,
@@ -1681,9 +1704,11 @@ on the server (not deleted, by design).
   contrast, the hand-maintained `index.html` description).
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
   restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
-- **`main` is untouched at `7451db0`, and the agent has never pushed to it.** The feature branch is
-  pushed through Phase S (`git log --oneline -3 | cat`). Deployment is an FTP upload of `dist/`, not
-  a git push.
+- **The agent has never pushed to `main`, but the recorded "`origin/main` is unchanged at `7451db0`"
+  is now FALSE — corrected this session.** Local `main` is still `7451db0`, but **`origin/main` is
+  `00fae15`**, three commits ahead, carrying a parallel Lovable app — see the **BLOCKER** entry at the
+  top of *Known-red / open items*. The feature branch is pushed through Phase S
+  (`git log --oneline -3 | cat`). Deployment is an FTP upload of `dist/`, not a git push.
 - **LIVE NOW: `https://nzwisiso.bitflex.app/` serves the Phase S build** — Phases R and S deployed
   and verified in a real browser against the live origin this session (2/2 checks, 0 console errors,
   0 off-origin requests); the SSL validation token and `cgi-bin/` were confirmed intact afterwards.
@@ -1743,7 +1768,14 @@ on the server (not deleted, by design).
   verified in a real browser (2/2 checks, 0 console errors, 0 off-origin requests) with the SSL token
   and `cgi-bin/` intact.
   Remaining work, in priority order:
-  1. **Open the Pull Request** (GitHub link in Phase I) for review before any merge to `main`.
+  1. **DECIDE the `main` divergence, then merge PR #1.** PR **#1** is **OPEN** —
+     `https://github.com/BitFlexFinTech/policy-nexus/pull/1` (base `main`, head
+     `feature/unified-platform`) — but GitHub reports **`mergeable: CONFLICTING`**: `origin/main`
+     (`00fae15`) carries the Lovable parallel app described in the BLOCKER entry, so **7 files
+     conflict** (`index.html`, `src/App.tsx`, `src/components/AgentFeed.tsx`,
+     `src/components/DocumentLibrary.tsx`, `src/components/PolicyInput.tsx`,
+     `src/config/departments.ts` (add/add), `src/pages/Index.tsx`). **This is a user decision, not an
+     agent one** — the two lines are different implementations of the same product and one must win.
   2. Non-credential backlog in `PRODUCTION_READINESS.md`: server-side PDF/DOCX extraction, a real
      `.docx` renderer, the remote assessment service client behind the seam, a backend drafting model
      behind `documents.ts`, and Government SSO.
