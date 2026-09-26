@@ -12,10 +12,15 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
 - **Typography LOCKED**: Inter + JetBrains Mono (`tailwind.config.ts` fontFamily). Self-hosted
   in Phase B to remove the Google Fonts CDN request — same faces.
 - **One shared dashboard** for all 16 departments, config-driven. Never 16 dashboards.
-- **Stack LOCKED**: Vite + React 18 + TS + Tailwind + shadcn/ui. Package manager **npm**
-  (`bun.lock` exists — never run `bun install`, never regenerate it).
+- **Stack LOCKED**: Vite + React 18 + TS + Tailwind + shadcn/ui. Package manager **npm**.
+  (`bun.lock` — the stale Lovable/Bun lockfile — was **deleted** in Phase V on the user's explicit
+  instruction to remove all Lovable traces; this project uses npm, so it was dead weight. Never run
+  `bun install`.)
 - **Design system LOCKED**: `src/components/ui/**` are stock primitives; not rewritten.
-- **No new runtime dependency** without explicit user approval.
+- **No new runtime dependency** without explicit user approval. (Phase V **removed** one
+  *dev*Dependency — `lovable-tagger` — and its Vite plugin, on the user's explicit instruction to
+  remove all Lovable traces. `package-lock.json` was regenerated with `npm install`; every other
+  dependency is unchanged.)
 - `main` is never committed to or pushed to by an agent. Baseline tag
   `baseline-pre-unified-platform` → `7451db0` (restore with `git checkout main`).
 - Branding: **Nzwisiso AI Policy Dashboard**, tagline **Understanding before action.**, national
@@ -1336,27 +1341,27 @@ because the block it sits in already names itself.
 | 2026-09-26 | live-host browser check (temporary Playwright spec, **deleted after the run**) | **2/2 PASS** — homepage renders the Phase R `#behind-the-assessment` section (5 terms, 8 pipeline stages, "The simulated environment") **and** the Phase S compact relationship graph (`role=group` "Relationship network: …"), plus the governance heading and champion; chooser lists **16** departments and one-click entry reaches `/app` (`Entry: one-click (Mock)`). **0 console errors, 0 page errors, 0 off-origin requests** on the live origin |
 | 2026-09-26 | `gh pr create` (PR opened) | PASS — PR **#1** opened: `https://github.com/BitFlexFinTech/policy-nexus/pull/1` (base `main`, head `feature/unified-platform`; 25 commits, 92 files, +16,510 / −3,933) |
 | 2026-09-26 | `gh pr view 1` + `git merge-tree` (mergeability) | **BLOCKER — `mergeable: CONFLICTING`.** `origin/main` is `00fae15`, **3 commits ahead of local `main` (`7451db0`)**, carrying a parallel Lovable/`gpt-engineer-app[bot]` app; `git merge-tree --write-tree` reports **7 conflicting files**. Corrects the stale Phase I claim that `origin/main` was unchanged at `7451db0` |
+| 2026-09-26 | `grep -rin lovable` (whole repo, Phase V baseline) | exactly **3** source-level traces — `vite.config.ts:4` (`componentTagger`), `package.json:85` (`lovable-tagger`), `README.md:1` ("Welcome to your Lovable project") — plus the stale `bun.lock` (which lists `lovable-tagger@1.1.13`). `.lovable/` existed only on `origin/main` |
+| 2026-09-26 | `git merge -s ours origin/main` (Phase V) | PASS — "Merge made by the 'ours' strategy"; `git diff --stat HEAD^1 HEAD` **empty** (tree byte-identical to the verified pre-merge commit); `git ls-tree -r \| grep -iE 'lovable\|jspdf'` → **(none)**; `jspdf` occurrences in `package.json`/`package-lock.json` → **0 / 0** |
+| 2026-09-26 | `gh pr view 1` after the push (Phase V) | **`mergeable: MERGEABLE`** (was `CONFLICTING`) — the divergence no longer blocks PR #1 |
+| 2026-09-26 | full suite after the Lovable removal (Phase V) | `npm run validate` **PASS**; `tsc -b` **0**; eslint **0 errors** (7 pre-existing warnings); **190/190** tests (12 files); `npm run build` ✓ 402 ms; `npx playwright test` **8/8**; `npm run dev` → **HTTP 200** on `:8080`. Whole-repo `grep -ril lovable` → **only `PROJECT_STATUS.md`** (the deliberate historical record) |
 
 
 
 ## Known-red / open items
-- **BLOCKER — `origin/main` and the feature branch are two different implementations of the same
-  product, and PR #1 is `CONFLICTING` because of it.** Local `main` is `7451db0`; **`origin/main` is
-  `00fae15`** ("Added NZwisiso branding", a *merge* commit, **3 ahead** of local `main`:
-  `4651e80`, `cd8e409`, `00fae15` — the `gpt-engineer-app[bot]` / Lovable line). That line contains a
-  parallel app the feature branch never saw: `src/lib/engine.ts`, `src/lib/store.ts`,
-  `src/lib/simulation.ts`, `src/lib/policyStore.ts`, `src/lib/reportPdf.ts` (which brings
-  **`jspdf@^4.2.1`** — a dependency the locked constraints forbid), `src/data/documents.ts`,
-  `src/components/ApprovalTracker.tsx`, `src/pages/Simulation.tsx`, `src/pages/Compare.tsx`, its own
-  **124-line** `src/config/departments.ts` (the feature branch's is 1,078), 45 lines of
-  `src/index.css` changes, and `.lovable/plan/…`. GitHub reports PR **#1** (`base main`,
-  `head feature/unified-platform`) as **`mergeable: CONFLICTING`**, with **7 conflicting files**:
-  `index.html`, `src/App.tsx`, `src/components/AgentFeed.tsx`,
-  `src/components/DocumentLibrary.tsx`, `src/components/PolicyInput.tsx`,
-  `src/config/departments.ts` (add/add), `src/pages/Index.tsx`. **A human must choose which line of
-  work wins** (merge `origin/main` into the branch and resolve 7 files; rebase; or close PR #1 and keep
-  the Lovable app). The agent must **not** resolve this unilaterally — merging would mix two apps and
-  pull `jspdf` in against a locked constraint.
+- **RESOLVED (Phase V) — `origin/main` carried a Lovable-generated parallel app and PR #1 conflicted
+  because of it. Both are fixed.** Kept for the record: local `main` was `7451db0` while
+  **`origin/main` was `00fae15`** ("Added NZwisiso branding", a *merge* commit 3 ahead — the
+  `gpt-engineer-app[bot]` / Lovable line). That line contained a parallel app the feature branch never
+  saw: `src/lib/engine.ts`, `store.ts`, `simulation.ts`, `policyStore.ts`, `reportPdf.ts` (which brought
+  **`jspdf`**), `src/data/documents.ts`, `src/components/ApprovalTracker.tsx`, `src/pages/Simulation.tsx`,
+  `Compare.tsx`, its own **124-line** `src/config/departments.ts`, 45 lines of `src/index.css` changes,
+  and `.lovable/plan/…`. **Fix, on the user's instruction "remove all lovable traces without breaking
+  anything":** `git merge -s ours origin/main` absorbed that history while keeping our tree
+  **byte-identical** (`git diff HEAD^1 HEAD` empty ⇒ no Lovable code, no `jspdf`, no `.lovable/`), and
+  the source-level traces were removed (`lovable-tagger` devDependency + its Vite plugin, the Lovable
+  `README.md`, the stale `bun.lock`). GitHub now reports PR #1 as **`mergeable: MERGEABLE`**.
+  **Merging PR #1 is the user's action — the agent never merges into or pushes `main`.**
 - **DEPLOYMENT — two facts a cold session must not get wrong.** (a) The host in the deployment
   brief, `ftp.nzwisiso.bitflex.app`, **does not exist in DNS**. The real FTP host is
   **`ftp.bitflex.app`**, user **`nzwisiso@nzwisiso.bitflex.app`**, over **explicit FTPS on port
@@ -1629,15 +1634,46 @@ relative path so it does not duplicate the source of truth).
 | `e2e/journey.spec.ts` | New browser test: the graph grows with the run and answers the pointer (selection as text, edge labels, drag, completion, runtime invariants) |
 | `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md` | Phase S record, verification rows, files-touched table, §6g |
 
-## Files touched this session (redeploy of Phases R–S + PR opened)
+## Phase V — Lovable removal (user instruction: "remove all lovable traces without breaking anything")
 
-**Repo:** **no source file changed.** The session re-verified the Phases 0–S baseline, rebuilt `dist/`,
-deployed it over FTPS, verified the live origin in a real browser, and opened **PR #1**. Only
-`PROJECT_STATUS.md` and `PRODUCTION_READINESS.md` records changed.
+**Status: DONE — verified this session.**
 
-**GitHub:** PR **#1** opened — `https://github.com/BitFlexFinTech/policy-nexus/pull/1`
-(`base main` ← `head feature/unified-platform`). It reports **`mergeable: CONFLICTING`**; the cause and
-the 7 conflicting files are recorded in the BLOCKER entry above. **Not** merged.
+The project was originally generated by Lovable, and that left traces in two places: the **code**
+(a Lovable dev plugin + package + README + a stale Bun lockfile) and **`origin/main`** (a whole
+parallel app the Lovable bot had generated, which made PR #1 `CONFLICTING`).
+
+**Code traces removed**
+| File | Change |
+|---|---|
+| `vite.config.ts` | Dropped `import { componentTagger } from "lovable-tagger"` and the
+`mode === "development" && componentTagger()` plugin; `defineConfig(({ mode }) => …)` → `defineConfig(() => …)`; plugins are now `[react()]` |
+| `package.json` | Removed the `"lovable-tagger"` devDependency |
+| `package-lock.json` | Regenerated with `npm install` — **0** `lovable` occurrences (was 499 lines) |
+| `README.md` | Replaced "# Welcome to your Lovable project / TODO: Document your project here" with a real project README |
+| `bun.lock` | **Deleted** — a stale Lovable/Bun lockfile (lists `lovable-tagger@1.1.13`) for a package manager this project does not use. A deliberate deviation from "bun.lock must stay untouched": the rule's intent was "never use bun / never regenerate it", and deleting removes the trace entirely. |
+
+**`origin/main` side (the merge blocker)**
+- `git merge -s ours origin/main` — absorbs main's history and **discards all of its content**. The
+  resulting tree is **byte-identical** to the verified pre-merge commit (`git diff --stat HEAD^1 HEAD`
+  is empty), so **no** Lovable file, **no** `.lovable/`, and **no** `jspdf` entered the branch.
+- Result: GitHub reports PR **#1** as **`mergeable: MERGEABLE`** (was `CONFLICTING`).
+
+**Evidence:** `npm run validate` PASS · `tsc -b` 0 · eslint 0 errors · **190/190** tests ·
+`npm run build` ✓ · `npx playwright test` **8/8** · `npm run dev` HTTP 200. Whole-repo
+`grep -ril lovable` → **only `PROJECT_STATUS.md`** (the deliberate historical audit record; the
+single-source-of-truth rule permits explicitly-historical records).
+
+## Files touched this session (redeploy of Phases R–S + PR opened + Lovable removal)
+
+**Repo — Lovable removal (Phase V), the only source change this session:** `vite.config.ts`
+(dropped the `lovable-tagger` import + plugin), `package.json` (dropped the `lovable-tagger`
+devDependency), `package-lock.json` (regenerated by `npm install`), `README.md` (rewritten),
+`bun.lock` (**deleted**). Then `git merge -s ours origin/main` (tree left byte-identical). Plus the
+records: `PROJECT_STATUS.md`, `PRODUCTION_READINESS.md`.
+
+**GitHub:** PR **#1** — `https://github.com/BitFlexFinTech/policy-nexus/pull/1`
+(`base main` ← `head feature/unified-platform`). Opened `CONFLICTING`; now
+**`mergeable: MERGEABLE`** after Phase V. **The agent has not merged it** — that is the user's action.
 
 **Live server** (FTPS `mirror -R dist .`, **no `--delete`**): 10 files — `.htaccess`, `index.html`,
 `favicon.ico`, `placeholder.svg`, `robots.txt`, `fonts/inter-latin-variable.woff2`,
@@ -1768,14 +1804,11 @@ on the server (not deleted, by design).
   verified in a real browser (2/2 checks, 0 console errors, 0 off-origin requests) with the SSL token
   and `cgi-bin/` intact.
   Remaining work, in priority order:
-  1. **DECIDE the `main` divergence, then merge PR #1.** PR **#1** is **OPEN** —
-     `https://github.com/BitFlexFinTech/policy-nexus/pull/1` (base `main`, head
-     `feature/unified-platform`) — but GitHub reports **`mergeable: CONFLICTING`**: `origin/main`
-     (`00fae15`) carries the Lovable parallel app described in the BLOCKER entry, so **7 files
-     conflict** (`index.html`, `src/App.tsx`, `src/components/AgentFeed.tsx`,
-     `src/components/DocumentLibrary.tsx`, `src/components/PolicyInput.tsx`,
-     `src/config/departments.ts` (add/add), `src/pages/Index.tsx`). **This is a user decision, not an
-     agent one** — the two lines are different implementations of the same product and one must win.
+  1. **Merge PR #1** — `https://github.com/BitFlexFinTech/policy-nexus/pull/1` (base `main`, head
+     `feature/unified-platform`). It is **`mergeable: MERGEABLE`** as of Phase V (the Lovable parallel
+     app was absorbed-and-discarded and the source traces removed), so merging it makes `main` equal
+     to this branch and removes the Lovable files from `main`. **The agent must not click Merge** —
+     never merge into or push `main`; this is the user's action.
   2. Non-credential backlog in `PRODUCTION_READINESS.md`: server-side PDF/DOCX extraction, a real
      `.docx` renderer, the remote assessment service client behind the seam, a backend drafting model
      behind `documents.ts`, and Government SSO.
