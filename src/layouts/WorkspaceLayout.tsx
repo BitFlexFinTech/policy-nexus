@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import { HeaderBar } from "@/components/HeaderBar";
 import { WorkspaceNav } from "@/components/WorkspaceNav";
 import { SovereignFooter } from "@/components/SovereignFooter";
+import { PlatformModeNotice } from "@/components/PlatformModeNotice";
 
 /**
  * The one workspace shell. Every `/app/**` screen renders inside it, so the
@@ -16,6 +17,7 @@ export function WorkspaceLayout() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       <HeaderBar />
+      <PlatformModeNotice />
       <WorkspaceNav />
       <Outlet />
       <SovereignFooter />

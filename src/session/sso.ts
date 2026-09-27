@@ -27,9 +27,19 @@ export type SsoFailureReason =
   | "state-mismatch"
   | "token-rejected";
 
-export type SsoResult =
-  | { ok: true; idToken: string }
-  | { ok: false; reason: SsoFailureReason; detail: string };
+/**
+ * The outcome of a sign-in attempt. A single shape with optional fields rather
+ * than a union, so callers never have to rely on narrowing to read it.
+ */
+export interface SsoResult {
+  ok: boolean;
+  /** Present only when `ok` is true. */
+  idToken?: string;
+  /** Present only when `ok` is false. */
+  reason?: SsoFailureReason;
+  /** Plain-language explanation. Present only when `ok` is false. */
+  detail?: string;
+}
 
 const toBase64Url = (bytes: Uint8Array): string => {
   let binary = "";
@@ -88,6 +98,36 @@ export const beginSignIn = async (): Promise<boolean> => {
   window.sessionStorage.setItem(VERIFIER_KEY, verifier);
   window.location.assign(await signInUrl(config, state, verifier));
   return true;
+};
+
+const fromBase64Url = (value: string): string => {
+  const normalised = value.split("-").join("+").split("_").join("/");
+  const padded = normalised + "=".repeat((4 - (normalised.length % 4)) % 4);
+  const binary = atob(padded);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+};
+
+/**
+ * Read one claim from the provider's identity token.
+ *
+ * ⚠️ THIS DOES NOT VERIFY THE TOKEN'S SIGNATURE. A browser cannot verify it — that
+ * needs the provider's public keys and a trusted step. It is provided so the
+ * sign-in path is complete and demonstrable, and it MUST NOT be treated as
+ * authorisation: before production the token must be verified and the department
+ * mapped on the server (docs/SERVER_CONTRACT.md §4).
+ */
+export const claimFrom = (idToken: string, claim: string): string | null => {
+  const parts = idToken.split(".");
+  if (parts.length < 2) return null;
+  try {
+    const payload: unknown = JSON.parse(fromBase64Url(parts[1]));
+    if (typeof payload !== "object" || payload === null) return null;
+    const value = (payload as Record<string, unknown>)[claim];
+    return typeof value === "string" && value ? value : null;
+  } catch {
+    return null;
+  }
 };
 
 /**

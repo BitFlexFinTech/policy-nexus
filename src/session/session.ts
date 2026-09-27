@@ -15,14 +15,20 @@ import { createKeyValueStore } from "@/lib/browserStorage";
 
 export const SESSION_STORAGE_KEY = "nzwisiso.session.v1";
 
-/** Entry modes. `oneclick` is the current implementation; real SSO adds a value. */
-export type SessionMode = "oneclick";
+/**
+ * How the session began. `oneclick` is the simulated entry the platform ships
+ * with; `sso` is real sign-in, reachable only once an identity provider is
+ * configured in platform administration.
+ */
+export type SessionMode = "oneclick" | "sso";
 
 export interface Session {
   departmentId: DepartmentId;
   mode: SessionMode;
   /** ISO date the session began. Always REFERENCE_DATE in scenario mode. */
   signedInAt: string;
+  /** The identity the provider returned. Present only for an SSO session. */
+  subject?: string;
 }
 
 /**
@@ -53,8 +59,11 @@ const parseSession = (raw: string | null): Session | null => {
     if (!value || typeof value.departmentId !== "string" || !isDepartmentId(value.departmentId)) return null;
     return {
       departmentId: value.departmentId,
-      mode: value.mode === "oneclick" ? "oneclick" : "oneclick",
+      // Anything unrecognised falls back to the simulated entry, so a corrupt or
+      // older stored session can never be read as a real sign-in.
+      mode: value.mode === "sso" ? "sso" : "oneclick",
       signedInAt: typeof value.signedInAt === "string" ? value.signedInAt : REFERENCE_DATE,
+      subject: typeof value.subject === "string" ? value.subject : undefined,
     };
   } catch {
     // A malformed stored value is not recoverable; treat it as absent.
@@ -107,6 +116,26 @@ export const signInToDepartment = (departmentId: string): Session | null => {
 export const clearSession = (): void => {
   storage.remove(SESSION_STORAGE_KEY);
   emit();
+};
+
+/**
+ * Enter the workspace from an identity provider's answer.
+ *
+ * Kept separate from `signInToDepartment` on purpose: the one-click demo entry
+ * and a real sign-in must never be mistaken for each other, and the session
+ * records which one happened so the workspace can say so.
+ */
+export const signInWithSso = (departmentId: string, subject: string): Session | null => {
+  if (!isDepartmentId(departmentId)) return null;
+  const session: Session = {
+    departmentId,
+    mode: "sso",
+    signedInAt: REFERENCE_DATE,
+    subject,
+  };
+  storage.write(SESSION_STORAGE_KEY, JSON.stringify(session));
+  emit();
+  return session;
 };
 
 /** The current department id, or null when signed out. */

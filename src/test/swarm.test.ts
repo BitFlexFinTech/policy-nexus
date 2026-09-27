@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { findDepartment } from "@/config/departments";
-import { assessmentService } from "@/services/assessment/AssessmentService";
+import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
 import {
   SWARM_HEIGHT,
   SWARM_WIDTH,
@@ -28,7 +28,7 @@ const requestFor = (departmentId: string): AssessmentRequest => {
 };
 
 const swarmFor = (departmentId: string) => {
-  const run = assessmentService.buildRun(requestFor(departmentId));
+  const run = buildSimulatedRun(requestFor(departmentId));
   return { run, swarm: createSwarm(buildRelationshipGraph(run), `${run.seed}::swarm`) };
 };
 
@@ -57,7 +57,7 @@ describe("swarm layout", () => {
   });
 
   it("orders the same graph differently under a different seed — the seed is really read", () => {
-    const run = assessmentService.buildRun(requestFor("fin"));
+    const run = buildSimulatedRun(requestFor("fin"));
     const graph = buildRelationshipGraph(run);
     const a = positionsOf(settleSwarm(createSwarm(graph, "seed-a")));
     const b = positionsOf(settleSwarm(createSwarm(graph, "seed-b")));
@@ -161,7 +161,7 @@ describe("swarm layout", () => {
   });
 
   it("survives a graph holding a single mark", () => {
-    const graph = buildRelationshipGraph(assessmentService.buildRun(requestFor("opc")));
+    const graph = buildRelationshipGraph(buildSimulatedRun(requestFor("opc")));
     const lone = { nodes: [graph.nodes[0]], edges: [], nodeArrival: {}, edgeArrival: {} };
     const state = settleSwarm(createSwarm(lone, "lone"));
     expect(state.nodes).toHaveLength(1);

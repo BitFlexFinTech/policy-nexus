@@ -7,7 +7,9 @@ import {
   MetricCards,
   ReactionList,
   RiskList,
+  RunError,
   RunNotFound,
+  RunPending,
 } from "@/components/assessment/AssessmentSections";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
@@ -20,8 +22,10 @@ import { useRun } from "@/services/assessment/useAssessmentRuns";
 export default function Assessment() {
   const params = useParams();
   const runId = params.id ? decodeURIComponent(params.id) : undefined;
-  const run = useRun(runId);
+  const { run, pending, error } = useRun(runId);
 
+  if (pending) return <RunPending heading="Executive Summary" />;
+  if (error) return <RunError heading="Executive Summary" message={error} />;
   if (!run) return <RunNotFound heading="Executive Summary" />;
 
   return (

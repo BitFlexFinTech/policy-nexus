@@ -27,7 +27,7 @@ const complete = (): PlatformConfig => ({
   assessment: service(),
   drafting: service(),
   extraction: service(),
-  sso: { mode: "live", issuer: IDP, clientId: "client-1", redirectUri: CALLBACK },
+  sso: { mode: "live", issuer: IDP, clientId: "client-1", redirectUri: CALLBACK, departmentClaim: "department_id" },
 });
 
 describe("platform configuration", () => {
@@ -88,7 +88,7 @@ describe("platform configuration", () => {
   it("needs an issuer, a client ID and a redirect address for sign-in", () => {
     saveConfig({
       ...DEFAULT_PLATFORM_CONFIG,
-      sso: { mode: "live", issuer: "", clientId: "client-1", redirectUri: "" },
+      sso: { mode: "live", issuer: "", clientId: "client-1", redirectUri: "", departmentClaim: "department_id" },
     });
     const status = describeCapability(getConfig(), "sso");
     expect(status.state).toBe("misconfigured");

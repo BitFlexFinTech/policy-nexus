@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import App from "@/App";
 import { clearSession, signInToDepartment } from "@/session/session";
 
@@ -49,9 +49,13 @@ describe("policy upload — what the screen says was read", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Run Simulation" }));
 
+    // The seam answers in a microtask, so the screen settles a moment after the
+    // click: wait for the address to change, then assert on what is on screen.
+    await waitFor(() => expect(window.location.pathname).toContain("/app/simulations/"));
+
     // The run's title is derived from the policy text, so seeing it proves the
     // file's own words reached the engine — and the source still reads `upload`.
-    expect(await screen.findByText(/A drafted policy on tax bands/)).toBeInTheDocument();
-    expect(await screen.findByText(/source upload/)).toBeInTheDocument();
+    expect(screen.getByText(/A drafted policy on tax bands/)).toBeInTheDocument();
+    expect(screen.getByText(/source upload/)).toBeInTheDocument();
   });
 });

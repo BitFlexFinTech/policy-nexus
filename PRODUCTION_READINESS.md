@@ -279,10 +279,17 @@ so it can be re-homed behind a production URL by changing one line.
 
 | Capability | Where it is entered | Simulated today | Live means | Client wiring |
 |---|---|---|---|---|
-| Assessment service | `/platform-admin` | scenario engine, `Scenario (Mock)` labels | `POST <endpoint>` returning a complete `AssessmentRun` | **built (`remoteAssessmentClient.ts`), unit-tested against a stubbed transport, NOT connected** — the run path must become asynchronous first |
-| Drafting model | `/platform-admin` (key + model name) | deterministic local generators | `POST <endpoint>` returning a complete `GeneratedDocument` | **built (`remoteDraftingClient.ts`), unit-tested, NOT connected** — same reason |
-| Document text extraction | `/platform-admin` | `.txt` read in the browser; PDF/DOCX recorded by name | `POST <endpoint>` returning `{ text }` | **BUILT AND WIRED** — `httpExtractionClient.ts`, reached only when the capability is live and complete |
-| Government sign-in (SSO) | `/platform-admin` (issuer, client ID, redirect address) | one-click entry, `Entry: one-click (Mock)` | OIDC Authorization Code + PKCE against `<issuer>/authorize` and `<issuer>/token` | **built (`src/session/sso.ts`), unit-tested, NOT connected** — needs a callback route and a claim→department mapping, which need a registered provider |
+| Assessment service | `/platform-admin` | scenario engine, `Scenario (Mock)` labels | `POST <endpoint>` returning a complete `AssessmentRun` | **BUILT AND CONNECTED (Phase Z)** — the run path now waits; the register, the run view and every assessment screen use it. While simulated the engine answers in the same render, so nothing appears to wait |
+| Drafting model | `/platform-admin` (key + model name) | deterministic local generators | `POST <endpoint>` returning a complete `GeneratedDocument` | **BUILT AND CONNECTED (Phase Z)** — `useGeneratedDocument`; the report and drafted-policy screens wait only when the capability is live |
+| Document text extraction | `/platform-admin` | `.txt` read in the browser; PDF/DOCX recorded by name | `POST <endpoint>` returning `{ text }` | **BUILT AND CONNECTED (Phase Y)** — `httpExtractionClient.ts`, reached only when the capability is live and complete |
+| Government sign-in (SSO) | `/platform-admin` (issuer, client ID, redirect address, department claim) | one-click entry, `Entry: one-click (Mock)` | OIDC Authorization Code + PKCE against `<issuer>/authorize` and `<issuer>/token` | **BUILT AND CONNECTED (Phase Z)** — `/auth/callback` completes the exchange and reads the configured department claim. **A browser cannot verify the provider's signature**; a server must do that before real use, and the screen says so |
+
+**The platform side is finished (Phase Z).** Nothing further needs building here: the only
+remaining work is the services themselves, and each is used the moment its details are entered
+above and the capability is switched on. While nothing is configured the platform stays simulated
+and makes no request at all — and while simulated it answers in the same render, so no screen
+waits and no spinner appears.
+
 
 **Rules the screen enforces** (all verified by tests): a capability is `live` only when BOTH its
 mode is switched on AND every required field is present; a half-configured capability reports

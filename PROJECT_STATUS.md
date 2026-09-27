@@ -1355,24 +1355,23 @@ because the block it sits in already names itself.
 | 2026-09-26 | `npm test` (Phase Y) | **258 passed / 20 files** (was 214/15). New: `platform.test.ts` (12) — defaults are all simulated; a half-configured or non-absolute capability is `misconfigured` and `liveService()` returns null; a model is required only for drafting; save/clear notify subscribers; unreadable stored JSON falls back to simulated; `normaliseConfig` ignores junk. `platform-admin.test.tsx` (6) — renders at `ADMIN_ROUTE` with four simulated capabilities; **no anchor on `/`, `/start` or `/app` points at the admin address**; a capability becomes live only when the mode is switched on AND the fields are complete; no `fetch` on render. `registers.test.tsx` (6) — the rail and the library open a document dialog; every prepared draft links to `?draft=`; the chosen draft really loads into the policy input and the parameter is stripped. `remote-clients.test.ts` (10) and `sso.test.ts` (6) — both clients reject incomplete payloads, are unavailable until the capability is live and complete, and are verified against a stubbed transport. `extraction.test.ts` (+4) — stays simulated with no capability, calls the service when live, and reports unreachable/no-text honestly |
 | 2026-09-26 | `npx playwright test` (Phase Y) | **9 passed** — new browser test *"the registers are actionable"*: a document in the rail opens its detail dialog (and Escape closes it), and "Use this draft" from the register loads the draft into the workspace policy input. Still 0 console errors, 0 off-origin requests |
 | 2026-09-26 | `grep` before the `NavLink.tsx` deletion (Phase Y) | **zero references** to `components/NavLink` anywhere in `src/` or `e2e/` (the two `NavLink` hits are react-router's own import in `WorkspaceNav`) — deletion proved, not assumed |
+| 2026-09-26 | `npm test` (Phase Z) | **272 passed / 22 files** (was 258/20). New: `demo-instant.test.tsx` (6) — proves the promise that wiring the seams did not change the demo: every screen already holds its result on the **first paint** (synchronous reads, no `findBy`) and the waiting panel is never present; `auth-callback.test.tsx` (2) — the callback signs nobody in and states that it cannot check the provider's answer; `sso.test.ts` (+6) — reading a claim from the provider's token, a real session recording `mode: "sso"`, and an unrecognised stored mode never read as a real sign-in |
+| 2026-09-26 | `npx playwright test` (Phase Z) | **9 passed** — now also asserts the workspace shows **no** "Live services in use" notice while nothing is configured, so the demo look is unchanged in a real browser. Still 0 console errors, 0 off-origin requests |
+| 2026-09-26 | `npm run validate` (Phase Z) | **PASS, byte-untouched** — no check was added, removed or loosened |
 | 2026-09-26 | external validation of the produced `.docx` (Phase X) | `unzip -t` → **“No errors detected in compressed data”**; `unzip -l` → the 7 expected parts, all dated the fixed `01-01-1980 00:00`; **all 7 parts well-formed** under `xmllint --noout`; `file` → **“Microsoft Word 2007+”** |
 | 2026-09-26 | `npm run validate` (Phase X) | **PASS, byte-untouched** — no check was added, removed or loosened. The OOXML namespace URIs live in `.xml` templates, so no `.ts`/`.tsx` gained a URL literal |
 
 
 
 ## Known-red / open items
-- **The run path is synchronous, which is what stops the assessment and drafting clients from being
-  connected.** `AssessmentService` (`src/services/assessment/AssessmentService.ts`) returns values,
-  not promises — `buildRun`/`run`/`getRun`/`listRuns`. A network client cannot satisfy that, so
-  `remoteAssessmentClient.ts` and `remoteDraftingClient.ts` are **built and unit-tested against a
-  stubbed transport, but connected to nothing**; enabling live mode changes no screen today. Wiring
-  them means making the interface asynchronous and following that through
-  `src/components/PolicyInput.tsx`, `src/services/assessment/useAssessmentRuns.ts` (both `useRun` and
-  `useAssessmentRuns`), and every screen that lists runs
-  (`HistoryTable`, `Simulations`, `Policies`, `SimulationRun`, `Assessment`, `FullAssessment`,
-  `AssessmentReport`, `PolicyDraft`), adding loading and error states — plus updating the tests that
-  currently assume a run resolves synchronously. Planned, not started; specified in
-  `docs/SERVER_CONTRACT.md` §5.
+- **RESOLVED (Phase Z) — the run path is asynchronous, so every capability is now connected.**
+  `AssessmentService` returns promises (`buildRun`/`run`/`getRun`/`listRuns`), and `assessmentService`
+  is a **dispatcher** that chooses the simulated engine or the live service at the moment of the
+  call — so completing a capability in platform administration takes effect without a page reload.
+  Kept for the record: the simulated engine is also exposed synchronously (`buildSimulatedRun`,
+  `peekRun`, `peekRuns`) so the workspace still renders in the same frame with nothing configured.
+  That is what keeps the demo free of spinners, and `src/test/demo-instant.test.tsx` fails if a
+  waiting panel ever appears while simulated.
 - **Capability credentials are stored in the browser and readable through developer tools.**
   Deliberate for a pilot, and stated on the administration screen itself. Production requires a
   server-side proxy holding the credential, with the browser holding only a session token. Also
@@ -1815,7 +1814,48 @@ now one module, `src/lib/browserStorage.ts`, used by all three stores.
 `npx playwright test` **9/9** (a new browser test opens a document in the rail and loads a draft
 from the register). **No validator check was added, removed or loosened.**
 
-## Files touched this session (redeploy of Phases R–S + PR opened + Lovable removal + PR merged + Phase X + Phase Y)
+### Phase Z — the platform is fully wired (all four capabilities connected)
+**Status: DONE — verified this session.** User instruction: *"do the full wiring… platform finished,
+demo untouched, nothing calls out, no pretend server."*
+
+**1. The run path now waits — the blocker found in the previous audit**
+- `AssessmentService` returns promises. `assessmentService` is a **dispatcher**: it chooses the
+  simulated engine or the live service at the moment of the call, so completing a capability in
+  platform administration takes effect without a page reload.
+- The simulated engine is also exposed **synchronously** (`buildSimulatedRun`, `peekRun`,
+  `peekRuns`), so the demo still renders in a single frame. `useRun` / `useAssessmentRuns` return
+  `{ run(s), pending, error }`; with nothing configured, `pending` is always false and the value is
+  already present.
+- `PolicyInput` awaits the seam and reports a live failure instead of doing nothing.
+- Five run screens gained honest waiting / failed panels (`RunPending`, `RunError`) that **cannot
+  appear while simulated**.
+- The `VITE_ASSESSMENT_MODE` environment switch was removed: platform administration is now the one
+  source of truth for which engine runs.
+
+**2. Drafting connected**
+- `useGeneratedDocument` — the local generator while simulated (byte-identical output, so every
+  determinism test still passes), the service when live. `/report` and `/policy-draft` use it.
+
+**3. Sign-in connected**
+- `SessionMode` gained `"sso"`; `signInWithSso` records a real sign-in and its subject; an
+  unrecognised stored mode still falls back to the simulated entry.
+- `/auth/callback` completes the exchange and reads the configured **department claim**.
+- A browser cannot verify the provider's signature. The screen says so in plain words, and the
+  server step is recorded in `docs/SERVER_CONTRACT.md` §5.
+
+**4. A live-mode notice** that appears **only when a capability is live**, so the demo looks
+byte-for-byte as it always has. Proven in the browser: the journey asserts the notice is absent
+with nothing configured.
+
+**5. The plain-English rule** — `.clinerules/06-plain-english.md` records the owner's instruction,
+so every future session answers in the same plain style.
+
+**Evidence:** `npm run validate` **PASS** · `tsc -b` **0** · eslint **0 errors** · **272/272** tests
+(22 files, was 258/20: **+6** `demo-instant.test.tsx`, **+2** `auth-callback.test.tsx`, **+6**
+`sso.test.ts`) · `npm run build` ✓ · `npx playwright test` **9/9**, 0 console errors, 0 off-origin
+requests. **No validator check was added, removed or loosened.**
+
+## Files touched this session (redeploy of Phases R–S + PR opened + Lovable removal + PR merged + Phase X + Phase Y + Phase Z)
 
 **Repo — Phase V (Lovable removal):** `vite.config.ts`
 (dropped the `lovable-tagger` import + plugin), `package.json` (dropped the devDependency),
@@ -1845,6 +1885,21 @@ route), `src/session/session.ts` and `src/services/assessment/runStore.ts` (shar
 `src/services/extraction/extractPolicyText.ts` (live path), `src/components/DocumentLibrary.tsx`,
 `src/components/HistoryTable.tsx`, `src/components/PolicyInput.tsx`, `src/pages/Documents.tsx`,
 `src/pages/Policies.tsx`, `e2e/journey.spec.ts`; **`src/components/NavLink.tsx` deleted**.
+
+**Repo — Phase Z (the full wiring):** `src/services/assessment/AssessmentService.ts` (promises, a
+per-call dispatcher, and synchronous simulated helpers; the `VITE_ASSESSMENT_MODE` switch removed),
+`src/services/assessment/useAssessmentRuns.ts` (waiting-aware run hooks),
+`src/services/documents/useGeneratedDocument.ts` *(new)*,
+`src/services/assessment/remoteAssessmentClient.ts` (+`run`),
+`src/components/assessment/AssessmentSections.tsx` (`RunPending`, `RunError`),
+`src/components/PlatformModeNotice.tsx` *(new)*, `src/layouts/WorkspaceLayout.tsx`,
+`src/components/{PolicyInput,EngineStatus,HistoryTable,HeaderBar}.tsx`,
+`src/pages/{Assessment,FullAssessment,AssessmentReport,PolicyDraft,SimulationRun}.tsx`,
+`src/pages/AuthCallback.tsx` *(new)*, `src/session/{session.ts,useSession.ts,sso.ts}`,
+`src/config/platform.ts` (the department claim), `src/components/admin/SsoEditor.tsx`, `src/App.tsx`,
+`e2e/journey.spec.ts`, `.clinerules/06-plain-english.md` *(new)*, plus test updates in
+`assessment.test.ts`, `documents.test.ts`, `network.test.ts`, `swarm.test.ts`, `graph-card.test.tsx`,
+`journey.test.tsx`, `policy-upload.test.tsx`, `platform.test.ts` and `sso.test.ts`.
 
 **GitHub:** PR **#1** — `https://github.com/BitFlexFinTech/policy-nexus/pull/1`
 (`base main` ← `head feature/unified-platform`) — opened `CONFLICTING`, made `MERGEABLE`, then
@@ -1972,26 +2027,26 @@ on the server (not deleted, by design).
   Word export is HTML-based `application/msword`), the remote assessment service client (registered
   in `CLIENTS` but deliberately unimplemented — the mock-first seam), and Government SSO. Playwright
   click-through is **no longer** on this list: it is built and green (Phases H→M).
-- **Next action: the platform is demo-complete and the administration screen is built and hidden.**
-  Phases 0–S built it, Phase V removed the Lovable traces, Phase W merged PR #1, Phase X made the
-  Word export a real OOXML `.docx` and the upload progress real `.txt` reading, and **Phase Y added
-  the capability configuration and the hidden administration screen and fixed the click-through dead
-  ends.** The full suite is green: `npm run validate` **PASS**, `npm run typecheck`
-  exit 0, `npm run lint` 0 errors, `npm test` **258/258** (20 files), `npm run build` ✓,
-  `npx playwright test` **9/9**.
+- **Next action: THE PLATFORM IS FINISHED AND FULLY WIRED.** Every capability is connected behind its
+  seam, and each takes effect the moment its details are entered at the hidden administration screen
+  and it is switched on — no further building is needed on the platform side. Phases 0–S built it,
+  Phase V removed the Lovable traces, Phase W merged PR #1, Phase X added the real `.docx` export and
+  real `.txt` reading, Phase Y added the capability configuration, the hidden administration screen
+  and the click-through fixes, and **Phase Z wired all four capabilities** — the run path now waits,
+  drafting and sign-in are connected, and the demo still renders in a single frame.
+  The full suite is green: `npm run validate` **PASS**, `npm run typecheck` exit 0, `npm run lint`
+  0 errors, `npm test` **272/272** (22 files), `npm run build` ✓, `npx playwright test` **9/9**.
   Remaining work, in priority order:
-  1. **Redeploy `dist/`** to publish Phases X and Y to the live host — `npm run build`, then the
-     FTPS `mirror -R dist .` command below; the live build is still the Phase S bundle.
-  2. **Make the run path asynchronous** so the assessment and drafting clients can be connected.
-     This is the one thing standing between "administration screen built" and "entering a key
-     switches the platform over" — see the first known-red for the exact file list and
-     `docs/SERVER_CONTRACT.md` §5.
-  3. **A server** implementing `docs/SERVER_CONTRACT.md` — then each capability is completed at
-     `/platform-admin` and takes effect. Compensation owed to nobody: the contract is written.
-  4. **A callback route and a claim→department mapping** for sign-in, once an identity provider is
-     registered.
-  5. Still outstanding, unchanged: native PDF rendering (beyond the browser print dialogue) and a
-     server-side PDF/DOCX extraction service (the client is built and wired; the service is not).
+  1. **Redeploy `dist/`** to publish Phases X–Z to the live host — `npm run build`, then the FTPS
+     `mirror -R dist .` command below; the live build is still the Phase S bundle.
+  2. **A server** implementing `docs/SERVER_CONTRACT.md`. Nothing on the platform changes when it
+     exists: enter its address and key at `/platform-admin`, switch the capability on, and it is in
+     use.
+  3. **Sign-in verification on the server** — a browser cannot check the provider's signature, so the
+     code exchange and the department mapping must move server-side before real use (the screen says
+     so). An identity provider must also be registered: issuer, client ID and redirect address.
+  4. Native PDF rendering, beyond the browser print dialogue — and the same server for PDF/DOCX text
+     extraction, whose client is connected and waiting for something to answer.
 - **Read next:** to change anything about credentials or live mode, read
   `src/config/platform.ts`, then `src/pages/PlatformAdmin.tsx` and
   `src/components/admin/CapabilityEditor.tsx`, then `docs/SERVER_CONTRACT.md`. For the run view and

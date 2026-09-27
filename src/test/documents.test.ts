@@ -33,16 +33,16 @@ const flat = (value: string) => value.replace(/\s+/g, " ");
  * render without throwing.
  */
 describe("generated documents — the long-form report", () => {
-  it("is byte-identical for the same run", () => {
-    const run = runFor("fin");
+  it("is byte-identical for the same run", async () => {
+    const run = await runFor("fin");
     const department = findDepartment("fin")!;
     expect(JSON.stringify(buildLongReport(run, department))).toBe(
       JSON.stringify(buildLongReport(run, department)),
     );
   });
 
-  it("accounts for every group, priority, risk and recommendation in the run", () => {
-    const run = runFor("fin");
+  it("accounts for every group, priority, risk and recommendation in the run", async () => {
+    const run = await runFor("fin");
     const report = buildLongReport(run, findDepartment("fin")!);
     const text = renderDocumentText(report);
 
@@ -56,40 +56,43 @@ describe("generated documents — the long-form report", () => {
     expect(text).toContain(run.seed);
   });
 
-  it("gives every section a heading and at least one paragraph", () => {
-    const report = buildLongReport(runFor("agri"), findDepartment("agri")!);
+  it("gives every section a heading and at least one paragraph", async () => {
+    const report = buildLongReport(await runFor("agri"), findDepartment("agri")!);
     report.sections.forEach((section) => {
       expect(section.heading.length).toBeGreaterThan(0);
       expect(section.paragraphs.length).toBeGreaterThan(0);
     });
   });
 
-  it.each(DEPARTMENTS)("renders a report for $abbr", (department) => {
-    const report = buildLongReport(assessmentService.buildRun(requestFor(department.id)), department);
+  it.each(DEPARTMENTS)("renders a report for $abbr", async (department) => {
+    const report = buildLongReport(
+      await assessmentService.buildRun(requestFor(department.id)),
+      department,
+    );
     const text = renderDocumentText(report);
     expect(report.sections.length).toBeGreaterThanOrEqual(8);
     expect(text).toContain(department.shortName);
     expect(text.length).toBeGreaterThan(2000);
   });
 
-  it("differs between departments rather than emitting one generic document", () => {
-    const fin = renderDocumentText(buildLongReport(runFor("fin"), findDepartment("fin")!));
-    const env = renderDocumentText(buildLongReport(runFor("env"), findDepartment("env")!));
+  it("differs between departments rather than emitting one generic document", async () => {
+    const fin = renderDocumentText(buildLongReport(await runFor("fin"), findDepartment("fin")!));
+    const env = renderDocumentText(buildLongReport(await runFor("env"), findDepartment("env")!));
     expect(fin).not.toBe(env);
   });
 });
 
 describe("generated documents — the drafted policy", () => {
-  it("is byte-identical for the same run", () => {
-    const run = runFor("health");
+  it("is byte-identical for the same run", async () => {
+    const run = await runFor("health");
     const department = findDepartment("health")!;
     expect(JSON.stringify(buildPolicyDraft(run, department))).toBe(
       JSON.stringify(buildPolicyDraft(run, department)),
     );
   });
 
-  it("turns the submitted draft into operative measures and keeps the findings", () => {
-    const run = runFor("health");
+  it("turns the submitted draft into operative measures and keeps the findings", async () => {
+    const run = await runFor("health");
     const department = findDepartment("health")!;
     const draft = buildPolicyDraft(run, department);
     const text = renderDocumentText(draft);
@@ -109,17 +112,17 @@ describe("generated documents — the drafted policy", () => {
     expect(text).toContain(DISCLAIMER.long);
   });
 
-  it("numbers clause lists when rendered as text", () => {
-    const draft = buildPolicyDraft(runFor("mines"), findDepartment("mines")!);
+  it("numbers clause lists when rendered as text", async () => {
+    const draft = buildPolicyDraft(await runFor("mines"), findDepartment("mines")!);
     const text = renderDocumentText(draft);
     expect(text).toMatch(/^1\. /m);
     expect(text).toMatch(/^2\. /m);
   });
 
-  it("produces a different draft when the policy text actually changes", () => {
+  it("produces a different draft when the policy text actually changes", async () => {
     const department = findDepartment("mines")!;
-    const base = runFor("mines");
-    const changed = assessmentService.buildRun({
+    const base = await runFor("mines");
+    const changed = await assessmentService.buildRun({
       ...requestFor("mines"),
       policyText: "A short alternative draft with one measure.",
     });
@@ -128,8 +131,11 @@ describe("generated documents — the drafted policy", () => {
     );
   });
 
-  it.each(DEPARTMENTS)("drafts a complete instrument for $abbr", (department) => {
-    const draft = buildPolicyDraft(assessmentService.buildRun(requestFor(department.id)), department);
+  it.each(DEPARTMENTS)("drafts a complete instrument for $abbr", async (department) => {
+    const draft = buildPolicyDraft(
+      await assessmentService.buildRun(requestFor(department.id)),
+      department,
+    );
     const ids = draft.sections.map((section) => section.id);
     [
       "preamble",

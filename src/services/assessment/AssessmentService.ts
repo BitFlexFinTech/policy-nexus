@@ -15,74 +15,116 @@
  */
 
 import type { DepartmentId } from "@/config/departments";
+import { liveService, type CapabilityConfig } from "@/config/platform";
 import { buildScenarioRun } from "./scenario";
-import { getRunRequest, listRunRequestsFor, saveRunRequest } from "./runStore";
+import {
+  getRunRequest,
+  listRunRequests,
+  listRunRequestsFor,
+  saveRunRequest,
+} from "./runStore";
+import { createRemoteAssessmentClient } from "./remoteAssessmentClient";
 import type { AssessmentRequest, AssessmentRun } from "./types";
 
+/**
+ * Every method returns a *promise* — an answer that arrives later.
+ *
+ * The simulated engine answers immediately, but a real service answers when it is
+ * ready, and the two must look the same to every screen. That is why the seam
+ * waits in both cases. See `peekRun`/`peekRuns` below for how the workspace still
+ * renders instantly while nothing is configured.
+ */
 export interface AssessmentService {
-  /**
-   * Pure: build a run from a request without recording it. The same request
-   * always yields a byte-identical run.
-   */
-  buildRun(request: AssessmentRequest): AssessmentRun;
+  /** Build a run from a request without recording it. */
+  buildRun(request: AssessmentRequest): Promise<AssessmentRun>;
   /** Build a run and record it in the department's register. Returns the run. */
-  run(request: AssessmentRequest): AssessmentRun;
+  run(request: AssessmentRequest): Promise<AssessmentRun>;
   /** Look up a recorded run by id. */
-  getRun(runId: string): AssessmentRun | undefined;
+  getRun(runId: string): Promise<AssessmentRun | undefined>;
   /** Every recorded run for a department, newest first. */
-  listRuns(departmentId: DepartmentId): AssessmentRun[];
+  listRuns(departmentId: DepartmentId): Promise<AssessmentRun[]>;
 }
 
-/** Which client serves results. `service` requires a remote endpoint. */
-export type AssessmentMode = "scenario" | "service";
-
 /**
- * Configured mode. Defaults to `scenario`; set `VITE_ASSESSMENT_MODE=service`
- * in the deployment environment to select the remote client once it is
- * registered below.
- */
-export const ASSESSMENT_MODE: AssessmentMode =
-  import.meta.env.VITE_ASSESSMENT_MODE === "service" ? "service" : "scenario";
-
-/**
- * The deterministic engine wrapped in the service contract. `run` records the
- * request (not the result) so a stored run is always recomputed from its inputs.
+ * The deterministic engine behind the same contract. It answers immediately — a
+ * promise that is already resolved — so the workspace still renders in one frame,
+ * exactly as it always has. `run` records the request, never the result, so a
+ * stored run cannot drift from its inputs.
  */
 const createScenarioAssessmentService = (): AssessmentService => ({
-  buildRun: (request) => buildScenarioRun(request),
+  buildRun: (request) => Promise.resolve(buildScenarioRun(request)),
   run: (request) => {
     saveRunRequest(request);
-    return buildScenarioRun(request);
+    return Promise.resolve(buildScenarioRun(request));
   },
   getRun: (runId) => {
     const stored = getRunRequest(runId);
-    return stored ? buildScenarioRun(stored) : undefined;
+    return Promise.resolve(stored ? buildScenarioRun(stored) : undefined);
   },
   listRuns: (departmentId) =>
-    listRunRequestsFor(departmentId).map((stored) => buildScenarioRun(stored)),
+    Promise.resolve(listRunRequestsFor(departmentId).map((stored) => buildScenarioRun(stored))),
 });
 
 /**
- * Client registry — the single place a client is registered.
- * `service` is explicitly NOT registered yet: its create function is a
- * documented fallback to the scenario engine so that setting the env var before
- * the endpoint exists degrades to simulated results instead of breaking.
+ * The live service, selected only when a platform administrator has switched the
+ * assessment capability on AND supplied its address and key. There is no fallback
+ * to simulated numbers here: a failure is reported as a failure.
  */
-const CLIENTS: Record<AssessmentMode, { create: () => AssessmentService; registered: boolean }> = {
-  scenario: { create: createScenarioAssessmentService, registered: true },
-  service: { create: createScenarioAssessmentService, registered: false },
+const createLiveAssessmentService = (config: CapabilityConfig): AssessmentService =>
+  createRemoteAssessmentClient(config);
+
+/** Which engine serves this call, decided at the moment of the call. */
+const selectClient = (): AssessmentService => {
+  const config = liveService("assessment");
+  return config ? createLiveAssessmentService(config) : createScenarioAssessmentService();
 };
 
-/** Factory. Selects the registered client for the configured mode. */
-export const createAssessmentService = (mode: AssessmentMode = ASSESSMENT_MODE): AssessmentService =>
-  CLIENTS[mode].create();
-
-/** The process-wide service instance. Components import only this. */
-export const assessmentService: AssessmentService = createAssessmentService();
+/**
+ * The process-wide service. Every screen imports only this. It is a dispatcher
+ * rather than a fixed choice, so switching a capability in platform
+ * administration takes effect without a page reload.
+ */
+export const assessmentService: AssessmentService = {
+  buildRun: (request) => selectClient().buildRun(request),
+  run: (request) => selectClient().run(request),
+  getRun: (runId) => selectClient().getRun(runId),
+  listRuns: (departmentId) => selectClient().listRuns(departmentId),
+};
 
 /**
- * True while the deterministic scenario engine produces results — i.e. while no
- * remote client is registered for the configured mode (mock-first). The UI uses
- * this to label results as simulated.
+ * Synchronous reads, available ONLY while the simulated engine is configured.
+ *
+ * They exist so the workspace keeps rendering instantly with nothing configured —
+ * no spinner and no flicker. A live service answers later by definition, so these
+ * return `undefined` the moment a live assessment service is configured and the
+ * caller must wait instead. No screen calls them directly; the run hooks do.
  */
-export const isScenarioMode = (): boolean => !CLIENTS[ASSESSMENT_MODE].registered;
+/**
+ * The simulated engine, synchronously.
+ *
+ * Used by the demo path so the workspace can render without waiting, and by tests
+ * that need a run value to derive a graph from. It ALWAYS uses the simulated
+ * engine — a live service cannot answer in the same breath, by definition.
+ */
+export const buildSimulatedRun = (request: AssessmentRequest): AssessmentRun =>
+  buildScenarioRun(request);
+
+export const peekRun = (runId: string): AssessmentRun | undefined => {
+  if (liveService("assessment")) return undefined;
+  const stored = getRunRequest(runId);
+  return stored ? buildScenarioRun(stored) : undefined;
+};
+
+export const peekRuns = (departmentId?: DepartmentId | null): AssessmentRun[] | undefined => {
+  if (liveService("assessment")) return undefined;
+  return listRunRequests()
+    .filter((stored) => !departmentId || stored.departmentId === departmentId)
+    .map((stored) => buildScenarioRun(stored));
+};
+
+/**
+ * True while the simulated engine produces results. The UI uses this to label
+ * results as simulated, and it changes the moment an administrator switches the
+ * capability on.
+ */
+export const isScenarioMode = (): boolean => liveService("assessment") === null;

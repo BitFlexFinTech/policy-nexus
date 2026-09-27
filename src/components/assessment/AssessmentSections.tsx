@@ -45,6 +45,45 @@ export function RunNotFound({ heading }: { heading: string }) {
 }
 
 /**
+ * Shown while a live service is answering. It never appears while the platform is
+ * simulated, because the simulated engine answers in the same render.
+ */
+export function RunPending({ heading }: { heading: string }) {
+  return (
+    <div className="min-h-0 flex-1 overflow-y-auto p-4">
+      <h2 className="text-sm font-semibold tracking-tight text-foreground">{heading}</h2>
+      <div className="mt-3 rounded-lg border bg-card p-4 text-xs leading-relaxed text-muted-foreground">
+        Asking the configured service for this run. The simulated engine answers immediately; a live
+        service takes as long as it takes.
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Shown when a live service fails. A failure is reported as a failure — never
+ * replaced by a made-up result.
+ */
+export function RunError({ heading, message }: { heading: string; message: string }) {
+  return (
+    <div className="min-h-0 flex-1 overflow-y-auto p-4">
+      <h2 className="text-sm font-semibold tracking-tight text-foreground">{heading}</h2>
+      <div className="mt-3 rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-xs leading-relaxed text-foreground">
+        The configured service could not be reached: {message}
+        <div className="mt-3 flex flex-wrap gap-3">
+          <Link to="/app/simulations" className="font-medium text-primary hover:underline">
+            Open the simulation register →
+          </Link>
+          <Link to="/app" className="font-medium text-primary hover:underline">
+            Back to the workspace →
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Headline metrics. Each card opens to the note explaining what the figure means
  * (the interactivity rule: a summary card must open to more detail, not sit as a
  * bare number).

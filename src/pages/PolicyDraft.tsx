@@ -3,10 +3,11 @@ import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DocumentActions } from "@/components/assessment/DocumentActions";
 import { GeneratedDocumentView } from "@/components/assessment/GeneratedDocumentView";
-import { RunNotFound } from "@/components/assessment/AssessmentSections";
+import { RunError, RunNotFound, RunPending } from "@/components/assessment/AssessmentSections";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
 import { findDepartment } from "@/config/departments";
-import { buildPolicyDraft, renderDocumentText } from "@/services/assessment/documents";
+import { renderDocumentText } from "@/services/assessment/documents";
+import { useGeneratedDocument } from "@/services/documents/useGeneratedDocument";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
 
 /**
@@ -23,13 +24,14 @@ import { useRun } from "@/services/assessment/useAssessmentRuns";
 export default function PolicyDraft() {
   const params = useParams();
   const runId = params.id ? decodeURIComponent(params.id) : undefined;
-  const run = useRun(runId);
+  const { run, pending: runPending, error: runError } = useRun(runId);
 
   const department = useMemo(() => (run ? findDepartment(run.departmentId) : undefined), [run]);
-  const generated = useMemo(
-    () => (run && department ? buildPolicyDraft(run, department) : null),
-    [run, department],
-  );
+  const {
+    document: generated,
+    pending: documentPending,
+    error: documentError,
+  } = useGeneratedDocument("policy-draft", run, department);
   const generatedText = useMemo(
     () => (generated ? renderDocumentText(generated) : ""),
     [generated],
@@ -38,7 +40,12 @@ export default function PolicyDraft() {
   // null means "still the generated text". A string means the officer has edited it.
   const [edited, setEdited] = useState<string | null>(null);
 
-  if (!run || !department || !generated) return <RunNotFound heading="Drafted policy" />;
+  if (runPending) return <RunPending heading="Drafted policy" />;
+  if (runError) return <RunError heading="Drafted policy" message={runError} />;
+  if (!run || !department) return <RunNotFound heading="Drafted policy" />;
+  if (documentPending) return <RunPending heading="Drafted policy" />;
+  if (documentError) return <RunError heading="Drafted policy" message={documentError} />;
+  if (!generated) return <RunNotFound heading="Drafted policy" />;
 
   const isEdited = edited !== null;
   const text = edited ?? generatedText;

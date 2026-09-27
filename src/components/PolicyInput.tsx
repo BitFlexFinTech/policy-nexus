@@ -30,6 +30,8 @@ export function PolicyInput() {
   const [readProgress, setReadProgress] = useState(0);
   const [isReading, setIsReading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+  const [runError, setRunError] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
   /**
@@ -49,7 +51,7 @@ export function PolicyInput() {
     setSearchParams({}, { replace: true });
   }, [searchParams, department, setSearchParams]);
 
-  const handleRunSimulation = useCallback(() => {
+  const handleRunSimulation = useCallback(async () => {
     if (!department) return;
     const fileNames = uploadedFiles.map((file) => file.name);
     const text = draft.trim();
@@ -74,8 +76,22 @@ export function PolicyInput() {
       timeHorizon: template?.timeHorizon,
       fileNames,
     };
-    const run = assessmentService.run(request);
-    navigate(`/app/simulations/${encodeURIComponent(run.id)}`);
+    // The seam always hands back a promise. While the platform is simulated it is
+    // already resolved, so the officer waits for nothing — the run opens in the
+    // same moment it does today. A live service takes as long as it takes, and a
+    // failure is reported rather than swallowed.
+    setIsRunning(true);
+    setRunError(null);
+    try {
+      const run = await assessmentService.run(request);
+      navigate(`/app/simulations/${encodeURIComponent(run.id)}`);
+    } catch (error) {
+      setRunError(
+        error instanceof Error ? error.message : "The assessment service could not be reached.",
+      );
+    } finally {
+      setIsRunning(false);
+    }
   }, [department, draft, templateId, uploadedFiles, navigate]);
 
   /**
@@ -120,13 +136,21 @@ export function PolicyInput() {
         <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Policy Ingestion Hub</span>
         <Button
           size="sm"
-          onClick={handleRunSimulation}
-          disabled={!draft.trim() && uploadedFiles.length === 0}
+          onClick={() => {
+            void handleRunSimulation();
+          }}
+          disabled={isRunning || (!draft.trim() && uploadedFiles.length === 0)}
           className="h-7 bg-primary text-xs hover:bg-primary/90"
         >
           Run Simulation
         </Button>
       </div>
+
+      {runError && (
+        <p className="border-b bg-destructive/5 px-3 py-2 text-[10px] leading-relaxed text-destructive">
+          The run did not complete: {runError}
+        </p>
+      )}
 
       {/* Presets */}
       <div className="space-y-1 border-b px-3 py-2">

@@ -14,7 +14,7 @@ import { useAssessmentRuns } from "@/services/assessment/useAssessmentRuns";
 export default function Simulations() {
   const session = useSession();
   const department = findDepartment(session?.departmentId);
-  const runs = useAssessmentRuns(session?.departmentId ?? null);
+  const { runs } = useAssessmentRuns(session?.departmentId ?? null);
 
   if (!department) return null;
 

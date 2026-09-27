@@ -17,6 +17,7 @@ import AssessmentReport from "./pages/AssessmentReport.tsx";
 import PolicyDraft from "./pages/PolicyDraft.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import PlatformAdmin from "./pages/PlatformAdmin.tsx";
+import AuthCallback from "./pages/AuthCallback.tsx";
 import { ADMIN_ROUTE } from "@/config/platform";
 import { RequireSession } from "./routes/RequireSession.tsx";
 import { WorkspaceLayout } from "./layouts/WorkspaceLayout.tsx";
@@ -48,6 +49,9 @@ const App = () => (
               <Route path="/app/reference" element={<Reference />} />
             </Route>
           </Route>
+          {/* Where an identity provider returns the officer. Reached only by the
+              provider's redirect; nothing in the platform links to it. */}
+          <Route path="/auth/callback" element={<AuthCallback />} />
           {/* Platform administration. HIDDEN BY DESIGN: not linked from the landing
               page, the workspace navigation, the header or the footer, and not
               behind the department session — it is reached only by its address,

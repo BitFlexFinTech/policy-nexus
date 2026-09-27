@@ -60,7 +60,14 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     });
   });
 
-  /** The journey is only clean if the browser stayed offline and quiet. */
+  /**
+   * The journey is only clean if the browser stayed offline and quiet.
+   *
+   * This holds because NOTHING is configured in platform administration: every
+   * capability is simulated, so no request may leave the origin. If an
+   * administrator ever switches a capability on, this assertion is the thing that
+   * will report it — which is exactly what it is for.
+   */
   const expectCleanRuntime = () => {
     expect(consoleErrors, `console errors: ${consoleErrors.join(" | ")}`).toEqual([]);
     expect(pageErrors, `page errors: ${pageErrors.join(" | ")}`).toEqual([]);
@@ -388,6 +395,10 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
   test("the registers are actionable: a document opens and a draft loads", async ({ page }) => {
     await page.goto("/");
     await enterWorkspace(page);
+
+    // Nothing is configured, so the workspace must show no "live services" notice
+    // at all — the demo looks exactly as it always has.
+    await expect(page.getByText(/Live services in use/)).toHaveCount(0);
 
     // The document rail used to advertise a click with no handler behind it.
     const document = DEPARTMENT.documents[0];

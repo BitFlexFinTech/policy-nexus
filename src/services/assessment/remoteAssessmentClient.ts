@@ -67,6 +67,7 @@ export const isAssessmentRun = (value: unknown): value is AssessmentRun => {
 
 export interface RemoteAssessmentClient {
   buildRun(request: AssessmentRequest): Promise<AssessmentRun>;
+  run(request: AssessmentRequest): Promise<AssessmentRun>;
   getRun(runId: string): Promise<AssessmentRun | undefined>;
   listRuns(departmentId: string): Promise<AssessmentRun[]>;
 }
@@ -77,23 +78,39 @@ const authHeaders = (config: CapabilityConfig) => ({
 
 const base = (endpoint: string) => endpoint.trim().replace(/\/+$/, "");
 
+const postRun = async (
+  config: CapabilityConfig,
+  request: AssessmentRequest,
+): Promise<AssessmentRun> => {
+  const response = await fetch(base(config.endpoint), {
+    method: "POST",
+    headers: { "content-type": "application/json", ...authHeaders(config) },
+    body: JSON.stringify({ request }),
+  });
+  if (!response.ok) {
+    throw new Error(`The assessment service answered ${response.status}.`);
+  }
+  const payload: unknown = await response.json();
+  if (!isAssessmentRun(payload)) {
+    throw new Error("The assessment service did not return a complete run.");
+  }
+  return payload;
+};
+
 export const createRemoteAssessmentClient = (
   config: CapabilityConfig,
 ): RemoteAssessmentClient => ({
-  async buildRun(request) {
-    const response = await fetch(base(config.endpoint), {
-      method: "POST",
-      headers: { "content-type": "application/json", ...authHeaders(config) },
-      body: JSON.stringify({ request }),
-    });
-    if (!response.ok) {
-      throw new Error(`The assessment service answered ${response.status}.`);
-    }
-    const payload: unknown = await response.json();
-    if (!isAssessmentRun(payload)) {
-      throw new Error("The assessment service did not return a complete run.");
-    }
-    return payload;
+  buildRun(request) {
+    return postRun(config, request);
+  },
+
+  /**
+   * A live run is not recorded locally: with a service configured, the service is
+   * the register, and `listRuns` reads it. Recording inputs here as well would
+   * create two registers that could disagree.
+   */
+  run(request) {
+    return postRun(config, request);
   },
 
   async getRun(runId) {

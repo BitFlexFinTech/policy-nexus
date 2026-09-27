@@ -97,22 +97,24 @@ The client is OIDC Authorization Code + PKCE (S256), no dependency
 The `redirect_uri` must be registered with the provider — that registration is
 outside this platform's reach.
 
-## 5. Wiring that is still outstanding (platform side)
+## 5. Wiring status (platform side)
 
-Named so it cannot be mistaken for "done":
+**DONE — the platform is fully wired.** The run path is asynchronous; all four capabilities —
+assessment, drafting, document text extraction and sign-in — are connected behind their seams; a
+capability is only ever used when it is *completely* configured and switched on; and with nothing
+configured the platform stays simulated and makes **no request at all**. While simulated, the
+seams answer in the same render, so the screens look exactly as they always have — no spinners.
 
-1. **The run path must become asynchronous.** `AssessmentService` — the interface
-   the screens use — is synchronous, so the remote assessment client
-   (`src/services/assessment/remoteAssessmentClient.ts`) and the remote drafting
-   client (`src/services/documents/remoteDraftingClient.ts`) are **built, unit-
-   tested against a stubbed transport, and NOT connected to any screen.** Wiring
-   them means: make the interface return promises, then follow that through the
-   policy input, `useAssessmentRuns`, `useRun`, and every register that lists runs,
-   adding loading and error states. Until then, live mode changes nothing on screen.
-2. **A callback route and a claim mapping for sign-in.** `completeSignIn` returns
-   the identity token; something must receive the callback at the configured
-   redirect address and map the token's claims to one of the 16 department IDs.
-   Neither is possible without a registered provider.
-3. **Credential storage.** Keys are held in the browser's local storage and are
-   readable through developer tools. A production deployment should hold them in a
-   server-side proxy and give the browser only a session token.
+**Still outstanding — and none of it is platform work:**
+
+1. **The services themselves.** Nothing exists yet to answer. Until something does, completing a
+   capability in administration changes nothing on screen: the platform waits, and reports
+   honestly when nothing answers. It never substitutes a made-up result for a live one.
+2. **Sign-in verification.** The callback reads the department from the provider's answer **in the
+   browser, which cannot check that answer's signature**. Before real use, the code exchange and
+   the department mapping must move to a server. The screen says this in plain words; it is not
+   hidden.
+3. **Credential storage.** Keys are held in the browser's local storage and are readable through
+   developer tools. A production deployment should hold them in a server-side proxy and give the
+   browser only a session token.
+

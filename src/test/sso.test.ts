@@ -5,7 +5,14 @@ import {
   saveConfig,
   type SsoConfig,
 } from "@/config/platform";
-import { beginSignIn, completeSignIn, isSsoConfigured, signInUrl } from "@/session/sso";
+import { SESSION_STORAGE_KEY, getSession, signInWithSso } from "@/session/session";
+import {
+  beginSignIn,
+  claimFrom,
+  completeSignIn,
+  isSsoConfigured,
+  signInUrl,
+} from "@/session/sso";
 
 /** Local addresses only, so no reachable remote address appears in this file. */
 const IDP = "http://localhost:8787/idp";
@@ -16,12 +23,17 @@ const ssoConfig: SsoConfig = {
   issuer: IDP,
   clientId: "client-1",
   redirectUri: CALLBACK,
+  departmentClaim: "department_id",
 };
 
 const STATE_KEY = "nzwisiso.sso.state.v1";
 const VERIFIER_KEY = "nzwisiso.sso.verifier.v1";
 
 const configureSso = () => saveConfig({ ...DEFAULT_PLATFORM_CONFIG, sso: ssoConfig });
+
+/** A token shaped like the provider's: header.payload.signature. */
+const tokenWith = (payload: Record<string, unknown>) =>
+  `header.${btoa(JSON.stringify(payload)).split("+").join("-").split("/").join("_").split("=").join("")}.signature`;
 
 beforeEach(() => {
   window.localStorage.clear();
@@ -109,3 +121,47 @@ describe("government sign-in client", () => {
     });
   });
 });
+
+describe("reading a claim from the provider's token", () => {
+  it("reads the department the provider states, and who signed in", () => {
+    const token = tokenWith({ department_id: "fin", sub: "officer-1" });
+    expect(claimFrom(token, "department_id")).toBe("fin");
+    expect(claimFrom(token, "sub")).toBe("officer-1");
+  });
+
+  it("returns nothing for a claim that is absent, empty or not text", () => {
+    expect(claimFrom(tokenWith({ department_id: "" }), "department_id")).toBeNull();
+    expect(claimFrom(tokenWith({ department_id: 5 }), "department_id")).toBeNull();
+    expect(claimFrom(tokenWith({}), "department_id")).toBeNull();
+  });
+
+  it("returns nothing for a token it cannot read", () => {
+    expect(claimFrom("not-a-token", "department_id")).toBeNull();
+    expect(claimFrom("header.!!!not-base64!!!.signature", "department_id")).toBeNull();
+  });
+});
+
+describe("a session that came from the provider", () => {
+  it("records that sign-in was real, and who signed in", () => {
+    expect(signInWithSso("fin", "officer-1")).toMatchObject({
+      departmentId: "fin",
+      mode: "sso",
+      subject: "officer-1",
+    });
+    expect(getSession()).toMatchObject({ mode: "sso", subject: "officer-1" });
+  });
+
+  it("refuses an id that is not one of the 16 departments", () => {
+    expect(signInWithSso("not-a-department", "officer-1")).toBeNull();
+    expect(getSession()).toBeNull();
+  });
+
+  it("never reads an unrecognised stored mode as a real sign-in", () => {
+    window.localStorage.setItem(
+      SESSION_STORAGE_KEY,
+      JSON.stringify({ departmentId: "fin", mode: "whatever", signedInAt: "2026-09-24" }),
+    );
+    expect(getSession()?.mode).toBe("oneclick");
+  });
+});
+

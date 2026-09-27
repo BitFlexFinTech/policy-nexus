@@ -1,11 +1,13 @@
+import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DocumentActions } from "@/components/assessment/DocumentActions";
 import { GeneratedDocumentView } from "@/components/assessment/GeneratedDocumentView";
-import { RunNotFound } from "@/components/assessment/AssessmentSections";
+import { RunError, RunNotFound, RunPending } from "@/components/assessment/AssessmentSections";
 import { DISCLAIMER } from "@/config/brand";
 import { findDepartment } from "@/config/departments";
-import { buildLongReport, renderDocumentText } from "@/services/assessment/documents";
+import { renderDocumentText } from "@/services/assessment/documents";
+import { useGeneratedDocument } from "@/services/documents/useGeneratedDocument";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
 
 /**
@@ -17,14 +19,21 @@ import { useRun } from "@/services/assessment/useAssessmentRuns";
 export default function AssessmentReport() {
   const params = useParams();
   const runId = params.id ? decodeURIComponent(params.id) : undefined;
-  const run = useRun(runId);
+  const { run, pending: runPending, error: runError } = useRun(runId);
+  const department = useMemo(() => (run ? findDepartment(run.departmentId) : undefined), [run]);
+  const {
+    document: report,
+    pending: reportPending,
+    error: reportError,
+  } = useGeneratedDocument("report", run, department);
 
+  if (runPending) return <RunPending heading="Full report" />;
+  if (runError) return <RunError heading="Full report" message={runError} />;
   if (!run) return <RunNotFound heading="Full report" />;
-
-  const department = findDepartment(run.departmentId);
   if (!department) return <RunNotFound heading="Full report" />;
-
-  const report = buildLongReport(run, department);
+  if (reportPending) return <RunPending heading="Full report" />;
+  if (reportError) return <RunError heading="Full report" message={reportError} />;
+  if (!report) return <RunNotFound heading="Full report" />;
 
   return (
     <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">

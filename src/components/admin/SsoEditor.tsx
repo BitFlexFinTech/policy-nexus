@@ -84,17 +84,45 @@ export function SsoEditor({
             className="h-8 text-xs"
           />
         </div>
+
+        <div className="space-y-1 md:col-span-2">
+          <Label htmlFor="sso-claim" className={FIELD_LABEL}>
+            Department claim
+          </Label>
+          <Input
+            id="sso-claim"
+            value={sso.departmentClaim}
+            placeholder="The field that names the officer's department"
+            onChange={(event) => update({ departmentClaim: event.target.value })}
+            className="h-8 font-mono text-xs"
+            autoComplete="off"
+            spellCheck={false}
+          />
+          <p className="text-[10px] text-muted-foreground">
+            The name of the field the provider puts the department in, for example{" "}
+            <span className="font-mono text-foreground">department_id</span>.
+          </p>
+        </div>
       </div>
 
       <p className="mt-3 text-[10px] text-muted-foreground">
         Registering this address with the provider is part of the identity-provider setup, not
-        something this screen can do.{" "}
+        something this screen can do. The provider's answer is read in the browser, which cannot
+        check its signature — that must be verified on a server before real use.{" "}
         <Button
           type="button"
           size="sm"
           variant="outline"
           className="h-6 px-2 text-[10px]"
-          onClick={() => update({ issuer: "", clientId: "", redirectUri: "", mode: "simulated" })}
+          onClick={() =>
+            update({
+              issuer: "",
+              clientId: "",
+              redirectUri: "",
+              departmentClaim: "department_id",
+              mode: "simulated",
+            })
+          }
         >
           Clear sign-in settings
         </Button>

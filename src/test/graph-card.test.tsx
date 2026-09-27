@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { RelationshipGraphCard } from "@/components/relationship/RelationshipGraphCard";
 import { findDepartment } from "@/config/departments";
-import { assessmentService } from "@/services/assessment/AssessmentService";
+import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
 import {
   RELATION_BANK,
   buildPreviewRelationshipGraph,
@@ -44,7 +44,7 @@ const requestFor = (departmentId: string): AssessmentRequest => {
 };
 
 const scenario = (departmentId: string) => {
-  const run = assessmentService.buildRun(requestFor(departmentId));
+  const run = buildSimulatedRun(requestFor(departmentId));
   return { run, graph: buildRelationshipGraph(run), seed: `${run.seed}::swarm` };
 };
 

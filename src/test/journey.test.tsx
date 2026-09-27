@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import App from "@/App";
 import { DISCLAIMER } from "@/config/brand";
 import { findDepartment } from "@/config/departments";
 import { clearSession, signInToDepartment } from "@/session/session";
-import { assessmentService } from "@/services/assessment/AssessmentService";
-import { clearRuns, listRunRequests } from "@/services/assessment/runStore";
+import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
+import { clearRuns, listRunRequests, saveRunRequest } from "@/services/assessment/runStore";
 import type { AssessmentRequest } from "@/services/assessment/types";
 import { RUN_ROUND_TICK_MS } from "@/pages/SimulationRun";
 
@@ -29,6 +29,16 @@ const requestFor = (departmentId: string): AssessmentRequest => {
 };
 
 /**
+ * Record a run and return it, in one synchronous step — exactly what the
+ * simulated engine does for the workspace. The demo path is synchronous by
+ * design, and this suite drives it with fake timers, so the tests must not await.
+ */
+const recordRun = (request: AssessmentRequest) => {
+  saveRunRequest(request);
+  return buildSimulatedRun(request);
+};
+
+/**
  * The end-to-end journey in jsdom: a policy draft is submitted, the live
  * simulation runs to completion, and the executive summary and full assessment
  * render every figure the run produced. This is what catches a route that
@@ -46,13 +56,14 @@ describe("journey — run a policy, then read its assessment", () => {
     vi.useRealTimers();
   });
 
-  it("submits a preset draft and opens the live simulation for it", () => {
+  it("submits a preset draft and opens the live simulation for it", async () => {
     const preset = findDepartment("fin")!.policyTemplates[0];
     renderAt("/app");
     fireEvent.click(screen.getByRole("button", { name: preset.title }));
     fireEvent.click(screen.getByRole("button", { name: "Run Simulation" }));
 
-    expect(window.location.pathname.startsWith("/app/simulations/")).toBe(true);
+    // The seam answers in a microtask, so the address changes a moment later.
+    await waitFor(() => expect(window.location.pathname).toContain("/app/simulations/"));
     expect(listRunRequests()).toHaveLength(1);
     expect(listRunRequests()[0].templateId).toBe(preset.id);
     expect(listRunRequests()[0].source).toBe("preset");
@@ -60,7 +71,7 @@ describe("journey — run a policy, then read its assessment", () => {
 
   it("runs every round and reaches Assessment Complete", () => {
     vi.useFakeTimers();
-    const run = assessmentService.run(requestFor("fin"));
+    const run = recordRun(requestFor("fin"));
     renderAt(`/app/simulations/${encodeURIComponent(run.id)}`);
 
     expect(screen.getByText(/Running deterministic rounds/)).toBeInTheDocument();
@@ -85,7 +96,7 @@ describe("journey — run a policy, then read its assessment", () => {
   });
 
   it("renders the executive summary with every metric, group, impact and risk", () => {
-    const run = assessmentService.run(requestFor("fin"));
+    const run = recordRun(requestFor("fin"));
     renderAt(`/app/assessments/${encodeURIComponent(run.id)}`);
 
     expect(screen.getByRole("heading", { name: "Executive Summary" })).toBeInTheDocument();
@@ -111,7 +122,7 @@ describe("journey — run a policy, then read its assessment", () => {
   });
 
   it("renders the full assessment with recommendations, inputs and seed", () => {
-    const run = assessmentService.run(requestFor("fin"));
+    const run = recordRun(requestFor("fin"));
     renderAt(`/app/assessments/${encodeURIComponent(run.id)}/full`);
 
     expect(screen.getByRole("heading", { name: "Full Assessment" })).toBeInTheDocument();
@@ -128,14 +139,14 @@ describe("journey — run a policy, then read its assessment", () => {
   });
 
   it("guards the simulation and assessment routes without a session, sending the user to the chooser", () => {
-    const run = assessmentService.run(requestFor("fin"));
+    const run = recordRun(requestFor("fin"));
     clearSession();
     renderAt(`/app/simulations/${encodeURIComponent(run.id)}`);
     expect(window.location.pathname).toBe("/start");
   });
 
   it("opens the long-form report with every group the run produced", () => {
-    const run = assessmentService.run(requestFor("fin"));
+    const run = recordRun(requestFor("fin"));
     renderAt(`/app/assessments/${encodeURIComponent(run.id)}/report`);
 
     expect(screen.getByRole("heading", { name: "Full report" })).toBeInTheDocument();
@@ -154,7 +165,7 @@ describe("journey — run a policy, then read its assessment", () => {
   });
 
   it("drafts the policy and lets the officer edit the wording before export", () => {
-    const run = assessmentService.run(requestFor("fin"));
+    const run = recordRun(requestFor("fin"));
     renderAt(`/app/assessments/${encodeURIComponent(run.id)}/policy-draft`);
 
     expect(screen.getByRole("heading", { name: "Drafted policy" })).toBeInTheDocument();

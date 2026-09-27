@@ -27,32 +27,36 @@ describe("assessment engine — determinism and coverage", () => {
     clearRuns();
   });
 
-  it("returns a byte-identical run for the same request", () => {
+  it("returns a byte-identical run for the same request", async () => {
     const request = requestFor("fin");
-    const first = assessmentService.buildRun(request);
-    const second = assessmentService.buildRun(request);
+    const first = await assessmentService.buildRun(request);
+    const second = await assessmentService.buildRun(request);
     expect(JSON.stringify(first)).toBe(JSON.stringify(second));
     expect(first.seed).toBe(second.seed);
     expect(first.id).toBe(second.id);
   });
 
-  it("ignores cosmetic whitespace and case in the policy text", () => {
+  it("ignores cosmetic whitespace and case in the policy text", async () => {
     const base = requestFor("agri");
     const messy: AssessmentRequest = {
       ...base,
       policyText: `  ${base.policyText.replace(/ /g, "\n  ").toUpperCase()}  `,
     };
-    expect(assessmentService.buildRun(messy).id).toBe(assessmentService.buildRun(base).id);
+    expect((await assessmentService.buildRun(messy)).id).toBe(
+      (await assessmentService.buildRun(base)).id,
+    );
   });
 
-  it("produces a different run when the policy text actually changes", () => {
+  it("produces a different run when the policy text actually changes", async () => {
     const base = requestFor("health");
     const changed: AssessmentRequest = { ...base, policyText: `${base.policyText} Additional clause.` };
-    expect(assessmentService.buildRun(changed).id).not.toBe(assessmentService.buildRun(base).id);
+    expect((await assessmentService.buildRun(changed)).id).not.toBe(
+      (await assessmentService.buildRun(base)).id,
+    );
   });
 
-  it.each(DEPARTMENTS)("covers every modelled group and priority for $abbr", (department) => {
-    const run = assessmentService.buildRun(requestFor(department.id));
+  it.each(DEPARTMENTS)("covers every modelled group and priority for $abbr", async (department) => {
+    const run = await assessmentService.buildRun(requestFor(department.id));
     expect(run.reactions).toHaveLength(department.segments.length);
     expect(run.impacts).toHaveLength(department.priorities.length);
     expect(run.status).toBe("complete");
@@ -71,25 +75,25 @@ describe("assessment engine — determinism and coverage", () => {
     });
   });
 
-  it("buildRun is pure — it does not record the run", () => {
-    assessmentService.buildRun(requestFor("ict"));
+  it("buildRun is pure — it does not record the run", async () => {
+    await assessmentService.buildRun(requestFor("ict"));
     expect(listRunRequests()).toHaveLength(0);
   });
 
-  it("run records the request and can be looked up again", () => {
-    const run = assessmentService.run(requestFor("zida"));
+  it("run records the request and can be looked up again", async () => {
+    const run = await assessmentService.run(requestFor("zida"));
     expect(listRunRequests()).toHaveLength(1);
     expect(getRunRequest(run.id)?.policyText).toBe(run.policyText);
-    expect(assessmentService.getRun(run.id)?.id).toBe(run.id);
+    expect((await assessmentService.getRun(run.id))?.id).toBe(run.id);
     expect(listRunRequestsFor("zida")).toHaveLength(1);
     expect(listRunRequestsFor("opc")).toHaveLength(0);
-    expect(assessmentService.listRuns("zida")[0].id).toBe(run.id);
+    expect((await assessmentService.listRuns("zida"))[0].id).toBe(run.id);
   });
 
-  it("re-running identical inputs replaces the register row instead of duplicating it", () => {
+  it("re-running identical inputs replaces the register row instead of duplicating it", async () => {
     const request = requestFor("mines");
-    assessmentService.run(request);
-    assessmentService.run(request);
+    await assessmentService.run(request);
+    await assessmentService.run(request);
     expect(listRunRequests()).toHaveLength(1);
   });
 });

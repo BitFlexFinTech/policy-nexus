@@ -59,6 +59,11 @@ export function HeaderBar() {
                 Entry: one-click (Mock)
               </span>
             )}
+            {session?.mode === "sso" && (
+              <span className="rounded border border-primary-foreground/30 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-primary-foreground/75">
+                Entry: government sign-in
+              </span>
+            )}
             <Button
               variant="secondary"
               size="sm"

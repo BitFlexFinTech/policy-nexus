@@ -43,6 +43,8 @@ export interface SsoConfig {
   /** A client ID is public, not a secret — stated in the admin screen. */
   clientId: string;
   redirectUri: string;
+  /** Which claim in the provider's token names the officer's department. */
+  departmentClaim: string;
 }
 
 export interface PlatformConfig {
@@ -85,7 +87,7 @@ export const DEFAULT_PLATFORM_CONFIG: PlatformConfig = {
   assessment: { ...SIMULATED },
   drafting: { ...SIMULATED },
   extraction: { ...SIMULATED },
-  sso: { mode: "simulated", issuer: "", clientId: "", redirectUri: "" },
+  sso: { mode: "simulated", issuer: "", clientId: "", redirectUri: "", departmentClaim: "department_id" },
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -132,6 +134,7 @@ export const normaliseConfig = (value: unknown): PlatformConfig => {
       issuer: asString(sso.issuer, ""),
       clientId: asString(sso.clientId, ""),
       redirectUri: asString(sso.redirectUri, ""),
+      departmentClaim: asString(sso.departmentClaim, "department_id"),
     },
   };
 };
@@ -232,6 +235,7 @@ export const describeCapability = (
     if (!isAbsoluteHttpUrl(config.sso.issuer)) missing.push("issuer URL");
     if (!config.sso.clientId.trim()) missing.push("client ID");
     if (!isAbsoluteHttpUrl(config.sso.redirectUri)) missing.push("redirect URL");
+    if (!config.sso.departmentClaim.trim()) missing.push("department claim");
     return missing.length
       ? {
           id,

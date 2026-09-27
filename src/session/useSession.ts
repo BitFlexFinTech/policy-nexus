@@ -4,6 +4,7 @@ import {
   getSessionServerSnapshot,
   getSessionSnapshot,
   signInToDepartment,
+  signInWithSso,
   subscribeToSession,
   type Session,
 } from "./session";
@@ -21,5 +22,6 @@ export const useSession = (): Session | null =>
  */
 export const sessionActions = {
   signInToDepartment,
+  signInWithSso,
   clearSession,
 };

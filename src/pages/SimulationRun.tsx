@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { EngineStatus } from "@/components/EngineStatus";
 import { RelationshipGraphCard } from "@/components/relationship/RelationshipGraphCard";
+import { RunError, RunPending } from "@/components/assessment/AssessmentSections";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { StatusPill } from "@/components/StatusPill";
@@ -42,7 +43,8 @@ const toneClassFor = (round: SimulationRound, position: number) =>
 export default function SimulationRun() {
   const params = useParams();
   const runId = params.id ? decodeURIComponent(params.id) : undefined;
-  const run = useRun(runId);
+  const runResult = useRun(runId);
+  const run = runResult.run;
 
   const [revealed, setRevealed] = useState(0);
   const total = run?.rounds.length ?? 0;
@@ -68,6 +70,11 @@ export default function SimulationRun() {
    * only when the run changes — never per reveal.
    */
   const graph = useMemo(() => (run ? buildRelationshipGraph(run) : null), [run]);
+
+  if (runResult.pending) return <RunPending heading="Simulation Run" />;
+  if (runResult.error) {
+    return <RunError heading="Simulation Run" message={runResult.error} />;
+  }
 
   if (!run) {
     return (

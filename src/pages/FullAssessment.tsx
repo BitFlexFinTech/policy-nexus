@@ -9,7 +9,9 @@ import {
   ReactionList,
   RecommendationList,
   RiskList,
+  RunError,
   RunNotFound,
+  RunPending,
 } from "@/components/assessment/AssessmentSections";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
@@ -22,8 +24,10 @@ import { useRun } from "@/services/assessment/useAssessmentRuns";
 export default function FullAssessment() {
   const params = useParams();
   const runId = params.id ? decodeURIComponent(params.id) : undefined;
-  const run = useRun(runId);
+  const { run, pending, error } = useRun(runId);
 
+  if (pending) return <RunPending heading="Full Assessment" />;
+  if (error) return <RunError heading="Full Assessment" message={error} />;
   if (!run) return <RunNotFound heading="Full Assessment" />;
 
   return (

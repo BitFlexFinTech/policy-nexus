@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { findDepartment } from "@/config/departments";
 import { getStakeholderSegment } from "@/config/reference";
-import { assessmentService } from "@/services/assessment/AssessmentService";
+import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
 import {
   PREVIEW_DEPARTMENT_ID,
   RELATION_BANK,
@@ -39,7 +39,7 @@ const ALL_RELATIONS = new Set<string>([
  */
 describe("relationship graph — derived from the run", () => {
   it("holds the draft, the modelled groups, the priorities and the department's documents", () => {
-    const run = assessmentService.buildRun(requestFor("fin"));
+    const run = buildSimulatedRun(requestFor("fin"));
     const department = findDepartment("fin")!;
     const graph = buildRelationshipGraph(run);
 
@@ -59,7 +59,7 @@ describe("relationship graph — derived from the run", () => {
   });
 
   it("dates every arrival to a round the run really produced", () => {
-    const run = assessmentService.buildRun(requestFor("fin"));
+    const run = buildSimulatedRun(requestFor("fin"));
     const graph = buildRelationshipGraph(run);
     const roundIndexes = new Set(run.rounds.map((round) => round.index));
 
@@ -90,7 +90,7 @@ describe("relationship graph — derived from the run", () => {
   });
 
   it("is still incomplete at the halfway point — the graph grows, rather than appearing whole", () => {
-    const run = assessmentService.buildRun(requestFor("fin"));
+    const run = buildSimulatedRun(requestFor("fin"));
     const graph = buildRelationshipGraph(run);
     const halfway = Math.floor(run.rounds.length / 2);
 
@@ -105,12 +105,12 @@ describe("relationship graph — derived from the run", () => {
   });
 
   it("reproduces byte-identically, and moves when the draft moves", () => {
-    const first = buildRelationshipGraph(assessmentService.buildRun(requestFor("fin")));
-    const second = buildRelationshipGraph(assessmentService.buildRun(requestFor("fin")));
+    const first = buildRelationshipGraph(buildSimulatedRun(requestFor("fin")));
+    const second = buildRelationshipGraph(buildSimulatedRun(requestFor("fin")));
     expect(JSON.stringify(second)).toBe(JSON.stringify(first));
 
     const other = buildRelationshipGraph(
-      assessmentService.buildRun({
+      buildSimulatedRun({
         ...requestFor("fin"),
         policyText: "A different draft, on the same subject, submitted for comparison.",
       }),
@@ -119,7 +119,7 @@ describe("relationship graph — derived from the run", () => {
   });
 
   it("states every relation from the one bank of phrases, with a weight in range", () => {
-    const graph = buildRelationshipGraph(assessmentService.buildRun(requestFor("opc")));
+    const graph = buildRelationshipGraph(buildSimulatedRun(requestFor("opc")));
     graph.edges.forEach((edge) => {
       expect(ALL_RELATIONS.has(edge.relation)).toBe(true);
       expect(edge.strength).toBeGreaterThanOrEqual(0);
@@ -128,7 +128,7 @@ describe("relationship graph — derived from the run", () => {
   });
 
   it("carries the run's own modelled sentiment as the group-to-draft relation", () => {
-    const run = assessmentService.buildRun(requestFor("health"));
+    const run = buildSimulatedRun(requestFor("health"));
     const graph = buildRelationshipGraph(run);
     run.reactions.forEach((reaction) => {
       const toDraft = graph.edges.filter(
