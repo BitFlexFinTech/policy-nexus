@@ -16,6 +16,8 @@ import FullAssessment from "./pages/FullAssessment.tsx";
 import AssessmentReport from "./pages/AssessmentReport.tsx";
 import PolicyDraft from "./pages/PolicyDraft.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import PlatformAdmin from "./pages/PlatformAdmin.tsx";
+import { ADMIN_ROUTE } from "@/config/platform";
 import { RequireSession } from "./routes/RequireSession.tsx";
 import { WorkspaceLayout } from "./layouts/WorkspaceLayout.tsx";
 
@@ -46,6 +48,11 @@ const App = () => (
               <Route path="/app/reference" element={<Reference />} />
             </Route>
           </Route>
+          {/* Platform administration. HIDDEN BY DESIGN: not linked from the landing
+              page, the workspace navigation, the header or the footer, and not
+              behind the department session — it is reached only by its address,
+              which lives in one constant so it can be re-homed for production. */}
+          <Route path={ADMIN_ROUTE} element={<PlatformAdmin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

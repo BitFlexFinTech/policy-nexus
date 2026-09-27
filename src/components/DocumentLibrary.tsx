@@ -1,15 +1,22 @@
+import { useState } from "react";
 import { File, FileText } from "lucide-react";
-import { findDepartment } from "@/config/departments";
+import { findDepartment, type DepartmentDocument } from "@/config/departments";
 import { formatReferenceDate } from "@/config/reference";
 import { useSession } from "@/session/useSession";
+import { RecordedDocumentDialog } from "@/components/documents/RecordedDocumentDialog";
 
 /**
  * Department document rail. Reads the signed-in department's document register
  * rather than a shared hardcoded list, and shows every document it declares.
+ *
+ * Selecting a document opens what the register knows about it, so the row's hover
+ * and pointer styling is honoured by a real action (it previously advertised a
+ * click and did nothing).
  */
 export function DocumentLibrary() {
   const session = useSession();
   const department = findDepartment(session?.departmentId);
+  const [selected, setSelected] = useState<DepartmentDocument | null>(null);
 
   if (!department) return null;
 
@@ -20,10 +27,12 @@ export function DocumentLibrary() {
       </div>
       <div className="flex-1 space-y-1 overflow-y-auto p-2">
         {department.documents.map((doc) => (
-          <div
+          <button
             key={doc.id}
+            type="button"
+            onClick={() => setSelected(doc)}
             title={doc.note}
-            className="flex cursor-pointer items-start gap-2 rounded-md px-2 py-2 transition-colors hover:bg-muted/50"
+            className="flex w-full items-start gap-2 rounded-md px-2 py-2 text-left transition-colors hover:bg-muted/50 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary"
           >
             {doc.kind === "pdf" ? (
               <FileText className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
@@ -36,9 +45,17 @@ export function DocumentLibrary() {
                 {doc.sizeLabel} · {formatReferenceDate(doc.date)}
               </span>
             </div>
-          </div>
+          </button>
         ))}
       </div>
+      <RecordedDocumentDialog
+        document={selected}
+        departmentName={department.name}
+        open={selected !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelected(null);
+        }}
+      />
     </div>
   );
 }

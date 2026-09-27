@@ -1,11 +1,13 @@
+import { Link } from "react-router-dom";
 import { findDepartment } from "@/config/departments";
 import { getStakeholderSegment, getTimeHorizon } from "@/config/reference";
 import { useSession } from "@/session/useSession";
 
 /**
  * Policy Register — the signed-in department's prepared policy drafts, with the
- * horizon and the stakeholder groups each one touches. Read-only: drafting and
- * running happen from the workspace and the simulation register.
+ * horizon and the stakeholder groups each one touches. Each entry can be loaded
+ * into the workspace policy input, so the register leads somewhere rather than
+ * being a list that cannot be acted on.
  */
 export default function Policies() {
   const session = useSession();
@@ -38,12 +40,20 @@ export default function Policies() {
             <p className="font-mono-code mt-2 whitespace-pre-wrap rounded-md border bg-background p-3 text-[11px] leading-relaxed text-foreground">
               {draft.policyText}
             </p>
-            <div className="mt-2 flex flex-wrap gap-1">
-              {draft.segments.map((segmentId) => (
-                <span key={segmentId} className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] text-primary">
-                  {getStakeholderSegment(segmentId).label}
-                </span>
-              ))}
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap gap-1">
+                {draft.segments.map((segmentId) => (
+                  <span key={segmentId} className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] text-primary">
+                    {getStakeholderSegment(segmentId).label}
+                  </span>
+                ))}
+              </div>
+              <Link
+                to={`/app?draft=${encodeURIComponent(draft.id)}`}
+                className="text-[10px] font-medium text-primary hover:underline"
+              >
+                Use this draft →
+              </Link>
             </div>
           </article>
         ))}

@@ -72,9 +72,12 @@ export function HistoryTable() {
                     <td className="px-3 py-1.5 text-right font-mono text-foreground">{draft.segments.length}</td>
                     <td className="px-3 py-1.5 text-muted-foreground">—</td>
                     <td className="px-3 py-1.5">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                        Draft
-                      </span>
+                      <Link
+                        to={`/app?draft=${encodeURIComponent(draft.id)}`}
+                        className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground hover:text-primary hover:underline"
+                      >
+                        Draft — use →
+                      </Link>
                     </td>
                   </tr>
                 ))}

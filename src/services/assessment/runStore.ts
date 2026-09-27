@@ -14,6 +14,7 @@
 
 import { REFERENCE_DATE } from "@/config/reference";
 import { isDepartmentId } from "@/config/departments";
+import { createKeyValueStore } from "@/lib/browserStorage";
 import { runIdFor } from "./seed";
 import type { AssessmentRequest } from "./types";
 
@@ -26,44 +27,13 @@ export interface StoredRun extends AssessmentRequest {
 }
 
 /* ------------------------------------------------------------------------- */
-/* Storage adapter — persistent, with a stated in-memory fallback.             */
+/* Storage adapter — the shared browser adapter (src/lib/browserStorage.ts).   */
 /* ------------------------------------------------------------------------- */
 
-const memoryStore = new Map<string, string>();
-let usingMemoryFallback = false;
-
-const storage = {
-  read(key: string): string | null {
-    if (usingMemoryFallback) return memoryStore.get(key) ?? null;
-    try {
-      return window.localStorage.getItem(key);
-    } catch {
-      usingMemoryFallback = true;
-      return memoryStore.get(key) ?? null;
-    }
-  },
-  write(key: string, value: string) {
-    memoryStore.set(key, value);
-    if (usingMemoryFallback) return;
-    try {
-      window.localStorage.setItem(key, value);
-    } catch {
-      usingMemoryFallback = true;
-    }
-  },
-  remove(key: string) {
-    memoryStore.delete(key);
-    if (usingMemoryFallback) return;
-    try {
-      window.localStorage.removeItem(key);
-    } catch {
-      usingMemoryFallback = true;
-    }
-  },
-};
+const storage = createKeyValueStore();
 
 /** False when the browser refused persistent storage and memory is in use. */
-export const isRunStorePersistent = () => !usingMemoryFallback;
+export const isRunStorePersistent = () => storage.isPersistent();
 
 /* ------------------------------------------------------------------------- */
 /* Snapshot + subscription                                                     */

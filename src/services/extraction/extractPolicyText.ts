@@ -12,6 +12,9 @@
  * (see .clinerules/04-determinism-and-validation.md and PRODUCTION_READINESS.md §4).
  */
 
+import { liveService } from "@/config/platform";
+import { requestTextExtraction } from "./httpExtractionClient";
+
 export type ExtractionKind = "text" | "pdf" | "docx" | "unsupported";
 
 export interface ExtractedPolicyFile {
@@ -126,6 +129,43 @@ export const extractPolicyFile = async (file: File): Promise<ExtractedPolicyFile
   }
 
   if (kind === "pdf" || kind === "docx") {
+    // LIVE PATH: only reachable when an administrator has completed the
+    // extraction capability in platform administration. Otherwise the file is
+    // recorded by name and the screen says so.
+    const live = liveService("extraction");
+    if (live) {
+      const label = kind.toUpperCase();
+      try {
+        const remoteText = await requestTextExtraction(file, live);
+        if (remoteText) {
+          const text = normalisePolicyText(remoteText);
+          if (text) {
+            return {
+              ...base,
+              kind,
+              extracted: true,
+              text,
+              status: `Text extracted by the configured service (${label}).`,
+            };
+          }
+        }
+        return {
+          ...base,
+          kind,
+          extracted: false,
+          text: "",
+          status: `The configured service returned no readable text for this ${label} file.`,
+        };
+      } catch {
+        return {
+          ...base,
+          kind,
+          extracted: false,
+          text: "",
+          status: `The configured service could not be reached; the file is recorded by name.`,
+        };
+      }
+    }
     return {
       ...base,
       kind,

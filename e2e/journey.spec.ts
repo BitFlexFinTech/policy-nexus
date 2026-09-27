@@ -385,6 +385,36 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     expectCleanRuntime();
   });
 
+  test("the registers are actionable: a document opens and a draft loads", async ({ page }) => {
+    await page.goto("/");
+    await enterWorkspace(page);
+
+    // The document rail used to advertise a click with no handler behind it.
+    const document = DEPARTMENT.documents[0];
+    await page
+      .getByRole("button", { name: new RegExp(escapeRegex(document.name)) })
+      .click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText(document.note)).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+
+    // The policy register leads to the workspace and actually loads the draft.
+    await page
+      .getByRole("navigation", { name: "Workspace sections" })
+      .getByRole("link", { name: "Policy Register" })
+      .click();
+    await expect(page.getByRole("heading", { name: "Policy Register" })).toBeVisible();
+
+    const preset = DEPARTMENT.policyTemplates[0];
+    await page.getByRole("link", { name: /Use this draft/ }).first().click();
+    await expect(page).toHaveURL(/\/app$/);
+    await expect(page.getByPlaceholder(/Draft the policy text/)).toHaveValue(preset.policyText);
+
+    expectCleanRuntime();
+  });
+
   test("paste a draft, run it, then read and export the assessment", async ({ page }) => {
     await page.goto("/");
     await enterWorkspace(page);

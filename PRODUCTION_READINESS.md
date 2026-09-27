@@ -270,3 +270,29 @@ displays) has **no DNS record** — verified against two public resolvers. The w
 **Non-credential work still outstanding for hosting:** none required for the current static
 build. If server-side PDF/DOCX extraction or the MiroFish backend is added later, that needs a
 Node/PHP service endpoint — the current host serves static files plus `cgi-bin/` only.
+
+## 9. Platform administration and live capabilities (Phase Y)
+
+One screen, **not linked from any officer-facing page**, reached only by its address:
+`/platform-admin`. The address is defined once as `ADMIN_ROUTE` in `src/config/platform.ts`,
+so it can be re-homed behind a production URL by changing one line.
+
+| Capability | Where it is entered | Simulated today | Live means | Client wiring |
+|---|---|---|---|---|
+| Assessment service | `/platform-admin` | scenario engine, `Scenario (Mock)` labels | `POST <endpoint>` returning a complete `AssessmentRun` | **built (`remoteAssessmentClient.ts`), unit-tested against a stubbed transport, NOT connected** — the run path must become asynchronous first |
+| Drafting model | `/platform-admin` (key + model name) | deterministic local generators | `POST <endpoint>` returning a complete `GeneratedDocument` | **built (`remoteDraftingClient.ts`), unit-tested, NOT connected** — same reason |
+| Document text extraction | `/platform-admin` | `.txt` read in the browser; PDF/DOCX recorded by name | `POST <endpoint>` returning `{ text }` | **BUILT AND WIRED** — `httpExtractionClient.ts`, reached only when the capability is live and complete |
+| Government sign-in (SSO) | `/platform-admin` (issuer, client ID, redirect address) | one-click entry, `Entry: one-click (Mock)` | OIDC Authorization Code + PKCE against `<issuer>/authorize` and `<issuer>/token` | **built (`src/session/sso.ts`), unit-tested, NOT connected** — needs a callback route and a claim→department mapping, which need a registered provider |
+
+**Rules the screen enforces** (all verified by tests): a capability is `live` only when BOTH its
+mode is switched on AND every required field is present; a half-configured capability reports
+`misconfigured` and the platform keeps using the simulated implementation; every capability
+defaults to simulated; nothing is constructed, fetched or called while a capability is simulated.
+
+**Stated in the screen, not hidden from it:** credentials are held in this browser's local
+storage and are readable through developer tools. Production requires a server-side proxy.
+
+**What a key alone cannot do:** PDF/DOCX extraction needs a server; sign-in needs a provider
+registration (issuer, client ID, redirect address) rather than a key; and the assessment and
+drafting clients need the run path to become asynchronous before they can serve a screen.
+`docs/SERVER_CONTRACT.md` specifies exactly what each service must implement.

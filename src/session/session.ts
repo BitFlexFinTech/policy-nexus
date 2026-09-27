@@ -11,6 +11,7 @@
 
 import { REFERENCE_DATE } from "@/config/reference";
 import { findDepartment, isDepartmentId, type DepartmentId } from "@/config/departments";
+import { createKeyValueStore } from "@/lib/browserStorage";
 
 export const SESSION_STORAGE_KEY = "nzwisiso.session.v1";
 
@@ -25,48 +26,13 @@ export interface Session {
 }
 
 /**
- * Storage adapter. Falls back to memory when local storage is unavailable
- * (for example a locked-down browser profile), so the workspace still functions
- * for the duration of the visit instead of throwing.
+ * Storage adapter — the shared browser adapter, so the fallback behaviour is
+ * defined in exactly one place (src/lib/browserStorage.ts).
  */
-const memoryStore = new Map<string, string>();
-let usingMemoryFallback = false;
-
-const storage = {
-  read(key: string): string | null {
-    if (usingMemoryFallback) return memoryStore.get(key) ?? null;
-    try {
-      return window.localStorage.getItem(key);
-    } catch {
-      // Local storage can be blocked by browser policy. This is a storage
-      // capability fallback, not an error being hidden: the flag is exposed
-      // through isSessionPersistent() so the UI can state it plainly.
-      usingMemoryFallback = true;
-      return memoryStore.get(key) ?? null;
-    }
-  },
-  write(key: string, value: string) {
-    memoryStore.set(key, value);
-    if (usingMemoryFallback) return;
-    try {
-      window.localStorage.setItem(key, value);
-    } catch {
-      usingMemoryFallback = true;
-    }
-  },
-  remove(key: string) {
-    memoryStore.delete(key);
-    if (usingMemoryFallback) return;
-    try {
-      window.localStorage.removeItem(key);
-    } catch {
-      usingMemoryFallback = true;
-    }
-  },
-};
+const storage = createKeyValueStore();
 
 /** False when the browser refused persistent storage and memory is in use. */
-export const isSessionPersistent = () => !usingMemoryFallback;
+export const isSessionPersistent = () => storage.isPersistent();
 
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((listener) => listener());

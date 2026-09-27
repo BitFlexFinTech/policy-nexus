@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { findDepartment } from "@/config/departments";
@@ -30,6 +30,24 @@ export function PolicyInput() {
   const [readProgress, setReadProgress] = useState(0);
   const [isReading, setIsReading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  /**
+   * A prepared draft chosen elsewhere — the policy register or the simulation
+   * history — arrives as `?draft=<template id>`. Seeding it here is what makes
+   * "Use this draft" true, rather than a link that points at a screen which
+   * ignores it. The parameter is then removed, so the address stays clean and a
+   * reload cannot overwrite edits the officer has since made.
+   */
+  useEffect(() => {
+    const requested = searchParams.get("draft");
+    if (!requested || !department) return;
+    const template = department.policyTemplates.find((item) => item.id === requested);
+    if (!template) return;
+    setDraft(template.policyText);
+    setTemplateId(template.id);
+    setSearchParams({}, { replace: true });
+  }, [searchParams, department, setSearchParams]);
 
   const handleRunSimulation = useCallback(() => {
     if (!department) return;

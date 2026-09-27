@@ -5,13 +5,25 @@ import {
   isAcceptedPolicyFile,
   normalisePolicyText,
 } from "@/services/extraction/extractPolicyText";
+import { DEFAULT_PLATFORM_CONFIG, clearConfig, saveConfig } from "@/config/platform";
+
+/** A local address, so the file carries no reachable remote address at all. */
+const LOCAL = "http://localhost:8787/extract";
 
 const makeFile = (name: string, content: string, type = "") =>
   new File([content], name, { type });
 
+const makeLive = () =>
+  saveConfig({
+    ...DEFAULT_PLATFORM_CONFIG,
+    extraction: { mode: "live", endpoint: LOCAL, key: "test-key", model: "" },
+  });
+
 describe("policy file extraction", () => {
   afterEach(() => {
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    clearConfig();
   });
 
   it("classifies a file from its name and type", () => {
@@ -85,5 +97,57 @@ describe("policy file extraction", () => {
   it("normalises idempotently", () => {
     const once = normalisePolicyText(" a \r\n\r\n\r\n b ");
     expect(normalisePolicyText(once)).toBe(once);
+  });
+
+  it("stays simulated for a PDF while the extraction capability is not live", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await extractPolicyFile(makeFile("brief.pdf", "%PDF-1.4", "application/pdf"));
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(result.extracted).toBe(false);
+    expect(result.status).toMatch(/\(Mock\)/);
+  });
+
+  it("asks the configured service for a PDF once the capability is live", async () => {
+    makeLive();
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ text: "Extracted policy text from the service." }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await extractPolicyFile(makeFile("brief.pdf", "%PDF-1.4", "application/pdf"));
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(result.extracted).toBe(true);
+    expect(result.text).toBe("Extracted policy text from the service.");
+  });
+
+  it("reports honestly when the configured service is unreachable", async () => {
+    makeLive();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        throw new Error("connection refused");
+      }),
+    );
+
+    const result = await extractPolicyFile(makeFile("brief.pdf", "%PDF-1.4", "application/pdf"));
+
+    expect(result.extracted).toBe(false);
+    expect(result.text).toBe("");
+    expect(result.status).toMatch(/could not be reached/);
+  });
+
+  it("reports honestly when the configured service answers without usable text", async () => {
+    makeLive();
+    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, json: async () => ({ text: "   " }) })));
+
+    const result = await extractPolicyFile(makeFile("brief.pdf", "%PDF-1.4", "application/pdf"));
+
+    expect(result.extracted).toBe(false);
+    expect(result.status).toMatch(/no readable text/);
   });
 });
