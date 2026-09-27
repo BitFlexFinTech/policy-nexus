@@ -211,7 +211,39 @@ client is registered.
   derives its step count from that exported constant instead of hardcoding one, and additionally
   asserts the counter reaches `n / n rounds`.
 
+## 6h. The agent population is now a modelled figure, drawn as far as it can be (Phase AA)
+
+**What changed and why it matters for go-live.** The platform's copy promised "thousands of agents"
+and "1,000+" while the graph drew 6–15 circles. That is a claim without a model behind it, and a
+Minister who counts would find it. Phase AA made the population **real and singular**:
+
+- `src/services/assessment/network.ts` now models a population of **2,000–3,200 agents per run**,
+  drawn from the run's own seed, and splits it across the modelled stakeholder groups.
+- The **caption, the on-screen figure and the marks drawn** are all derived from that one record
+  (`AgentPopulation`), and `marks` is read from the field actually drawn — so the words can never
+  claim a different number of marks from the ones on the screen.
+- The field is **capped** (600 marks on the full card, 180 on the compact one) and, whenever the cap
+  bites, the card says in plain words how many agents one mark stands for
+  (*"Each mark stands for about 4 agents"*). This is deliberate: drawing one vector mark per agent at
+  this population would be a smudge, not a picture.
+
+| Item | Status now | What replaces it | Where it is entered |
+|---|---|---|---|
+| Modelled agent population (2,000–3,200 per run) | **Mock / scenario mode** — a seeded modelled figure, **not** a measured count of real people | The engine's own agent count, reported per run | `buildAgentField()` in `src/services/assessment/network.ts` — one function, no UI change |
+| Split of the population across stakeholder groups | **Mock / scenario mode** — seeded weights, so group sizes differ believably but are not real census shares | Real population shares per segment | same function |
+| Drawn marks (600 / 180 cap) and the stated ratio | **Presentation, deliberately capped** — an honesty device, not a limitation of the model | Nothing: a real engine with the same population should keep a cap and keep stating the ratio | `AGENT_MARK_CAP`, `AGENT_COMPACT_MARK_CAP` in the same file |
+
+**Verified in a real browser (Chromium, built preview):** the public page reads **2,763** modelled
+agents over **180** marks; a `fin` run reads **2,191** agents over **495** marks and
+*"15 / 15 entities · 32 / 32 relationships"*. Guards: 9 new unit tests plus real-DOM counts in
+`e2e/journey.spec.ts`.
+
+**Outside the estate:** front-end only, so the deploy rule is unchanged — remember this is a new
+build, so it must actually be deployed before it is presented. As at this record the live host still
+serves the **Phase S** bundle.
+
 ## 7. Disabled by default (deliberate)
+
 - Puter CDN script and `puter.ai.chat()`: **fully removed.** Phase B deleted the
   `<script src="https://js.puter.com/v2/">` tag from `index.html`; **Phase D deleted the
   remaining dead `puter` reads from `PolicyInput.tsx`**, so no third-party AI call can occur

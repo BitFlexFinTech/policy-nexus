@@ -1360,10 +1360,33 @@ because the block it sits in already names itself.
 | 2026-09-26 | `npm run validate` (Phase Z) | **PASS, byte-untouched** — no check was added, removed or loosened |
 | 2026-09-26 | external validation of the produced `.docx` (Phase X) | `unzip -t` → **“No errors detected in compressed data”**; `unzip -l` → the 7 expected parts, all dated the fixed `01-01-1980 00:00`; **all 7 parts well-formed** under `xmllint --noout`; `file` → **“Microsoft Word 2007+”** |
 | 2026-09-26 | `npm run validate` (Phase X) | **PASS, byte-untouched** — no check was added, removed or loosened. The OOXML namespace URIs live in `.xml` templates, so no `.ts`/`.tsx` gained a URL literal |
+| 2026-09-27 | `npm run validate` (Phase AA) | **PASS — all checks green**, including the measured-contrast check re-run over the same token pairs. **No colour, typography, dependency or schema change was made**, so the palette guarantees are byte-untouched |
+| 2026-09-27 | `npm run typecheck` (Phase AA) | **exit 0** (`tsc -b --pretty false`, no output) |
+| 2026-09-27 | `npm run lint` (Phase AA) | **0 errors**, 7 pre-existing warnings (the same 7 as before) |
+| 2026-09-27 | `npm test` (Phase AA) | **282 passed / 22 files** (was 272/22). New guards: `network.test.ts` **+6** (the population band 2,000–3,200, `marks` read from the drawn field, every agent belongs to a modelled group and no group is empty, the ratio is stated in words, byte-identical replay, hand-written thousands separators) and `graph-card.test.tsx` **+3** (the field is drawn and declared decoration, the compact card draws a smaller field and never one mark per agent, the field follows the run's reach) |
+| 2026-09-27 | `npm run build` (Phase AA) | **✓ built in 462 ms** — no new warnings beyond the pre-existing chunk-size note |
+| 2026-09-27 | `npx playwright test` (Phase AA) | **9 passed (17.7 s)**, 0 console errors, 0 off-origin requests. New assertions: the authority line sits **above** the h1 by real geometry; the landing figure matches `/^\d{1,3}(,\d{3})+$/`, is **≥ 2,000** and appears exactly **twice**; the public page draws **> 50** nested agent circles; the run draws **> 100** and shows the stated ratio; the drag aims at `:scope > circle` |
+| 2026-09-27 | **real-browser measurement of the field** (Phase AA) | Read from the built preview in Chromium, not from the unit tests. **Public page:** `Simulated agents` = **2,763**, caption *"Each mark stands for about 5 agents — 2,763 simulated across the modelled groups."*, **180** agent marks + **6** group marks; `scrollWidth` = `clientWidth` at 1440/1024/390. **A `fin` run, after the run finished:** *"15 / 15 entities · 32 / 32 relationships"*, **2,191** agents, *"Each mark stands for about 4 agents"*, **495** agent marks, **510** circles in total (was 15) |
+| 2026-09-27 | **real-browser measurement of the authority line** (Phase AA) | 1440×820: line **161 px** tall, top 210 → h1 439, hero action bottom **754 — above the fold**. 1024×768: identical, action bottom **754 — above the fold**. 390×844: line **272 px**, h1 577, action bottom **922 — below the fold**. No sideways scroll at any width (`scrollWidth` = `clientWidth`) |
 
 
 
 ## Known-red / open items
+
+- **Phase AA — two items are known and deliberately open, stated rather than hidden:**
+  1. **On a 390 px phone the hero's primary action is below the fold** (bottom 922 px in an 844 px
+     viewport), because the authority line stacks above the hero. On 1440 and 1024 it is still above
+     the fold, which is the presentation case. Not "fixed" by hiding the Minister on small screens,
+     because that would defeat the reason the line exists. A cold session that wants it back above
+     the phone fold should compact the line further, not remove it.
+  2. **The scale strip still reads "Hundreds · Relationships"** while a run draws **32** structural
+     relationships. It is a conceptual indicator from the brief and was **not** part of the Phase AA
+     request, so it was reported rather than changed under cover of an unrelated change. Fixing it
+     means deciding whether the strip should carry measured counts — a brief-level decision.
+- **Phases X–Z and AA are built but NOT deployed.** The live host (`nzwisiso.bitflex.app`) still
+  serves the **Phase S** bundle as of this record. Deploying is a `npm run build` + FTPS
+  `mirror -R dist .` (never `--delete`). **The presentation build is therefore local until this is
+  run** — do it before showing anything to the Minister.
 - **RESOLVED (Phase Z) — the run path is asynchronous, so every capability is now connected.**
   `AssessmentService` returns promises (`buildRun`/`run`/`getRun`/`listRuns`), and `assessmentService`
   is a **dispatcher** that chooses the simulated engine or the live service at the moment of the
@@ -1855,6 +1878,109 @@ so every future session answers in the same plain style.
 `sso.test.ts`) · `npm run build` ✓ · `npx playwright test` **9/9**, 0 console errors, 0 off-origin
 requests. **No validator check was added, removed or loosened.**
 
+### Phase AA — the authority line, and a real agent population — DONE
+**Status: DONE — verified this session.** (Two changes requested by the user this session, plus a
+third deliverable: the proposal prompt.)
+
+**Instruction (user):** (1) the ministerial card — *"A proposed national digital innovation
+initiative … Hon. Tatenda A. Mavetera, MP … Powered by Nzwisiso AI®"* — must be **at the top**,
+"since we are presenting it to her", *without disturbing the UI layout*; (2) the simulated
+population is far too small — *"how can you say 1000+ agents when they are only 7 nodes"* — and the
+fix must apply to the public page **and** to the real run when the user clicks **Run Simulation**;
+(3) then: a ready-to-paste prompt (`docs/PROPOSAL_PROMPT.md`) for the full proposal, pitch deck,
+legal instrument, procurement route and stated ask — this platform being the working proof of
+concept.
+
+#### 1. The authority line — researched first, because the user asked whether the page should be a proposal
+
+The instruction was to research the decision before changing anything, so it was researched rather
+than assumed.
+
+**Findings (sources named; limits stated):**
+- For a **cabinet minister or senior executive**, a briefing/memo format is *"rigidly defined and
+  limited to one or two pages"* — cited to Blake & Bly, *The Elements of Technical Writing*, p.113,
+  via the *Memorandum / briefing note* article.
+- A briefing note is marked **"for information"** or **"for decision"**, and the *for decision* form
+  **must carry a recommendation**, written from a **neutral civil-service** standpoint, usually with
+  numbered paragraphs. (same article, Westminster practice)
+- Government **approval is a separate, formal process** — appraisal, a business case, an approvals
+  route, cost–benefit, optimism bias — with dedicated guidance for *"Agile digital and IT
+  projects"*. (HM Treasury **Green Book** + **Treasury Approvals Process**)
+- **Not verified:** the **Zimbabwe Cabinet Handbook** itself. Search engines blocked automated
+  access, so the exact national memorandum format is unconfirmed here and belongs to the ministry's
+  legal desk / Cabinet Office. Stated rather than guessed.
+
+**Conclusion, and what was built:** a website cannot *be* the proposal, and a page that mimics one
+invites cost/legal questions it cannot answer. So the page keeps its real job — a working
+demonstration with a named government sponsor — and the proposal stays a separate document. The
+block moved to the **top of `<main>`** as a slim **authority line**: proposal status + the one-line
+description on the left; **Ministerial champion**, the minister, the ministry and the platform credit
+on the right. The old bottom panel is **deleted**, not duplicated: no line is printed twice. The
+initiative's own name is deliberately **not** repeated inside the line, because it is the `<h1>`
+immediately below, and the same name twice inside one screen reads as a mistake.
+
+**Measured in a real browser** (not eyeballed — this is the evidence for "without disturbing the UI
+layout"):
+
+| Measurement | 1440×820 | 1024×768 | 390×844 |
+|---|---|---|---|
+| authority line height | 161 px | 161 px | 272 px |
+| line top → page heading top | 210 → 439 | 210 → 439 | 238 → 577 |
+| hero primary action bottom | **754 — above the fold** | **754 — above the fold** | 922 — **below** the fold |
+| sideways scroll (`scrollWidth` = `clientWidth`) | yes | yes | yes |
+
+**Honest caveat:** on a 390 px phone the primary action now sits below the fold, because the
+authority line stacks above the hero. On desktop and laptop it is still above the fold, which is the
+presentation case. Recorded, not hidden.
+
+#### 2. The agent population — the words and the picture now come from one place
+
+**The complaint was verified first, and it was correct.** The public schematic drew **6 marks**
+(1 policy hub + 5 groups for `opc`) and a run drew **12–15** (policy + 4 priorities + 3–4 documents +
+5–6 groups — counted per department: `def` 12, ten departments 13, four 14, `fin` 15). The copy
+claimed **"1,000+"** (`SIMULATED_AGENT_FIGURE`, rendered twice), *"Thousands of individual agents"*
+and *"thousands of interacting agents"*. Nothing was drawn per agent: the only agent-ish marks were
+**40** decorative dots (`AGENT_DOTS`), whose own comment said one element per row-of-ten, *"never per
+agent"*.
+
+**The fix, in one place (`src/services/assessment/network.ts`):** a **seeded** modelled population of
+**2,000–3,200 per run**, split across the modelled groups by seeded weight, carried as an `agents`
+field plus an `AgentPopulation` record (`total`, `marks`, `perMark`, `caption`). The **caption, the
+figure and the marks are derived from the same numbers**, and `marks` is **read from the drawn
+field**, so the caption can never claim a different number of marks from the ones drawn. Marks sit
+on a golden-angle spiral around their group, and are drawn **inside the group's `<g>`**, so the whole
+field rides the group's transform — the animation costs nothing extra per mark.
+
+| Where | Before | After — measured in a real browser |
+|---|---|---|
+| Public page, *Simulated population* | 6 marks, figure `1,000+` | **180 agent marks** + 6 group marks; figure **2,763**; caption *"Each mark stands for about 5 agents — 2,763 simulated across the modelled groups."* |
+| A real run (`fin`) | 15 circles | **495 agent marks** + 15 entities; header *"15 / 15 entities · 32 / 32 relationships"*; caption *"Each mark stands for about 4 agents — 2,191 simulated across the modelled groups."* |
+
+The 40-mark decorative dot field is **removed** — the graph now says the same thing at a higher
+density, so there is one mark system instead of two. `SIMULATED_AGENT_FIGURE` is now **derived** from
+the same structure the schematic draws (`formatAgentCount(PREVIEW_STRUCTURE.population.total)`), and
+the thousands separator is written by hand rather than with `toLocaleString`, which would be
+machine-dependent and would break determinism.
+
+**Known remaining mismatch, deliberately NOT changed (flagged, not silently fixed):** the scale strip
+still reads *"Hundreds · Relationships"* while a run draws **32** structural relationships. It was not
+part of the request, so it was reported rather than changed under cover of this one.
+
+#### Files touched in Phase AA
+
+| File | Change |
+|---|---|
+| `src/pages/Landing.tsx` | The authority-line section added as the first child of `PublicPageShell`; the old bottom ministerial panel deleted and replaced by a pointer comment |
+| `src/config/brand.ts` | One comment corrected — the credit line is now rendered in the authority line and under the hero heading |
+| `src/services/assessment/network.ts` | `RelationshipAgent`, `AgentPopulation`, `agents`/`population` on `RelationshipGraph`; `AGENT_POPULATION_FLOOR/CEILING`, `AGENT_MARK_CAP`, `AGENT_COMPACT_MARK_CAP`, `AGENT_CLUSTER_RADIUS`, `AGENT_MARK_RADIUS`; `buildAgentField`, `formatAgentCount`; `finalise` now counts the field and builds the caption; both graph builders seed a field |
+| `src/components/relationship/RelationshipGraphCard.tsx` | The agent field drawn inside each stakeholder group (aria-hidden, pointer-events-none, scaled with the node); the population caption under the count; the population in the surface's `aria-label` |
+| `src/components/public/SimulationVisuals.tsx` | `PREVIEW_STRUCTURE` moved above the figures; `SIMULATED_AGENT_FIGURE` derived from it; `AGENT_DOTS` and the 40-mark field **deleted**; the schematic caption now states the ratio |
+| `src/test/network.test.ts` | +6 guards: the population band, the mark count read from the field, group membership, the stated ratio, byte-identical replay, hand-written counters |
+| `src/test/graph-card.test.tsx` | +3 guards: the field is drawn and is decoration; the compact card draws less and never one mark per agent; the field follows the run's reach. The radius query is scoped to direct-child circles |
+| `src/test/landing.test.tsx` | The authority-line position test added; the initiative-name count re-anchored from 2 to 1 with the reason |
+| `src/test/swarm.test.ts` | The single-node fixture spreads the real graph, so it stays valid as the graph grew |
+| `e2e/journey.spec.ts` | The authority line asserted by real geometry (above the heading); the placeholder figure replaced by a read-the-page assertion in the thousands, twice; the agent field counted in the real DOM on the public page and mid-run; the drag aims at `:scope > circle` |
+
 ## Files touched this session (redeploy of Phases R–S + PR opened + Lovable removal + PR merged + Phase X + Phase Y + Phase Z)
 
 **Repo — Phase V (Lovable removal):** `vite.config.ts`
@@ -1917,7 +2043,22 @@ on the server (not deleted, by design).
 
 ## RESUME HERE
 
-- **Phase S is the current state of the run view and the public "Simulated population" block.**
+- **Phase AA is the current state of the landing page and of the relationship graph.**
+  The page now opens with the **authority line** — proposal status, the one-line description,
+  **Ministerial champion** + the minister + the ministry + the platform credit — as the first thing
+  inside `<main>` (`src/pages/Landing.tsx`, ~lines 100–140), and the old bottom ministerial panel is
+  **deleted**, not duplicated. The graph now carries a real **agent population**
+  (`src/services/assessment/network.ts`): 2,000–3,200 modelled agents per run, drawn as up to
+  **600** marks on the full card and **180** on the compact card, with the ratio stated in words on
+  the card. **A cold session must read `src/services/assessment/network.ts` (the population and the
+  field) and `src/components/relationship/RelationshipGraphCard.tsx` (how it is drawn) before
+  touching the graph**, then `src/components/public/SimulationVisuals.tsx` (the derived figure).
+  Measured in a real browser this session: the public page shows **2,763 agents over 180 marks**;
+  a `fin` run shows **2,191 agents over 495 marks** (it used to draw 15 circles and say "1,000+").
+  Open item, flagged not fixed: the scale strip still reads *"Hundreds · Relationships"* while a run
+  draws 32 structural relationships.
+- **Phase S is the current state of the run view and the public "Simulated population" block**
+  (Phase AA changed what the block *draws* and what the graph *models*; everything else stands).
   Inside a run (`/app/simulations/:id`) the left column is the **Graph Relationship Visualization**
   card: it is fully arranged on the first paint, grows one round at a time as the run is revealed
   (the count reads `n / N entities · m / M relationships`), each mark is clickable and states its
@@ -1940,17 +2081,14 @@ on the server (not deleted, by design).
   verified in a real browser against the live origin (2/2 checks, 0 console errors, 0 off-origin
   requests, SSL token intact). To publish any further change: `npm run build`, then the `.env`-based
   FTPS `mirror -R dist .` command below.
-- **Branch:** `feature/unified-platform` · **HEAD:** the latest `docs(phase-t)` record commit — run
-  `git rev-parse HEAD`. The last **code** change is `4f3f90c` (`feat(phase-s)`); this session added
-  **no source change**, only the two status documents.
-  `tree:` clean. Functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C ·
-  Phase D = the commit whose message begins `feat(phase-d)` · Phase J = `feat(phase-j)` ·
-  Phases E–G = the commit whose message begins `feat(phase-e)` ·
-  Phase H = the commit whose message begins `test(phase-h)` ·
-  Phase M = the commit whose message begins `feat(phase-m)` ·
-  Phase N = the commit whose message begins `feat(phase-n)` ·
-  Phase O = the commit whose message begins `feat(phase-o)` ·
-  Phase P = the commit whose message begins `feat(phase-p)`.
+- **Branch:** `feature/unified-platform` · **HEAD:** `d90db02` (`feat(phase-aa)`), followed by the
+  `docs(phase-aa)` record commit — run `git rev-parse HEAD`. `tree:` clean. Phase AA is the last
+  **code** change; earlier functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B ·
+  `6b69dfb` Phase C · Phase D = the commit whose message begins `feat(phase-d)` · Phase J =
+  `feat(phase-j)` · Phases E–G = `feat(phase-e)` · Phase H = `test(phase-h)` · Phase M =
+  `feat(phase-m)` · Phase N = `feat(phase-n)` · Phase O = `feat(phase-o)` · Phase P =
+  `feat(phase-p)` · Phase X = `feat(phase-x)` · Phase Y = `feat(phase-y)` · Phase Z =
+  `feat(phase-z)`.
   `git log --oneline -10 | cat` is the second opinion on state.
   (This shell's git rejects `--no-pager`; use plain `git log --oneline | cat`.)
 - **Phase P is the current state of the public landing page** (supersedes Phase O, which had built
@@ -2035,7 +2173,9 @@ on the server (not deleted, by design).
   and the click-through fixes, and **Phase Z wired all four capabilities** — the run path now waits,
   drafting and sign-in are connected, and the demo still renders in a single frame.
   The full suite is green: `npm run validate` **PASS**, `npm run typecheck` exit 0, `npm run lint`
-  0 errors, `npm test` **272/272** (22 files), `npm run build` ✓, `npx playwright test` **9/9**.
+  0 errors, `npm test` **282/282** (22 files), `npm run build` ✓, `npx playwright test` **9/9**.
+  Phase AA left this green with 9 new guards (agent-population band and replay, the field drawn on
+  the card, the authority line's position by real geometry).
   Remaining work, in priority order:
   1. **Redeploy `dist/`** to publish Phases X–Z to the live host — `npm run build`, then the FTPS
      `mirror -R dist .` command below; the live build is still the Phase S bundle.
@@ -2058,7 +2198,7 @@ on the server (not deleted, by design).
 - **Exact commands:**
 ```bash
 npm run validate; npm run typecheck; npm run lint; npm test; npm run build
-npx playwright test   # 8/8 — real browser vs vite preview; asserts 0 console errors, 0 off-origin requests
+npx playwright test   # 9/9 — real browser vs vite preview; asserts 0 console errors, 0 off-origin requests
 npm run dev           # serves at http://localhost:8080/  (NOT 5173)
 ```
 
