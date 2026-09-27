@@ -162,7 +162,7 @@ describe("swarm layout", () => {
 
   it("survives a graph holding a single mark", () => {
     const graph = buildRelationshipGraph(buildSimulatedRun(requestFor("opc")));
-    const lone = { nodes: [graph.nodes[0]], edges: [], nodeArrival: {}, edgeArrival: {} };
+    const lone = { ...graph, nodes: [graph.nodes[0]], edges: [] };
     const state = settleSwarm(createSwarm(lone, "lone"));
     expect(state.nodes).toHaveLength(1);
     expect(Number.isFinite(state.nodes[0].x)).toBe(true);

@@ -4,6 +4,7 @@ import { RelationshipGraphCard } from "@/components/relationship/RelationshipGra
 import { findDepartment } from "@/config/departments";
 import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
 import {
+  AGENT_COMPACT_MARK_CAP,
   RELATION_BANK,
   buildPreviewRelationshipGraph,
   buildRelationshipGraph,
@@ -258,7 +259,9 @@ describe("relationship graph card — being read and used", () => {
   it("draws the compact form larger, because it is read in a smaller card", () => {
     const graph = buildPreviewRelationshipGraph();
     const radiusOfFirstMark = (container: HTMLElement) =>
-      Number(container.querySelector("g[role='button'] circle")?.getAttribute("r"));
+      // Direct-child circles only: the agent field is drawn inside a nested group
+      // around each stakeholder mark, and it must not be mistaken for the mark.
+      Number(container.querySelector("g[role='button'] > circle")?.getAttribute("r"));
 
     const full = render(<RelationshipGraphCard graph={graph} seed="same-seed" />);
     const fullRadius = radiusOfFirstMark(full.container);
@@ -311,5 +314,61 @@ describe("relationship graph card — being read and used", () => {
     expect(held.x).toBeCloseTo(820, 0);
     expect(held.y).toBeCloseTo(640, 0);
     fireEvent.pointerUp(surface, { pointerId: 1 });
+  });
+});
+
+/**
+ * The agent field on the card. The platform says it models thousands of agents;
+ * these guards are what stop the drawing contradicting the words, which is the
+ * complaint the field was built to answer.
+ */
+describe("relationship graph card — the agent field", () => {
+  it("rings each modelled group with the agents it stands for", () => {
+    const { graph, seed } = scenario("fin");
+    const { container } = render(<RelationshipGraphCard graph={graph} seed={seed} />);
+
+    // The field is nested INSIDE the group marks, which is exactly what makes it
+    // ride the group's transform — so the whole school of agents moves for free
+    // rather than costing a calculation per mark per frame.
+    const field = container.querySelectorAll("g[role='button'] g circle");
+    expect(field.length).toBeGreaterThan(100);
+    expect(field.length).toBeLessThanOrEqual(graph.population.marks);
+
+    // Decoration, and declared as such: hidden from assistive technology and from
+    // the pointer, so it can never swallow a click meant for the group.
+    field.forEach((mark) => {
+      const wrapper = mark.closest("g");
+      expect(wrapper?.getAttribute("aria-hidden")).toBe("true");
+      expect(wrapper?.getAttribute("class")).toContain("pointer-events-none");
+    });
+
+    // The counting is never left to the eye alone.
+    expect(screen.getByText(graph.population.caption)).toBeInTheDocument();
+  });
+
+  it("draws a smaller field in the compact card, and never one mark per agent", () => {
+    const graph = buildPreviewRelationshipGraph();
+    const { container } = render(
+      <RelationshipGraphCard graph={graph} seed="landing::structure" compact />,
+    );
+
+    const field = container.querySelectorAll("g[role='button'] g circle");
+    expect(field.length).toBeGreaterThan(30);
+    expect(field.length).toBeLessThanOrEqual(AGENT_COMPACT_MARK_CAP + 6);
+    // The marks are a sample of the population, not the population — which is why
+    // the card states what one mark stands for.
+    expect(field.length).toBeLessThan(graph.population.total);
+  });
+
+  it("draws only the field of the groups the run has actually reached", () => {
+    const { graph, seed, run } = scenario("fin");
+    const systemRounds = run.rounds.filter((round) => round.actor === "System");
+    const { container } = render(
+      <RelationshipGraphCard graph={graph} seed={seed} revealedRounds={systemRounds[0].index} />,
+    );
+
+    // One mark so far, and it is the draft — not a modelled group, so there is no
+    // agent field yet: the population arrives with the groups that stand for it.
+    expect(container.querySelectorAll("g[role='button'] g circle").length).toBe(0);
   });
 });

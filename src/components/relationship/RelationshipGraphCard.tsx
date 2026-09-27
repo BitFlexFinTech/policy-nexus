@@ -3,8 +3,12 @@ import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
+  AGENT_COMPACT_MARK_CAP,
+  AGENT_MARK_CAP,
+  AGENT_MARK_RADIUS,
   RELATIONSHIP_KINDS,
   relationshipKindLabel,
+  type RelationshipAgent,
   type RelationshipGraph,
   type RelationshipNode,
   type RelationshipNodeKind,
@@ -31,6 +35,14 @@ import { cn } from "@/lib/utils";
  * event record, so the graph grows only as far as the simulation has actually
  * got. Selecting a node states its relationships as text, so the information is
  * never carried by the picture alone.
+ *
+ * AND THE AGENTS THOSE GROUPS STAND FOR: every modelled group is ringed by the
+ * agents it represents, so a page that says it models thousands of agents shows
+ * thousands of agents' worth of marks rather than a handful of circles. The field
+ * is drawn at a capped density — the cap is stated in words on the card, so the
+ * drawing never claims to be larger than it is — and each mark is drawn INSIDE
+ * its group's element, which means the whole field rides the group's transform
+ * and the animation costs nothing extra per mark.
  *
  * HOW IT MOVES: a hand-written force model (`@/lib/graph/swarm`) holds the
  * structure together and makes the nodes school together; a node that is dragged
@@ -162,6 +174,24 @@ export function RelationshipGraphCard({
     () => graph.edges.filter((edge) => (graph.edgeArrival[edge.id] ?? 1) <= visibleRounds),
     [graph, visibleRounds],
   );
+
+  /**
+   * The agent marks, grouped by the node they belong to and thinned to what the
+   * card can draw. The compact schematic gets a smaller budget because it is read
+   * in a much smaller card, where a full field would read as a smudge.
+   */
+  const agentMarks = useMemo(() => {
+    const budget = compact ? AGENT_COMPACT_MARK_CAP : AGENT_MARK_CAP;
+    const grouped = new Map<string, RelationshipAgent[]>();
+    graph.agents.forEach((agent) => {
+      const list = grouped.get(agent.groupId) ?? [];
+      list.push(agent);
+      grouped.set(agent.groupId, list);
+    });
+    const perGroup = Math.max(6, Math.floor(budget / Math.max(grouped.size, 1)));
+    grouped.forEach((list, groupId) => grouped.set(groupId, list.slice(0, perGroup)));
+    return grouped;
+  }, [graph, compact]);
 
   /**
    * Write the current positions straight to the DOM. The animation loop calls
@@ -357,6 +387,11 @@ export function RelationshipGraphCard({
               {visibleNodes.length} / {graph.nodes.length} entities · {visibleEdges.length} /{" "}
               {graph.edges.length} relationships
             </p>
+            {/* What the marks in the field stand for. Read from the graph's own
+                population, so the number here and the number drawn cannot differ. */}
+            <p className="mt-1 max-w-md text-[10px] leading-relaxed text-muted-foreground">
+              {graph.population.caption}
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <label
@@ -393,7 +428,7 @@ export function RelationshipGraphCard({
             preserveAspectRatio="xMidYMid meet"
             className="h-full w-full select-none"
             role="group"
-            aria-label={`Relationship network: ${visibleNodes.length} of ${graph.nodes.length} entities, ${visibleEdges.length} of ${graph.edges.length} relationships`}
+            aria-label={`Relationship network: ${visibleNodes.length} of ${graph.nodes.length} entities, ${visibleEdges.length} of ${graph.edges.length} relationships, ${graph.population.total} simulated agents`}
             onPointerMove={handlePointerMove}
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
@@ -503,6 +538,26 @@ export function RelationshipGraphCard({
                     onFocus={() => setFocusedId(node.id)}
                     onBlur={() => setFocusedId(null)}
                   >
+                    {/* The agents this group stands for, drawn AROUND it and BEHIND
+                        it: the group's own mark and its label stay on top, so the
+                        field thickens the picture without ever obscuring what the
+                        picture is for. Hidden from assistive technology and from the
+                        pointer — the caption states what each mark stands for.
+                        Scaled with the node, so the field stays proportional to its
+                        group in the compact card as well. */}
+                    {node.kind === "stakeholder" && (agentMarks.get(node.id)?.length ?? 0) > 0 && (
+                      <g aria-hidden="true" className="pointer-events-none">
+                        {agentMarks.get(node.id)?.map((agent) => (
+                          <circle
+                            key={agent.id}
+                            cx={agent.dx * visualScale}
+                            cy={agent.dy * visualScale}
+                            r={AGENT_MARK_RADIUS * visualScale}
+                            className="fill-gold/60"
+                          />
+                        ))}
+                      </g>
+                    )}
                     {/* The ring is the focus, selection and hover indicator — a shape,
                         not a colour change, so it survives any colour perception. */}
                     {isRinged && (

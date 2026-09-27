@@ -1,7 +1,22 @@
 import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 import { RelationshipGraphCard } from "@/components/relationship/RelationshipGraphCard";
-import { buildPreviewRelationshipGraph } from "@/services/assessment/network";
+import { buildPreviewRelationshipGraph, formatAgentCount } from "@/services/assessment/network";
+
+/**
+ * The compact relationship structure drawn inside the "Simulated population"
+ * block: the draft and the groups a run models around it, from ONE documented
+ * representative departmental configuration. Built once at module scope, so the
+ * schematic is identical on every visit and in every build — it is a picture of
+ * the structure, not of anyone's run.
+ *
+ * It is built BEFORE the figures below because they are read from it: the agent
+ * count in the scale strip, the caption and the marks on the card all come from
+ * this one structure, so they cannot disagree about how large the population is.
+ */
+const PREVIEW_STRUCTURE = buildPreviewRelationshipGraph();
+const PREVIEW_STRUCTURE_SEED = "landing::structure";
+
 
 /**
  * The two visuals that explain what the assessment engine does with a policy
@@ -24,10 +39,12 @@ import { buildPreviewRelationshipGraph } from "@/services/assessment/network";
  */
 
 /**
- * The population figure. Stated ONCE: the scale strip and the diagram's caption
- * both read it, so the two can never disagree about how large the population is.
+ * The population figure, READ FROM the structure above — the modelled agent count
+ * for the representative department, with thousands separators. Written once here:
+ * the scale strip, the diagram and the graph card all read it, so the number on
+ * the page and the marks drawn behind it cannot disagree.
  */
-export const SIMULATED_AGENT_FIGURE = "1,000+";
+export const SIMULATED_AGENT_FIGURE = formatAgentCount(PREVIEW_STRUCTURE.population.total);
 
 /**
  * The four things the knowledge map holds — and the only place they are written.
@@ -53,8 +70,11 @@ export const KNOWLEDGE_MAP_LINE =
 
 /**
  * The five scale indicators, in the order they are read. Deliberately a mix of
- * magnitudes ("1,000+", "Multiple", "Hundreds") and capabilities — the point is
- * the scale and the complexity of the simulated environment, not a metric set.
+ * magnitudes (the modelled agent count, "Multiple", "Hundreds") and capabilities
+ * — the point is the scale and the complexity of the simulated environment, not
+ * a metric set. The agent count is the one figure that is now a real modelled
+ * number rather than a placeholder: it is read from the representative structure
+ * the schematic draws, so the words and the field behind them agree.
  */
 export const SIMULATION_SCALE = [
   { figure: SIMULATED_AGENT_FIGURE, label: "Simulated agents" },
@@ -82,13 +102,6 @@ export const SIMULATION_PIPELINE = [
   { title: "Policy intelligence", body: "Patterns \u2022 tensions \u2022 risks \u2022 areas of support" },
   { title: "Policy assessment", body: "Structured findings for human review" },
 ] as const;
-
-/**
- * The dot field: 40 marks standing in for a population of thousands. A mark per
- * agent would mean four figures of DOM nodes to say the same thing, so the field
- * is a fixed, static render — one element per row-of-ten, never per agent.
- */
-const AGENT_DOTS = Array.from({ length: 40 }, (_, index) => index);
 
 /**
  * The pipeline as a vertical process diagram: numbered markers, a title and a
@@ -140,16 +153,6 @@ function DiagramBlock({ label, children }: { label: string; children?: ReactNode
 }
 
 /**
- * The compact relationship structure drawn inside the "Simulated population"
- * block: the draft and the groups a run models around it, from ONE documented
- * representative departmental configuration. Built once at module scope, so the
- * schematic is identical on every visit and in every build — it is a picture of
- * the structure, not of anyone's run.
- */
-const PREVIEW_STRUCTURE = buildPreviewRelationshipGraph();
-const PREVIEW_STRUCTURE_SEED = "landing::structure";
-
-/**
  * The compact schematic: the policy becomes a knowledge map, the map becomes a
  * simulated population of thousands of agents, the agents interact, and the
  * result is a structured assessment. It exists so the size of the environment
@@ -193,29 +196,16 @@ export function AgentPopulationDiagram() {
         <p className="text-xs font-semibold uppercase tracking-wide text-foreground">
           Simulated population
         </p>
-        {/* The graph is the point of the block now, with the field of marks kept
-            faintly behind it: the block still reads as a population of many
-            agents AND as the relationships between the groups modelled from it.
-            The field is decoration and stays hidden from assistive technology;
-            the graph states its own structure, and its labels are real text. */}
-        <div className="relative mt-2">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 grid animate-slide-up-fade grid-cols-10 content-center justify-items-center gap-1.5 opacity-30 motion-reduce:animate-none"
-          >
-            {AGENT_DOTS.map((dot) => (
-              <span key={dot} className="h-1 w-1 justify-self-center self-center rounded-full bg-primary/40" />
-            ))}
-          </div>
-          <RelationshipGraphCard
-            graph={PREVIEW_STRUCTURE}
-            seed={PREVIEW_STRUCTURE_SEED}
-            compact
-            className="relative"
-          />
+        {/* The graph carries the whole picture now — the structure AND the agents
+            those groups stand for, drawn as the field around each group. The
+            40-mark dot field that used to sit faintly behind it was saying the
+            same thing at a lower density, so it is gone: one mark system, not
+            two. */}
+        <div className="mt-2">
+          <RelationshipGraphCard graph={PREVIEW_STRUCTURE} seed={PREVIEW_STRUCTURE_SEED} compact />
         </div>
         <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
-          The relationships between the modelled groups, drawn from a representative departmental
+          {PREVIEW_STRUCTURE.population.caption} Drawn from a representative departmental
           configuration.
         </p>
         <p className="mt-2 flex items-baseline justify-center gap-2">

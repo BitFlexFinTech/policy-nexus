@@ -56,7 +56,8 @@ export const BRAND = {
     "to policy assessment and decision support.",
   /** The minister championing the initiative. */
   ministerialChampion: "Hon. Tatenda A. Mavetera, MP",
-  /** The platform credit line. Rendered in the hero and in the positioning section. */
+  /** The platform credit line. Rendered twice: in the authority line that opens
+   *  the page, and under the hero heading. */
   poweredBy: "Powered by Nzwisiso AI\u00AE",
   /**
    * Official attribution line, required on the homepage footer. The wording is

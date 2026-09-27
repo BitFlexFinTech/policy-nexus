@@ -3,11 +3,15 @@ import { findDepartment } from "@/config/departments";
 import { getStakeholderSegment } from "@/config/reference";
 import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
 import {
+  AGENT_MARK_CAP,
+  AGENT_POPULATION_CEILING,
+  AGENT_POPULATION_FLOOR,
   PREVIEW_DEPARTMENT_ID,
   RELATION_BANK,
   RELATIONSHIP_KINDS,
   buildPreviewRelationshipGraph,
   buildRelationshipGraph,
+  formatAgentCount,
 } from "@/services/assessment/network";
 import type { AssessmentRequest } from "@/services/assessment/types";
 
@@ -183,5 +187,85 @@ describe("the public schematic", () => {
     buildPreviewRelationshipGraph().edges.forEach((edge) => {
       expect(reactions.has(edge.relation)).toBe(false);
     });
+  });
+});
+
+/**
+ * The agent field. These guards exist because the platform's own wording promises
+ * "thousands of agents" and the picture used to draw a handful of circles: the
+ * claim and the drawing have to be derived from one population, or a reader who
+ * counts will find them contradicting each other.
+ */
+describe("the agent field — the population the words promise", () => {
+  it("models a population in the thousands, seeded so the same draft always agrees", () => {
+    const graph = buildRelationshipGraph(buildSimulatedRun(requestFor("fin")));
+
+    expect(graph.population.total).toBeGreaterThanOrEqual(AGENT_POPULATION_FLOOR);
+    expect(graph.population.total).toBeLessThanOrEqual(AGENT_POPULATION_CEILING);
+    // The mark count is READ FROM the field, so the caption can never claim a
+    // different number of marks from the ones actually drawn.
+    expect(graph.population.marks).toBe(graph.agents.length);
+    expect(graph.population.marks).toBeGreaterThan(100);
+    expect(graph.population.marks).toBeLessThanOrEqual(AGENT_MARK_CAP + 1);
+  });
+
+  it("gives every drawn agent to a modelled group, and leaves no group unpopulated", () => {
+    const graph = buildRelationshipGraph(buildSimulatedRun(requestFor("fin")));
+    const groups = new Set(
+      graph.nodes.filter((node) => node.kind === "stakeholder").map((node) => node.id),
+    );
+
+    expect(groups.size).toBeGreaterThan(1);
+    graph.agents.forEach((agent) => expect(groups.has(agent.groupId)).toBe(true));
+    groups.forEach((groupId) =>
+      expect(graph.agents.some((agent) => agent.groupId === groupId)).toBe(true),
+    );
+    // Ids are unique, or two marks would silently collapse into one.
+    expect(new Set(graph.agents.map((agent) => agent.id)).size).toBe(graph.agents.length);
+  });
+
+  it("states in words what one mark stands for, so the field is never overclaimed", () => {
+    const graph = buildRelationshipGraph(buildSimulatedRun(requestFor("opc")));
+
+    if (graph.population.perMark > 1) {
+      expect(graph.population.caption).toContain(`about ${graph.population.perMark} agents`);
+      expect(graph.population.caption).toContain(formatAgentCount(graph.population.total));
+      expect(graph.population.marks).toBeLessThan(graph.population.total);
+    } else {
+      expect(graph.population.caption).toContain("each drawn as one mark");
+    }
+  });
+
+  it("reproduces byte-identically, and moves when the draft moves", () => {
+    const first = buildRelationshipGraph(buildSimulatedRun(requestFor("opc")));
+    const second = buildRelationshipGraph(buildSimulatedRun(requestFor("opc")));
+    expect(JSON.stringify(second.agents)).toBe(JSON.stringify(first.agents));
+    expect(second.population).toEqual(first.population);
+
+    const other = buildRelationshipGraph(
+      buildSimulatedRun({
+        ...requestFor("opc"),
+        policyText: "A different draft, on the same subject, submitted for comparison.",
+      }),
+    );
+    expect(JSON.stringify(other.agents)).not.toBe(JSON.stringify(first.agents));
+  });
+
+  it("draws the public schematic's field from the representative department, identically every build", () => {
+    const graph = buildPreviewRelationshipGraph();
+
+    expect(graph.population.total).toBeGreaterThanOrEqual(AGENT_POPULATION_FLOOR);
+    expect(graph.population.total).toBeLessThanOrEqual(AGENT_POPULATION_CEILING);
+    expect(JSON.stringify(graph.agents)).toBe(
+      JSON.stringify(buildPreviewRelationshipGraph().agents),
+    );
+  });
+
+  it("writes counters by hand, so the same run reads the same on every machine", () => {
+    // `toLocaleString` would make the figure machine-dependent; this may not be.
+    expect(formatAgentCount(999)).toBe("999");
+    expect(formatAgentCount(1000)).toBe("1,000");
+    expect(formatAgentCount(2486)).toBe("2,486");
+    expect(formatAgentCount(12345)).toBe("12,345");
   });
 });

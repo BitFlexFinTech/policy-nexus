@@ -7,6 +7,12 @@
  * run models around it, the priorities it is assessed against, and the documents
  * it is read against.
  *
+ * It also states the POPULATION those groups stand for: each modelled group
+ * carries the agents it represents, as marks drawn around it. That is what stops
+ * the picture contradicting the words — the platform says it models thousands of
+ * agents, so thousands of agents are modelled, counted from one place and drawn
+ * as far as the card can honestly draw them. See `AgentPopulation`.
+ *
  * DELIBERATELY NOT PART OF THE RESULT SCHEMA. `AssessmentRun`
  * (`./types.ts`) is unchanged: the graph is a PURE FUNCTION OF THE RUN, derived
  * on read. That keeps the stored-run contract and the mock → real engine swap
@@ -24,7 +30,7 @@
 
 import { findDepartment, type DepartmentId } from "@/config/departments";
 import { getStakeholderSegment } from "@/config/reference";
-import { createRng } from "@/lib/prng";
+import { createRng, type Rng } from "@/lib/prng";
 import type { AssessmentRun, ReactionSentiment } from "./types";
 
 /** The four kinds of thing the graph draws. Declared ONCE: the legend, the
@@ -56,6 +62,47 @@ export interface RelationshipGraph {
   nodeArrival: Record<string, number>;
   /** Round index at which each edge appears — the later of its two endpoints. */
   edgeArrival: Record<string, number>;
+  /**
+   * The agent field: the individual agents the modelled groups stand for, drawn
+   * around the group they belong to. Deliberately NOT nodes — a node is something
+   * a reader can select and read, and there are thousands of agents.
+   */
+  agents: RelationshipAgent[];
+  /** How large the modelled population is, and how honestly it is drawn. */
+  population: AgentPopulation;
+}
+
+/** One drawn agent mark, placed relative to the group it belongs to. */
+export interface RelationshipAgent {
+  /** Stable id — the field is identical on every render and every build. */
+  id: string;
+  /** The stakeholder-group node this agent belongs to. */
+  groupId: string;
+  /** Offset from the group's centre, in layout units. */
+  dx: number;
+  dy: number;
+}
+
+/**
+ * The modelled population behind a run.
+ *
+ * `total` is a MODELLED figure — this is scenario mode — derived from the run's
+ * own seed, so the same draft always models the same population and a different
+ * draft models a different one. It is deliberately in the thousands, because
+ * that is what this platform's own wording promises, and the words and the
+ * picture must agree.
+ *
+ * `perMark` is the honesty valve. Drawing one mark per agent would be four
+ * figures of vector elements, so the field is drawn at a capped density and
+ * `perMark` states in plain words how many agents each mark stands for. The
+ * caption, the marks and the figure all come from these same numbers, so they
+ * cannot drift apart.
+ */
+export interface AgentPopulation {
+  total: number;
+  marks: number;
+  perMark: number;
+  caption: string;
 }
 
 /** The four node kinds, with the one label each kind is shown under. */
@@ -116,6 +163,8 @@ interface GraphSpec {
   nodes: RelationshipNode[];
   edges: RelationshipEdge[];
   arrival: Record<string, number>;
+  agents: RelationshipAgent[];
+  population: Omit<AgentPopulation, "marks" | "caption">;
 }
 
 /**
@@ -128,7 +177,15 @@ const edgeIdFor = (source: string, target: string, relation: string): string =>
 /** Two decimal places, so an edge weight never carries float noise into a snapshot. */
 const round2 = (value: number): number => Math.round(value * 100) / 100;
 
-/** Close the spec: drop duplicate relationships, then date every edge. */
+/**
+ * A count with thousands separators, written by hand rather than with
+ * `toLocaleString`: a locale-dependent format would make the same run read
+ * differently on two machines. (see .clinerules/04-determinism-and-validation.md)
+ */
+export const formatAgentCount = (value: number): string =>
+  String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+/** Close the spec: drop duplicate relationships, date every edge, count the field. */
 const finalise = (spec: GraphSpec): RelationshipGraph => {
   const edges: RelationshipEdge[] = [];
   const seen = new Set<string>();
@@ -145,7 +202,96 @@ const finalise = (spec: GraphSpec): RelationshipGraph => {
     edgeArrival[edge.id] = Math.max(source, target);
   });
 
-  return { nodes: spec.nodes, edges, nodeArrival: { ...spec.arrival }, edgeArrival };
+  // The mark count is READ FROM the field, never carried alongside it, so the
+  // caption can never claim a different number of marks from the ones drawn.
+  const marks = spec.agents.length;
+  const population: AgentPopulation = {
+    total: spec.population.total,
+    perMark: spec.population.perMark,
+    marks,
+    caption:
+      spec.population.perMark <= 1
+        ? `${formatAgentCount(spec.population.total)} simulated agents, each drawn as one mark.`
+        : `Each mark stands for about ${spec.population.perMark} agents — ` +
+          `${formatAgentCount(spec.population.total)} simulated across the modelled groups.`,
+  };
+
+  return {
+    nodes: spec.nodes,
+    edges,
+    nodeArrival: { ...spec.arrival },
+    edgeArrival,
+    agents: spec.agents,
+    population,
+  };
+};
+
+/* ------------------------------------------------------------------------- */
+/* The agent field                                                             */
+/* ------------------------------------------------------------------------- */
+
+/**
+ * How large a modelled population is, and how many of its agents are drawn.
+ *
+ * The band is stated rather than a single number so two different drafts model
+ * two different populations — the figure is seeded, not fixed — while every run
+ * still models "thousands", which is what the platform's wording promises.
+ */
+export const AGENT_POPULATION_FLOOR = 2000;
+export const AGENT_POPULATION_CEILING = 3200;
+
+/** The most marks ever drawn on the full card, and on the compact schematic. */
+export const AGENT_MARK_CAP = 600;
+export const AGENT_COMPACT_MARK_CAP = 180;
+
+/** How far a group's agents spread from its centre, and how big each mark is. */
+export const AGENT_CLUSTER_RADIUS = 32;
+export const AGENT_MARK_RADIUS = 2.1;
+
+/** The golden angle: the cheapest way to scatter points evenly over a disc. */
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+
+/**
+ * Build the agent field for a set of modelled groups.
+ *
+ * Pure and seeded: the population, the split across groups and every mark's place
+ * come from the run's own seed, so the same input always draws the same field.
+ * Marks sit on a golden-angle spiral around their group's centre, which spreads
+ * them evenly at any count and leaves no visible ring or gap.
+ */
+const buildAgentField = (
+  groupIds: readonly string[],
+  rng: Rng,
+): { agents: RelationshipAgent[]; total: number; perMark: number } => {
+  const span = AGENT_POPULATION_CEILING - AGENT_POPULATION_FLOOR;
+  const total = AGENT_POPULATION_FLOOR + Math.floor(rng.next() * (span + 1));
+
+  // Split the population across the modelled groups by seeded weight, so group
+  // sizes differ the way real populations do. Every group models at least one.
+  const weights = groupIds.map(() => 0.5 + rng.next());
+  const weightTotal = weights.reduce((sum, weight) => sum + weight, 0);
+  const counts = weights.map((weight) => Math.max(1, Math.floor((weight / weightTotal) * total)));
+  const rounding = counts.reduce((sum, count) => sum + count, 0);
+  if (counts.length > 0) counts[0] += total - rounding;
+
+  const perMark = Math.max(1, Math.ceil(total / AGENT_MARK_CAP));
+
+  const agents: RelationshipAgent[] = [];
+  groupIds.forEach((groupId, index) => {
+    const marks = Math.max(1, Math.round(counts[index] / perMark));
+    for (let mark = 0; mark < marks; mark += 1) {
+      const angle = mark * GOLDEN_ANGLE + rng.next() * 0.4;
+      const distance = AGENT_CLUSTER_RADIUS * Math.sqrt((mark + 0.5) / marks);
+      agents.push({
+        id: `agent:${groupId}:${mark}`,
+        groupId,
+        dx: round2(Math.cos(angle) * distance),
+        dy: round2(Math.sin(angle) * distance),
+      });
+    }
+  });
+
+  return { agents, total, perMark };
 };
 
 /**
@@ -250,7 +396,21 @@ export const buildRelationshipGraph = (run: AssessmentRun): RelationshipGraph =>
     }
   });
 
-  return finalise({ nodes, edges, arrival });
+  // The agents those groups stand for. Seeded from the run's own seed, so the
+  // same draft always draws the same field, and a different draft draws a
+  // different one.
+  const agentField = buildAgentField(
+    run.reactions.map((reaction) => `stakeholder:${reaction.segmentId}`),
+    createRng(`${run.seed}::agents`),
+  );
+
+  return finalise({
+    nodes,
+    edges,
+    arrival,
+    agents: agentField.agents,
+    population: { total: agentField.total, perMark: agentField.perMark },
+  });
 };
 
 
@@ -312,5 +472,18 @@ export const buildPreviewRelationshipGraph = (
     }
   });
 
-  return finalise({ nodes, edges, arrival });
+  // The agents those groups stand for, from the representative department's own
+  // seed, so the public schematic is identical on every visit and every build.
+  const agentField = buildAgentField(
+    department.segments.map((segmentId) => `stakeholder:${segmentId}`),
+    createRng(`${department.id}::agents`),
+  );
+
+  return finalise({
+    nodes,
+    edges,
+    arrival,
+    agents: agentField.agents,
+    population: { total: agentField.total, perMark: agentField.perMark },
+  });
 };

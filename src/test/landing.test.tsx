@@ -43,8 +43,8 @@ describe("Landing — the pure public landing page", () => {
 
     // The programme and the platform are distinguished on the same screen: the
     // initiative is the government capability, Nzwisiso AI is what delivers it.
-    // §15 places the credit twice — under the hero heading and in the positioning
-    // panel — and both must read from the one config string.
+    // The credit is placed twice — in the authority line that opens the page and
+    // under the hero heading — and both must read from the one config string.
     const credits = screen.getAllByText(/Powered by/);
     expect(credits).toHaveLength(2);
     credits.forEach((credit) => expect(credit).toHaveTextContent(BRAND.poweredBy));
@@ -188,11 +188,31 @@ describe("Landing — the pure public landing page", () => {
       within(panel as HTMLElement).getByRole("heading", { name: "Ministerial champion" }),
     ).toBeInTheDocument();
 
-    // The initiative name appears once as the h1 and once here as plain text — never as
-    // a second heading, which would let the page name itself twice.
+    // The initiative name appears exactly ONCE on the page — as the <h1> immediately
+    // below the authority line. The authority line deliberately carries the proposal
+    // status and the championing Minister rather than the name, because printing the
+    // same name twice inside one screen reads as a mistake.
     const nameMatches = screen.getAllByText(BRAND.initiative);
-    expect(nameMatches).toHaveLength(2);
+    expect(nameMatches).toHaveLength(1);
     expect(nameMatches.filter((node) => node.tagName === "H1")).toHaveLength(1);
+  });
+
+  it("opens with the authority line — the proposal status and the Minister come first", () => {
+    renderLanding();
+    const authority = screen
+      .getByRole("heading", { name: BRAND.proposalLabel })
+      .closest("section") as HTMLElement;
+    const heading = screen.getByRole("heading", { level: 1 });
+
+    // The point of the change: a Minister opening this page (or a colleague opening a
+    // shared link or screenshot) meets the proposal status and the championing
+    // Minister BEFORE anything else. Asserted by real document order, not by styling.
+    expect(
+      authority.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(within(authority).getByText(BRAND.ministerialChampion)).toBeInTheDocument();
+    expect(within(authority).getByText(BRAND.entityCustodian)).toBeInTheDocument();
+    expect(within(authority).getByText(BRAND.initiativeDescription)).toBeInTheDocument();
   });
 
   it("explains the three steps of a run and anchors the sections", () => {

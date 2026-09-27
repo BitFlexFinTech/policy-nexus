@@ -98,6 +98,45 @@ function SectionRule() {
 export default function Landing() {
   return (
     <PublicPageShell>
+      {/* The authority line — the first thing on the page, and therefore the first
+          thing in any screenshot or link a colleague opens. Every government
+          artefact opens by stating what it is and whose it is; that is the whole
+          reason the proposal status, the championing Minister and the ministry sit
+          here rather than at the foot of the page.
+
+          Deliberately NOT a proposal: this platform is the working demonstration,
+          and the proposal itself is a separate document. Deliberately WITHOUT the
+          initiative's own name, too — that name is the page's <h1> immediately
+          below, and printing the same name twice inside one screen reads as a
+          mistake. */}
+      <section
+        aria-labelledby="authority-heading"
+        className="mb-10 rounded-lg border bg-primary-tint p-5 sm:p-6"
+      >
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-8">
+          <div>
+            <SectionRule />
+            <h2
+              id="authority-heading"
+              className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-primary"
+            >
+              {BRAND.proposalLabel}
+            </h2>
+            <p className="mt-2 max-w-xl text-pretty text-xs leading-relaxed text-foreground sm:text-base">
+              {BRAND.initiativeDescription}
+            </p>
+          </div>
+          <div className="sm:border-l sm:border-border sm:pl-8">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Ministerial champion
+            </h3>
+            <p className="mt-1.5 text-sm font-semibold text-foreground">{BRAND.ministerialChampion}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">{BRAND.entityCustodian}</p>
+            <p className="mt-2 text-xs text-muted-foreground">{BRAND.poweredBy}</p>
+          </div>
+        </div>
+      </section>
+
       <section
         aria-labelledby="landing-heading"
         className="grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:items-start lg:gap-10"
@@ -433,37 +472,10 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* The proposal and its ministerial champion. Visually important, deliberately
-          not promotional: one restrained panel, no portrait, no party styling. The
-          initiative name is deliberately NOT a second heading — the section heading
-          is the proposal label, so the page still has exactly one <h1> and no
-          duplicated heading names. */}
-      <section
-        aria-labelledby="positioning-heading"
-        className="mt-16 rounded-lg border bg-primary-tint p-5 sm:p-6"
-      >
-        <SectionRule />
-        <h2
-          id="positioning-heading"
-          className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-primary"
-        >
-          {BRAND.proposalLabel}
-        </h2>
-        <p className="mt-3 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
-          {BRAND.initiative}
-        </p>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-          {BRAND.initiativeDescription}
-        </p>
-        <div className="mt-6 border-t border-border pt-4">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            Ministerial champion
-          </h3>
-          <p className="mt-2 text-sm font-semibold text-foreground">{BRAND.ministerialChampion}</p>
-          <p className="mt-0.5 text-sm text-muted-foreground">{BRAND.entityCustodian}</p>
-          <p className="mt-4 text-xs text-muted-foreground">{BRAND.poweredBy}</p>
-        </div>
-      </section>
+      {/* The proposal block and its ministerial champion used to sit here. They now
+          open the page instead — see the authority line at the top of this
+          component — because the Minister reads the top of a page, and only the top
+          of a screenshot, travels. Nothing was lost: every line moved verbatim. */}
 
       <section className="mt-16 rounded-lg border border-primary/25 bg-card p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">

@@ -201,10 +201,19 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     expect(order.how).toBeGreaterThan(order.behind);
 
     // The five approved indicators, and the population figure rendered in BOTH the
-    // strip and the schematic — one constant, two renderings, so the count is two.
+    // strip and the schematic — one source, two renderings, so the count is two.
     await expect(behind.getByRole("term")).toHaveCount(5);
     await expect(behind.getByText("Simulated agents", { exact: true })).toBeVisible();
-    await expect(behind.getByText("1,000+")).toHaveCount(2);
+    // The figure is now a MODELLED count rather than a placeholder, and it is read
+    // in the real DOM: a real number in the thousands, appearing exactly twice —
+    // once in the strip, once under the schematic's graph.
+    const agentFigure = (await behind.getByRole("term").first().textContent())?.trim() ?? "";
+    expect(agentFigure).toMatch(/^\d{1,3}(,\d{3})+$/);
+    expect(Number(agentFigure.replace(/,/g, ""))).toBeGreaterThanOrEqual(2000);
+    await expect(behind.getByText(agentFigure, { exact: true })).toHaveCount(2);
+    // And the field those agents are drawn as: the marks nested inside the group
+    // marks, counted in the real DOM. A handful of circles would fail here.
+    expect(await behind.locator("svg g[role='button'] g circle").count()).toBeGreaterThan(50);
 
     // The eight-stage pipeline, in order, with its supporting lines.
     await expect(behind.locator("ol > li")).toHaveCount(8);
@@ -226,7 +235,10 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
       page.getByRole("heading", { name: "From policy draft to policy intelligence", exact: true }),
     ).toBeVisible();
     await expect(page.getByText(/does not replace policymakers or determine policy outcomes/)).toBeVisible();
-    // §15 — the proposal and its ministerial champion.
+    // The authority line — the proposal status, the championing Minister and the
+    // ministry. It must open the page, above the main heading: a Minister reading
+    // this page meets it before anything else, and only the top of the page travels
+    // in a screenshot. Asserted by real geometry, not by styling.
     await expect(
       page.getByRole("heading", {
         name: "A proposed national digital innovation initiative",
@@ -235,8 +247,25 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     ).toBeVisible();
     await expect(page.getByText("Hon. Tatenda A. Mavetera, MP", { exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Ministerial champion", exact: true })).toBeVisible();
-    // The initiative is named once as the h1 and once in the positioning panel —
-    // never twice as a heading, which is asserted below by the single level-one.
+    const authorityTop =
+      (
+        await page
+          .getByRole("heading", {
+            name: "A proposed national digital innovation initiative",
+            exact: true,
+          })
+          .boundingBox()
+      )?.y ?? -1;
+    const heroTop =
+      (
+        await page
+          .getByRole("heading", { level: 1, name: "Zimbabwe AI Policy Intelligence Initiative" })
+          .boundingBox()
+      )?.y ?? -1;
+    expect(authorityTop).toBeGreaterThan(0);
+    expect(authorityTop).toBeLessThan(heroTop);
+    // The initiative is named exactly once — as the single level-one heading, directly
+    // under the authority line. It is deliberately not repeated inside the line itself.
     await expect(
       page.getByRole("heading", { level: 1, name: "Zimbabwe AI Policy Intelligence Initiative" }),
     ).toHaveCount(1);
@@ -348,7 +377,12 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     // schematic, all still present at phone width.
     await expect(behind.getByRole("term")).toHaveCount(5);
     await expect(behind.locator("ol > li")).toHaveCount(8);
-    await expect(behind.getByText("1,000+").first()).toBeVisible();
+    // The modelled figure, read from the page rather than hard-coded — the strip and
+    // the diagram both carry it, and it is a real number in the thousands.
+    await expect(behind.getByRole("term").first()).toHaveText(/^\d{1,3}(,\d{3})+$/);
+    // The agent field is drawn on the compact card too, which is what makes the
+    // claim visible on the page the Minister is most likely to see first.
+    expect(await behind.locator("svg g[role='button'] g circle").count()).toBeGreaterThan(50);
     await expect(behind.getByText("The simulated environment", { exact: true })).toBeVisible();
 
     const width = await page.evaluate(() => ({
@@ -551,7 +585,9 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     // at the mark itself (the painted circle), not at the group's box centre,
     // which can fall in the gap between the mark and its label.
     const before = await group.getAttribute("transform");
-    const mark = group.locator("circle").last();
+    // Direct children only: the agent field is drawn as circles inside a nested
+    // group around the mark, and the drag must aim at the mark itself.
+    const mark = group.locator(":scope > circle").last();
     // Scrolled in first: a pointer event aimed below the fold lands nowhere, and
     // this page is taller than the viewport.
     await mark.scrollIntoViewIfNeeded();
@@ -569,6 +605,16 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     });
     const finished = await entityCount();
     expect(finished.drawn).toBe(finished.total);
+
+    // The field the platform promises is really drawn: the modelled groups are
+    // ringed by the agents they stand for, counted in the real DOM. This is the
+    // guard that stops the page saying "thousands of agents" over a handful of
+    // circles ever again.
+    const agentMarks = await graphCard.locator("svg g[role='button'] g circle").count();
+    expect(agentMarks).toBeGreaterThan(100);
+    // And the card says in words what each mark stands for, so the density is never
+    // mistaken for one mark per agent.
+    await expect(graphCard.getByText(/Each mark stands for about \d+ agents/)).toBeVisible();
 
     expectCleanRuntime();
   });
