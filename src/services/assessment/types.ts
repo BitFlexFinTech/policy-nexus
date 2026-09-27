@@ -31,7 +31,11 @@ export interface AssessmentRequest {
   templateId?: string;
   /** Horizon the department prepared the draft for. */
   timeHorizon?: TimeHorizonId;
-  /** Names of uploaded files, recorded only (no extraction in scenario mode). */
+  /**
+   * Names of uploaded files, recorded for provenance. A `.txt` upload also
+   * supplies the policy text itself (read in the browser); `.pdf` and `.docx`
+   * uploads are recorded by name only — their text is not read in this build.
+   */
   fileNames?: string[];
 }
 

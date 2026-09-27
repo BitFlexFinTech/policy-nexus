@@ -29,16 +29,17 @@ client is registered.
 ## 3. Policy ingestion
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
-| `.txt` / `.pdf` / `.docx` upload | File accepted, name and size recorded. **No text extraction** — when only files are supplied the recorded file list *is* the policy text and the run's `source` states `upload` plainly, so the UI never implies the file was parsed. | Server-side document extraction | Backend service call behind `AssessmentService` (`extractPolicyText`) |
+| `.txt` upload | **REAL — Phase X.** The file is read in the browser (`src/services/extraction/extractPolicyText.ts`) and its own text becomes the run's policy text; `source` still reads `upload`. Deterministic, no dependency, no network call. | unchanged for `.txt` | `extractPolicyFile()` — the extraction seam |
+| `.pdf` / `.docx` upload | **Mock — Phase X.** Recorded by name; the screen shows `Text extraction (Mock) — recorded by name; PDF/DOCX text is not read in this build`, so nothing implies the file was parsed. The fixed-step progress animation was removed along with it. | Server-side document extraction (PDF/DOCX parsers) | Replace `extractPolicyFile()` in `src/services/extraction/extractPolicyText.ts` with a server call — one function, no UI change |
 | Preset chips | Department-aware: read from `department.policyTemplates` (`src/config/departments.ts`); selecting a chip also records its `templateId`, so the run's reference and horizon come from the department's own draft | unchanged | n/a |
-| Parse progress | Deterministic fixed-step progress (`PARSE_STEP` / `PARSE_TICK_MS` in `src/components/PolicyInput.tsx`) — no `Math.random` | Real progress from the backend | Same seam |
+| Reading progress | **REAL — Phase X.** The bar advances one step per accepted file as that file is actually read, and each file lists what happened to it. The fixed-step `PARSE_STEP`/`PARSE_TICK_MS` animation is gone. | unchanged | `src/components/PolicyInput.tsx` |
 | Run Simulation action | **Real, deterministic, and labelled.** The button is `Run Simulation`; it calls `assessmentService.run()`, records the request and opens `/app/simulations/:id`. The engine is the scenario engine (Mock) — the UI says so on the run, the register and the assessment. | Unchanged button; the service behind it changes | `src/components/PolicyInput.tsx` → `AssessmentService` seam |
 
 ## 4. Document actions
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
 | Save as PDF | Opens the browser print dialogue via `window.print()` — choose "Save as PDF" as the destination. No `jspdf` dependency and no new dependency added. | Native server-side PDF renderer | Backend endpoint behind `DocumentActions` (`src/components/assessment/DocumentActions.tsx`) |
-| Download Word | Real downloadable `.doc` built from a Word-compatible HTML Blob (`application/msword`) — **HTML-based, not OOXML `.docx`** | Server-side real `.docx` | Backend endpoint behind `DocumentActions` |
+| Download Word | **REAL OOXML `.docx` — Phase X.** A genuine Word document: `src/services/documents/docx.ts` fills the WordprocessingML parts and `zip.ts` writes a deterministic ZIP. No dependency; `file` reports “Microsoft Word 2007+”; the same run is byte-identical. Verified with `unzip -t` and `xmllint` as well as in the browser. | A server-side renderer only if a house template is ever mandated | `createDocxBlob()` in `src/services/documents/docx.ts` |
 | Print | Real `window.print()`; `@media print` in `src/index.css` hides the workspace chrome and any `data-print="hide"` control, so the printed page is the assessment alone | unchanged | n/a |
 | Share | `navigator.share` where the platform provides a share sheet, otherwise the clipboard (`navigator.clipboard.writeText`). The shared text is the plain-text rendering of the run plus the disclaimer. **No network call and no email client is invoked.** | Server-side email / link dispatch | Backend endpoint behind `DocumentActions` |
 
@@ -55,12 +56,12 @@ client is registered.
 ## 6. Non-credential work still outstanding (no credential can fix these)
 - ~~Build `src/services/assessment/**`~~ — **DONE (Phase E):** interface + factory + deterministic engine + PRNG + run store.
 - ~~Build the live simulation view and the assessment / executive-summary / full-assessment screens~~ — **DONE (Phase F/G):** `/app/simulations/:id`, `/app/assessments/:id`, `/app/assessments/:id/full`.
-- ~~PDF / Word / print / share document actions (`src/components/assessment/DocumentActions.tsx`)~~ — **DONE (Phase G)**, with the caveats in §4 above (print-dialogue PDF, HTML-based `.doc`).
+- ~~PDF / Word / print / share document actions (`src/components/assessment/DocumentActions.tsx`)~~ — **DONE (Phase G)**, and the Word caveat is **closed in Phase X: the export is now a real OOXML `.docx`**. The only remaining caveat is the PDF path, which is the browser print dialogue by design.
 - ~~Derive a long-form report and a drafted policy from a completed run~~ — **DONE (Phase K):**
   `src/services/assessment/documents.ts` (deterministic), routes `/app/assessments/:id/report` and
   `/app/assessments/:id/policy-draft`, editable draft text, exported through the Phase G seam.
-- Robust PDF/DOCX text extraction (server-side).
-- Real `.docx` / native PDF rendering.
+- **PDF/DOCX text extraction (server-side).** The `.txt` half is **DONE (Phase X)** — read in the browser, no server needed. The PDF/DOCX half still needs a server or a parser, and stays Mock and labelled until it exists.
+- ~~Real `.docx` rendering.~~ — **DONE (Phase X):** `src/services/documents/docx.ts` + `zip.ts` write a genuine OOXML `.docx` with zero dependencies (`file` reports “Microsoft Word 2007+”). **Native PDF rendering** — beyond the browser print dialogue — is still outstanding.
 - Remote assessment service endpoint + client construction in `CLIENTS` (`src/services/assessment/AssessmentService.ts`).
 - Government SSO integration.
 - ~~Playwright Chromium binary is not installed and no `e2e/` spec exists yet — Phase H.~~
@@ -76,7 +77,7 @@ client is registered.
 - `npx playwright test` → **4/4 PASS** against the production `vite preview` build: home lists all
   16 departments · one-click entry · session survives navigation **and a full reload** · paste →
   Run Simulation → **Assessment Complete** → executive summary → metric drill-down →
-  Print / Save-as-PDF / Download-Word (a real `…-executive-summary.doc`) / Share · upload → the run
+  Print / Save-as-PDF / Download-Word (a real `…-executive-summary.doc` at the time — Phase X changed it to a real OOXML `.docx`) / Share · upload → the run
   records `source upload`.
 - Every browser test asserts **0 console errors, 0 uncaught page errors, and 0 off-origin requests** —
   the built bundle provably makes **no runtime network call**, which is the strongest available form

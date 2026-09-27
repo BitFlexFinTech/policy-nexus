@@ -2,12 +2,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BRAND, DISCLAIMER } from "@/config/brand";
 import { REFERENCE_DATE_LABEL } from "@/config/reference";
+import { createDocxBlob } from "@/services/documents/docx";
 import type { AssessmentRun } from "@/services/assessment/types";
 
 export type DocumentScope = "summary" | "full";
-
-const escapeHtml = (value: string): string =>
-  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /** Plain-text rendering of a run, used for the clipboard share payload. */
 const buildPlainText = (run: AssessmentRun, scope: DocumentScope): string => {
@@ -41,21 +39,6 @@ const buildPlainText = (run: AssessmentRun, scope: DocumentScope): string => {
   }
   lines.push("", DISCLAIMER.long);
   return lines.join("\n");
-};
-
-/** Word-compatible HTML. Namespaces are URNs — the document makes no network call. */
-const buildWordHtml = (title: string, text: string): string => {
-  const body = text
-    .split("\n")
-    .map((line) => (line ? `<p>${escapeHtml(line)}</p>` : "<p>&nbsp;</p>"))
-    .join("");
-  return (
-    `<html xmlns:o="urn:schemas-microsoft-com:office:office" ` +
-    `xmlns:w="urn:schemas-microsoft-com:office:word" ` +
-    `xmlns="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8">` +
-    `<title>${escapeHtml(title)}</title>` +
-    `</head><body>${body}</body></html>`
-  );
 };
 
 const fileNameFor = (run: AssessmentRun, scope: DocumentScope) =>
@@ -116,18 +99,16 @@ export function DocumentActions({
   const handleWord = () => {
     if (!payload) return;
     try {
-      const blob = new Blob([buildWordHtml(payload.title, payload.text)], {
-        type: "application/msword",
-      });
+      const blob = createDocxBlob({ title: payload.title, body: payload.text });
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `${payload.fileStem}.doc`;
+      anchor.download = `${payload.fileStem}.docx`;
       document.body.appendChild(anchor);
       anchor.click();
       document.body.removeChild(anchor);
       URL.revokeObjectURL(url);
-      setStatus(`Word document downloaded: ${payload.fileStem}.doc`);
+      setStatus(`Word document downloaded: ${payload.fileStem}.docx`);
     } catch {
       setStatus("The Word download could not be prepared in this browser.");
     }
@@ -168,7 +149,8 @@ export function DocumentActions({
       </div>
       <p className="text-[10px] text-muted-foreground">
         Print and Save as PDF open the browser dialogue — choose “Save as PDF” as the destination to
-        keep a copy. The export carries this assessment's disclaimer.
+        keep a copy. Download Word produces a real .docx document. The export carries this
+        assessment's disclaimer.
       </p>
       {status && <p className="text-[10px] font-medium text-primary">{status}</p>}
     </div>

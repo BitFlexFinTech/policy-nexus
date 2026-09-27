@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { Buffer } from "node:buffer";
+import { readFileSync } from "node:fs";
 import { DEPARTMENTS, DEPARTMENT_COUNT, findDepartment } from "../src/config/departments";
 
 /**
@@ -418,12 +419,17 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
       .poll(() => page.evaluate(() => (window as unknown as { __printCalls: number }).__printCalls))
       .toBe(2);
 
-    // Word produces a real download with a real filename.
+    // Word produces a real download: a `.docx`, which is a ZIP container, so the
+    // first two bytes must be the ZIP signature `PK`.
     const [download] = await Promise.all([
       page.waitForEvent("download"),
       page.getByRole("button", { name: "Download Word" }).click(),
     ]);
-    expect(download.suggestedFilename()).toMatch(/executive-summary\.doc$/);
+    expect(download.suggestedFilename()).toMatch(/executive-summary\.docx$/);
+    const downloadPath = await download.path();
+    expect(downloadPath).not.toBeNull();
+    const signature = readFileSync(downloadPath as string).subarray(0, 2).toString("latin1");
+    expect(signature).toBe("PK");
 
     // Share falls back to the clipboard here and reports what it did.
     await page.getByRole("button", { name: "Share" }).click();

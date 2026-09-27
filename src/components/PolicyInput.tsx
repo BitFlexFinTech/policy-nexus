@@ -5,24 +5,19 @@ import { Progress } from "@/components/ui/progress";
 import { findDepartment } from "@/config/departments";
 import { REFERENCE_FISCAL_YEAR } from "@/config/reference";
 import { assessmentService } from "@/services/assessment/AssessmentService";
-import type { AssessmentRequest } from "@/services/assessment/types";
+import type { AssessmentRequest, AssessmentSource } from "@/services/assessment/types";
+import {
+  extractPolicyFile,
+  isAcceptedPolicyFile,
+  type ExtractedPolicyFile,
+} from "@/services/extraction/extractPolicyText";
 import { useSession } from "@/session/useSession";
-
-const formatFileSize = (bytes: number) => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1048576).toFixed(1)} MB`;
-};
-
-/** Deterministic parsing steps — no clock, no randomness, same every run. */
-const PARSE_STEP = 8;
-const PARSE_TICK_MS = 250;
 
 /**
  * Policy ingestion for the signed-in department. Presets come from the
- * department's own prepared drafts, the parsing indicator advances in fixed
- * steps, and **Run Simulation** hands the draft to the assessment service and
- * opens the live deterministic run. It performs no network call.
+ * department's own prepared drafts, an uploaded `.txt` file is read for real, and
+ * **Run Simulation** hands the draft to the assessment service and opens the live
+ * deterministic run. It performs no network call.
  */
 export function PolicyInput() {
   const session = useSession();
@@ -31,25 +26,32 @@ export function PolicyInput() {
 
   const [draft, setDraft] = useState("");
   const [templateId, setTemplateId] = useState<string | undefined>(undefined);
-  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: string }[]>([]);
-  const [parseProgress, setParseProgress] = useState(0);
-  const [isParsing, setIsParsing] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<ExtractedPolicyFile[]>([]);
+  const [readProgress, setReadProgress] = useState(0);
+  const [isReading, setIsReading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleRunSimulation = useCallback(() => {
     if (!department) return;
     const fileNames = uploadedFiles.map((file) => file.name);
     const text = draft.trim();
-    if (!text && fileNames.length === 0) return;
-    // No text extraction exists in scenario mode: when only files were supplied
-    // the recorded file list is the policy text, and the source says `upload`
-    // plainly rather than implying the file was parsed.
-    const policyText = text || `Uploaded policy document(s): ${fileNames.join(", ")}`;
+    // Text read from an uploaded `.txt` file is the policy text when the officer
+    // has not typed a draft of their own. The source stays `upload`, so the run
+    // states where the text came from without implying that more was read than was.
+    const uploadedText = uploadedFiles
+      .filter((file) => file.extracted && file.text)
+      .map((file) => file.text)
+      .join("\n\n")
+      .trim();
+    if (!text && !uploadedText && fileNames.length === 0) return;
+    const policyText =
+      text || uploadedText || `Uploaded policy document(s): ${fileNames.join(", ")}`;
     const template = department.policyTemplates.find((item) => item.id === templateId);
+    const source: AssessmentSource = text ? (template ? "preset" : "paste") : "upload";
     const request: AssessmentRequest = {
       departmentId: department.id,
       policyText,
-      source: text ? (template ? "preset" : "paste") : "upload",
+      source,
       templateId: text ? templateId : undefined,
       timeHorizon: template?.timeHorizon,
       fileNames,
@@ -58,44 +60,34 @@ export function PolicyInput() {
     navigate(`/app/simulations/${encodeURIComponent(run.id)}`);
   }, [department, draft, templateId, uploadedFiles, navigate]);
 
-  const handleFileUpload = useCallback((files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    const validTypes = [
-      "application/pdf",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "text/plain",
-    ];
+  /**
+   * Read each accepted file through the extraction seam, one at a time, and show
+   * the real progress. Nothing is skipped silently: a file that cannot be read is
+   * still listed, with a status line saying so.
+   */
+  const handleFileUpload = useCallback(async (fileList: FileList | null) => {
+    if (!fileList || fileList.length === 0) return;
+    const accepted = Array.from(fileList).filter((file) =>
+      isAcceptedPolicyFile(file.name, file.type),
+    );
+    if (accepted.length === 0) return;
 
-    const newFiles: { name: string; size: string }[] = [];
-    Array.from(files).forEach((file) => {
-      if (validTypes.includes(file.type) || file.name.endsWith(".txt") || file.name.endsWith(".pdf") || file.name.endsWith(".docx")) {
-        newFiles.push({ name: file.name, size: formatFileSize(file.size) });
-      }
-    });
-
-    if (newFiles.length > 0) {
-      setUploadedFiles((prev) => [...prev, ...newFiles]);
-      setIsParsing(true);
-      setParseProgress(0);
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += PARSE_STEP;
-        if (progress >= 100) {
-          clearInterval(interval);
-          setParseProgress(100);
-          setTimeout(() => setIsParsing(false), 300);
-        } else {
-          setParseProgress(progress);
-        }
-      }, PARSE_TICK_MS);
+    setIsReading(true);
+    setReadProgress(0);
+    const results: ExtractedPolicyFile[] = [];
+    for (let index = 0; index < accepted.length; index += 1) {
+      results.push(await extractPolicyFile(accepted[index]));
+      setReadProgress(Math.round(((index + 1) / accepted.length) * 100));
     }
+    setUploadedFiles((prev) => [...prev, ...results]);
+    setIsReading(false);
   }, []);
 
   const handleDrop = useCallback(
-    (e: React.DragEvent) => {
+    async (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragOver(false);
-      handleFileUpload(e.dataTransfer.files);
+      await handleFileUpload(e.dataTransfer.files);
     },
     [handleFileUpload],
   );
@@ -174,28 +166,35 @@ export function PolicyInput() {
               className="hidden"
               accept=".pdf,.docx,.txt"
               multiple
-              onChange={(e) => handleFileUpload(e.target.files)}
+              onChange={(e) => {
+                void handleFileUpload(e.target.files);
+              }}
             />
           </label>
         </div>
 
-        {/* Parse progress */}
-        {isParsing && (
+        {/* Reading progress — real: one step per accepted file */}
+        {isReading && (
           <div className="mt-2 space-y-1">
             <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-              Document Parsing & Knowledge Map Extraction
+              Reading uploaded files
             </span>
-            <Progress value={parseProgress} className="h-1.5" />
+            <Progress value={readProgress} className="h-1.5" />
           </div>
         )}
 
-        {/* Uploaded files list */}
+        {/* Uploaded files, each with what actually happened to it */}
         {uploadedFiles.length > 0 && (
-          <div className="mt-2 space-y-0.5">
-            {uploadedFiles.map((f, i) => (
-              <div key={i} className="flex items-center justify-between px-1 text-[10px] text-foreground">
-                <span className="truncate">{f.name}</span>
-                <span className="ml-2 text-muted-foreground">{f.size}</span>
+          <div className="mt-2 space-y-1">
+            {uploadedFiles.map((file, i) => (
+              <div key={i} className="px-1 text-[10px] text-foreground">
+                <div className="flex items-center justify-between">
+                  <span className="truncate">{file.name}</span>
+                  <span className="ml-2 shrink-0 text-muted-foreground">{file.sizeLabel}</span>
+                </div>
+                <span className={file.extracted ? "text-primary" : "text-muted-foreground"}>
+                  {file.status}
+                </span>
               </div>
             ))}
           </div>
