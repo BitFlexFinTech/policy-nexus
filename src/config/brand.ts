@@ -92,7 +92,7 @@ export const DISCLAIMER = {
   short: "Prepared for decision support. Not a definitive forecast.",
   long:
     "This assessment was produced by the Nzwisiso AI Policy Dashboard from the policy text " +
-    "supplied and the department's published reference indicators. It describes a simulated " +
+    "supplied and the department's reference indicators. It describes a simulated " +
     "range of stakeholder responses under stated assumptions. It is prepared for decision " +
     "support and is not a definitive forecast of public opinion, market outcomes, or " +
     "administrative results. Figures are indicative and must be read together with the " +

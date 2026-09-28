@@ -14,7 +14,7 @@
  * may later replace behind these same signatures (see PRODUCTION_READINESS.md).
  */
 
-import type { Department } from "@/config/departments";
+import { indicatorBasisLabel, type Department } from "@/config/departments";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
 import { REFERENCE_DATE_LABEL } from "@/config/reference";
 import { createRng } from "@/lib/prng";
@@ -75,7 +75,7 @@ const REPORT_PURPOSE: readonly string[] = [
 
 const REPORT_METHOD: readonly string[] = [
   "The generator is deterministic and holds no state, so the same inputs always reproduce this exact result.",
-  "Every figure below is derived from the submitted draft, the department's published reference indicators and the modelled behaviour of its stakeholder groups.",
+  "Every figure below is derived from the submitted draft, the department's reference indicators and the modelled behaviour of its stakeholder groups.",
   "The run models each group separately and then reads their combined position, which is why one draft can read as supportive to one group and resistant to another.",
 ];
 
@@ -122,7 +122,7 @@ export const buildLongReport = (run: AssessmentRun, department: Department): Gen
     paragraphs: [
       `The ${VOCABULARY.simulationCore} is computed locally within the Government of Zimbabwe estate. No policy text or result leaves national custody, and no external service is contacted.`,
       rng.pick(REPORT_METHOD),
-      `This run modelled ${run.reactions.length} stakeholder groups, tested the draft against ${run.impacts.length} of ${department.shortName}'s stated priorities, and drew on ${department.indicators.length} published reference indicators over a ${run.horizonLabel.toLowerCase()} horizon of ${run.horizonMonths} months.`,
+      `This run modelled ${run.reactions.length} stakeholder groups, tested the draft against ${run.impacts.length} of ${department.shortName}'s stated priorities, and drew on ${department.indicators.length} reference indicators over a ${run.horizonLabel.toLowerCase()} horizon of ${run.horizonMonths} months.`,
       `The draft's own words were read before anything was modelled; the run screen and the assessment state what that reading found.`,
     ],
     // BATCH E — every assumption the run was modelled under, in the report's own words.
@@ -358,14 +358,14 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
     id: "monitoring",
     heading: "7. Monitoring, evaluation and review",
     paragraphs: [
-      `The policy is monitored against the department's own published reference indicators, so that progress is read from one set of figures rather than several.`,
+      `The policy is monitored against the department's own reference indicators, so that progress is read from one set of figures rather than several.`,
       `The policy shall be reviewed when ${rng.pick(
         REVIEW_TRIGGERS,
       )}. The review shall report the actual position against the modelled position using the indicators below, and shall be published.`,
     ],
     bullets: department.indicators.map(
       (indicator) =>
-        `${indicator.label} — baseline ${indicator.value}${indicator.unit ? ` ${indicator.unit}` : ""} (${indicator.source})`,
+        `${indicator.label} — baseline ${indicator.value}${indicator.unit ? ` ${indicator.unit}` : ""} (${indicatorBasisLabel(indicator.basis)})`,
     ),
     listStyle: "clauses",
   };

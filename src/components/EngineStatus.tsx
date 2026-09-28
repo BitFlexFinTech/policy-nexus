@@ -1,5 +1,5 @@
 import { StatusPill } from "./StatusPill";
-import { findDepartment } from "@/config/departments";
+import { countIndicatorsByBasis, findDepartment } from "@/config/departments";
 import { VOCABULARY } from "@/config/brand";
 import { getReferenceRate } from "@/config/reference";
 import { useSession } from "@/session/useSession";
@@ -35,6 +35,10 @@ export function EngineStatus() {
   if (!department) return null;
 
   const zigRate = getReferenceRate("zig-usd");
+  // Derived from the configuration: a screen may never state a split the platform
+  // does not hold. While an indicator is modelled this says so, rather than calling
+  // the set "published".
+  const basis = countIndicatorsByBasis(department.indicators);
 
   return (
     <div className="border-b bg-card">
@@ -56,7 +60,11 @@ export function EngineStatus() {
           sub="Simulations recorded in this browser"
         />
         <Metric label="Stakeholder segments" value={String(department.segments.length)} sub="Modelled population groups" />
-        <Metric label="Reference indicators" value={String(department.indicators.length)} sub="Published department measures" />
+        <Metric
+          label="Reference indicators"
+          value={String(department.indicators.length)}
+          sub={`${basis.published} published · ${basis.modelled} modelled`}
+        />
         <Metric label="Policy templates" value={String(department.policyTemplates.length)} sub="Prepared departmental drafts" />
         <Metric label={zigRate.label} value={String(zigRate.value)} sub={zigRate.unit} />
       </div>

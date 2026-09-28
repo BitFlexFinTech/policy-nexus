@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { findDepartment, type IndicatorTone } from "@/config/departments";
+import { findDepartment, indicatorBasisLabel, type IndicatorTone } from "@/config/departments";
 import { useSession } from "@/session/useSession";
 
 interface KPICardProps {
@@ -8,7 +8,7 @@ interface KPICardProps {
   unit?: string;
   score: number;
   description: string;
-  source: string;
+  sourceLabel: string;
   color: IndicatorTone;
 }
 
@@ -17,7 +17,7 @@ interface KPICardProps {
  * to its plain-language meaning and its stated source rather than showing a
  * number with no drill-down.
  */
-function KPICard({ title, value, unit, score, description, source, color }: KPICardProps) {
+function KPICard({ title, value, unit, score, description, sourceLabel, color }: KPICardProps) {
   const [open, setOpen] = useState(false);
 
   const barColor = {
@@ -48,7 +48,7 @@ function KPICard({ title, value, unit, score, description, source, color }: KPIC
       {open ? (
         <div className="space-y-0.5">
           <p className="text-[10px] leading-snug text-foreground">{description}</p>
-          <p className="text-[10px] text-muted-foreground">Source: {source}</p>
+          <p className="text-[10px] text-muted-foreground">Source: {sourceLabel}</p>
         </div>
       ) : (
         <span className="text-[10px] text-muted-foreground">Open for detail</span>
@@ -58,7 +58,7 @@ function KPICard({ title, value, unit, score, description, source, color }: KPIC
 }
 
 /**
- * The KPI strip, read from the signed-in department's published indicators.
+ * The KPI strip, read from the signed-in department's reference indicators.
  * Every indicator the department states is rendered — never a curated subset —
  * so the strip always matches `department.indicators`.
  */
@@ -83,7 +83,7 @@ export function KPICards() {
           unit={indicator.unit}
           score={indicator.score}
           description={indicator.note}
-          source={indicator.source}
+          sourceLabel={indicatorBasisLabel(indicator.basis)}
           color={indicator.tone}
         />
       ))}

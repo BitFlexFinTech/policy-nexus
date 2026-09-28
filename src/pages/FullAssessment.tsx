@@ -62,7 +62,7 @@ export default function FullAssessment() {
           Method and limitations
         </div>
         The {VOCABULARY.simulationCore} derives this result from the submitted policy text, the
-        department's published reference indicators and its modelled stakeholder groups, using a
+        department's reference indicators and its modelled stakeholder groups, using a
         seeded deterministic process. The same inputs always produce the same result. Figures are
         modelled support indices and participation measures, not poll results, and are indicative
         only. Methodology and limitations are set out in full on the{" "}

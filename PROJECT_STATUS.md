@@ -1441,6 +1441,10 @@ because the block it sits in already names itself.
 | 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (final bytes of the stale-document sweep, this session) | **ALL GREEN**: validate **PASS — all checks green**, now **13 checks** (12 + the retired-statements check + the deployment-claim check), and its new INFO line prints *the local build produces: assets/index-BeggQU9V.js (the same file — the live host is current)* · typecheck **exit 0** · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **369/369 across 31 files** — unchanged, because this sweep changed **no application code** · build **✓**, emitting `assets/index-BeggQU9V.js` |
 | 2026-09-28 | `npx playwright test` (final bytes of the stale-document sweep, this session) | **PASS — 11 passed (28.3 s)**, against the production preview build, with 0 console errors and 0 off-origin requests per test |
 | 2026-09-28 | **defect inventory (stale-document sweep session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. Six defects, all false statements in the documents rather than code faults, and one of them a missing piece of evidence: (1) the Phase AA bullet listing two open items — false for **both** of them, since Batch G had fixed the phone fold and the "Hundreds" strip; (2) the Phase AA *"known remaining mismatch, deliberately NOT changed"* — the same claim again; (3) the open item repeated in RESUME HERE — the same claim a third time; (4) **five false deployment claims in three documents** (`PRODUCTION_READINESS.md` §6c, §6e, §8; `docs/PROPOSAL_PROMPT.md`; this file's Phase J note) — each corrected to the fact verified by fetching the live bundle and hashing it; (5) the Phase O bullet claiming the `index.html`/`brand.ts` duplication "can drift silently" when validate has checked it since the defect sweep; (6) the RESUME HERE deployment claim carrying **no sha256**, so a reader had no way to check it — the evidence is now recorded beside it. **Every fix carries a gate** (validate checks 11 and 12), and **both gates were proved to fail by mutation and restored byte-identical**. **One item remains BLOCKED and unchanged, in the strict form recorded in the AB-5 inventory above:** the 63 department indicator values are authored scenario content — **(a)** it needs a decision from the user plus 63 real per-department figures that do not exist in the repository, **(b)** the exact next action is to put that question to the user, **(c)** the values must **never** be described as sourced official figures, and **(d)** under the agreed order it must be settled **before AB-7**. It is work still owed, not an accepted limitation |
+| 2026-09-28 | `npx vitest run src/test/indicator-basis.test.tsx` (Phase AD R1) | **PASS — 10/10 new gates**, run against the migrated configuration: all 63 indicators carry a `basis`, none carries the retired free-text `source`, the derived label and derived count are what the screens show, and the whole of `src/**` is free of "published (reference )?indicators" and "published department measures" |
+| 2026-09-28 | **mutation proofs of the R1 gates** (Phase AD R1) | **(1)** One indicator given a `published` basis dated **October 2026**, later than the reference month → **FAIL**, `opc/opc-impl is not dated after the reference month: expected 9 to be less than or equal to 8`. **(2)** "Published department measures" put back on the engine vitals → **FAIL, 3 gates** (the rendered workspace text, the source-text scan, and the derived split). Both files restored from backups with `shasum -a 256` **identical**: `5b7a66a4fa828624432775d9571fc960ef126d7e5736781b10612bf9a946849e` (departments.ts) and `2f6922b948bd5de4e6e746fc5fd599cb38723c52eeb6d120f162393a60f94c3c` (EngineStatus.tsx) |
+| 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (Phase AD R1, final bytes) | **ALL GREEN**: validate **PASS — all checks green** (13 checks) · typecheck **exit 0** · lint **0 errors** (the same 7 pre-existing warnings in `src/components/ui/**`) · **379/379 across 32 files** — the 369 before R1 plus its 10 gates · build **✓**, emitting `assets/index-DZDVvf8v.js` (a new bundle, so validate check 12 now prints the local build beside the live bundle as INFO — the live host is behind until R7 redeploys, and that is stated rather than hidden) |
+| 2026-09-28 | `npx playwright test` (Phase AD R1, final bytes) | **PASS — 11 passed (28.1 s)** against the production preview, 0 console errors and 0 off-origin requests per test. The migration changed a field name, a label and six sentences, so the end-to-end journey needed re-running and it holds |
 
 
 ### Phase AB-6 — the defect sweep and the simulation-power batches (2026-09-28)
@@ -1474,12 +1478,55 @@ place. And `PRODUCTION_READINESS.md` §5 claimed **16** canonical segments when 
 holds **36** — corrected, and the neighbouring counts (63 indicators, 48 templates, 49 documents) were
 **re-counted rather than assumed** and were already right.
 
-**One item remains BLOCKED, unchanged and stated in the strict form in the AB-5 defect inventory above:**
-the **63 department indicator values are authored scenario content**, not figures read from a named
-publication, so they must never be described as sourced official figures. Fixing that needs the user's
-decision plus 63 real per-department values, and if it is ever done it must happen **before AB-7**.
+**One item was BLOCKED here and is now IN PROGRESS.** The **63 department indicator values** were
+authored scenario content, not figures read from a named publication, so they must never be described as
+sourced official figures. **The user decided this session** (*"Replace all 63 with real published
+figures — research them department by department first, then build AB-7."*), so the item is no longer
+blocked: **Phase AD** below records it, **R1 is done**, and the research runs as **R2–R5, all before
+AB-7**. Until R2–R5 land, every indicator is labelled `Modelled` — which is true, because the numbers in
+the platform *are* still the modelled ones until a published figure replaces each one. What is no longer
+true, and no longer happens anywhere, is calling them published.
 
 
+### Phase AD — the 63 department indicator figures (2026-09-28, requested by the user this session)
+
+**Requested by the user, verbatim:** *"Replace all 63 with real published figures — research them
+department by department first, then build AB-7."* That settles the one item BLOCKED in the AB-5 and
+AB-6 inventories: the 63 indicators were authored demonstration figures, each carrying a free-text
+`source` such as "Trade statistics", while the engine vitals called the whole set **"Published department
+measures"** — so an authored number read as an official published figure.
+
+| # | Batch | What it does | Status |
+|---|---|---|---|
+| **R1** | **The shape and the gates** | `DepartmentIndicator` now carries `basis`, a union — `{ kind: "published", sourceId, publication, asOf }` pointing at the one shared `NAMED_SOURCES` table, or `{ kind: "modelled" }`. The free-text `source` field is **gone**. One derived label (`indicatorBasisLabel`) and one derived count (`countIndicatorsByBasis`) are the only readers, so the KPI strip, the drill-down, the drafted policy and the engine vitals cannot describe the same number differently. | **DONE — verified this session** |
+| **R2–R5** | **The research, in four department clusters** | Each indicator either becomes the real published figure with its publisher, publication and period, or is labelled `Modelled`. **Nothing is invented**: a figure that cannot be confirmed from a named publication stays modelled, exactly as AB-2 left 16 stakeholder shares modelled. | **NOT STARTED** |
+| **R6** | Interface refinement for published figures | Trimming what the drill-down and reports print once real figures land. | **NOT STARTED** |
+| **R7** | Docs, deploy, review zip | `PRODUCTION_READINESS.md` states the published/modelled split; the live host is redeployed. | **NOT STARTED** |
+| **R8** | **AB-7** — funding memo, pitch deck, one-page ask | Rewrite `docs/PROPOSAL_PROMPT.md` down from six documents to three. | **NOT STARTED — still last** |
+
+**R1 found and fixed six further false claims that were live on screen** (the defect was not only in the
+KPI strip): `EngineStatus` "Published department measures" → the derived split; `FullAssessment` "the
+department's published reference indicators" → "reference indicators"; `documents.ts` twice ("the
+department's published reference indicators", "drew on N published reference indicators");
+`drafting.ts` provenance ("grounded in the N published reference indicators"); `brand.ts`'s
+**disclaimer**; and the drafted policy's own monitoring section, which printed a modelled baseline as if
+it were a published figure. `KPICards` printed `Source: <free text>` and now prints the derived basis
+label.
+
+**The 11 new gates** (`src/test/indicator-basis.test.tsx`): all 63 carry a basis and **none** carries the
+retired free-text `source`; published plus modelled counts to the department's own total; every published
+basis names a known `NAMED_SOURCES` entry, a publication and a period in the reference year **and no later
+than the reference month** (month order derived from `formatReferenceDate`, never a second month list);
+a modelled indicator renders as modelled, contains the platform's single word, and **names no publisher**;
+the sourcing statement carries the indicator rule; the drill-down and the engine vitals show the derived
+text; the workspace never says "published measures"; the retired field and phrase are absent from the
+whole of `src/**`; and the drafted policy writes a modelled baseline as modelled.
+
+**Two mutation proofs, both restored byte-identical:** (1) giving one indicator a published basis dated
+**October 2026** (after the reference month) → `opc/opc-impl is not dated after the reference month:
+expected 9 to be less than or equal to 8`; (2) putting "Published department measures" back on the
+engine vitals → **3 gates failed** (the rendered text, the source-text scan and the derived split).
+`sha256` before and after: `5b7a66a4…` (departments.ts) and `2f6922b9…` (EngineStatus.tsx), unchanged.
 ## Known-red / open items
 
 - **RESOLVED in the defect sweep (Batches A–G): four items that used to be listed here are fixed.**

@@ -264,6 +264,6 @@ export const provenanceParagraphs = (
   department: Department,
   verification: CitationVerification,
 ): string[] => [
-  `Provenance: this draft was produced from simulation ${run.reference} on ${REFERENCE_DATE_LABEL}, seeded "${run.seed}", grounded in the ${department.indicators.length} published reference indicators of ${department.shortName} and the modelled positions of the ${department.segments.length} groups it models.`,
+  `Provenance: this draft was produced from simulation ${run.reference} on ${REFERENCE_DATE_LABEL}, seeded "${run.seed}", grounded in the ${department.indicators.length} reference indicators of ${department.shortName} and the modelled positions of the ${department.segments.length} groups it models.`,
   `Citations: ${verification.citations.length} instrument(s) are listed in clause 8. Every one was checked against the platform's cited-instrument table; ${verification.unknown.length + verification.outsideRegister.length + verification.strayChapters.length} could not be verified.`,
 ];

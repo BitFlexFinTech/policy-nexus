@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import App from "@/App";
-import { DEPARTMENTS, findDepartment } from "@/config/departments";
+import { DEPARTMENTS, findDepartment, indicatorBasisLabel } from "@/config/departments";
 import { citedInstrumentLabel } from "@/config/instruments";
 import {
   MODELLED_SHARE_LABEL,
@@ -50,7 +50,7 @@ describe("workspace — all 16 departments, department-aware panels", () => {
     renderAt("/app");
     const indicator = findDepartment("fin")!.indicators[0];
     fireEvent.click(screen.getByRole("button", { name: new RegExp(escapeRegex(indicator.label)) }));
-    expect(screen.getByText(`Source: ${indicator.source}`)).toBeInTheDocument();
+    expect(screen.getByText(`Source: ${indicatorBasisLabel(indicator.basis)}`)).toBeInTheDocument();
   });
 
   it.each(SECONDARY)("renders %s without throwing", (path, heading) => {

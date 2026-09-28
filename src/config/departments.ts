@@ -11,7 +11,13 @@
  * The same departmentId must always resolve to byte-identical content.
  */
 
-import type { StakeholderSegmentId, TimeHorizonId } from "./reference";
+import {
+  getNamedSource,
+  MODELLED_INDICATOR_LABEL,
+  type NamedSourceId,
+  type StakeholderSegmentId,
+  type TimeHorizonId,
+} from "./reference";
 import { UNIVERSAL_INSTRUMENTS, type CitedInstrumentId } from "./instruments";
 
 /** The exact, stable department identifiers. Never renumber or rename these. */
@@ -55,7 +61,26 @@ export const DEPARTMENT_IDS: readonly DepartmentId[] = [
 
 export type IndicatorTone = "primary" | "gold" | "success" | "warning";
 
-/** A published reference indicator shown on the KPI strip (and drill-down). */
+/**
+ * Where a department indicator comes from. A union rather than a free-text label on
+ * purpose: an indicator either names the body that publishes it, the publication it
+ * is taken from and the period the figure is for, or it is plainly modelled. There
+ * is no third state, so a number cannot be shown with wording that reads as
+ * official without being one.
+ */
+export type IndicatorBasis =
+  | {
+      kind: "published";
+      /** The body that publishes the figure — a key into `NAMED_SOURCES`. */
+      sourceId: NamedSourceId;
+      /** The publication the figure is taken from. */
+      publication: string;
+      /** The period the figure is for, written as "<Month> <Year>". */
+      asOf: string;
+    }
+  | { kind: "modelled" };
+
+/** A reference indicator shown on the KPI strip (and its drill-down). */
 export interface DepartmentIndicator {
   id: string;
   label: string;
@@ -67,9 +92,34 @@ export interface DepartmentIndicator {
   tone: IndicatorTone;
   /** One line of plain-language meaning, shown when the card is opened. */
   note: string;
-  /** Where the indicator comes from — shown on the drill-down. */
-  source: string;
+  /** Where the indicator comes from — a named publication, or plainly modelled. */
+  basis: IndicatorBasis;
 }
+
+/**
+ * The line shown under an indicator when its card is opened. Written once, here, so
+ * the KPI strip and any other reader cannot describe the same indicator differently.
+ */
+export const indicatorBasisLabel = (basis: IndicatorBasis): string => {
+  if (basis.kind === "modelled") return MODELLED_INDICATOR_LABEL;
+  const source = getNamedSource(basis.sourceId);
+  return `Published by ${source.name} — ${basis.publication}, ${basis.asOf}`;
+};
+
+/**
+ * How many of a department's indicators are published figures and how many are
+ * modelled. Derived, never counted by hand, so a screen cannot state a split the
+ * configuration does not hold.
+ */
+export const countIndicatorsByBasis = (indicators: readonly DepartmentIndicator[]) =>
+  indicators.reduce(
+    (totals, indicator) => {
+      if (indicator.basis.kind === "published") totals.published += 1;
+      else totals.modelled += 1;
+      return totals;
+    },
+    { published: 0, modelled: 0 },
+  );
 
 /** A stated departmental priority, used by the workspace and the report. */
 export interface DepartmentPriority {
@@ -151,9 +201,9 @@ export const DEPARTMENTS: Department[] = [
       { id: "opc-devolution", label: "Devolution coordination", note: "Align provincial and local delivery with national priorities." },
     ],
     indicators: [
-      { id: "opc-impl", label: "Policy implementation rate", value: "68", unit: "%", score: 68, tone: "gold", note: "Share of Cabinet-approved policies with an active implementation plan this year.", source: "Departmental delivery reports" },
-      { id: "opc-milestone", label: "Reform milestones met", value: "41 of 60", score: 68, tone: "primary", note: "Milestones completed against the public sector reform programme.", source: "Reform programme tracker" },
-      { id: "opc-response", label: "Cross-ministry turnaround", value: "23", unit: "days", score: 54, tone: "warning", note: "Average time to resolve a matter referred between ministries.", source: "Cabinet committee secretariat" },
+      { id: "opc-impl", label: "Policy implementation rate", value: "68", unit: "%", score: 68, tone: "gold", note: "Share of Cabinet-approved policies with an active implementation plan this year.", basis: { kind: "modelled" } },
+      { id: "opc-milestone", label: "Reform milestones met", value: "41 of 60", score: 68, tone: "primary", note: "Milestones completed against the public sector reform programme.", basis: { kind: "modelled" } },
+      { id: "opc-response", label: "Cross-ministry turnaround", value: "23", unit: "days", score: 54, tone: "warning", note: "Average time to resolve a matter referred between ministries.", basis: { kind: "modelled" } },
     ],
     segments: ["civil-servants", "local-authorities", "development-partners", "formal-business", "youth", "traditional-leaders", "faith-groups", "media"],
     policyTemplates: [
@@ -208,10 +258,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "fin-invest", label: "Investment promotion", note: "Improve the pipeline of bankable domestic and foreign projects." },
     ],
     indicators: [
-      { id: "fin-deficit", label: "Fiscal deficit", value: "4.2", unit: "% of GDP", score: 58, tone: "warning", note: "Projected deficit against the annual fiscal framework.", source: "Budget statement indicators" },
-      { id: "fin-revenue", label: "Revenue performance", value: "94", unit: "%", score: 94, tone: "success", note: "Revenue collected against the annual target for the period to date.", source: "Treasury monthly returns" },
-      { id: "fin-taxbase", label: "Registered taxpayer growth", value: "+6.8", unit: "% YoY", score: 68, tone: "primary", note: "Growth in the active taxpayer register year on year.", source: "Revenue authority register" },
-      { id: "fin-investment", label: "Approved investment value", value: "USD 1.9B", score: 62, tone: "gold", note: "Value of investment licences approved in the period.", source: "Investment agency pipeline" },
+      { id: "fin-deficit", label: "Fiscal deficit", value: "4.2", unit: "% of GDP", score: 58, tone: "warning", note: "Projected deficit against the annual fiscal framework.", basis: { kind: "modelled" } },
+      { id: "fin-revenue", label: "Revenue performance", value: "94", unit: "%", score: 94, tone: "success", note: "Revenue collected against the annual target for the period to date.", basis: { kind: "modelled" } },
+      { id: "fin-taxbase", label: "Registered taxpayer growth", value: "+6.8", unit: "% YoY", score: 68, tone: "primary", note: "Growth in the active taxpayer register year on year.", basis: { kind: "modelled" } },
+      { id: "fin-investment", label: "Approved investment value", value: "USD 1.9B", score: 62, tone: "gold", note: "Value of investment licences approved in the period.", basis: { kind: "modelled" } },
     ],
     segments: ["exporters", "formal-business", "financial-sector", "civil-servants", "informal-traders", "diaspora", "manufacturers", "pensioners"],
     policyTemplates: [
@@ -267,10 +317,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "agri-market", label: "Smallholder market access", note: "Link communal producers to structured buyers and contracts." },
     ],
     indicators: [
-      { id: "agri-grain", label: "Staple grain self-sufficiency", value: "89", unit: "%", score: 89, tone: "success", note: "Domestic staple grain availability against estimated national requirement.", source: "Seasonal crop assessment" },
-      { id: "agri-irrigated", label: "Irrigated area", value: "203k", unit: "ha", score: 66, tone: "primary", note: "Area under functioning irrigation, all schemes.", source: "Irrigation scheme register" },
-      { id: "agri-herd", label: "National cattle herd", value: "5.4M", score: 62, tone: "gold", note: "Estimated national herd after the annual veterinary survey.", source: "Veterinary services survey" },
-      { id: "agri-input", label: "Input support delivery", value: "76", unit: "%", score: 76, tone: "warning", note: "Share of enrolled households receiving inputs before planting.", source: "Input programme monitoring" },
+      { id: "agri-grain", label: "Staple grain self-sufficiency", value: "89", unit: "%", score: 89, tone: "success", note: "Domestic staple grain availability against estimated national requirement.", basis: { kind: "modelled" } },
+      { id: "agri-irrigated", label: "Irrigated area", value: "203k", unit: "ha", score: 66, tone: "primary", note: "Area under functioning irrigation, all schemes.", basis: { kind: "modelled" } },
+      { id: "agri-herd", label: "National cattle herd", value: "5.4M", score: 62, tone: "gold", note: "Estimated national herd after the annual veterinary survey.", basis: { kind: "modelled" } },
+      { id: "agri-input", label: "Input support delivery", value: "76", unit: "%", score: 76, tone: "warning", note: "Share of enrolled households receiving inputs before planting.", basis: { kind: "modelled" } },
     ],
     segments: ["smallholder-farmers", "rural-households", "informal-traders", "exporters", "women-led-enterprises", "development-partners", "cooperatives", "informal-workers"],
     policyTemplates: [
@@ -325,10 +375,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "health-surveillance", label: "Disease surveillance", note: "Detect and respond to outbreaks within the reporting window." },
     ],
     indicators: [
-      { id: "health-facilities", label: "Functional primary facilities", value: "94", unit: "%", score: 94, tone: "success", note: "Facilities open and staffed on the reporting day.", source: "Facility reporting system" },
-      { id: "health-stockout", label: "Essential medicine availability", value: "72", unit: "%", score: 72, tone: "warning", note: "Tracer medicines available at the point of care.", source: "Supply chain dashboard" },
-      { id: "health-staffing", label: "Nurse posts filled", value: "81", unit: "%", score: 81, tone: "primary", note: "Funded nursing posts with an officer in place.", source: "Establishment returns" },
-      { id: "health-immune", label: "Child immunisation coverage", value: "87", unit: "%", score: 87, tone: "gold", note: "Children completing the scheduled course before age one.", source: "Expanded programme returns" },
+      { id: "health-facilities", label: "Functional primary facilities", value: "94", unit: "%", score: 94, tone: "success", note: "Facilities open and staffed on the reporting day.", basis: { kind: "modelled" } },
+      { id: "health-stockout", label: "Essential medicine availability", value: "72", unit: "%", score: 72, tone: "warning", note: "Tracer medicines available at the point of care.", basis: { kind: "modelled" } },
+      { id: "health-staffing", label: "Nurse posts filled", value: "81", unit: "%", score: 81, tone: "primary", note: "Funded nursing posts with an officer in place.", basis: { kind: "modelled" } },
+      { id: "health-immune", label: "Child immunisation coverage", value: "87", unit: "%", score: 87, tone: "gold", note: "Children completing the scheduled course before age one.", basis: { kind: "modelled" } },
     ],
     segments: ["health-workers", "urban-households", "rural-households", "civil-servants", "development-partners", "women-led-enterprises", "persons-with-disabilities", "women"],
     policyTemplates: [
@@ -383,10 +433,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "edu-retention", label: "Learner retention", note: "Reduce dropout at the primary-to-secondary transition." },
     ],
     indicators: [
-      { id: "edu-enrolment", label: "Primary enrolment", value: "94", unit: "% net", score: 94, tone: "success", note: "Children of primary age enrolled in a registered school.", source: "Annual school census" },
-      { id: "edu-ratio", label: "Learner-teacher ratio", value: "38:1", score: 62, tone: "warning", note: "National average across public primary schools.", source: "Annual school census" },
-      { id: "edu-transition", label: "Secondary transition", value: "82", unit: "%", score: 82, tone: "primary", note: "Grade 7 completers progressing to form one.", source: "Examinations returns" },
-      { id: "edu-feeding", label: "Feeding coverage", value: "1.6M", unit: "learners", score: 70, tone: "gold", note: "Learners receiving a daily meal under the programme.", source: "Programme monitoring returns" },
+      { id: "edu-enrolment", label: "Primary enrolment", value: "94", unit: "% net", score: 94, tone: "success", note: "Children of primary age enrolled in a registered school.", basis: { kind: "modelled" } },
+      { id: "edu-ratio", label: "Learner-teacher ratio", value: "38:1", score: 62, tone: "warning", note: "National average across public primary schools.", basis: { kind: "modelled" } },
+      { id: "edu-transition", label: "Secondary transition", value: "82", unit: "%", score: 82, tone: "primary", note: "Grade 7 completers progressing to form one.", basis: { kind: "modelled" } },
+      { id: "edu-feeding", label: "Feeding coverage", value: "1.6M", unit: "learners", score: 70, tone: "gold", note: "Learners receiving a daily meal under the programme.", basis: { kind: "modelled" } },
     ],
     segments: ["educators", "rural-households", "urban-households", "youth", "development-partners", "women-led-enterprises", "faith-groups", "persons-with-disabilities"],
     policyTemplates: [
@@ -441,10 +491,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "hedu-industry", label: "University-industry linkage", note: "Embed workplace attachment in every programme." },
     ],
     indicators: [
-      { id: "hedu-enrolment", label: "Tertiary enrolment", value: "131k", unit: "students", score: 74, tone: "primary", note: "Students registered at universities and colleges in the academic year.", source: "Tertiary enrolment returns" },
-      { id: "hedu-tvet-share", label: "Vocational share of enrolment", value: "34", unit: "%", score: 54, tone: "warning", note: "Share of tertiary students in vocational rather than academic programmes.", source: "Tertiary enrolment returns" },
-      { id: "hedu-graduation", label: "Graduation rate", value: "78", unit: "%", score: 78, tone: "success", note: "Registered students completing their programme within the standard duration.", source: "Institutional returns" },
-      { id: "hedu-research", label: "Research outputs registered", value: "212", score: 66, tone: "gold", note: "Publications and intellectual property registrations in the year.", source: "Research council register" },
+      { id: "hedu-enrolment", label: "Tertiary enrolment", value: "131k", unit: "students", score: 74, tone: "primary", note: "Students registered at universities and colleges in the academic year.", basis: { kind: "modelled" } },
+      { id: "hedu-tvet-share", label: "Vocational share of enrolment", value: "34", unit: "%", score: 54, tone: "warning", note: "Share of tertiary students in vocational rather than academic programmes.", basis: { kind: "modelled" } },
+      { id: "hedu-graduation", label: "Graduation rate", value: "78", unit: "%", score: 78, tone: "success", note: "Registered students completing their programme within the standard duration.", basis: { kind: "modelled" } },
+      { id: "hedu-research", label: "Research outputs registered", value: "212", score: 66, tone: "gold", note: "Publications and intellectual property registrations in the year.", basis: { kind: "modelled" } },
     ],
     segments: ["youth", "educators", "formal-business", "diaspora", "development-partners", "researchers", "employer-federations"],
     policyTemplates: [
@@ -499,10 +549,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "ict-inclusion", label: "Digital financial inclusion", note: "Reduce the cost of digital transactions for low-income users." },
     ],
     indicators: [
-      { id: "ict-coverage", label: "Population mobile coverage", value: "93", unit: "%", score: 93, tone: "success", note: "Population within reach of a functioning mobile signal.", source: "Regulator coverage survey" },
-      { id: "ict-broadband", label: "Broadband penetration", value: "61", unit: "%", score: 61, tone: "primary", note: "Households with a fixed or mobile broadband subscription.", source: "Regulator market report" },
-      { id: "ict-data-cost", label: "Data cost", value: "4.1", unit: "% of GNI", score: 58, tone: "warning", note: "Entry-level mobile data basket as a share of average income.", source: "Regulator market report" },
-      { id: "ict-egov", label: "Services online", value: "38 of 120", score: 32, tone: "gold", note: "High-volume public services available end to end online.", source: "e-Government programme office" },
+      { id: "ict-coverage", label: "Population mobile coverage", value: "93", unit: "%", score: 93, tone: "success", note: "Population within reach of a functioning mobile signal.", basis: { kind: "modelled" } },
+      { id: "ict-broadband", label: "Broadband penetration", value: "61", unit: "%", score: 61, tone: "primary", note: "Households with a fixed or mobile broadband subscription.", basis: { kind: "modelled" } },
+      { id: "ict-data-cost", label: "Data cost", value: "4.1", unit: "% of GNI", score: 58, tone: "warning", note: "Entry-level mobile data basket as a share of average income.", basis: { kind: "modelled" } },
+      { id: "ict-egov", label: "Services online", value: "38 of 120", score: 32, tone: "gold", note: "High-volume public services available end to end online.", basis: { kind: "modelled" } },
     ],
     segments: ["urban-households", "rural-households", "financial-sector", "formal-business", "youth", "informal-traders", "ict-operators", "researchers"],
     policyTemplates: [
@@ -557,10 +607,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "mines-safety", label: "Mine health and safety", note: "Reduce accidents through inspection and reporting." },
     ],
     indicators: [
-      { id: "mines-share", label: "Mining share of exports", value: "61", unit: "%", score: 61, tone: "gold", note: "Minerals as a share of total merchandise export value.", source: "Trade statistics" },
-      { id: "mines-beneficiation", label: "Domestically processed output", value: "27", unit: "%", score: 27, tone: "warning", note: "Share of extracted mineral value processed before export.", source: "Mining sector returns" },
-      { id: "mines-licences", label: "Licence turnaround", value: "48", unit: "days", score: 42, tone: "primary", note: "Average time from complete application to decision.", source: "Mining cadastre" },
-      { id: "mines-incidents", label: "Reportable incidents", value: "31", unit: "per year", score: 62, tone: "success", note: "Reportable accidents recorded across inspected operations.", source: "Inspectorate returns" },
+      { id: "mines-share", label: "Mining share of exports", value: "61", unit: "%", score: 61, tone: "gold", note: "Minerals as a share of total merchandise export value.", basis: { kind: "modelled" } },
+      { id: "mines-beneficiation", label: "Domestically processed output", value: "27", unit: "%", score: 27, tone: "warning", note: "Share of extracted mineral value processed before export.", basis: { kind: "modelled" } },
+      { id: "mines-licences", label: "Licence turnaround", value: "48", unit: "days", score: 42, tone: "primary", note: "Average time from complete application to decision.", basis: { kind: "modelled" } },
+      { id: "mines-incidents", label: "Reportable incidents", value: "31", unit: "per year", score: 62, tone: "success", note: "Reportable accidents recorded across inspected operations.", basis: { kind: "modelled" } },
     ],
     segments: ["mining-operators", "rural-households", "exporters", "local-authorities", "formal-business", "artisanal-miners", "conservation-communities"],
     policyTemplates: [
@@ -615,10 +665,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "energy-ipp", label: "Independent power producer framework", note: "Make private generation projects bankable and faster to close." },
     ],
     indicators: [
-      { id: "energy-access", label: "Electricity access", value: "55", unit: "% of households", score: 55, tone: "warning", note: "Households connected to the grid or a verified off-grid supply.", source: "National electrification survey" },
-      { id: "energy-gen", label: "Installed capacity", value: "2.5", unit: "GW", score: 68, tone: "primary", note: "Installed generation capacity connected to the national grid.", source: "System operator returns" },
-      { id: "energy-supply", label: "Unserved demand", value: "410", unit: "MW", score: 48, tone: "gold", note: "Average shortfall met through load management.", source: "System operator returns" },
-      { id: "energy-losses", label: "Distribution losses", value: "12.6", unit: "%", score: 60, tone: "success", note: "Energy lost between transmission and billing.", source: "Utility performance report" },
+      { id: "energy-access", label: "Electricity access", value: "55", unit: "% of households", score: 55, tone: "warning", note: "Households connected to the grid or a verified off-grid supply.", basis: { kind: "modelled" } },
+      { id: "energy-gen", label: "Installed capacity", value: "2.5", unit: "GW", score: 68, tone: "primary", note: "Installed generation capacity connected to the national grid.", basis: { kind: "modelled" } },
+      { id: "energy-supply", label: "Unserved demand", value: "410", unit: "MW", score: 48, tone: "gold", note: "Average shortfall met through load management.", basis: { kind: "modelled" } },
+      { id: "energy-losses", label: "Distribution losses", value: "12.6", unit: "%", score: 60, tone: "success", note: "Energy lost between transmission and billing.", basis: { kind: "modelled" } },
     ],
     segments: ["formal-business", "urban-households", "rural-households", "mining-operators", "informal-traders", "energy-water-utilities", "transport-operators"],
     policyTemplates: [
@@ -673,10 +723,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "psc-capacity", label: "Capacity development", note: "Target training at the skills the service actually lacks." },
     ],
     indicators: [
-      { id: "psc-establishment", label: "Funded posts filled", value: "88", unit: "%", score: 88, tone: "success", note: "Funded establishment positions with an officer in post.", source: "Establishment returns" },
-      { id: "psc-age", label: "Officers aged over 55", value: "19", unit: "%", score: 19, tone: "warning", note: "Share of the establishment approaching retirement age.", source: "Payroll analysis" },
-      { id: "psc-appraisal", label: "Appraisals completed", value: "64", unit: "%", score: 64, tone: "primary", note: "Officers with a completed and countersigned annual appraisal.", source: "Performance management returns" },
-      { id: "psc-training", label: "Training days per officer", value: "4.2", score: 42, tone: "gold", note: "Average recorded training days per officer in the year.", source: "Training records" },
+      { id: "psc-establishment", label: "Funded posts filled", value: "88", unit: "%", score: 88, tone: "success", note: "Funded establishment positions with an officer in post.", basis: { kind: "modelled" } },
+      { id: "psc-age", label: "Officers aged over 55", value: "19", unit: "%", score: 19, tone: "warning", note: "Share of the establishment approaching retirement age.", basis: { kind: "modelled" } },
+      { id: "psc-appraisal", label: "Appraisals completed", value: "64", unit: "%", score: 64, tone: "primary", note: "Officers with a completed and countersigned annual appraisal.", basis: { kind: "modelled" } },
+      { id: "psc-training", label: "Training days per officer", value: "4.2", score: 42, tone: "gold", note: "Average recorded training days per officer in the year.", basis: { kind: "modelled" } },
     ],
     segments: ["civil-servants", "youth", "women-led-enterprises", "local-authorities", "development-partners", "pensioners", "trade-unions"],
     policyTemplates: [
@@ -731,10 +781,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "lg-devolution", label: "Devolution funds administration", note: "Improve absorption and accountability of devolution funds." },
     ],
     indicators: [
-      { id: "lg-water", label: "Urban water availability", value: "17.5", unit: "hrs/day", score: 58, tone: "warning", note: "Average hours of piped water supply in serviced urban areas.", source: "Local authority returns" },
-      { id: "lg-sanitation", label: "Sewerage coverage", value: "76", unit: "%", score: 76, tone: "primary", note: "Households connected to a functioning sewerage system.", source: "Local authority returns" },
-      { id: "lg-roads", label: "Feeder roads in good condition", value: "48", unit: "%", score: 48, tone: "gold", note: "Assessed feeder road length in fair or better condition.", source: "Road condition survey" },
-      { id: "lg-absorption", label: "Devolution absorption", value: "71", unit: "%", score: 71, tone: "success", note: "Allocated devolution funds spent within the financial year.", source: "Devolution fund returns" },
+      { id: "lg-water", label: "Urban water availability", value: "17.5", unit: "hrs/day", score: 58, tone: "warning", note: "Average hours of piped water supply in serviced urban areas.", basis: { kind: "modelled" } },
+      { id: "lg-sanitation", label: "Sewerage coverage", value: "76", unit: "%", score: 76, tone: "primary", note: "Households connected to a functioning sewerage system.", basis: { kind: "modelled" } },
+      { id: "lg-roads", label: "Feeder roads in good condition", value: "48", unit: "%", score: 48, tone: "gold", note: "Assessed feeder road length in fair or better condition.", basis: { kind: "modelled" } },
+      { id: "lg-absorption", label: "Devolution absorption", value: "71", unit: "%", score: 71, tone: "success", note: "Allocated devolution funds spent within the financial year.", basis: { kind: "modelled" } },
     ],
     segments: ["local-authorities", "urban-households", "rural-households", "informal-traders", "women-led-enterprises", "traditional-leaders", "energy-water-utilities", "transport-operators"],
     policyTemplates: [
@@ -789,10 +839,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "mfa-consular-modernisation", label: "Consular service modernisation", note: "Reduce document turnaround for citizens abroad." },
     ],
     indicators: [
-      { id: "mfa-missions", label: "Diplomatic missions", value: "46", score: 74, tone: "primary", note: "Missions and consulates in operation.", source: "Ministry establishment record" },
-      { id: "mfa-consular", label: "Consular document turnaround", value: "21", unit: "days", score: 46, tone: "warning", note: "Average time to issue a passport or consular document abroad.", source: "Consular service returns" },
-      { id: "mfa-trade-util", label: "Preferential access utilisation", value: "58", unit: "%", score: 58, tone: "gold", note: "Exports eligible for preferential terms that actually claim them.", source: "Trade statistics" },
-      { id: "mfa-remittance", label: "Recorded remittances", value: "USD 2.1B", score: 70, tone: "success", note: "Formal remittance inflows recorded in the year.", source: "Balance of payments" },
+      { id: "mfa-missions", label: "Diplomatic missions", value: "46", score: 74, tone: "primary", note: "Missions and consulates in operation.", basis: { kind: "modelled" } },
+      { id: "mfa-consular", label: "Consular document turnaround", value: "21", unit: "days", score: 46, tone: "warning", note: "Average time to issue a passport or consular document abroad.", basis: { kind: "modelled" } },
+      { id: "mfa-trade-util", label: "Preferential access utilisation", value: "58", unit: "%", score: 58, tone: "gold", note: "Exports eligible for preferential terms that actually claim them.", basis: { kind: "modelled" } },
+      { id: "mfa-remittance", label: "Recorded remittances", value: "USD 2.1B", score: 70, tone: "success", note: "Formal remittance inflows recorded in the year.", basis: { kind: "modelled" } },
     ],
     segments: ["exporters", "diaspora", "development-partners", "formal-business", "financial-sector", "tourism-operators", "cross-border-traders", "media"],
     policyTemplates: [
@@ -847,10 +897,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "env-waste", label: "Waste and pollution management", note: "Improve collection and reduce illegal disposal." },
     ],
     indicators: [
-      { id: "env-parks", label: "Protected area coverage", value: "16.2", unit: "% of land", score: 81, tone: "success", note: "Land under statutory protection, including parks and conservancies.", source: "Protected area register" },
-      { id: "env-forest", label: "Forest cover change", value: "-0.4", unit: "% per year", score: 44, tone: "warning", note: "Net annual change in national forest cover.", source: "Forestry survey" },
-      { id: "env-licences", label: "Environmental licence turnaround", value: "62", unit: "days", score: 38, tone: "gold", note: "Average time from complete application to decision.", source: "Environmental agency records" },
-      { id: "env-climate", label: "Adaptation plans in place", value: "31 of 92", score: 34, tone: "primary", note: "Local authorities with an adopted climate adaptation plan.", source: "Climate programme returns" },
+      { id: "env-parks", label: "Protected area coverage", value: "16.2", unit: "% of land", score: 81, tone: "success", note: "Land under statutory protection, including parks and conservancies.", basis: { kind: "modelled" } },
+      { id: "env-forest", label: "Forest cover change", value: "-0.4", unit: "% per year", score: 44, tone: "warning", note: "Net annual change in national forest cover.", basis: { kind: "modelled" } },
+      { id: "env-licences", label: "Environmental licence turnaround", value: "62", unit: "days", score: 38, tone: "gold", note: "Average time from complete application to decision.", basis: { kind: "modelled" } },
+      { id: "env-climate", label: "Adaptation plans in place", value: "31 of 92", score: 34, tone: "primary", note: "Local authorities with an adopted climate adaptation plan.", basis: { kind: "modelled" } },
     ],
     segments: ["rural-households", "smallholder-farmers", "mining-operators", "development-partners", "local-authorities", "conservation-communities", "tourism-operators", "energy-water-utilities"],
     policyTemplates: [
@@ -905,10 +955,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "def-border", label: "Border integrity", note: "Support border control and territorial surveillance." },
     ],
     indicators: [
-      { id: "def-readiness", label: "Personnel at readiness", value: "91", unit: "%", score: 91, tone: "success", note: "Establishment personnel assessed as deployable at the reporting date.", source: "Readiness returns" },
-      { id: "def-veterans", label: "Veteran benefits processed", value: "78", unit: "%", score: 78, tone: "primary", note: "Verified benefit applications processed within the published standard.", source: "Veterans affairs returns" },
-      { id: "def-response", label: "Civil support response", value: "14", unit: "hrs", score: 66, tone: "gold", note: "Average time from a request by civil authorities to deployment.", source: "Operations records" },
-      { id: "def-equipment", label: "Equipment serviceability", value: "71", unit: "%", score: 71, tone: "warning", note: "Major equipment assessed as serviceable.", source: "Technical services returns" },
+      { id: "def-readiness", label: "Personnel at readiness", value: "91", unit: "%", score: 91, tone: "success", note: "Establishment personnel assessed as deployable at the reporting date.", basis: { kind: "modelled" } },
+      { id: "def-veterans", label: "Veteran benefits processed", value: "78", unit: "%", score: 78, tone: "primary", note: "Verified benefit applications processed within the published standard.", basis: { kind: "modelled" } },
+      { id: "def-response", label: "Civil support response", value: "14", unit: "hrs", score: 66, tone: "gold", note: "Average time from a request by civil authorities to deployment.", basis: { kind: "modelled" } },
+      { id: "def-equipment", label: "Equipment serviceability", value: "71", unit: "%", score: 71, tone: "warning", note: "Major equipment assessed as serviceable.", basis: { kind: "modelled" } },
     ],
     segments: ["civil-servants", "rural-households", "development-partners", "local-authorities", "war-veterans", "pensioners", "persons-with-disabilities"],
     policyTemplates: [
@@ -963,10 +1013,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "zimra-digital", label: "Digital customs modernisation", note: "Move declarations and payments to a single electronic channel." },
     ],
     indicators: [
-      { id: "zimra-target", label: "Revenue against target", value: "94", unit: "%", score: 94, tone: "success", note: "Collections against the annual revenue target to date.", source: "Monthly collections report" },
-      { id: "zimra-clearance", label: "Border clearance time", value: "26", unit: "hrs", score: 56, tone: "warning", note: "Average time from declaration to release for compliant consignments.", source: "Customs systems data" },
-      { id: "zimra-filing", label: "On-time filing rate", value: "69", unit: "%", score: 69, tone: "primary", note: "Registered taxpayers filing by the due date.", source: "Taxpayer register" },
-      { id: "zimra-audit", label: "Audit yield per case", value: "USD 18k", score: 62, tone: "gold", note: "Average additional assessment raised per completed audit.", source: "Audit performance report" },
+      { id: "zimra-target", label: "Revenue against target", value: "94", unit: "%", score: 94, tone: "success", note: "Collections against the annual revenue target to date.", basis: { kind: "modelled" } },
+      { id: "zimra-clearance", label: "Border clearance time", value: "26", unit: "hrs", score: 56, tone: "warning", note: "Average time from declaration to release for compliant consignments.", basis: { kind: "modelled" } },
+      { id: "zimra-filing", label: "On-time filing rate", value: "69", unit: "%", score: 69, tone: "primary", note: "Registered taxpayers filing by the due date.", basis: { kind: "modelled" } },
+      { id: "zimra-audit", label: "Audit yield per case", value: "USD 18k", score: 62, tone: "gold", note: "Average additional assessment raised per completed audit.", basis: { kind: "modelled" } },
     ],
     segments: ["formal-business", "informal-traders", "exporters", "financial-sector", "mining-operators", "informal-workers", "cross-border-traders", "manufacturers"],
     policyTemplates: [
@@ -1021,10 +1071,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "zida-pipeline", label: "Investment pipeline development", note: "Build a visible pipeline of bankable projects." },
     ],
     indicators: [
-      { id: "zida-licences", label: "Licences issued", value: "412", score: 82, tone: "primary", note: "Investment licences issued in the reporting year.", source: "Licensing register" },
-      { id: "zida-turnaround", label: "Licence turnaround", value: "18", unit: "days", score: 64, tone: "gold", note: "Average time from complete application to decision.", source: "Licensing register" },
-      { id: "zida-zones", label: "Zone occupancy", value: "63", unit: "%", score: 63, tone: "success", note: "Developable area in designated zones occupied by operating firms.", source: "Zone administration returns" },
-      { id: "zida-retention", label: "Investor retention", value: "89", unit: "%", score: 89, tone: "primary", note: "Licensed investors still operating three years after licensing.", source: "Aftercare survey" },
+      { id: "zida-licences", label: "Licences issued", value: "412", score: 82, tone: "primary", note: "Investment licences issued in the reporting year.", basis: { kind: "modelled" } },
+      { id: "zida-turnaround", label: "Licence turnaround", value: "18", unit: "days", score: 64, tone: "gold", note: "Average time from complete application to decision.", basis: { kind: "modelled" } },
+      { id: "zida-zones", label: "Zone occupancy", value: "63", unit: "%", score: 63, tone: "success", note: "Developable area in designated zones occupied by operating firms.", basis: { kind: "modelled" } },
+      { id: "zida-retention", label: "Investor retention", value: "89", unit: "%", score: 89, tone: "primary", note: "Licensed investors still operating three years after licensing.", basis: { kind: "modelled" } },
     ],
     segments: ["formal-business", "exporters", "diaspora", "development-partners", "financial-sector", "manufacturers", "employer-federations", "tourism-operators"],
     policyTemplates: [

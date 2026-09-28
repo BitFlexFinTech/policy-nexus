@@ -8,7 +8,7 @@ import {
   getDepartment,
   isDepartmentId,
 } from "@/config/departments";
-import { STAKEHOLDER_SEGMENTS, TIME_HORIZONS, REFERENCE_DATE } from "@/config/reference";
+import { STAKEHOLDER_SEGMENTS, TIME_HORIZONS, REFERENCE_DATE, getNamedSource } from "@/config/reference";
 import {
   CITED_INSTRUMENTS,
   UNIVERSAL_INSTRUMENTS,
@@ -91,7 +91,15 @@ describe("department config (src/config/departments.ts)", () => {
         expect(i.score, `${d.id}/${i.id} score`).toBeGreaterThanOrEqual(0);
         expect(i.score, `${d.id}/${i.id} score`).toBeLessThanOrEqual(100);
         expect(i.note.length, `${d.id}/${i.id} note`).toBeGreaterThan(10);
-        expect(i.source.length, `${d.id}/${i.id} source`).toBeGreaterThan(3);
+        // Where the number comes from. A published figure must name the body that
+        // publishes it, the publication and the period; a modelled one carries no
+        // source at all, so nothing here can be read as an official figure by default.
+        if (i.basis.kind === "published") {
+          const source = getNamedSource(i.basis.sourceId);
+          expect(source.name, `${d.id}/${i.id} publisher`).toBeTruthy();
+          expect(i.basis.publication.length, `${d.id}/${i.id} publication`).toBeGreaterThan(3);
+          expect(i.basis.asOf, `${d.id}/${i.id} period`).toBeTruthy();
+        }
       }
     }
   });

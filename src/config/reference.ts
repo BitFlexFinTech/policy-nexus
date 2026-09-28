@@ -16,8 +16,16 @@ export const REFERENCE_DATE_LABEL = "24 September 2026";
 /** The fiscal year the department indicators are stated for. */
 export const REFERENCE_FISCAL_YEAR = "2026";
 
-/** The one word used wherever a share is modelled rather than published. */
+/** The one word used wherever a figure is modelled rather than published. */
 export const MODELLED_SHARE_LABEL = "Modelled";
+
+/**
+ * The sentence shown where a department indicator is the platform's own modelled
+ * figure rather than a published one. It is composed from the same single word the
+ * shares use, so the platform has one word for "modelled" and not two, and a
+ * modelled indicator can never be read as an official published figure.
+ */
+export const MODELLED_INDICATOR_LABEL = `${MODELLED_SHARE_LABEL} — no published figure, so this is the platform's own modelled figure`;
 
 /**
  * NAMED SOURCES (AB-5). One entry per body the platform's own figures come from,
@@ -67,7 +75,9 @@ export const NAMED_SOURCE_STATEMENT =
   "Stakeholder shares are ZIMSTAT's published 2022 census figures, each naming the figure and the " +
   "base it is a share of; where no official figure exists the share is labelled " +
   `${MODELLED_SHARE_LABEL} rather than estimated. The reference inputs name the body that publishes ` +
-  "them and the period the figure is for. Every instrument cited in a department's documents is a " +
+  "them and the period the figure is for. Each department indicator either names the body that " +
+  "publishes it, the publication it is taken from and the period it is for, or it is shown as " +
+  `${MODELLED_INDICATOR_LABEL}. Every instrument cited in a department's documents is a ` +
   "real Zimbabwean Act, named from the consolidated Acts index.";
 
 /**
