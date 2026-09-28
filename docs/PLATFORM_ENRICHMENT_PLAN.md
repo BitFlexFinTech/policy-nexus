@@ -170,3 +170,34 @@ Reflection Paper* · Zimbabwe Institute via ResearchGate · World Bank / ILO mod
 Government of Zimbabwe, *National Development Strategy 2, 2026–2030* · Zimbabwe Government Portal
 National Development Plans.
 
+---
+
+## PART 6 — The reference rates, reconciled to their sources (AB-5)
+
+**Written 2026-09-28.** Recorded here so no later session re-researches it. The three reference rates
+were labelled "reference inputs" and named no source, and the inflation figure the workspace showed
+(8.4%) matched no published figure — ZIMSTAT's own site publishes **0.25% for August 2026**. AB-5
+replaces all three with published figures and names the body that publishes each one, in the code
+(`REFERENCE_RATES` with `sourceId` + `asOf`) and on the reference screen.
+
+| Rate (id) | Figure now shown | Published by | Period | Where it was read |
+|---|---|---|---|---|
+| ZiG exchange rate (`zig-usd`) | **26.85 ZiG per USD** | Reserve Bank of Zimbabwe | September 2026 | The RBZ official weighted-average rate for **28 September 2026** is **26.8470** (previous 26.63), read from the RBZ-sourced series at Trading Economics; shown rounded to two decimals |
+| Bank policy rate (`policy-rate`) | **30.00% per annum** | Reserve Bank of Zimbabwe | September 2026 | RBZ benchmark lending rate, cut by 500 basis points to **30%** at the Monetary Policy Committee meeting of **15 June 2026** — the first change since the ZiG was introduced in April 2024 |
+| Inflation rate (`inflation`) | **0.25%** | ZIMSTAT | August 2026 | ZIMSTAT's own homepage figure — *"Inflation Rate 0.25% — Inflation, in August 2026"* — read directly from `zimstat.co.zw` |
+
+**Two honest notes, so no later session has to re-discover them:**
+
+1. **The exact day of the exchange rate is not pinned to the reference date.** The workspace's reference
+   date is **24 September 2026**; the RBZ figure that could actually be verified was published for
+   **28 September 2026**. The rate is therefore stated against the **month** ("September 2026") — the
+   month the reference date falls in — and never against a specific day the source does not support.
+2. **A second source disagrees on inflation, and the higher authority wins.** Trading Economics quotes
+   ZIMSTAT for **2.9% (August 2026)** and **3.7% (September 2026)**, while ZIMSTAT's own site publishes
+   **0.25% (August 2026)**. The agency's own publication is the higher authority, so **0.25%** is the
+   figure the platform states, and the disagreement is recorded here rather than hidden.
+
+**Sources for PART 6:** Reserve Bank of Zimbabwe — exchange-rate and interest-rate statistics
+(`rbz.co.zw`) and the Monetary Policy Committee statement of 15 June 2026 · ZIMSTAT (`zimstat.co.zw`) ·
+the RBZ/ZIMSTAT series as compiled by Trading Economics, used only as the retrieval path and the
+cross-check above.

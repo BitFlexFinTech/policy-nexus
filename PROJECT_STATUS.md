@@ -1417,6 +1417,13 @@ because the block it sits in already names itself.
 | 2026-09-28 | **defect inventory (AB-4 session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. (1) **A false claim baked into the screen**: `PolicyDraft.tsx` hard-coded *"It was generated locally by the Nzwisiso simulation core (Mock)"* — true today, **false the moment an administrator switches the drafting service on**. Now conditional on the actual producer, and asserted by the journey test. (2) **A test that could not fail**: my first version of the "shorter title inside a longer title" test claimed `Education Act` sits inside `Zimbabwe Council for Higher Education Act`; a scan of all 71 labels proved the table contains **exactly one** substring pair (`Constitution of Zimbabwe (Amendment No. 20) Act, 2013` inside the same title `…, ss. 202–203`), and it built on a case that does not exist. Replaced with a test on the **real** pair, which was then proved to fail under mutation. (3) **A latent false positive in the verifier itself**: a naive substring scan would have flagged a shorter title contained in a longer one; fixed with the residue rule, pinned by the corrected test. (4) **A stale status line**: Phase AC still read *"NO code from it has been written yet"* after E-1…E-5 had shipped — corrected. (5) **A self-inflicted documentation slip**: an `### Phase AC` heading was deleted by one of my own edits and restored in the same session. (6) **A false symbol name I wrote myself** — the files-touched list named a non-existent `groundItems` export alongside the real `groundGroup`; corrected in the same session |
 | 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (AB-4, final bytes) | **ALL GREEN**: validate `PASS — all checks green` · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **323/323 (25 files)** — the 313 after E-4 plus the 10 AB-4 gates · build **✓ in 499 ms** (only the pre-existing chunk-size note) |
 | 2026-09-28 | `npx playwright test` (AB-4, final bytes) | **PASS — 10 passed (21.8 s)**; 0 console errors, 0 off-origin requests per test. Expected to be unchanged: AB-4 changes the drafted policy's content and adds a provenance panel, and the journey that reads the long-form report and drafts the policy still passes in a real browser |
+| 2026-09-28 | **AB-5 code delivered** (reference-rate reconciliation + named-source statement) | **Changed:** `src/config/reference.ts` — `REFERENCE_RATES` reconciled to published figures (**ZiG 26.85** per USD and the **bank policy rate 30.00%**, both Reserve Bank of Zimbabwe, period **September 2026**; **inflation 0.25%**, ZIMSTAT, period **August 2026**), replacing 13.56 / 19.5% / 8.4%; every rate gained **`sourceId`** (a key into the new **`NAMED_SOURCES`** table) and **`asOf`** (the period the figure is for). **New in the same file:** `NAMED_SOURCES` (3 rows: ZIMSTAT · Reserve Bank of Zimbabwe · veritaszim A–Z List of Acts), `getNamedSource`, and `NAMED_SOURCE_STATEMENT` (three clauses). `MODELLED_SHARE_LABEL` was **moved above its first use** so the statement can interpolate it instead of repeating the word. **Changed:** `src/pages/Reference.tsx` — the **Reference inputs** table now prints the publisher, what the figure is and *as at \<period\>* under every rate, and a new **Named sources** section renders the statement and all three sources. `PRODUCTION_READINESS.md` §5 rows 53–55 updated, and the stale *“16 canonical segments”* claim on row 54 corrected to **36**. `docs/PLATFORM_ENRICHMENT_PLAN.md` gained **PART 6** with the three figures, their publishers, their periods and the two honest notes. **No dependency, colour, font, layout or route changed** (`package.json` untouched; no `src/components/ui/**` edit; `src/index.css` untouched) |
+| 2026-09-28 | `npx vitest run src/test/reference-sources.test.tsx` (AB-5) | PASS — **5/5 new gates**: every rate names a known publisher, states what the figure is and states its period; every rate is dated in the reference year and **no later than the reference month** (month order derived from `formatReferenceDate`, never a second hand-written month list); the statement carries the platform's own `MODELLED_SHARE_LABEL` word; the reference screen shows each rate's publisher and *as at \<period\>*; the screen renders the Named sources heading, the statement, and every source's name, figures and publication |
+| 2026-09-28 | **mutation proofs of the AB-5 gates** | Two type-valid mutations at once: `asOf: "September 2026"` → `"October 2026"`, and the inflation rate's `sourceDetail` blanked. Result **2 failed / 3 passed** — exactly the two intended gates failed (*dates every reference rate…* and *gives every reference rate a named publisher, what the figure is, and its period*). Restored from backup with `shasum -a 256` **identical** before and after: `33e61759fe10ddbfcf6a69179538b2b650285af66be66027760b1ddeffba2b02` |
+| 2026-09-28 | **defect inventory (AB-5 session) — every defect found, and its disposition** | **FIXED at source:** (1) **the three reference rates named no source at all** — now each carries `sourceId` + `asOf`, both printed on the screen, and a gate fails if either is missing. (2) **The inflation figure (8.4%) matched no published figure and contradicted ZIMSTAT's own release** — reconciled to **0.25% (August 2026, ZIMSTAT)**, the agency's own homepage figure read directly this session. (3) **The ZiG rate (13.56) was the April 2024 ZiG launch rate and the policy rate (19.5%) matched nothing** — reconciled to the RBZ figures **26.85** and **30.00%**, with the policy rate's date (the MPC meeting of 15 June 2026) stated. (4) **A stale current-state claim**: `PRODUCTION_READINESS.md` §5 said `STAKEHOLDER_SEGMENTS` holds *“16 canonical segments”* when it holds **36** — corrected, with the 20-published / 16-`Modelled` split stated. **VERIFIED, not assumed** (so a stale count is not left behind): the same table's *“16 departments, 64 priorities, 63 indicators, 48 policy templates, 49 documents”* was re-counted this session by grep on the config (`tone:` 63 · `timeHorizon:` 48 · `sizeLabel:` 49 · `shareSource:` 36 · instrument `id:` 71) — **all correct, nothing to fix**. **BLOCKED — one item, in the strict form:** *the 63 department indicator values are authored scenario content, not figures read from a named publication; the KPI drill-down states a reporting-source **kind** (“Source: Trade statistics”) and `EngineStatus` calls them “Published department measures”.* **(a) Missing input/authority:** a decision from the user on whether the demonstration's indicator values must be replaced with real published figures (and, if so, the real per-department source data — 63 values across 16 departments — which does not exist in the repository). **(b) Exact next action:** put the question to the user; if the answer is “real figures”, retrieve them department by department and add a `sourceId` to `DepartmentIndicator` exactly as AB-5 added one to `REFERENCE_RATE`, before **AB-7** (which must stay last). **(c) Not working / never to be reported working:** the indicator values are **not** sourced official figures today, and must never be described as such. **(d) It stays as work**, not as an accepted limitation |
+| 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (AB-5, final bytes) | **ALL GREEN**: validate `PASS — all checks green` (11 checks, incl. the unchanged `KNOWN-RED (not enforced)` note for `--destructive`) · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **328/328 (26 files)** — the 323 after AB-4 plus the 5 AB-5 gates · build **✓ in 496 ms** |
+| 2026-09-28 | `npx playwright test` (AB-5, final bytes) | **PASS — 10 passed (22.6 s)**; 0 console errors, 0 off-origin requests per test. Expected unchanged: AB-5 changes two reference-input values and adds a section to the reference screen, and no journey step depends on a rate value |
+
 
 
 
@@ -2067,7 +2074,7 @@ SUPERSEDED by this decision** — it must be rewritten down to three documents a
 | **AB-2** | **More stakeholder groups, with real ZIMSTAT weights** | **DONE (2026-09-28).** The weights landed in the AB-2 session; the **groups** landed in E-1 (**20 new groups → 36 in total**: **20 carry a real published share**, **16 are explicitly `Modelled`** with `share: null`) and E-2 gave each department the **6–8** groups its mandate covers (**123 assignments**, all 36 used). Gates: `src/test/stakeholder-weights.test.ts` (6 guards — every share equals the census count it cites, the modelled set is exact) and `src/test/departments.test.ts` (6–8 per department, no orphan group, the exact 16→group mapping). See *AB-2 — the weights are IN* below and the E-1/E-2 rows in the verification log |
 | **AB-3** | **Real reference documents** for the departments shown in the demo | **DONE via E-3 + E-4 (2026-09-28).** Every one of the **49** documents now cites a **real, verified instrument** from `src/config/instruments.ts` (71 instruments, each inside its own department's register), and **E-4 makes that citation visible** — in both document rails and in the detail dialog. **Honest caveat, unchanged and deliberate:** the platform holds the department document **register**, not the document files; the dialog says so plainly, and no invented filename is presented as a real file |
 | **AB-4** | **AI "Draft the policy"** — department prompt library, grounding, citation verification, provenance | **DONE (2026-09-28).** All four parts are built and gated: a **department prompt library** derived from each department's own configuration (never hand-written, so it cannot drift), the **grounding** handed to the local generator and to a configured service alike, **citation verification** that refuses any draft naming an instrument the register does not hold, and a **provenance record** in the draft's closing note and on the screen. The drafted policy gains clause **8. Citations**. The remote seam now carries the prompt and grounding. **10 new gates in `src/test/drafting.test.ts`**, plus a provenance render assertion added to the journey test and a grounding assertion added to the remote-client test — see the AB-4 rows in the verification log; three code mutations were proved to fail before restore. **No colour, font, layout, route or dependency changed.** |
-| **AB-5** | **"Real data, and where it comes from"** — a short named-source statement on the platform, and the reference-rate reconciliation | **IN PROGRESS (2026-09-28).** The share-and-source half is delivered by **E-4**: the Reference screen now states every group's share, its base and its named source, printing **`Modelled`** where no official figure exists. **Remaining:** the **reference-rate reconciliation** (the three reference rates against their named sources) and a short named-source statement as its own item |
+| **AB-5** | **"Real data, and where it comes from"** — a short named-source statement on the platform, and the reference-rate reconciliation | **DONE (2026-09-28).** Both halves are in. **The rates are reconciled to named sources:** `REFERENCE_RATES` now holds the **published figures** — ZiG **26.85** per USD and the bank policy rate **30.00%** (both Reserve Bank of Zimbabwe, period **September 2026**) and inflation **0.25%** (ZIMSTAT, period **August 2026**) — and each rate names its publisher (`sourceId` → the new `NAMED_SOURCES`) and the period it is for (`asOf`), both of which the reference screen prints under every rate. The three values the platform used to show (13.56 ZiG, 19.5%, 8.4%) matched **no published figure**, and 8.4% contradicted ZIMSTAT's own release; all three were replaced. **The named-source statement is its own item:** `NAMED_SOURCE_STATEMENT` (three clauses, each a rule the platform actually follows) with the `NAMED_SOURCES` list, rendered as a **Named sources** section on the reference screen. **Five new gates** in `src/test/reference-sources.test.tsx`; two mutations proved they fail before the byte-identical restore. The share-and-source half was already delivered by **E-4**. **One honest caveat, unchanged:** the exchange rate is stated against its **month** (September 2026), not a specific day, because the RBZ figure that could be verified was published for 28 September 2026 — four days after the workspace reference date — and no source supports a 24 September value. See *PART 6* of `docs/PLATFORM_ENRICHMENT_PLAN.md` |
 | **AB-6** | **Retrieve the missing official figures** — ZIMSTAT employment-by-sector, the 2022 urban/rural split, the 2022 age structure, and the **NDS pillars** (NDS1 and any NDS2) | **DONE — every item retrieved and recorded this session (2026-09-28).** See *AB-6 — retrieved in this session* below for the figures, the named sources, and the one honest remaining limit (the 21-industry QLFS break-up exists only as chart images). |
 | **AB-7** | **The final Claude prompt** — memo + deck + ask. **Must be last.** | NOT STARTED |
 
@@ -2622,15 +2629,30 @@ must show clause 8, the citation, the Provenance panel and the Mock producer);
 the route map, the determinism rules, `LICENSE` / `NOTICE`, and `package.json` — **no dependency added or
 removed**. `dist/` was rebuilt.
 
+## Files touched in Phase AB-5 (reference-rate reconciliation + named-source statement)
+
+**New — 1 repo file.** `src/test/reference-sources.test.tsx` (the 5 provenance gates; the month order
+is derived from `formatReferenceDate`, so the test carries no second copy of the month list).
+**Changed — 3 repo files.** `src/config/reference.ts` (`NAMED_SOURCES` + `getNamedSource` +
+`NAMED_SOURCE_STATEMENT`; `REFERENCE_RATES` reconciled to published figures and given `sourceId`/`asOf`/
+`sourceDetail`; `MODELLED_SHARE_LABEL` moved above its first use so the statement interpolates it).
+`src/pages/Reference.tsx` (publisher + period under every rate; the **Named sources** section).
+**Docs:** `PRODUCTION_READINESS.md` §5 (the rates row, the segments row corrected to 36, the new
+sourcing-rule row), `docs/PLATFORM_ENRICHMENT_PLAN.md` **PART 6** (the figures, publishers, periods and
+the two honest notes).
+**Not changed, deliberately:** the emerald/gold palette, Inter + JetBrains Mono, `src/components/ui/**`,
+`src/index.css`, the route map, the determinism rules, `LICENSE` / `NOTICE`, and `package.json` — **no
+dependency was added or removed**. `dist/` was rebuilt.
+
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`; the AB-4 work is committed as `2cf8aee`** (followed by the docs commit that
-  recorded this line — run `git log --no-pager --oneline -3` for the exact tip, which is the second opinion on
-  state). Working tree clean. Baseline `main` is untouched at
+- **Branch `feature/unified-platform`; the AB-5 work is committed on top of `2cf8aee` (AB-4)** (run
+  `git log --oneline -4 | cat` for the exact tip, which is the second opinion on state). Working tree clean.
+  Baseline `main` is untouched at
   `7451db0`; `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*.
   Everything is committed, so a cold session can start from this file alone.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test` — expected **all green** (**323/323 tests across 25 files**, 10/10 Playwright).
+  then `npx playwright test` — expected **all green** (**328/328 tests across 26 files**, 10/10 Playwright).
 - **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
   FIRST (it is below, in the phase list).** It holds: the goal in the user's words (*"we just want to get
   this platform funded … this is just a tool that will help each department research and draft policies"*),
@@ -2646,9 +2668,10 @@ removed**. `dist/` was rebuilt.
   across the departments (**6–8 each**), and **71 cited instruments** in `src/config/instruments.ts` with all
   **49** documents wired to one. **And the citations are now visible**: both document rails and the document
   dialog name each document's instrument from the derived `citedInstrumentLabel`, and the Reference screen states
-  every group's share, base and source, printing `Modelled` where no official figure exists. The whole ladder is
-  green on the final bytes (**313/313 tests across 24 files, 10/10 Playwright**, 0 console errors and 0
-  off-origin requests per test).
+  every group's share, base and source, printing `Modelled` where no official figure exists. The whole ladder
+  was green on the final bytes when it closed (**313/313 tests across 24 files, 10/10 Playwright**, 0 console
+  errors and 0 off-origin requests per test); with AB-4 and AB-5 on top the suite is now **328/328 across
+  26 files**, also 10/10 Playwright.
   **Do not re-fetch any figure; every one is recorded above and in `docs/PLATFORM_ENRICHMENT_PLAN.md`.** The
   deeper research remains **DONE** and written to that plan (Phase AC): **20 new stakeholder groups → 36 in
   total** (**20** with a real published share, **16** explicitly `Modelled`), plus **real citable instruments for
@@ -2656,15 +2679,24 @@ removed**. `dist/` was rebuilt.
   [Chapter 13:19], Mines and Minerals Act [Chapter 21:05], Traditional Leaders Act [Chapter 29:17], War Veterans
   Act [Chapter 11:15], and the Constitution (Amendment No. 20) Act, 2013) — **all of them now in the code and
   shown in the interface (E-3, E-4).**
-  **AB-4 is now DONE too** — the department prompt library, the grounding, verified citations and provenance
-  are built and gated (**10 new gates** in `src/test/drafting.test.ts`; see *Phase AB-4* above), and the drafted
-  policy carries clause **8. Citations** and its own provenance. **The next action is AB-5 — "Real data, and
-  where it comes from"**: the **reference-rate reconciliation** (the three rates in `src/config/reference.ts` —
-  the ZiG exchange rate, the policy rate and inflation — are labelled reference inputs but name **no source**,
-  and that is the gap to close) and the short **named-source statement** as its own item. The share-and-source
-  half of AB-5 is **already delivered by E-4**. After AB-5: **AB-7, the final Claude prompt, which MUST be
-  last** (the funding memo, the pitch deck and the one-page ask; `docs/PROPOSAL_PROMPT.md` is superseded and must
-  be rewritten down to three documents). AB-3 is DONE via E-3 + E-4, and AB-6 is already DONE.
+  **AB-4 is DONE** — the department prompt library, the grounding, verified citations and provenance
+  are built and gated (**10 gates** in `src/test/drafting.test.ts`; see *Phase AB-4* above), and the drafted
+  policy carries clause **8. Citations** and its own provenance.
+  **AB-5 is now DONE too — all three reference rates are reconciled to named sources, and the named-source
+  statement is on the platform.** `REFERENCE_RATES` holds the **published figures** (ZiG **26.85** per USD
+  and the **bank policy rate 30.00%**, both Reserve Bank of Zimbabwe, period **September 2026**;
+  **inflation 0.25%**, ZIMSTAT, period **August 2026**), each naming its publisher (`sourceId` →
+  `NAMED_SOURCES`) and its period (`asOf`), and the reference screen prints both under every rate plus a
+  **Named sources** section carrying `NAMED_SOURCE_STATEMENT`. The old 13.56 / 19.5% / 8.4% matched no
+  published figure and are gone. **Five gates** in `src/test/reference-sources.test.tsx`; the figures,
+  publishers and periods are recorded in **PART 6 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** so they are never
+  re-researched. **The next action is AB-7 — the final Claude prompt, which MUST be last** (the funding
+  memo, the pitch deck and the one-page ask; `docs/PROPOSAL_PROMPT.md` is superseded and must be rewritten
+  down to three documents). **One item is BLOCKED and is stated in full in the AB-5 defect inventory above:**
+  the **63 department indicator values are authored scenario content**, not figures read from a named
+  publication, so they must never be described as sourced official figures — fixing that needs the user's
+  decision plus 63 real per-department values, and if it is ever done it must happen **before AB-7**.
+  AB-3 is DONE via E-3 + E-4, and AB-6 is already DONE.
   **Never invent a share — an official figure or the `Modelled` label, nothing in between; and never print a
   chapter the index did not confirm.**
   **AB-1 is finished and verified** (its own section above holds the evidence: pixel-pinned strokes, per-group
