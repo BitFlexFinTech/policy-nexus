@@ -9,6 +9,12 @@ import {
   isDepartmentId,
 } from "@/config/departments";
 import { STAKEHOLDER_SEGMENTS, TIME_HORIZONS, REFERENCE_DATE } from "@/config/reference";
+import {
+  CITED_INSTRUMENTS,
+  UNIVERSAL_INSTRUMENTS,
+  citedInstrumentLabel,
+  isCitedInstrumentId,
+} from "@/config/instruments";
 
 /**
  * The groups each department models, pinned exactly (Phase AC, batch E-2).
@@ -141,6 +147,61 @@ describe("department config (src/config/departments.ts)", () => {
     }
     // The pin covers every department, so a new department cannot slip past this gate.
     expect(Object.keys(DEPARTMENT_SEGMENTS).sort()).toEqual([...DEPARTMENT_IDS].sort());
+  });
+
+  it("cites only real instruments, each from its own department's register", () => {
+    for (const d of DEPARTMENTS) {
+      // Every instrument in the register must exist in the table.
+      for (const id of d.instruments) {
+        expect(isCitedInstrumentId(id), `${d.id} registers unknown instrument ${id}`).toBe(true);
+      }
+      // Every document must cite one of ITS OWN department's instruments — so a document
+      // can neither carry a fabricated citation nor reach outside its mandate.
+      expect(d.documents.length, `${d.id} documents`).toBeGreaterThan(0);
+      for (const doc of d.documents) {
+        expect(doc.instrument, `${doc.id} cites an instrument`).toBeTruthy();
+        expect(d.instruments, `${doc.id} cites outside ${d.id}'s register`).toContain(doc.instrument);
+      }
+    }
+  });
+
+  it("carries the universal instruments in every department", () => {
+    for (const d of DEPARTMENTS) {
+      for (const id of UNIVERSAL_INSTRUMENTS) {
+        expect(d.instruments, `${d.id} carries ${id}`).toContain(id);
+      }
+    }
+  });
+
+  it("keeps the instrument table honest: unique ids, a title, a source, no guessed chapter", () => {
+    const ids = CITED_INSTRUMENTS.map((i) => i.id);
+    expect(new Set(ids).size, "duplicate instrument id").toBe(ids.length);
+    CITED_INSTRUMENTS.forEach((i) => {
+      expect(i.title.length, `${i.id} title`).toBeGreaterThan(3);
+      expect(i.source.length, `${i.id} source`).toBeGreaterThan(3);
+      // A chapter is either absent (null) or written the one documented way, "Chapter 12:05".
+      // A number in any other shape means someone typed a chapter the index did not confirm.
+      if (i.chapter !== null) {
+        expect(i.chapter, `${i.id} chapter form`).toMatch(/^Chapter \d+:\d+$/);
+      }
+    });
+  });
+
+  it("uses every instrument in the table in at least one department", () => {
+    const used = new Set<string>(DEPARTMENTS.flatMap((d) => [...d.instruments]));
+    const unused = CITED_INSTRUMENTS.filter((i) => !used.has(i.id)).map((i) => i.id);
+    expect(unused, "instruments no department carries").toEqual([]);
+  });
+
+  it("renders a citation as the title, with the chapter only where the index confirms it", () => {
+    expect(citedInstrumentLabel("banking-act")).toBe("Banking Act [Chapter 24:20]");
+    expect(citedInstrumentLabel("environmental-management-act")).toBe("Environmental Management Act");
+    // The label is DERIVED from the table, so it can never disagree with it.
+    CITED_INSTRUMENTS.forEach((i) => {
+      const label = citedInstrumentLabel(i.id);
+      expect(label.startsWith(i.title), `${i.id} label starts with its title`).toBe(true);
+      expect(label.includes(i.chapter ?? i.title), `${i.id} label carries its chapter`).toBe(true);
+    });
   });
 
   it("references only canonical time horizons", () => {

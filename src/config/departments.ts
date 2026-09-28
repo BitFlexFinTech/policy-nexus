@@ -12,6 +12,7 @@
  */
 
 import type { StakeholderSegmentId, TimeHorizonId } from "./reference";
+import { UNIVERSAL_INSTRUMENTS, type CitedInstrumentId } from "./instruments";
 
 /** The exact, stable department identifiers. Never renumber or rename these. */
 export type DepartmentId =
@@ -98,6 +99,13 @@ export interface DepartmentDocument {
   /** ISO date, always on or before REFERENCE_DATE. */
   date: string;
   note: string;
+  /**
+   * The instrument this document is prepared under, as a key into `CITED_INSTRUMENTS`.
+   * Optional, so a document that genuinely rests on no single instrument simply carries
+   * none. The citation text is derived from that table — never stored here — so a title
+   * and its chapter cannot drift apart.
+   */
+  instrument?: CitedInstrumentId;
 }
 
 export interface Department {
@@ -117,6 +125,12 @@ export interface Department {
   /** Stakeholder segments the simulation models for this department. */
   segments: StakeholderSegmentId[];
   policyTemplates: PolicyTemplate[];
+  /**
+   * The instruments this department's work rests on: the universal set every department
+   * carries, plus its own. Every document's `instrument` must be one of these, so a
+   * department can never cite an instrument outside its mandate.
+   */
+  instruments: CitedInstrumentId[];
   documents: DepartmentDocument[];
 }
 
@@ -171,10 +185,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["local-authorities", "rural-households", "urban-households", "civil-servants"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "public-entities-corporate-governance-act", "provincial-councils-act", "administrative-justice-act"],
     documents: [
-      { id: "opc-doc-1", name: "National_Development_Strategy_Progress_Review.pdf", kind: "pdf", sizeLabel: "3.1 MB", date: "2026-08-19", note: "Annual delivery review across all ministries." },
-      { id: "opc-doc-2", name: "Public_Sector_Reform_Phase_II_Concept.docx", kind: "docx", sizeLabel: "892 KB", date: "2026-07-30", note: "Concept note for process simplification." },
-      { id: "opc-doc-3", name: "Devolution_Absorption_Report.txt", kind: "txt", sizeLabel: "126 KB", date: "2026-06-11", note: "Provincial absorption figures and commentary." },
+      { id: "opc-doc-1", name: "National_Development_Strategy_Progress_Review.pdf", kind: "pdf", sizeLabel: "3.1 MB", date: "2026-08-19", note: "Annual delivery review across all ministries.", instrument: "nds2" },
+      { id: "opc-doc-2", name: "Public_Sector_Reform_Phase_II_Concept.docx", kind: "docx", sizeLabel: "892 KB", date: "2026-07-30", note: "Concept note for process simplification.", instrument: "administrative-justice-act" },
+      { id: "opc-doc-3", name: "Devolution_Absorption_Report.txt", kind: "txt", sizeLabel: "126 KB", date: "2026-06-11", note: "Provincial absorption figures and commentary.", instrument: "provincial-councils-act" },
     ],
   },
   {
@@ -228,11 +243,12 @@ export const DEPARTMENTS: Department[] = [
         segments: ["civil-servants", "formal-business", "financial-sector"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "rbz-act", "banking-act", "public-debt-management-act", "money-laundering-act", "bank-use-promotion-act", "microfinance-act", "pension-provident-funds-act", "movable-property-security-act", "income-tax-act"],
     documents: [
-      { id: "fin-doc-1", name: "Budget_Framework_Statement_2026.pdf", kind: "pdf", sizeLabel: "4.6 MB", date: "2026-08-28", note: "Fiscal framework and expenditure ceilings." },
-      { id: "fin-doc-2", name: "Small_Business_Tax_Simulation_Note.docx", kind: "docx", sizeLabel: "1.3 MB", date: "2026-07-22", note: "Distributional note on presumptive bands." },
-      { id: "fin-doc-3", name: "Export_Settlement_Review.txt", kind: "txt", sizeLabel: "214 KB", date: "2026-06-30", note: "Options paper on settlement shares." },
-      { id: "fin-doc-4", name: "Debt_Sustainability_Update.pdf", kind: "pdf", sizeLabel: "2.8 MB", date: "2026-05-14", note: "Updated sustainability position." },
+      { id: "fin-doc-1", name: "Budget_Framework_Statement_2026.pdf", kind: "pdf", sizeLabel: "4.6 MB", date: "2026-08-28", note: "Fiscal framework and expenditure ceilings.", instrument: "pfma" },
+      { id: "fin-doc-2", name: "Small_Business_Tax_Simulation_Note.docx", kind: "docx", sizeLabel: "1.3 MB", date: "2026-07-22", note: "Distributional note on presumptive bands.", instrument: "income-tax-act" },
+      { id: "fin-doc-3", name: "Export_Settlement_Review.txt", kind: "txt", sizeLabel: "214 KB", date: "2026-06-30", note: "Options paper on settlement shares.", instrument: "rbz-act" },
+      { id: "fin-doc-4", name: "Debt_Sustainability_Update.pdf", kind: "pdf", sizeLabel: "2.8 MB", date: "2026-05-14", note: "Updated sustainability position.", instrument: "public-debt-management-act" },
     ],
   },
   {
@@ -286,10 +302,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["smallholder-farmers", "rural-households", "informal-traders", "exporters"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "rural-land-act", "agricultural-land-settlement-act", "land-acquisition-act", "land-survey-act", "farm-equipment-act", "warehouse-receipt-act", "water-act"],
     documents: [
-      { id: "agri-doc-1", name: "Seasonal_Crop_Assessment_2026.pdf", kind: "pdf", sizeLabel: "5.2 MB", date: "2026-07-08", note: "Provincial production estimates and commentary." },
-      { id: "agri-doc-2", name: "Irrigation_Rehabilitation_Options.txt", kind: "txt", sizeLabel: "168 KB", date: "2026-06-19", note: "Scheme-by-scheme rehabilitation options." },
-      { id: "agri-doc-3", name: "Livestock_Disease_Contingency.docx", kind: "docx", sizeLabel: "1.1 MB", date: "2026-04-27", note: "Contingency plan for notifiable diseases." },
+      { id: "agri-doc-1", name: "Seasonal_Crop_Assessment_2026.pdf", kind: "pdf", sizeLabel: "5.2 MB", date: "2026-07-08", note: "Provincial production estimates and commentary.", instrument: "census-statistics-act" },
+      { id: "agri-doc-2", name: "Irrigation_Rehabilitation_Options.txt", kind: "txt", sizeLabel: "168 KB", date: "2026-06-19", note: "Scheme-by-scheme rehabilitation options.", instrument: "water-act" },
+      { id: "agri-doc-3", name: "Livestock_Disease_Contingency.docx", kind: "docx", sizeLabel: "1.1 MB", date: "2026-04-27", note: "Contingency plan for notifiable diseases.", instrument: "rural-land-act" },
     ],
   },
   {
@@ -343,10 +360,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["health-workers", "formal-business", "development-partners"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "public-health-act", "health-service-act", "mental-health-act", "family-planning-council-act", "social-workers-act"],
     documents: [
-      { id: "health-doc-1", name: "National_Health_Profile_2026.pdf", kind: "pdf", sizeLabel: "6.4 MB", date: "2026-08-05", note: "National health indicators by province." },
-      { id: "health-doc-2", name: "Workforce_Retention_Options.docx", kind: "docx", sizeLabel: "1.7 MB", date: "2026-07-14", note: "Non-salary retention options appraisal." },
-      { id: "health-doc-3", name: "Essential_Medicines_Stock_Report.txt", kind: "txt", sizeLabel: "96 KB", date: "2026-06-02", note: "Tracer medicine availability report." },
+      { id: "health-doc-1", name: "National_Health_Profile_2026.pdf", kind: "pdf", sizeLabel: "6.4 MB", date: "2026-08-05", note: "National health indicators by province.", instrument: "public-health-act" },
+      { id: "health-doc-2", name: "Workforce_Retention_Options.docx", kind: "docx", sizeLabel: "1.7 MB", date: "2026-07-14", note: "Non-salary retention options appraisal.", instrument: "health-service-act" },
+      { id: "health-doc-3", name: "Essential_Medicines_Stock_Report.txt", kind: "txt", sizeLabel: "96 KB", date: "2026-06-02", note: "Tracer medicine availability report.", instrument: "public-health-act" },
     ],
   },
   {
@@ -400,10 +418,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["rural-households", "smallholder-farmers", "development-partners", "women-led-enterprises"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "education-act", "childrens-act", "manpower-planning-act"],
     documents: [
-      { id: "edu-doc-1", name: "Annual_School_Census_2026.pdf", kind: "pdf", sizeLabel: "4.1 MB", date: "2026-08-12", note: "Enrolment, staffing and infrastructure census." },
-      { id: "edu-doc-2", name: "Teacher_Deployment_Analysis.txt", kind: "txt", sizeLabel: "142 KB", date: "2026-07-03", note: "Vacancy and ratio analysis by district." },
-      { id: "edu-doc-3", name: "Curriculum_Implementation_Review.docx", kind: "docx", sizeLabel: "2.2 MB", date: "2026-05-21", note: "Review of curriculum rollout readiness." },
+      { id: "edu-doc-1", name: "Annual_School_Census_2026.pdf", kind: "pdf", sizeLabel: "4.1 MB", date: "2026-08-12", note: "Enrolment, staffing and infrastructure census.", instrument: "education-act" },
+      { id: "edu-doc-2", name: "Teacher_Deployment_Analysis.txt", kind: "txt", sizeLabel: "142 KB", date: "2026-07-03", note: "Vacancy and ratio analysis by district.", instrument: "manpower-planning-act" },
+      { id: "edu-doc-3", name: "Curriculum_Implementation_Review.docx", kind: "docx", sizeLabel: "2.2 MB", date: "2026-05-21", note: "Review of curriculum rollout readiness.", instrument: "education-act" },
     ],
   },
   {
@@ -457,10 +476,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["educators", "formal-business", "diaspora", "development-partners"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "higher-education-act", "research-act", "research-development-centre-act", "manpower-planning-act"],
     documents: [
-      { id: "hedu-doc-1", name: "Tertiary_Enrolment_Report_2026.pdf", kind: "pdf", sizeLabel: "3.3 MB", date: "2026-08-21", note: "Enrolment and completion by institution." },
-      { id: "hedu-doc-2", name: "Skills_Priority_Schedule.txt", kind: "txt", sizeLabel: "88 KB", date: "2026-07-10", note: "Occupations identified as national skill gaps." },
-      { id: "hedu-doc-3", name: "Innovation_Fund_Design_Note.docx", kind: "docx", sizeLabel: "1.4 MB", date: "2026-05-29", note: "Design options for competitive research funding." },
+      { id: "hedu-doc-1", name: "Tertiary_Enrolment_Report_2026.pdf", kind: "pdf", sizeLabel: "3.3 MB", date: "2026-08-21", note: "Enrolment and completion by institution.", instrument: "higher-education-act" },
+      { id: "hedu-doc-2", name: "Skills_Priority_Schedule.txt", kind: "txt", sizeLabel: "88 KB", date: "2026-07-10", note: "Occupations identified as national skill gaps.", instrument: "manpower-planning-act" },
+      { id: "hedu-doc-3", name: "Innovation_Fund_Design_Note.docx", kind: "docx", sizeLabel: "1.4 MB", date: "2026-05-29", note: "Design options for competitive research funding.", instrument: "research-act" },
     ],
   },
   {
@@ -514,10 +534,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["civil-servants", "financial-sector", "formal-business", "development-partners"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "postal-telecommunications-act", "broadcasting-services-act", "access-to-information-act"],
     documents: [
-      { id: "ict-doc-1", name: "National_Broadband_Coverage_Survey.pdf", kind: "pdf", sizeLabel: "2.9 MB", date: "2026-08-14", note: "Coverage and quality survey by district." },
-      { id: "ict-doc-2", name: "Digital_Services_Inventory.txt", kind: "txt", sizeLabel: "104 KB", date: "2026-07-17", note: "Inventory of online-ready public services." },
-      { id: "ict-doc-3", name: "Data_Residency_Standard_Draft.docx", kind: "docx", sizeLabel: "780 KB", date: "2026-06-05", note: "Draft classification and residency standard." },
+      { id: "ict-doc-1", name: "National_Broadband_Coverage_Survey.pdf", kind: "pdf", sizeLabel: "2.9 MB", date: "2026-08-14", note: "Coverage and quality survey by district.", instrument: "postal-telecommunications-act" },
+      { id: "ict-doc-2", name: "Digital_Services_Inventory.txt", kind: "txt", sizeLabel: "104 KB", date: "2026-07-17", note: "Inventory of online-ready public services.", instrument: "access-to-information-act" },
+      { id: "ict-doc-3", name: "Data_Residency_Standard_Draft.docx", kind: "docx", sizeLabel: "780 KB", date: "2026-06-05", note: "Draft classification and residency standard.", instrument: "access-to-information-act" },
     ],
   },
   {
@@ -571,10 +592,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["mining-operators", "formal-business", "exporters", "local-authorities"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "mines-minerals-act", "mines-minerals-bill-2025", "movable-property-security-act", "environmental-management-act"],
     documents: [
-      { id: "mines-doc-1", name: "Mineral_Revenue_Statement_2026.pdf", kind: "pdf", sizeLabel: "2.2 MB", date: "2026-08-07", note: "Royalty and mineral revenue by commodity." },
-      { id: "mines-doc-2", name: "Artisanal_Mining_Register.txt", kind: "txt", sizeLabel: "156 KB", date: "2026-07-01", note: "Registered small-scale operations by district." },
-      { id: "mines-doc-3", name: "Beneficiation_Options_Paper.docx", kind: "docx", sizeLabel: "1.9 MB", date: "2026-04-30", note: "Options for domestic processing incentives." },
+      { id: "mines-doc-1", name: "Mineral_Revenue_Statement_2026.pdf", kind: "pdf", sizeLabel: "2.2 MB", date: "2026-08-07", note: "Royalty and mineral revenue by commodity.", instrument: "mines-minerals-act" },
+      { id: "mines-doc-2", name: "Artisanal_Mining_Register.txt", kind: "txt", sizeLabel: "156 KB", date: "2026-07-01", note: "Registered small-scale operations by district.", instrument: "mines-minerals-bill-2025" },
+      { id: "mines-doc-3", name: "Beneficiation_Options_Paper.docx", kind: "docx", sizeLabel: "1.9 MB", date: "2026-04-30", note: "Options for domestic processing incentives.", instrument: "environmental-management-act" },
     ],
   },
   {
@@ -628,10 +650,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["informal-traders", "formal-business", "urban-households", "mining-operators"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "electricity-act", "energy-regulatory-act", "petroleum-act"],
     documents: [
-      { id: "energy-doc-1", name: "National_Electrification_Survey.pdf", kind: "pdf", sizeLabel: "3.7 MB", date: "2026-08-18", note: "Access and connection survey by district." },
-      { id: "energy-doc-2", name: "Tariff_Path_Modelling.txt", kind: "txt", sizeLabel: "132 KB", date: "2026-06-25", note: "Modelled tariff path and affordability analysis." },
-      { id: "energy-doc-3", name: "Fuel_Stockholding_Review.docx", kind: "docx", sizeLabel: "940 KB", date: "2026-05-08", note: "Review of strategic stock obligations." },
+      { id: "energy-doc-1", name: "National_Electrification_Survey.pdf", kind: "pdf", sizeLabel: "3.7 MB", date: "2026-08-18", note: "Access and connection survey by district.", instrument: "electricity-act" },
+      { id: "energy-doc-2", name: "Tariff_Path_Modelling.txt", kind: "txt", sizeLabel: "132 KB", date: "2026-06-25", note: "Modelled tariff path and affordability analysis.", instrument: "energy-regulatory-act" },
+      { id: "energy-doc-3", name: "Fuel_Stockholding_Review.docx", kind: "docx", sizeLabel: "940 KB", date: "2026-05-08", note: "Review of strategic stock obligations.", instrument: "petroleum-act" },
     ],
   },
   {
@@ -685,10 +708,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["civil-servants", "youth", "educators"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "public-service-act", "constitution-s202-203", "allowances-pensions-act", "labour-act", "tripartite-negotiating-forum-act"],
     documents: [
-      { id: "psc-doc-1", name: "Establishment_and_Payroll_Report.pdf", kind: "pdf", sizeLabel: "2.4 MB", date: "2026-08-26", note: "Establishment, vacancy and payroll reconciliation." },
-      { id: "psc-doc-2", name: "Age_Profile_Analysis.txt", kind: "txt", sizeLabel: "74 KB", date: "2026-07-09", note: "Age distribution by cadre and ministry." },
-      { id: "psc-doc-3", name: "Performance_Framework_Options.docx", kind: "docx", sizeLabel: "1.2 MB", date: "2026-06-16", note: "Options for appraisal reform." },
+      { id: "psc-doc-1", name: "Establishment_and_Payroll_Report.pdf", kind: "pdf", sizeLabel: "2.4 MB", date: "2026-08-26", note: "Establishment, vacancy and payroll reconciliation.", instrument: "public-service-act" },
+      { id: "psc-doc-2", name: "Age_Profile_Analysis.txt", kind: "txt", sizeLabel: "74 KB", date: "2026-07-09", note: "Age distribution by cadre and ministry.", instrument: "allowances-pensions-act" },
+      { id: "psc-doc-3", name: "Performance_Framework_Options.docx", kind: "docx", sizeLabel: "1.2 MB", date: "2026-06-16", note: "Options for appraisal reform.", instrument: "constitution-s202-203" },
     ],
   },
   {
@@ -742,10 +766,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["informal-traders", "women-led-enterprises", "local-authorities", "urban-households"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "traditional-leaders-act", "urban-councils-act", "rural-district-councils-act", "provincial-councils-act", "local-government-laws-amendment-act"],
     documents: [
-      { id: "lg-doc-1", name: "Local_Authority_Performance_Report.pdf", kind: "pdf", sizeLabel: "3.4 MB", date: "2026-08-23", note: "Service performance across urban and rural councils." },
-      { id: "lg-doc-2", name: "Water_Supply_Audit.txt", kind: "txt", sizeLabel: "148 KB", date: "2026-07-06", note: "Supply hours and non-revenue water by town." },
-      { id: "lg-doc-3", name: "Devolution_Absorption_Brief.docx", kind: "docx", sizeLabel: "860 KB", date: "2026-05-19", note: "Absorption by province and council." },
+      { id: "lg-doc-1", name: "Local_Authority_Performance_Report.pdf", kind: "pdf", sizeLabel: "3.4 MB", date: "2026-08-23", note: "Service performance across urban and rural councils.", instrument: "local-government-laws-amendment-act" },
+      { id: "lg-doc-2", name: "Water_Supply_Audit.txt", kind: "txt", sizeLabel: "148 KB", date: "2026-07-06", note: "Supply hours and non-revenue water by town.", instrument: "urban-councils-act" },
+      { id: "lg-doc-3", name: "Devolution_Absorption_Brief.docx", kind: "docx", sizeLabel: "860 KB", date: "2026-05-19", note: "Absorption by province and council.", instrument: "provincial-councils-act" },
     ],
   },
   {
@@ -799,10 +824,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["diaspora", "financial-sector", "development-partners", "formal-business"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "immigration-act", "citizenship-act", "trade-marks-act", "zida-act"],
     documents: [
-      { id: "mfa-doc-1", name: "Trade_Agreement_Utilisation_Report.pdf", kind: "pdf", sizeLabel: "2.6 MB", date: "2026-08-09", note: "Utilisation of preferential access by agreement." },
-      { id: "mfa-doc-2", name: "Consular_Service_Audit.txt", kind: "txt", sizeLabel: "112 KB", date: "2026-06-27", note: "Processing times and volumes by mission." },
-      { id: "mfa-doc-3", name: "Diaspora_Framework_Consultation.docx", kind: "docx", sizeLabel: "1.5 MB", date: "2026-05-11", note: "Consultation record on diaspora channels." },
+      { id: "mfa-doc-1", name: "Trade_Agreement_Utilisation_Report.pdf", kind: "pdf", sizeLabel: "2.6 MB", date: "2026-08-09", note: "Utilisation of preferential access by agreement.", instrument: "zida-act" },
+      { id: "mfa-doc-2", name: "Consular_Service_Audit.txt", kind: "txt", sizeLabel: "112 KB", date: "2026-06-27", note: "Processing times and volumes by mission.", instrument: "citizenship-act" },
+      { id: "mfa-doc-3", name: "Diaspora_Framework_Consultation.docx", kind: "docx", sizeLabel: "1.5 MB", date: "2026-05-11", note: "Consultation record on diaspora channels.", instrument: "immigration-act" },
     ],
   },
   {
@@ -856,10 +882,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["rural-households", "local-authorities", "development-partners", "women-led-enterprises"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "environmental-management-act", "parks-wildlife-act", "forest-act", "water-act"],
     documents: [
-      { id: "env-doc-1", name: "State_of_the_Environment_Report.pdf", kind: "pdf", sizeLabel: "8.1 MB", date: "2026-08-01", note: "National environmental condition report." },
-      { id: "env-doc-2", name: "Wetland_Inventory.txt", kind: "txt", sizeLabel: "204 KB", date: "2026-07-13", note: "Listed wetlands by province and district." },
-      { id: "env-doc-3", name: "Impact_Assessment_Reform_Options.docx", kind: "docx", sizeLabel: "1.6 MB", date: "2026-05-26", note: "Options for tiered assessment." },
+      { id: "env-doc-1", name: "State_of_the_Environment_Report.pdf", kind: "pdf", sizeLabel: "8.1 MB", date: "2026-08-01", note: "National environmental condition report.", instrument: "environmental-management-act" },
+      { id: "env-doc-2", name: "Wetland_Inventory.txt", kind: "txt", sizeLabel: "204 KB", date: "2026-07-13", note: "Listed wetlands by province and district.", instrument: "water-act" },
+      { id: "env-doc-3", name: "Impact_Assessment_Reform_Options.docx", kind: "docx", sizeLabel: "1.6 MB", date: "2026-05-26", note: "Options for tiered assessment.", instrument: "environmental-management-act" },
     ],
   },
   {
@@ -913,10 +940,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["civil-servants", "formal-business"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "defence-act", "war-veterans-act", "veterans-liberation-struggle-act", "national-security-council-act"],
     documents: [
-      { id: "def-doc-1", name: "Readiness_Assessment_Report.pdf", kind: "pdf", sizeLabel: "1.8 MB", date: "2026-08-16", note: "Personnel and equipment readiness assessment." },
-      { id: "def-doc-2", name: "Veterans_Benefits_Register_Summary.txt", kind: "txt", sizeLabel: "66 KB", date: "2026-07-07", note: "Beneficiary counts and payment summary." },
-      { id: "def-doc-3", name: "Civil_Support_Framework_Draft.docx", kind: "docx", sizeLabel: "1.0 MB", date: "2026-06-09", note: "Draft framework for disaster support." },
+      { id: "def-doc-1", name: "Readiness_Assessment_Report.pdf", kind: "pdf", sizeLabel: "1.8 MB", date: "2026-08-16", note: "Personnel and equipment readiness assessment.", instrument: "defence-act" },
+      { id: "def-doc-2", name: "Veterans_Benefits_Register_Summary.txt", kind: "txt", sizeLabel: "66 KB", date: "2026-07-07", note: "Beneficiary counts and payment summary.", instrument: "war-veterans-act" },
+      { id: "def-doc-3", name: "Civil_Support_Framework_Draft.docx", kind: "docx", sizeLabel: "1.0 MB", date: "2026-06-09", note: "Draft framework for disaster support.", instrument: "defence-act" },
     ],
   },
   {
@@ -970,10 +998,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["formal-business", "mining-operators", "exporters", "financial-sector"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "revenue-authority-act", "customs-excise-act", "income-tax-act", "vat-act", "money-laundering-act"],
     documents: [
-      { id: "zimra-doc-1", name: "Revenue_Performance_Report_2026.pdf", kind: "pdf", sizeLabel: "2.7 MB", date: "2026-08-25", note: "Collections by tax head against target." },
-      { id: "zimra-doc-2", name: "Border_Clearance_Study.txt", kind: "txt", sizeLabel: "118 KB", date: "2026-07-02", note: "Clearance time study at major ports." },
-      { id: "zimra-doc-3", name: "Compliance_Strategy_Options.docx", kind: "docx", sizeLabel: "1.3 MB", date: "2026-05-15", note: "Options for compliance and dispute reform." },
+      { id: "zimra-doc-1", name: "Revenue_Performance_Report_2026.pdf", kind: "pdf", sizeLabel: "2.7 MB", date: "2026-08-25", note: "Collections by tax head against target.", instrument: "revenue-authority-act" },
+      { id: "zimra-doc-2", name: "Border_Clearance_Study.txt", kind: "txt", sizeLabel: "118 KB", date: "2026-07-02", note: "Clearance time study at major ports.", instrument: "customs-excise-act" },
+      { id: "zimra-doc-3", name: "Compliance_Strategy_Options.docx", kind: "docx", sizeLabel: "1.3 MB", date: "2026-05-15", note: "Options for compliance and dispute reform.", instrument: "income-tax-act" },
     ],
   },
   {
@@ -1027,10 +1056,11 @@ export const DEPARTMENTS: Department[] = [
         segments: ["formal-business", "development-partners", "financial-sector"],
       },
     ],
+    instruments: [...UNIVERSAL_INSTRUMENTS, "zida-act", "special-economic-zones-act", "companies-act", "competition-act", "competitiveness-commission-act"],
     documents: [
-      { id: "zida-doc-1", name: "Investment_Licensing_Report_2026.pdf", kind: "pdf", sizeLabel: "2.1 MB", date: "2026-08-20", note: "Licences issued by sector and origin." },
-      { id: "zida-doc-2", name: "Zone_Occupancy_Returns.txt", kind: "txt", sizeLabel: "82 KB", date: "2026-07-16", note: "Zone occupancy and employment figures." },
-      { id: "zida-doc-3", name: "Aftercare_Case_Review.docx", kind: "docx", sizeLabel: "1.1 MB", date: "2026-06-13", note: "Review of investor aftercare cases." },
+      { id: "zida-doc-1", name: "Investment_Licensing_Report_2026.pdf", kind: "pdf", sizeLabel: "2.1 MB", date: "2026-08-20", note: "Licences issued by sector and origin.", instrument: "zida-act" },
+      { id: "zida-doc-2", name: "Zone_Occupancy_Returns.txt", kind: "txt", sizeLabel: "82 KB", date: "2026-07-16", note: "Zone occupancy and employment figures.", instrument: "special-economic-zones-act" },
+      { id: "zida-doc-3", name: "Aftercare_Case_Review.docx", kind: "docx", sizeLabel: "1.1 MB", date: "2026-06-13", note: "Review of investor aftercare cases.", instrument: "companies-act" },
     ],
   },
 ];

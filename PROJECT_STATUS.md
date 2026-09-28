@@ -32,6 +32,11 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
   constant and `initiativeShort` from `initiative`, so they cannot drift.
   User-visible vocabulary: *Nzwisiso simulation core*, *Nzwisiso knowledge map*,
   *Nzwisiso agent memory*. Never expose MiroFish / OASIS / GraphRAG / Zep / Puter.
+- **Cited instruments live ONLY in `src/config/instruments.ts`** (added in E-3, 2026-09-28). It holds
+  every instrument the platform cites — the exact title, a chapter number **only where the official
+  consolidated index confirms one** (`chapter: null` otherwise), the kind and the source. Departments point
+  at it by `id`; the citation text shown anywhere is **derived** (`citedInstrumentLabel`) and is never
+  stored a second time, so a title and its chapter cannot drift apart.
 - Determinism: no `Math.random()`, no `Date.now()`, no `new Date()` for content.
   `REFERENCE_DATE = "2026-09-24"`. Same department + same policy ⇒ identical result.
 - Scenario mode only: no backend, no DB, no AI APIs, no CDN scripts at runtime.
@@ -1393,6 +1398,12 @@ because the block it sits in already names itself.
 | 2026-09-28 | **mutation proofs of the three new E-2 gates** | (1) `opc` loses `"media"` (7 groups) → *keeps each department's groups exactly as agreed* **FAIL** (`opc groups changed: expected [ 'civil-servants', …(6) ] to deeply equal [ …(7) ]`); (2) `ict` loses `"ict-operators"` → *models every canonical group in at least one department* **FAIL** (`canonical groups no department models: expected [ 'ict-operators' ] to deeply equal []`) **and** the exact-mapping gate FAIL; (3) `def` grown to 9 groups → *gives every department between 6 and 8 stakeholder groups* **FAIL** (`def models 9 groups: expected 9 to be less than or equal to 8`). All three restored; `shasum` of `departments.ts` back to `d4175a463e696f132975eacab4c7096ff8cf5e9f`, and all **16** department-level `segments:` lines present |
 | 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (E-2, final bytes) | **ALL GREEN**: validate `PASS — all checks green` · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **305/305 (24 files)** — the 302 after E-1 plus the 3 new department gates · build ✓ (no new warnings) |
 | 2026-09-28 | `npx playwright test` (E-2, final bytes) | **PASS — 10 passed (22.0 s)**; each test asserts 0 console errors and 0 off-origin requests |
+| 2026-09-28 | **E-3 code delivered** (Phase AC batch 3) | **NEW FILE** `src/config/instruments.ts` (**~594 lines**): `CITED_INSTRUMENTS` with **71** rows (each `id`/`title`/`chapter`/`kind`/`source`), **`UNIVERSAL_INSTRUMENTS`** (the 6 every department carries), and the helpers `getCitedInstrument`, `isCitedInstrumentId`, `citedInstrumentLabel`. Chapter numbers: **38 present, 33 `null`** — no chapter was written that the index did not confirm. `src/config/departments.ts`: import added; `DepartmentDocument` gained `instrument?: CitedInstrumentId`; `Department` gained `instruments: CitedInstrumentId[]`; **49 documents wired** and **16 registers** added. `docs/PLATFORM_ENRICHMENT_PLAN.md`: Finance row gained the Income Tax Act and the one mis-shaped chapter was corrected |
+| 2026-09-28 | `npm run typecheck` (E-3) | PASS — `tsc -b --pretty false`, no output (the compiler also proves every `instruments` array uses only real ids, since the field is typed) |
+| 2026-09-28 | `npx vitest run src/test/departments.test.ts` (E-3) | PASS — **22/22** (17 before plus the 5 new gates) |
+| 2026-09-28 | **mutation proofs of the four new E-3 gates** | (1) `fin-doc-2` changed to cite `vat-act`, which is **not** in Finance's register → *cites only real instruments, each from its own department's register* **FAIL** (1 failed / 21 passed). (2) `banking-act` chapter typed as `Chapter 24.20` → *keeps the instrument table honest: … no guessed chapter* **FAIL** **and** *renders a citation …* **FAIL** (2 failed / 20 passed) — the label check is derived, so a bad chapter shows up twice. (3) `zimra` drops `vat-act`, leaving a row nothing carries → *uses every instrument in the table in at least one department* **FAIL**. (4) `procurement-act` removed from the universal set → the same unused-row gate **FAIL**. Every file restored; `shasum` of `departments.ts` back to `703f07f322e34a52c67eaea56f2832f0cd263091` and `instruments.ts` to `d80f03e51f93d671d91f10f7f3cfb44c6ead5fba`, with all **49** document citations intact |
+| 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (E-3, final bytes) | **ALL GREEN**: validate `PASS — all checks green` · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **310/310 (24 files)** — the 305 after E-2 plus the 5 new instrument gates · build ✓ in 464 ms |
+| 2026-09-28 | `npx playwright test` (E-3, final bytes) | **PASS — 10 passed (21.8 s)**; 0 console errors, 0 off-origin requests. Expected to be unchanged: E-3 is data and gates only, and **the rail does not draw the citation until E-4** |
 
 
 
@@ -2310,27 +2321,34 @@ each department?"*
 - **Implementation batches E-1…E-5**, each with its own gate, and an explicit list of what must NOT change
   (palette, typography, `src/components/ui/**`, route map, determinism, `package.json`).
 
-**Honest state (updated 2026-09-28 — batches E-1 and E-2 are DONE):** the 20 new groups are **in the code**,
-and **every one is now modelled by at least one department** — so a real run draws on them. The participant
-groups changed for all 16 departments (each now models **6–8**, up from 4–6). **E-3…E-5 are still NOT STARTED**,
-so the document rail still holds the old invented filenames and no citation is shown anywhere yet. Two wrong
-figures in the plan document were **found and fixed at source** during E-1: the Christian share was written
-**85.3%** and is **85.2%** (12,937,804 ÷ 15,178,957), and the informal-sector share was written **64.9%** and is
-**65.0%** (2,069,901 ÷ 3,186,598). Two rows of the modelled table were also mis-numbered (9 and 10 → 19 and 20).
+**Honest state (updated 2026-09-28 — batches E-1, E-2 and E-3 are DONE):** the 20 new groups are **in the
+code**, **every one is modelled by at least one department** (each department now models **6–8**, up from 4–6),
+and **every document now cites a real instrument** — 71 instruments in the table, all 49 documents wired, each
+to an instrument inside its own department's register. **E-4 and E-5 are still NOT STARTED**, so the citation is
+**not yet visible in the interface** — it exists in the data and is gated, but the document rail does not draw it
+yet. Two wrong figures in the plan document were **found and fixed at source** during E-1: the Christian share was
+written **85.3%** and is **85.2%** (12,937,804 ÷ 15,178,957), and the informal-sector share was written **64.9%**
+and is **65.0%** (2,069,901 ÷ 3,186,598). Two rows of the modelled table were also mis-numbered (9 and 10 → 19
+and 20). During E-3 the plan's Finance row gained the **Income Tax Act [Chapter 23:06]** (Finance documents on
+presumptive bands genuinely rest on it) and its one chapter in the wrong shape was corrected — see the defect
+list in the verification log.
 
 | Batch | Work | Status |
 |---|---|---|
 | **E-1** | Add the 20 new groups to `src/config/reference.ts`, each with a real share or the `Modelled` label; extend the weight gate | **DONE** — 36 groups in total. **9 new groups carry a real published share** (persons with disabilities, faith-based organisations, tourism operators, manufacturers, transport operators, researchers, pensioners, informal-sector workers, women) and **11 new groups are `Modelled`** (traditional leaders, energy and water utilities, ICT and network operators, communities by protected areas, media, cooperatives, trade unions, employer federations, artisanal miners, cross-border traders, war veterans). Two extra named bases were added, because two shares are **not** percentages of the two bases already in use: people aged 5 and over (**13,102,643**, the disability base) and the QLFS Q2 2025 employed total (**3,186,598**, the informal-sector base). The weight gate now checks all four bases, pins the modelled set exactly, and carries a specific gate for the traditional-leaders case (a real count in the note, a `Modelled` weight, never a share) |
 | **E-2** | Give each of the 16 departments the groups that belong to its mandate (6–8 each, up from 4–6) | **DONE** — every department now models **6–8** groups (eleven model 8, five model 7; none below 6), **123 department-to-group assignments in total** (was 84). All **36** canonical groups are modelled by at least one department, so nothing sits unused. Each group was placed only where the department's own mandate reaches it: **war veterans → `def`** (whose mandate is literally "the welfare of war veterans") · **traditional leaders → `opc` + `lg`** · **faith-based organisations → `opc` + `edu`** · **media → `opc` + `mfa`** · **manufacturers → `fin` + `zimra` + `zida`** · **pensioners → `fin` + `psc` + `def`** · **trade unions → `psc`** · **cooperatives → `agri`** · **informal-sector workers → `agri` + `zimra`** · **persons with disabilities → `health` + `edu` + `def`** · **women → `health` + `edu`** · **researchers → `hedu` + `ict`** · **employer federations → `hedu` + `zida`** · **ICT and network operators → `ict`** · **artisanal miners → `mines`** · **communities by protected areas → `mines` + `env`** · **energy and water utilities → `energy` + `lg` + `env`** · **transport operators → `energy` + `lg`** · **tourism operators → `mfa` + `env` + `zida`** · **cross-border traders → `mfa` + `zimra`**. **Three new gates added** (6–8 groups per department with no repeats; every canonical group modelled somewhere; an exact pin of all 16 department→group lists) |
-| **E-3** | Add the `CITED_INSTRUMENTS` table plus `citation`/`instrument` on `DepartmentDocument`, and wire each department's documents to real instruments | NOT STARTED |
+| **E-3** | Add the `CITED_INSTRUMENTS` table plus `citation`/`instrument` on `DepartmentDocument`, and wire each department's documents to real instruments | **DONE** — new source-of-truth module **`src/config/instruments.ts`** holding **71 real instruments**, each with its exact title, its kind, the source it was verified from, and a chapter **only where the official consolidated index confirms one** (**38 carry a chapter**, **33 carry `null`** rather than a guessed number). All **49 documents across the 16 departments** now cite one, and each department carries a register of its own instruments (the 6 universal ones plus its own 3–9). **One deliberate deviation from the plan's letter:** `DepartmentDocument` gained `instrument` (the key) but **not** a stored `citation` string — the citation is **derived** from the table by `citedInstrumentLabel()`, because project rule 03 forbids hand-maintaining two copies of one fact. **Five new gates added** (citations resolve and stay inside the department's own register; every department carries the universal set; the table has unique ids, a title, a source and no malformed chapter; no instrument row is unused; the derived label matches the table) |
 | **E-4** | Render the citation in the document rail; show each group's share and source on the Reference screen | NOT STARTED |
 | **E-5** | Full suite green + review zip | NOT STARTED |
 
-**Two counts are pinned deliberately, never silently:** (1) `src/test/workspace.test.tsx` line 88 asserts
+**Three counts are pinned deliberately, never silently:** (1) `src/test/workspace.test.tsx` line 88 asserts
 `STAKEHOLDER_SEGMENTS` has length **36** (was 16) — the landing test and `coverage.ts` read the length from the
-source, so they needed no change and both render 36 without an edit. (2) `src/test/departments.test.ts` now pins
+source, so they needed no change and both render 36 without an edit. (2) `src/test/departments.test.ts` pins
 **every** department's group list exactly (`DEPARTMENT_SEGMENTS`), together with 6–8 groups per department and no
-orphan group, so any future change to what a department models must be deliberate.
+orphan group. (3) The same file pins the instrument rules: every document's citation must resolve to
+`CITED_INSTRUMENTS` **and** sit inside its own department's register, every department must carry the universal
+instruments, no row may be unused, and no chapter may be written in a shape other than `Chapter NN:NN`. So any
+future change to what a department models, or cites, must be deliberate.
 
 #### AB-1 — the graph, diagnosed from the code so a cold session does not re-derive it
 
@@ -2530,10 +2548,10 @@ measurement test). **No file was deleted, no dependency or schema changed, and `
   model — do not resurrect them), the graph diagnosis with the exact current stroke values, the agreed
   graph-only colour exemption, and the **official Zimbabwean figures already gathered** so they are never
   re-researched.
-- **The next action, exactly:** **E-1 and E-2 are DONE (2026-09-28)** — the 20 new groups are in
-  `src/config/reference.ts` (**36 in total**), the weight gate covers all four bases and pins the exact modelled
-  set, **every department now models 6–8 groups** (all 36 groups used by at least one department), and the pinned
-  count in `src/test/workspace.test.tsx` reads **36**. The whole ladder is green (305/305 tests, 10/10 Playwright).
+- **The next action, exactly:** **E-1, E-2 and E-3 are DONE (2026-09-28)** — 36 groups in
+  `src/config/reference.ts`, all 36 modelled across the departments (**6–8 each**), and **71 cited instruments** in
+  `src/config/instruments.ts` with all **49** documents wired to one. The whole ladder is green (310/310 tests,
+  10/10 Playwright). **But none of the citations are visible in the interface yet** — that is E-4.
   **Do not re-fetch any figure; every one is recorded above and in
   `docs/PLATFORM_ENRICHMENT_PLAN.md`.** The deeper research remains **DONE** and written to that plan (Phase AC):
   **20 new stakeholder groups → 36 in total** (9 with a real published share, 11 explicitly `Modelled`), plus
@@ -2541,20 +2559,17 @@ measurement test). **No file was deleted, no dependency or schema changed, and `
   [Chapter 25:04], Electricity Act [Chapter 13:19], Mines and Minerals Act [Chapter 21:05], Traditional Leaders
   Act [Chapter 29:17], War Veterans Act [Chapter 11:15], and the Constitution (Amendment No. 20) Act, 2013) —
   **the instruments are still NOT in the code.**
-  **The next action is batch E-3:** add the `CITED_INSTRUMENTS` table plus the optional `citation`/`instrument`
-  fields on `DepartmentDocument`, and wire each department's documents to real instruments — the full
-  per-department list is **PART 2.2 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** (for example the Banking
-  Act [Chapter 24:20] + Reserve Bank of Zimbabwe Act [Chapter 22:15] to `fin`; Education Act [Chapter 25:04] to
-  `edu`; Electricity Act [Chapter 13:19] to `energy`; Mines and Minerals Act [Chapter 21:05] to `mines`;
-  Traditional Leaders Act [Chapter 29:17], Urban Councils Act [Chapter 29:15] and Rural District Councils Act
-  [Chapter 29:13] to `lg`; War Veterans Act [Chapter 11:15] and Veterans of the Liberation Struggle Act
-  [Chapter 17:12] to `def`; Public Health Act [Chapter 15:17] to `health`; plus the Constitution (Amendment
-  No. 20) Act, 2013 and NDS2 2026–2030 for every department). **Show a chapter number only where the
-  consolidated index confirms it — otherwise the title alone, never a guessed number.** Its gate: every citation
-  resolves to the table, so a fabricated citation cannot be added. Then **E-4** (render the citation in the
-  document rail; each group's share and source on the Reference screen) → **E-5** (full suite + review zip).
-  **The instruments are still NOT in the code** — E-3 is the batch that puts them there.
-  **Never invent a share — an official figure or the `Modelled` label, nothing in between.**
+  **The next action is batch E-4 (mostly a UI batch — read the UI rules first):** render the citation in the
+  document rail (there are **two** rails to touch — `src/components/DocumentLibrary.tsx` and
+  `src/pages/Documents.tsx`, both of which render a document list), using the **derived** label
+  `citedInstrumentLabel(doc.instrument)` from `src/config/instruments.ts` — **never store the citation text in a
+  component**; and show each stakeholder group's share and source on the Reference screen
+  (`src/pages/Reference.tsx`) from `share` / `shareBase` / `shareSource`, printing `Modelled` where the share is
+  `null`. The plan's E-4 also sorts cited instruments first and requires the **palette, typography and layout to be
+  unchanged** — `.clinerules/03-preserve-existing-ui-and-no-break.md` governs this batch, and its palette lock is
+  enforced by `src/test/palette-lock.test.ts`. Then **E-5** (full suite + review zip).
+  **Never invent a share — an official figure or the `Modelled` label, nothing in between; and never print a
+  chapter the index did not confirm.**
   **AB-1 is finished and verified** (its own section above holds the evidence: pixel-pinned strokes, per-group
   colour, per-kind shape, a shape-first legend, the measured before/after, and the four mutated gates). Read
   `src/config/reference.ts` (`STAKEHOLDER_SEGMENTS` — **36** today) and `src/config/departments.ts` (which
