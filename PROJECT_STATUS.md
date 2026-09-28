@@ -1377,6 +1377,10 @@ because the block it sits in already names itself.
 | 2026-09-28 | **real-browser measurement before/after the stroke fix** (Phase AB-1) | The new e2e test reads the card's rendering scale and what each stroke really paints, at 1280 / 900 / 640 px. **AFTER (pinned):** scale 0.445 / 0.792 / 0.532 → ring **2 px**, group outline **1.25 px**, edge **1.36 px** at **every** width; agent mark **3.42 / 6.08 / 4.09 px**. **BEFORE (mutation: every `vector-effect="non-scaling-stroke"` removed, rebuilt):** ring 0.89 / 1.58 / 1.06 px, outline **0.56 / 0.99 / 0.67 px**, edge 0.61 / 1.08 / 0.72 px — the outline painted about **half a pixel**, the reported grey smear. Card file restored byte-identical (`467984cabb041d2730bce5d5b40e7e3a8e74237dfed3be8c985fed266ca15c0f`) |
 | 2026-09-28 | **mutation proofs of the four new gates** (Phase AB-1) | Mutations: (1) unpin every stroke → `graph-card.test.tsx` *pins every stroke to real pixels* FAIL + the browser measurement FAIL; (2) `GRAPH_NODE_SHAPE.priority` `square` → `circle` → *gives every kind of mark a shape of its own* FAIL and `network.test.ts` *names all four kinds … with a shape of its own* FAIL; (3) the document fill → `#F7F7F7` → *keeps every fill far enough from the card surface* FAIL; (4) the agent field drawn in one gold → *colours each group with its own palette colour, outlined in ink* FAIL. **4 failed / 41 passed** as expected; `palette.ts` and the card both restored with hashes **identical** to before the mutation (`44ea86c6…`, `467984ca…`) |
 | 2026-09-28 | `npm run validate && typecheck && lint && npm test && build && npx playwright test` (Phase AB-1, final bytes) | **ALL GREEN**: validate PASS · typecheck exit 0 · lint 0 errors · **296/296 (23 files)** · build ✓ · playwright **10/10**. `EXIT:0` |
+| 2026-09-28 | AB-6 / AB-6b retrievals (real output, read directly) | ZIMSTAT **2022 PHC main report** (259 pp, text-extracted): Table 6.6 employed by industry **2,501,887** — public admin 82,040 · education 148,470 · health 61,358 · mining 227,079 · agriculture 582,138; Table 2.7 urban **5,855,099** / rural **9,323,858**, aged 15–34 **4,836,291**; Table 3.8 emigrants **908,914**. ZIMSTAT **QLFS Q2 2025** (22 pp): employed **3,186,598**, formal 29.9 / informal 39.5 / household 5.7 / agriculture 24.8. **NDS2 document** (648 pp): ten national priorities (§113, approved 11 Mar 2025); **Embassy of Zimbabwe DC**: NDS1's fourteen. World Bank/ILO: agriculture 54.3 / industry 11.5 / services 34.2 |
+| 2026-09-28 | `npm run validate; npm run typecheck; npm run lint; npm test; npm run build` (Phase AB-2 weights, final bytes) | **ALL GREEN**: validate `PASS — all checks green` · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing `react-refresh` warnings) · **301/301 (24 files)** — the 296 before plus the 5 new guards · build ✓ (586.94 kB JS / 175.75 kB gzip) |
+| 2026-09-28 | `npx playwright test` (Phase AB-2 weights) | **PASS — 10 passed (18.0s)**; each test asserts 0 console errors and 0 off-origin requests |
+| 2026-09-28 | mutation proofs of the AB-2 weight guards | (1) civil servants `share: 3.3` → `9.9` → *makes every published share equal the census count it cites* **FAIL**; (2) formal business `share: null` → `5` → *marks exactly the segments with no published figure as modelled* **AND** *declares a source and a base for every segment* **FAIL** (2 failed / 3 passed, as expected). `src/config/reference.ts` restored with the hash **identical** before and after both mutations (`d3f3c746e511da1dd2a5bc63073a937daec6346317deb7ac17074312ed4fb36a`) |
 
 
 
@@ -2024,7 +2028,7 @@ SUPERSEDED by this decision** — it must be rewritten down to three documents a
 | # | Item | Status |
 |---|---|---|
 | **AB-1** | **Graph quality and per-group colour** (the graph only — *not* the platform palette) | **DONE — verified this session (see below)** |
-| **AB-2** | **More stakeholder groups, with real ZIMSTAT weights** | **UNBLOCKED — all the figures it needed are now retrieved (2026-09-28, see AB-6b).** Real official shares exist for public administration 82,040 · education 148,470 · health 61,358 (2022 census, Table 6.6) and the diaspora 908,914. **The remaining decision is the user's: which groups to add.** Once that is given, the weights are set from these figures, and any segment without an official share is labelled **modelled**. |
+| **AB-2** | **More stakeholder groups, with real ZIMSTAT weights** | **WEIGHTS DONE (2026-09-28); GROUPS STILL TO COME.** 11 of the 16 segments now carry a published ZIMSTAT 2022 census share and 5 are explicitly labelled **Modelled**; the run's agent field splits by them, guarded by 5 new tests. See *AB-2 — the weights are IN* below. **Remaining: the user's group list**, after which each new group gets its own weight or a modelled label. |
 | **AB-3** | **Real reference documents** for the departments shown in the demo | NOT STARTED |
 | **AB-4** | **AI "Draft the policy"** — department prompt library, grounding, citation verification, provenance | NOT STARTED |
 | **AB-5** | **"Real data, and where it comes from"** — a short named-source statement on the platform, and the reference-rate reconciliation | NOT STARTED |
@@ -2205,6 +2209,63 @@ average household size 4.0.
 agriculture, finance, insurance, ICT, transport, construction and accommodation. Only a few segments
 (civil servants as distinct from general public administration, local authorities, development partners,
 exporters, women-led enterprises, youth) still rest on a **modelled** weight, and each will be labelled as such.
+
+#### AB-2 — the weights are IN (2026-09-28). The groups are still to come, by the user's own order.
+
+**Status: the WEIGHT half is DONE; the GROUP half is the remaining decision.** The user's instruction was
+*"…then set all weights, then add the groups"*, so the weights were done first and **no stakeholder group was
+added yet**.
+
+**What changed (code):**
+- `src/config/reference.ts` — every one of the 16 segments now carries `share` (the real national percentage it
+  stands for), `shareBase` (what that percentage is a percentage of) and `shareSource` (the named figure).
+  **11 segments carry a published ZIMSTAT 2022 census figure; 5 are explicitly labelled `Modelled`** with
+  `share: null` — formal business, women-led enterprises, exporters, local authorities, development partners.
+  A modelled share is never a number pretending to be official. New exports: `MODELLED_SHARE_LABEL`,
+  `MODELLED_SEGMENT_WEIGHT`, `segmentWeight(id)`.
+- `src/services/assessment/network.ts` — `buildAgentField` now splits the modelled agents by `segmentWeight`
+  instead of a random `0.5 + rng.next()` weight. The population total and every mark's place are still seeded,
+  so the same run is still byte-identical; the SPLIT is now the country's real shape, normalised across the
+  groups a department models.
+
+**The weights, and where each one comes from**
+
+| Segment | Share | Base | Source (ZIMSTAT 2022 census main report) |
+|---|---|---|---|
+| rural households | 61.4% | population | rural population 9,323,858 (Table 2.7) |
+| urban households | 38.6% | population | urban population 5,855,099 (Table 2.7) |
+| youth | 31.9% | population | aged 15–34, 4,836,291 (Table 2.7) |
+| smallholder farmers | 23.3% | employed | agriculture, forestry and fishing 582,138 (Table 6.6) |
+| informal traders | 17.7% | employed | wholesale and retail trade 443,742 (Table 6.6) |
+| mining operators | 9.1% | employed | mining and quarrying 227,079 (Table 6.6) |
+| diaspora | 6.0% | population | 908,914 emigrants counted (Tables 3.6–3.14) |
+| educators | 5.9% | employed | education 148,470 (Table 6.6) |
+| civil servants | 3.3% | employed | public administration and defence 82,040 (Table 6.6) |
+| health workers | 2.5% | employed | human health and social work 61,358 (Table 6.6) |
+| financial sector | 1.3% | employed | financial and insurance activities 32,050 (Table 6.6) |
+| formal business · women-led enterprises · exporters · local authorities · development partners | **modelled** | — | no published population count exists |
+
+The two bases are, exactly: **employed persons counted in the 2022 census (2,501,887)** and **people counted in
+Zimbabwe in the 2022 census (15,178,957)**.
+
+**Gate added, and proved able to fail.** `src/test/stakeholder-weights.test.ts` holds **5 guards**: every
+segment names a source and a base; a modelled segment is labelled `Modelled` and claims no base; **every
+published share equals the census count it cites** (within 0.05 of a percentage point); the modelled set is
+exactly the five named above, so a new segment cannot slip in unlabelled; and the drawn field really follows the
+declared weights (rural households out-draw a modelled group, and the order is monotonic). **Mutated to prove
+they fail, then restored byte-identical** (`d3f3c746e511da1dd2a5bc63073a937daec6346317deb7ac17074312ed4fb36a`
+before and after): (i) civil servants 3.3 → 9.9 fired *"makes every published share equal the census count it
+cites"*; (ii) formal business `null` → `5` fired **two** guards — the modelled-set guard and the source/base
+guard.
+
+**Verified this session, on the final bytes:** `npm run validate` **PASS** · `typecheck` exit 0 · `lint`
+**0 errors** (the same 7 pre-existing `react-refresh` warnings) · `npm test` **301/301 (24 files)** — the 296
+before plus the 5 new guards · `build` ✓ · `npx playwright test` **10/10**, each test asserting 0 console errors
+and 0 off-origin requests.
+
+**Deliberately still NOT done:** no stakeholder group was added, and the Reference screen does not yet show the
+weights and their sources. Both are the next actions; the screen is the honest home for them (AB-5 is the
+"named source" item).
 
 #### AB-1 — the graph, diagnosed from the code so a cold session does not re-derive it
 
@@ -2397,14 +2458,13 @@ measurement test). **No file was deleted, no dependency or schema changed, and `
   model — do not resurrect them), the graph diagnosis with the exact current stroke values, the agreed
   graph-only colour exemption, and the **official Zimbabwean figures already gathered** so they are never
   re-researched.
-- **The next action, exactly:** **AB-6 and AB-6b are DONE (2026-09-28)** — every figure is retrieved and
-  recorded in the two *AB-6* sections above; **do not re-fetch them.** The next action is **AB-2 — more
-  stakeholder groups, with real ZIMSTAT weights.** The data that was blocking it is gone: official shares now
-  exist for **public administration 82,040 · education 148,470 · health 61,358 · diaspora 908,914 · mining
-  227,079 · manufacturing 257,740 · trade 443,742 · agriculture 582,138 · financial+insurance 32,050 · ICT
-  22,747 · transport 87,730 · construction 128,186** (2022 census, Table 6.6). **The group list is still the
-  user's decision** — ask which groups to add, then set the weights from these figures. **Never invent a weight
-  for a segment with no official share: label it modelled.**
+- **The next action, exactly:** **AB-6, AB-6b and the AB-2 WEIGHTS are DONE (2026-09-28)** — every figure is
+  retrieved and recorded above, **do not re-fetch it**, and **11 of the 16 segments now carry a published
+  ZIMSTAT 2022 census share** (5 are labelled `Modelled`), guarded by `src/test/stakeholder-weights.test.ts`.
+  **The one remaining action is the user's group list for AB-2:** ask which stakeholder groups to add, then give
+  each new group a real share from the figures already recorded, or the `Modelled` label — **never an invented
+  weight**. After that, surface the weights and their sources on the Reference screen (AB-5 owns the named-source
+  statement).
   **AB-1 is finished and verified** (its own section above holds the evidence: pixel-pinned strokes, per-group
   colour, per-kind shape, a shape-first legend, the measured before/after, and the four mutated gates). Read
   `src/config/reference.ts` (`STAKEHOLDER_SEGMENTS` — **16** today) and `src/config/departments.ts` (which

@@ -29,7 +29,7 @@
  */
 
 import { findDepartment, type DepartmentId } from "@/config/departments";
-import { getStakeholderSegment } from "@/config/reference";
+import { getStakeholderSegment, segmentWeight, type StakeholderSegmentId } from "@/config/reference";
 import { createRng, type Rng } from "@/lib/prng";
 import type { AssessmentRun, ReactionSentiment } from "./types";
 
@@ -270,21 +270,28 @@ const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 /**
  * Build the agent field for a set of modelled groups.
  *
- * Pure and seeded: the population, the split across groups and every mark's place
- * come from the run's own seed, so the same input always draws the same field.
+ * Pure and seeded: the POPULATION and every mark's place come from the run's own
+ * seed, so the same input always draws the same field. The SPLIT between the groups
+ * is neither seeded nor invented — it follows each segment's own published national
+ * share (`segmentWeight`, from `@/config/reference`), so a group that stands for a
+ * large part of the country carries more agents than a small one. A group with no
+ * official share carries a neutral modelled weight and is never silently dropped,
+ * because every modelled group is given at least one mark.
+ *
  * Marks sit on a golden-angle spiral around their group's centre, which spreads
  * them evenly at any count and leaves no visible ring or gap.
  */
 const buildAgentField = (
-  groupIds: readonly string[],
+  segmentIds: readonly StakeholderSegmentId[],
   rng: Rng,
 ): { agents: RelationshipAgent[]; total: number; perMark: number } => {
   const span = AGENT_POPULATION_CEILING - AGENT_POPULATION_FLOOR;
   const total = AGENT_POPULATION_FLOOR + Math.floor(rng.next() * (span + 1));
 
-  // Split the population across the modelled groups by seeded weight, so group
-  // sizes differ the way real populations do. Every group models at least one.
-  const weights = groupIds.map(() => 0.5 + rng.next());
+  // Split by each group's own published share, normalised across the groups this
+  // department actually models, so the field reflects who the policy really reaches.
+  // Every group models at least one agent, so no modelled group can vanish.
+  const weights = segmentIds.map((segmentId) => segmentWeight(segmentId));
   const weightTotal = weights.reduce((sum, weight) => sum + weight, 0);
   const counts = weights.map((weight) => Math.max(1, Math.floor((weight / weightTotal) * total)));
   const rounding = counts.reduce((sum, count) => sum + count, 0);
@@ -293,7 +300,8 @@ const buildAgentField = (
   const perMark = Math.max(1, Math.ceil(total / AGENT_MARK_CAP));
 
   const agents: RelationshipAgent[] = [];
-  groupIds.forEach((groupId, index) => {
+  segmentIds.forEach((segmentId, index) => {
+    const groupId = `stakeholder:${segmentId}`;
     const marks = Math.max(1, Math.round(counts[index] / perMark));
     for (let mark = 0; mark < marks; mark += 1) {
       const angle = mark * GOLDEN_ANGLE + rng.next() * 0.4;
@@ -416,7 +424,7 @@ export const buildRelationshipGraph = (run: AssessmentRun): RelationshipGraph =>
   // same draft always draws the same field, and a different draft draws a
   // different one.
   const agentField = buildAgentField(
-    run.reactions.map((reaction) => `stakeholder:${reaction.segmentId}`),
+    run.reactions.map((reaction) => reaction.segmentId),
     createRng(`${run.seed}::agents`),
   );
 
@@ -491,7 +499,7 @@ export const buildPreviewRelationshipGraph = (
   // The agents those groups stand for, from the representative department's own
   // seed, so the public schematic is identical on every visit and every build.
   const agentField = buildAgentField(
-    department.segments.map((segmentId) => `stakeholder:${segmentId}`),
+    department.segments,
     createRng(`${department.id}::agents`),
   );
 
