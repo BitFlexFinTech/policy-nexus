@@ -2758,12 +2758,14 @@ dependency was added or removed**. `dist/` was rebuilt.
 
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`; the tip is `1d7c5d3`** — the stale-document sweep (six false
-  statements corrected at source; validate checks 11 and 12 added). It sits on `76a38d3`, which recorded
-  Batches A–G, the deploy and the retirements; the last **code** commit before it was `5a918ea` (Batch G).
-  Run `git log --oneline -8 | cat` as the second opinion on state. **Working tree clean.** Baseline `main`
-  is untouched at `7451db0`; `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER
-  in *Known-red*. Everything is committed, so a cold session can start from this file alone.
+- **Branch `feature/unified-platform`.** The commit to know is **`1d7c5d3`** — the stale-document sweep
+  (six false statements corrected at source; validate checks 11 and 12 added) — on top of `76a38d3`
+  (Batches A–G, the deploy, the retirements); the last **code** commit before the sweep was `5a918ea`
+  (Batch G). A status-only commit recording this file follows `1d7c5d3`, so **run `git log --oneline -8 |
+  cat` as the second opinion on state** and treat any commit after `1d7c5d3` that touches only documents
+  as part of the same record. **Working tree clean.** Baseline `main` is untouched at `7451db0`;
+  `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything
+  is committed, so a cold session can start from this file alone.
 - **THE LIVE SITE IS NOW THIS BUILD.** `nzwisiso.bitflex.app` serves `assets/index-BeggQU9V.js`, the same
   file `npm run build` emits — verified by fetching the served file and hashing it:
   `c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`, identical to the local
