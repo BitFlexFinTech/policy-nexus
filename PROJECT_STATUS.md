@@ -1404,6 +1404,13 @@ because the block it sits in already names itself.
 | 2026-09-28 | **mutation proofs of the four new E-3 gates** | (1) `fin-doc-2` changed to cite `vat-act`, which is **not** in Finance's register → *cites only real instruments, each from its own department's register* **FAIL** (1 failed / 21 passed). (2) `banking-act` chapter typed as `Chapter 24.20` → *keeps the instrument table honest: … no guessed chapter* **FAIL** **and** *renders a citation …* **FAIL** (2 failed / 20 passed) — the label check is derived, so a bad chapter shows up twice. (3) `zimra` drops `vat-act`, leaving a row nothing carries → *uses every instrument in the table in at least one department* **FAIL**. (4) `procurement-act` removed from the universal set → the same unused-row gate **FAIL**. Every file restored; `shasum` of `departments.ts` back to `703f07f322e34a52c67eaea56f2832f0cd263091` and `instruments.ts` to `d80f03e51f93d671d91f10f7f3cfb44c6ead5fba`, with all **49** document citations intact |
 | 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (E-3, final bytes) | **ALL GREEN**: validate `PASS — all checks green` · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **310/310 (24 files)** — the 305 after E-2 plus the 5 new instrument gates · build ✓ in 464 ms |
 | 2026-09-28 | `npx playwright test` (E-3, final bytes) | **PASS — 10 passed (21.8 s)**; 0 console errors, 0 off-origin requests. Expected to be unchanged: E-3 is data and gates only, and **the rail does not draw the citation until E-4** |
+| 2026-09-28 | **E-4 code delivered** (Phase AC batch 4 — the citations and shares become visible) | `src/config/departments.ts`: one new exported helper **`sortDocumentsByCitation()`** — documents that cite an instrument first, the register's own order kept otherwise, the array copied so the authored data is never rearranged (today every document cites one, so the order is unchanged; the helper exists so a future uncited document cannot push a cited one down the rail, and so **both** rails sort by one shared rule). `src/components/DocumentLibrary.tsx`: rows sorted by it, and each row now carries the **derived** citation `citedInstrumentLabel(doc.instrument)` as a third `text-[10px]` caption (same typography token, no new colour, `truncate` + `title` so a long title never widens the 56-wide rail). `src/pages/Documents.tsx`: same sort, and the caption reads `Prepared under <citation>`. `src/components/documents/RecordedDocumentDialog.tsx`: a `Prepared under` row appears in the dialog's list, built from the same derived label. `src/pages/Reference.tsx`: every one of the **36** groups now shows its share and source — a published group reads `Share: 38.6% of people counted in Zimbabwe in the 2022 census (15,178,957) · ZIMSTAT 2022 census — urban population (5,855,099)`, and a group with no official figure reads `Share: Modelled — no official figure, so the modelling weight is not a published share`, using the exported `MODELLED_SHARE_LABEL` rather than a hand-typed word; a one-line caption above the list explains the two kinds. **No colour, font, layout, route or dependency changed** (no `package.json` edit; `src/components/ui/**` untouched) |
+| 2026-09-28 | `npx vitest run src/test/workspace.test.tsx` (E-4) | PASS — **32/32** (29 before plus the 3 new render gates: the rail + the dialog name each document's instrument; the Documents screen names it for every document; the Reference screen states every published share with its base and source and prints the exact `Modelled` line for every modelled group) |
+| 2026-09-28 | **mutation proofs of the two new E-4 render gates** | (1) the rail's citation branch `doc.instrument ?` → `false ?` → *names the instrument each document is prepared under, in the rail and in the detail* **FAIL**; (2) the Reference modelled branch `Share: ${segment.shareSource}` → `Share: Estimated` → *states every modelled group's share and source, labelling the modelled ones* **FAIL**. **2 failed / 30 passed** as expected; both files restored with `shasum -a 256` **identical** to before (`DocumentLibrary.tsx` `4372494caecf35412af3e1838e38c0b8ae901be77906a4f064c4e7235ef3c940`, `Reference.tsx` `694dfcaa5ec2384d4cfbce3253e14ae70b881f9857aae9e053f7dfefd42d4bb7`) |
+| 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (E-4, final bytes) | **ALL GREEN**: validate `PASS — all checks green` · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **313/313 (24 files)** — the 310 after E-3 plus the 3 new render gates · build **✓ in 485 ms** (`dist/assets/index-B1ck7OWh.js` 604.51 kB / gzip 180.08 kB; only the pre-existing chunk-size note) |
+| 2026-09-28 | `npx playwright test` (E-4, final bytes) | **PASS — 10 passed (21.8 s)**; each test asserts 0 console errors and 0 off-origin requests. The registers journey now also asserts the citation is visible **in the real rail** and named **in the dialog** |
+| 2026-09-28 | **review zip refreshed** (E-5) | `Review Zip/nzwisiso-policy-dashboard-review-10.zip` — **1,327,496 bytes, 231 entries**, written **inside the project** (the rule that governs this is `always-export-review-zip`). Exclusions: `node_modules`, `dist`, `.git`, `Review Zip`, `playwright-report`, `test-results`, `*.zip`, and every `.env*`. **Secret check:** `unzip -Z1 … | grep -E '(^\|/)\.env'` printed **no entry at all** — the real `.env` in this project is therefore not inside the archive. `npm run build` had already rebuilt `dist/` before the zip was made, and the build is excluded as required |
+| 2026-09-28 | **defect inventory (E-4 session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. (1) **A stale status row**: AB-2 still read *“GROUPS STILL TO COME”* and *“Remaining: the user's group list”* after E-1/E-2 had delivered the groups — corrected to **DONE** with the real counts (36 groups, 20 published / 16 `Modelled`, 123 assignments). (2) **AB-3 still read `NOT STARTED`** although E-3 wired all 49 documents to real instruments — corrected to **DONE via E-3 + E-4**, with the register-vs-files caveat stated. (3) **AB-5 still read `NOT STARTED`** although E-4 delivers the share/source half — corrected to **IN PROGRESS** with the remaining work named. (4) **The “Honest state” paragraph was false**: it said E-4/E-5 were not started and the citation was not in the interface — rewritten to the true state. (5) **RESUME HERE was false in three places**: “E-1, E-2 and E-3 are DONE … none of the citations are visible” (citations now visible), the expected test count **302/302** (the real number is **313/313**), and the committed tip `87ec018` (the E-3 tip was `b8daca9`, and E-4 is now `06f33ff`). (6) **A self-inflicted typo** — the phrase *“and HONEST LIMIT.”* accidentally left inside the AB-5 row — removed in the same session. Each of (1)–(5) is a gate of its own in the sense that the string can be re-checked by `grep`; the fix is the corrected text itself |
 
 
 
@@ -2051,10 +2058,10 @@ SUPERSEDED by this decision** — it must be rewritten down to three documents a
 | # | Item | Status |
 |---|---|---|
 | **AB-1** | **Graph quality and per-group colour** (the graph only — *not* the platform palette) | **DONE — verified this session (see below)** |
-| **AB-2** | **More stakeholder groups, with real ZIMSTAT weights** | **WEIGHTS DONE (2026-09-28); GROUPS STILL TO COME.** 11 of the 16 segments now carry a published ZIMSTAT 2022 census share and 5 are explicitly labelled **Modelled**; the run's agent field splits by them, guarded by 5 new tests. See *AB-2 — the weights are IN* below. **Remaining: the user's group list**, after which each new group gets its own weight or a modelled label. |
-| **AB-3** | **Real reference documents** for the departments shown in the demo | NOT STARTED |
+| **AB-2** | **More stakeholder groups, with real ZIMSTAT weights** | **DONE (2026-09-28).** The weights landed in the AB-2 session; the **groups** landed in E-1 (**20 new groups → 36 in total**: **20 carry a real published share**, **16 are explicitly `Modelled`** with `share: null`) and E-2 gave each department the **6–8** groups its mandate covers (**123 assignments**, all 36 used). Gates: `src/test/stakeholder-weights.test.ts` (6 guards — every share equals the census count it cites, the modelled set is exact) and `src/test/departments.test.ts` (6–8 per department, no orphan group, the exact 16→group mapping). See *AB-2 — the weights are IN* below and the E-1/E-2 rows in the verification log |
+| **AB-3** | **Real reference documents** for the departments shown in the demo | **DONE via E-3 + E-4 (2026-09-28).** Every one of the **49** documents now cites a **real, verified instrument** from `src/config/instruments.ts` (71 instruments, each inside its own department's register), and **E-4 makes that citation visible** — in both document rails and in the detail dialog. **Honest caveat, unchanged and deliberate:** the platform holds the department document **register**, not the document files; the dialog says so plainly, and no invented filename is presented as a real file |
 | **AB-4** | **AI "Draft the policy"** — department prompt library, grounding, citation verification, provenance | NOT STARTED |
-| **AB-5** | **"Real data, and where it comes from"** — a short named-source statement on the platform, and the reference-rate reconciliation | NOT STARTED |
+| **AB-5** | **"Real data, and where it comes from"** — a short named-source statement on the platform, and the reference-rate reconciliation | **IN PROGRESS (2026-09-28).** The share-and-source half is delivered by **E-4**: the Reference screen now states every group's share, its base and its named source, printing **`Modelled`** where no official figure exists. **Remaining:** the **reference-rate reconciliation** (the three reference rates against their named sources) and a short named-source statement as its own item |
 | **AB-6** | **Retrieve the missing official figures** — ZIMSTAT employment-by-sector, the 2022 urban/rural split, the 2022 age structure, and the **NDS pillars** (NDS1 and any NDS2) | **DONE — every item retrieved and recorded this session (2026-09-28).** See *AB-6 — retrieved in this session* below for the figures, the named sources, and the one honest remaining limit (the 21-industry QLFS break-up exists only as chart images). |
 | **AB-7** | **The final Claude prompt** — memo + deck + ask. **Must be last.** | NOT STARTED |
 
@@ -2321,25 +2328,29 @@ each department?"*
 - **Implementation batches E-1…E-5**, each with its own gate, and an explicit list of what must NOT change
   (palette, typography, `src/components/ui/**`, route map, determinism, `package.json`).
 
-**Honest state (updated 2026-09-28 — batches E-1, E-2 and E-3 are DONE):** the 20 new groups are **in the
+**Honest state (updated 2026-09-28 — the whole ladder E-1…E-5 is DONE):** the 20 new groups are **in the
 code**, **every one is modelled by at least one department** (each department now models **6–8**, up from 4–6),
-and **every document now cites a real instrument** — 71 instruments in the table, all 49 documents wired, each
-to an instrument inside its own department's register. **E-4 and E-5 are still NOT STARTED**, so the citation is
-**not yet visible in the interface** — it exists in the data and is gated, but the document rail does not draw it
-yet. Two wrong figures in the plan document were **found and fixed at source** during E-1: the Christian share was
+**every document cites a real instrument** — 71 instruments in the table, all 49 documents wired, each
+to an instrument inside its own department's register — and **the citation is now visible**: both document
+rails and the document dialog name the instrument, and the Reference screen states every one of the 36
+groups' share, base and source, with the word **`Modelled`** wherever no official figure exists. Two wrong
+figures in the plan document were **found and fixed at source** during E-1: the Christian share was
 written **85.3%** and is **85.2%** (12,937,804 ÷ 15,178,957), and the informal-sector share was written **64.9%**
 and is **65.0%** (2,069,901 ÷ 3,186,598). Two rows of the modelled table were also mis-numbered (9 and 10 → 19
 and 20). During E-3 the plan's Finance row gained the **Income Tax Act [Chapter 23:06]** (Finance documents on
 presumptive bands genuinely rest on it) and its one chapter in the wrong shape was corrected — see the defect
-list in the verification log.
+list in the verification log. **One honest limit, unchanged and deliberate:** the platform holds each
+department's document *register*, not the document files — the rails state what each document is and which
+instrument it rests on, and the dialog says plainly that the files themselves are not stored. That is the
+AB-3 caveat, not a defect: no invented file is presented as a real one.
 
 | Batch | Work | Status |
 |---|---|---|
 | **E-1** | Add the 20 new groups to `src/config/reference.ts`, each with a real share or the `Modelled` label; extend the weight gate | **DONE** — 36 groups in total. **9 new groups carry a real published share** (persons with disabilities, faith-based organisations, tourism operators, manufacturers, transport operators, researchers, pensioners, informal-sector workers, women) and **11 new groups are `Modelled`** (traditional leaders, energy and water utilities, ICT and network operators, communities by protected areas, media, cooperatives, trade unions, employer federations, artisanal miners, cross-border traders, war veterans). Two extra named bases were added, because two shares are **not** percentages of the two bases already in use: people aged 5 and over (**13,102,643**, the disability base) and the QLFS Q2 2025 employed total (**3,186,598**, the informal-sector base). The weight gate now checks all four bases, pins the modelled set exactly, and carries a specific gate for the traditional-leaders case (a real count in the note, a `Modelled` weight, never a share) |
 | **E-2** | Give each of the 16 departments the groups that belong to its mandate (6–8 each, up from 4–6) | **DONE** — every department now models **6–8** groups (eleven model 8, five model 7; none below 6), **123 department-to-group assignments in total** (was 84). All **36** canonical groups are modelled by at least one department, so nothing sits unused. Each group was placed only where the department's own mandate reaches it: **war veterans → `def`** (whose mandate is literally "the welfare of war veterans") · **traditional leaders → `opc` + `lg`** · **faith-based organisations → `opc` + `edu`** · **media → `opc` + `mfa`** · **manufacturers → `fin` + `zimra` + `zida`** · **pensioners → `fin` + `psc` + `def`** · **trade unions → `psc`** · **cooperatives → `agri`** · **informal-sector workers → `agri` + `zimra`** · **persons with disabilities → `health` + `edu` + `def`** · **women → `health` + `edu`** · **researchers → `hedu` + `ict`** · **employer federations → `hedu` + `zida`** · **ICT and network operators → `ict`** · **artisanal miners → `mines`** · **communities by protected areas → `mines` + `env`** · **energy and water utilities → `energy` + `lg` + `env`** · **transport operators → `energy` + `lg`** · **tourism operators → `mfa` + `env` + `zida`** · **cross-border traders → `mfa` + `zimra`**. **Three new gates added** (6–8 groups per department with no repeats; every canonical group modelled somewhere; an exact pin of all 16 department→group lists) |
 | **E-3** | Add the `CITED_INSTRUMENTS` table plus `citation`/`instrument` on `DepartmentDocument`, and wire each department's documents to real instruments | **DONE** — new source-of-truth module **`src/config/instruments.ts`** holding **71 real instruments**, each with its exact title, its kind, the source it was verified from, and a chapter **only where the official consolidated index confirms one** (**38 carry a chapter**, **33 carry `null`** rather than a guessed number). All **49 documents across the 16 departments** now cite one, and each department carries a register of its own instruments (the 6 universal ones plus its own 3–9). **One deliberate deviation from the plan's letter:** `DepartmentDocument` gained `instrument` (the key) but **not** a stored `citation` string — the citation is **derived** from the table by `citedInstrumentLabel()`, because project rule 03 forbids hand-maintaining two copies of one fact. **Five new gates added** (citations resolve and stay inside the department's own register; every department carries the universal set; the table has unique ids, a title, a source and no malformed chapter; no instrument row is unused; the derived label matches the table) |
-| **E-4** | Render the citation in the document rail; show each group's share and source on the Reference screen | NOT STARTED |
-| **E-5** | Full suite green + review zip | NOT STARTED |
+| **E-4** | Render the citation in the document rail; show each group's share and source on the Reference screen | **DONE** — both rails show the **derived** citation (a `sortDocumentsByCitation()` helper in `departments.ts` puts cited documents first for both, so the rule is written once), the detail dialog adds a `Prepared under` row, and the Reference screen states all **36** groups' share, base and source, printing the exported `MODELLED_SHARE_LABEL` (**"Modelled"**) where no published figure exists. **3 new render gates** in `src/test/workspace.test.tsx` (29 → 32), **both proved able to fail by mutation and restored byte-identical**, plus the Playwright registers journey now asserts the citation in the real rail and in the dialog. **No colour, font, layout, route or dependency changed.** See the E-4 rows in the verification log |
+| **E-5** | Full suite green + review zip | **DONE** — the whole ladder green on the final bytes: `validate` PASS · `typecheck` exit 0 · `lint` 0 errors (7 pre-existing warnings) · **313/313 tests (24 files)** · `build` ✓ · Playwright **10/10** (0 console errors, 0 off-origin requests per test). Recorded in the verification log; the review zip is refreshed at the end of the session |
 
 **Three counts are pinned deliberately, never silently:** (1) `src/test/workspace.test.tsx` line 88 asserts
 `STAKEHOLDER_SEGMENTS` has length **36** (was 16) — the landing test and `coverage.ts` read the length from the
@@ -2529,15 +2540,39 @@ field removed from `RELATIONSHIP_KINDS`.
 re-anchored to the mark classes), `src/test/network.test.ts` (the legend guard now tests shapes),
 `e2e/journey.spec.ts` (9 → 10: the four field/mark selectors re-anchored, and the new three-width
 measurement test). **No file was deleted, no dependency or schema changed, and `dist/` was rebuilt.**
+## Files touched in Phase AC E-4 (the citations and the shares become visible)
+
+**Repo — five files changed, all inside the plan's declared scope, none of them a design-system file.**
+`src/config/departments.ts` — one new export, `sortDocumentsByCitation(documents)`; it copies the array,
+puts documents that cite an instrument first and keeps the register's own order for the rest, so **both**
+rails sort by one written-once rule instead of two copies of the same idea.
+`src/components/DocumentLibrary.tsx` — rows sorted by that helper and each row carries a third caption,
+the **derived** `citedInstrumentLabel(doc.instrument)`, in the existing `text-[10px] text-muted-foreground`
+token with `truncate` and a `title` so a long Act title cannot widen the 56-unit rail.
+`src/pages/Documents.tsx` — the same sort, and the caption reads `Prepared under <citation>`.
+`src/components/documents/RecordedDocumentDialog.tsx` — a `Prepared under` row is pushed into the dialog's
+own row list from the same derived label, so the rail and the detail can never disagree.
+`src/pages/Reference.tsx` — every one of the 36 groups now shows its share, its base and its source; a group
+with a published figure reads `Share: <n>% of <base> · <source>`, and one without reads
+`Share: Modelled — no official figure, so the modelling weight is not a published share`, built from the
+exported `MODELLED_SHARE_LABEL`; a one-line caption above the list explains the two kinds.
+**Tests:** `src/test/workspace.test.tsx` (29 → **32** gates: the rail and the dialog for every Finance
+document; the Documents screen for every Health document; and the Reference screen for **all 36** groups,
+asserting each published line exactly and the exact `Modelled` line for each modelled group), and
+`e2e/journey.spec.ts` (the registers journey now asserts the citation in the real rail and in the dialog).
+**Not changed, deliberately:** the emerald/gold palette, Inter + JetBrains Mono, `src/components/ui/**`,
+the route map, the determinism rules, `LICENSE` / `NOTICE`, and `package.json` — **no dependency was added
+or removed**. `dist/` was rebuilt.
+
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`; the E-1 work is committed as `87ec018`** (followed by the docs commit that
+- **Branch `feature/unified-platform`; the E-4 work is committed as `06f33ff`** (followed by the docs commit that
   recorded this line — run `git log --no-pager --oneline -3` for the exact tip, which is the second opinion on
   state). Working tree clean. Baseline `main` is untouched at
   `7451db0`; `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*.
   Everything is committed, so a cold session can start from this file alone.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test` — expected **all green** (302/302 tests, 10/10 Playwright).
+  then `npx playwright test` — expected **all green** (**313/313 tests across 24 files**, 10/10 Playwright).
 - **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
   FIRST (it is below, in the phase list).** It holds: the goal in the user's words (*"we just want to get
   this platform funded … this is just a tool that will help each department research and draft policies"*),
@@ -2548,26 +2583,29 @@ measurement test). **No file was deleted, no dependency or schema changed, and `
   model — do not resurrect them), the graph diagnosis with the exact current stroke values, the agreed
   graph-only colour exemption, and the **official Zimbabwean figures already gathered** so they are never
   re-researched.
-- **The next action, exactly:** **E-1, E-2 and E-3 are DONE (2026-09-28)** — 36 groups in
-  `src/config/reference.ts`, all 36 modelled across the departments (**6–8 each**), and **71 cited instruments** in
-  `src/config/instruments.ts` with all **49** documents wired to one. The whole ladder is green (310/310 tests,
-  10/10 Playwright). **But none of the citations are visible in the interface yet** — that is E-4.
-  **Do not re-fetch any figure; every one is recorded above and in
-  `docs/PLATFORM_ENRICHMENT_PLAN.md`.** The deeper research remains **DONE** and written to that plan (Phase AC):
-  **20 new stakeholder groups → 36 in total** (9 with a real published share, 11 explicitly `Modelled`), plus
-  **real citable instruments for each of the 16 departments** (Banking Act [Chapter 24:20], Education Act
-  [Chapter 25:04], Electricity Act [Chapter 13:19], Mines and Minerals Act [Chapter 21:05], Traditional Leaders
-  Act [Chapter 29:17], War Veterans Act [Chapter 11:15], and the Constitution (Amendment No. 20) Act, 2013) —
-  **the instruments are still NOT in the code.**
-  **The next action is batch E-4 (mostly a UI batch — read the UI rules first):** render the citation in the
-  document rail (there are **two** rails to touch — `src/components/DocumentLibrary.tsx` and
-  `src/pages/Documents.tsx`, both of which render a document list), using the **derived** label
-  `citedInstrumentLabel(doc.instrument)` from `src/config/instruments.ts` — **never store the citation text in a
-  component**; and show each stakeholder group's share and source on the Reference screen
-  (`src/pages/Reference.tsx`) from `share` / `shareBase` / `shareSource`, printing `Modelled` where the share is
-  `null`. The plan's E-4 also sorts cited instruments first and requires the **palette, typography and layout to be
-  unchanged** — `.clinerules/03-preserve-existing-ui-and-no-break.md` governs this batch, and its palette lock is
-  enforced by `src/test/palette-lock.test.ts`. Then **E-5** (full suite + review zip).
+- **The next action, exactly:** **the whole ladder E-1, E-2, E-3, E-4 and E-5 is DONE (2026-09-28)** — 36 groups
+  in `src/config/reference.ts` (**20** with a published share, **16** explicitly `Modelled`), all 36 modelled
+  across the departments (**6–8 each**), and **71 cited instruments** in `src/config/instruments.ts` with all
+  **49** documents wired to one. **And the citations are now visible**: both document rails and the document
+  dialog name each document's instrument from the derived `citedInstrumentLabel`, and the Reference screen states
+  every group's share, base and source, printing `Modelled` where no official figure exists. The whole ladder is
+  green on the final bytes (**313/313 tests across 24 files, 10/10 Playwright**, 0 console errors and 0
+  off-origin requests per test).
+  **Do not re-fetch any figure; every one is recorded above and in `docs/PLATFORM_ENRICHMENT_PLAN.md`.** The
+  deeper research remains **DONE** and written to that plan (Phase AC): **20 new stakeholder groups → 36 in
+  total** (**20** with a real published share, **16** explicitly `Modelled`), plus **real citable instruments for
+  each of the 16 departments** (Banking Act [Chapter 24:20], Education Act [Chapter 25:04], Electricity Act
+  [Chapter 13:19], Mines and Minerals Act [Chapter 21:05], Traditional Leaders Act [Chapter 29:17], War Veterans
+  Act [Chapter 11:15], and the Constitution (Amendment No. 20) Act, 2013) — **all of them now in the code and
+  shown in the interface (E-3, E-4).**
+  **The next action is AB-4 — "AI 'Draft the policy'"** (the department prompt library, grounding, citation
+  verification and provenance), the next unfinished item in the agreed order in *Phase AB — the funding plan*
+  above. It must obey the mock-first rule (`.clinerules/02-mock-first-policy.md`): the drafting generator sits
+  behind the same swappable seam the assessment service already uses, so **scenario mode keeps working with no
+  runtime network**, and every placeholder is listed in `PRODUCTION_READINESS.md`. After AB-4: **AB-5** (the
+  reference-rate reconciliation and the short named-source statement — the share/source half is already delivered
+  by E-4), then **AB-7, the final Claude prompt, which MUST be last**. AB-3 is DONE via E-3 + E-4, and AB-6 is
+  already DONE.
   **Never invent a share — an official figure or the `Modelled` label, nothing in between; and never print a
   chapter the index did not confirm.**
   **AB-1 is finished and verified** (its own section above holds the evidence: pixel-pinned strokes, per-group
