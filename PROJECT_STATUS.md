@@ -2758,12 +2758,12 @@ dependency was added or removed**. `dist/` was rebuilt.
 
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`; the defect sweep is committed on top of `8f4d4c3` (Batch E) and
-  `3645764` (Batch F)**, with `5a918ea` (Batch G, the four defect fixes) as the last code commit and a docs
-  commit after it (run `git log --oneline -8 | cat` for the exact tip, which is the second opinion on
-  state). Working tree clean. Baseline `main` is untouched at
-  `7451db0`; `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*.
-  Everything is committed, so a cold session can start from this file alone.
+- **Branch `feature/unified-platform`; the tip is `1d7c5d3`** — the stale-document sweep (six false
+  statements corrected at source; validate checks 11 and 12 added). It sits on `76a38d3`, which recorded
+  Batches A–G, the deploy and the retirements; the last **code** commit before it was `5a918ea` (Batch G).
+  Run `git log --oneline -8 | cat` as the second opinion on state. **Working tree clean.** Baseline `main`
+  is untouched at `7451db0`; `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER
+  in *Known-red*. Everything is committed, so a cold session can start from this file alone.
 - **THE LIVE SITE IS NOW THIS BUILD.** `nzwisiso.bitflex.app` serves `assets/index-BeggQU9V.js`, the same
   file `npm run build` emits — verified by fetching the served file and hashing it:
   `c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`, identical to the local
@@ -2775,6 +2775,13 @@ dependency was added or removed**. `dist/` was rebuilt.
   then `npx playwright test` — expected **all green** (**369/369 tests across 31 files**, **11/11** Playwright,
   validate **13/13**: the `--destructive` known-red is **retired**, and the two checks added in this
   defect sweep cover the *retired document statements* and the *deployment claim and its evidence*).
+- **The order of what remains. (1) Put the 63 department indicator values to the user** — it is the only
+  BLOCKED item; it needs their decision plus 63 real per-department figures that are not in this
+  repository, and by the agreed order it must be settled **before AB-7**. **(2) Then AB-7, the final
+  Claude prompt** — the funding memo, the pitch deck and the one-page ask — by rewriting
+  `docs/PROPOSAL_PROMPT.md` down from the six-document version to three. **AB-7 is the last item, and
+  nothing follows it.** The goal, the dropped items and the decision rules are in the **Phase AB**
+  section below.
 - **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
   FIRST (it is below, in the phase list).** It holds: the goal in the user's words (*"we just want to get
   this platform funded … this is just a tool that will help each department research and draft policies"*),
