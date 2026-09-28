@@ -143,6 +143,48 @@ if (!disclaimerSources.length) {
   const ok = disclaimerSources.filter((f) => /prepared for decision support|not a definitive forecast/i.test(readFileSync(f, "utf8")));
   check("decision-support disclaimer present", ok.length ? [] : disclaimerSources.map((f) => `${rel(f)} does not contain the disclaimer`));
   if (ok.length) notes.push(`INFO  disclaimer found in: ${ok.map(rel).join(", ")}`);
+
+// The served HTML duplicates the brand summary by hand — a static file cannot import
+// TypeScript. That duplication cannot be removed without a build step, so instead the
+// two copies are CHECKED against each other, turning a silent drift into a failed build.
+{
+  const brandPath = join(ROOT, "src/config/brand.ts");
+  const htmlPath = join(ROOT, "index.html");
+  const drift = [];
+  if (existsSync(brandPath) && existsSync(htmlPath)) {
+    const brandText = readFileSync(brandPath, "utf8");
+    const html = readFileSync(htmlPath, "utf8");
+    const declared = [
+      ...html.matchAll(/(?:name|property)="(?:description|og:description)"[^>]*content="([^"]*)"/g),
+    ].map((m) => m[1]);
+    // brand.ts builds the sentence from concatenated literals, so strip the whitespace,
+    // quotes and join operators from the statement and compare the bare sentence. The
+    // anchor is a line-start two-space indent followed by a word character OR a comment
+    // slash, so the capture stops at the field's own comma and can never run into the
+    // COMMENT above or below it (both of which mention "description").
+    const statement =
+      (brandText.match(/\n  description:([\s\S]*?)\n  (?=[\w/])/) || [])[1] || "";
+    const owned = statement.includes('"')
+      ? statement.replace(/[\s"+]/g, "").replace(/,$/, "")
+      : "";
+    const bare = (value) => value.replace(/\s+/g, "");
+
+    if (!owned) drift.push("no description found in src/config/brand.ts to check the served HTML against");
+    else if (declared.length === 0) drift.push("index.html declares no description or og:description to check");
+    else {
+      declared.forEach((value) => {
+        if (bare(value) !== owned) {
+          drift.push(
+            `index.html description "${value}" does not match BRAND.description in src/config/brand.ts — update both or neither`,
+          );
+        }
+      });
+    }
+  }
+  check("served HTML description matches the brand description", drift);
+}
+
+
 }
 
 // 9 — print rules present once report actions exist
@@ -207,6 +249,11 @@ if (!existsSync(cssPath)) {
     ["gold rule on the tinted surface", "gold-rule", 1, "primary-tint", 3],
     ["gold rule on the page canvas", "gold-rule", 1, "background", 3],
     ["brand gold on green (masthead rule, wordmark)", "gold", 1, "primary", 3],
+    // ENFORCED since the defect sweep: this pair used to be printed as a KNOWN-RED note
+    // at 3.73:1. The token was darkened to 4 80% 48% and the pair moved into the
+    // enforced set, so a regression now fails the build rather than being reported.
+    ["danger text on a card (risk state, error copy)", "destructive", 1, "card", 4.5],
+    ["white on danger (destructive buttons)", "destructive-foreground", 1, "destructive", 4.5],
   ];
   const contrastHits = [];
   const measured = [];
@@ -244,16 +291,17 @@ if (!existsSync(cssPath)) {
       measured.map((line) => `    ${line}`).join("\n"),
   );
 
-  // Known-red, deliberately NOT enforced: recorded so it stays visible every run
-  // without the landing-page work silently taking ownership of the whole app's
-  // danger colour. See PROJECT_STATUS.md "Known-red".
+  // The old KNOWN-RED note for --destructive as text on --card is RETIRED: that pair is
+  // now enforced in PAIRS above, because the token was darkened and the app-wide risk of
+  // changing it was accepted. It is kept here only as a guard that the pair really is
+  // being measured, so the note can never quietly revert to being informational.
   if (declared.destructive && declared.card) {
-    notes.push(
-      `INFO  KNOWN-RED (not enforced)  --destructive as text on --card measures ` +
-        `${contrastOf(toRgb(declared.destructive), toRgb(declared.card)).toFixed(2)}:1 (needs 4.5:1). ` +
-        `Out of scope for the landing page: it is the workspace risk-state colour and also drives ` +
-        `destructive buttons app-wide.`,
-    );
+    const ratio = contrastOf(toRgb(declared.destructive), toRgb(declared.card));
+    if (ratio < 4.5) {
+      contrastHits.push(
+        `danger text on a card regressed to ${ratio.toFixed(2)}:1 — the token is what fixed this, not a check exemption`,
+      );
+    }
   }
 }
 

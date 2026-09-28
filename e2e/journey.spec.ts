@@ -371,6 +371,31 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
    * sideways scrollbar. A real viewport at a real width is the only honest way to
    * prove either: the classes compile whether or not they fit.
    */
+  /**
+   * The primary action must be reachable without scrolling on the phone, because the
+   * Minister's first look at this page may well be a link opened on a phone. The
+   * authority line was compacted (two short columns instead of four stacked lines)
+   * rather than trimmed, and this test measures the result at a real width instead of
+   * trusting the classes.
+   */
+  test("the primary action is above the fold on a phone", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    const action = page.getByRole("link", { name: "Choose your Department" }).first();
+    await expect(action).toBeVisible();
+
+    const box = await action.boundingBox();
+    expect(box, "the primary action has a box").not.toBeNull();
+    const viewportHeight = page.viewportSize()?.height ?? 844;
+    const bottom = (box?.y ?? 0) + (box?.height ?? 0);
+    console.log(`PHONE-FOLD: primary action bottom edge at ${Math.round(bottom)}px of ${viewportHeight}px`);
+    expect(bottom, "the primary action sits within the first screen of a phone").toBeLessThanOrEqual(
+      viewportHeight,
+    );
+  });
+
+
   test("the engine explanation fits a phone viewport with no sideways scroll", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");

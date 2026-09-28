@@ -111,14 +111,14 @@ export default function Landing() {
           mistake. */}
       <section
         aria-labelledby="authority-heading"
-        className="mb-10 rounded-lg border bg-primary-tint p-5 sm:p-6"
+        className="mb-4 rounded-lg border bg-primary-tint p-3 sm:mb-10 sm:p-6"
       >
-        <div className="grid gap-4 sm:grid-cols-2 sm:gap-8">
+        <div className="grid gap-3 sm:grid-cols-2 sm:gap-8">
           <div>
             <SectionRule />
             <h2
               id="authority-heading"
-              className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-primary"
+              className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-primary sm:mt-3"
             >
               {BRAND.proposalLabel}
             </h2>
@@ -126,13 +126,29 @@ export default function Landing() {
               {BRAND.initiativeDescription}
             </p>
           </div>
+          {/* On a phone the four lines below are laid out in two short columns rather
+              than stacked, so the line costs about half the height it used to without
+              losing a word. Removing any of it was never an option: the Minister is
+              the reason the line is here at all. */}
           <div className="sm:border-l sm:border-border sm:pl-8">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              Ministerial champion
-            </h3>
-            <p className="mt-1.5 text-sm font-semibold text-foreground">{BRAND.ministerialChampion}</p>
-            <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">{BRAND.entityCustodian}</p>
-            <p className="mt-2 text-xs text-muted-foreground">{BRAND.poweredBy}</p>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-2 sm:block">
+              <div>
+                <h3 className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground sm:text-xs">
+                  Ministerial champion
+                </h3>
+                <p className="mt-1 text-xs font-semibold text-foreground sm:mt-1.5 sm:text-sm">
+                  {BRAND.ministerialChampion}
+                </p>
+              </div>
+              <div>
+                <p className="mt-0 text-[10px] leading-snug text-muted-foreground sm:mt-0.5 sm:text-xs">
+                  {BRAND.entityCustodian}
+                </p>
+                <p className="mt-1 text-[10px] text-muted-foreground sm:mt-2 sm:text-xs">
+                  {BRAND.poweredBy}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -149,23 +165,26 @@ export default function Landing() {
           {/* The initiative is the government capability; Nzwisiso AI is the platform. */}
           <h1
             id="landing-heading"
-            className="mt-3 text-balance text-[1.875rem] font-bold uppercase leading-[1.15] tracking-[0.02em] text-foreground sm:text-[2.25rem]"
+            className="mt-3 text-balance text-[1.875rem] font-bold uppercase leading-[1.1] tracking-[0.02em] text-foreground sm:leading-[1.15] sm:text-[2.25rem]"
           >
             {BRAND.initiative}
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">{BRAND.poweredBy}</p>
+          <p className="mt-1 text-sm text-muted-foreground sm:mt-2">{BRAND.poweredBy}</p>
           {/* The primary supporting statement, then what the platform provides. */}
-          <p className="mt-5 max-w-xl text-pretty text-lg font-medium leading-relaxed text-foreground sm:text-xl">
+          <p className="mt-3 max-w-xl text-pretty text-lg font-medium leading-relaxed text-foreground sm:mt-5 sm:text-xl">
             {BRAND.summary}
           </p>
-          <p className="mt-3 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-2 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:mt-3">
             {BRAND.description}
           </p>
 
           {/* ONE primary action. The secondary link that used to sit beside it was
               removed: two side-by-side actions left the page without an obvious next
-              step. The section it pointed at is still linked from the footer nav. */}
-          <div className="mt-8">
+              step. The section it pointed at is still linked from the footer nav.
+
+              On a phone the gap above it is tighter, because the first screen is the
+              only screen a reader is guaranteed to see. */}
+          <div className="mt-4 sm:mt-8">
             <Button asChild size="lg" className="h-11 px-5 text-sm">
               <Link to="/start">
                 Choose your Department

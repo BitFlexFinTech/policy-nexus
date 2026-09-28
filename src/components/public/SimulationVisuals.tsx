@@ -69,17 +69,22 @@ export const KNOWLEDGE_MAP_LINE =
     .join("");
 
 /**
- * The five scale indicators, in the order they are read. Deliberately a mix of
- * magnitudes (the modelled agent count, "Multiple", "Hundreds") and capabilities
- * — the point is the scale and the complexity of the simulated environment, not
- * a metric set. The agent count is the one figure that is now a real modelled
- * number rather than a placeholder: it is read from the representative structure
- * the schematic draws, so the words and the field behind them agree.
+ * The five scale indicators, in the order they are read. Two of them are now MEASURED
+ * from the representative structure the schematic draws — the agent count and the
+ * number of structural relationships — and the number of groups is counted from it
+ * too. The remaining two are capabilities, not magnitudes.
+ *
+ * This replaced a hand-written "Hundreds" for relationships, which the structure did
+ * not support: it draws 32. A figure a reader can count is worth more than a word
+ * that overstates it, and the words and the drawing behind them now cannot disagree.
  */
 export const SIMULATION_SCALE = [
   { figure: SIMULATED_AGENT_FIGURE, label: "Simulated agents" },
-  { figure: "Multiple", label: "Stakeholder groups" },
-  { figure: "Hundreds", label: "Relationships" },
+  {
+    figure: String(PREVIEW_STRUCTURE.nodes.filter((node) => node.kind === "stakeholder").length),
+    label: "Stakeholder groups",
+  },
+  { figure: String(PREVIEW_STRUCTURE.edges.length), label: "Structural relationships" },
   { figure: "Scenario-based", label: "Interactions" },
   { figure: "Structured", label: "Policy assessment" },
 ] as const;
