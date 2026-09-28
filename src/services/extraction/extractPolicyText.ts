@@ -4,15 +4,20 @@
  * REAL for plain text: a `.txt` file is read in the browser and its own text
  * becomes the policy text of the run.
  *
- * NOT EXTRACTED: `.pdf` and `.docx` uploads. Reading those needs a parser or a
- * server, and neither exists in this build, so the file is recorded by name and
- * the screen says plainly that it was not read — rather than showing a progress
- * bar that implies it was. Nothing here makes a network call, and nothing here
- * reads a clock, so the same file always yields the same result
+ * REAL for Word: a `.docx` file is unpacked in the browser (see `./docxText`) and
+ * its own paragraphs become the policy text of the run. No server, no dependency,
+ * no network call.
+ *
+ * NOT EXTRACTED: `.pdf`. Reading a PDF needs a parser or a server, and neither
+ * exists in this build, so the file is recorded by name and the screen says plainly
+ * that it was not read — rather than showing a progress bar that implies it was.
+ * Nothing here makes a network call, and nothing here reads a clock, so the same
+ * file always yields the same result
  * (see .clinerules/04-determinism-and-validation.md and PRODUCTION_READINESS.md §4).
  */
 
 import { liveService } from "@/config/platform";
+import { readDocxText } from "./docxText";
 import { requestTextExtraction } from "./httpExtractionClient";
 
 export type ExtractionKind = "text" | "pdf" | "docx" | "unsupported";
@@ -128,10 +133,42 @@ export const extractPolicyFile = async (file: File): Promise<ExtractedPolicyFile
     return { ...base, kind, extracted: true, text, status: "Text extracted." };
   }
 
+  if (kind === "docx") {
+    // REAL PATH — unpacked in the browser, with no server and no dependency. Tried
+    // before the configured service, because it needs nothing configured to work.
+    try {
+      const text = normalisePolicyText(await readDocxText(file));
+      if (text) {
+        return {
+          ...base,
+          kind,
+          extracted: true,
+          text,
+          status: "Text extracted from the Word document in this browser.",
+        };
+      }
+    } catch (error) {
+      // A genuine failure is reported in plain words, then the service is offered a
+      // chance below — never disguised as "not read".
+      const reason = error instanceof Error ? error.message : "The Word document could not be opened.";
+      const live = liveService("extraction");
+      if (!live) {
+        return {
+          ...base,
+          kind,
+          extracted: false,
+          text: "",
+          status: `Not read — ${reason}`,
+        };
+      }
+    }
+  }
+
   if (kind === "pdf" || kind === "docx") {
     // LIVE PATH: only reachable when an administrator has completed the
-    // extraction capability in platform administration. Otherwise the file is
-    // recorded by name and the screen says so.
+    // extraction capability in platform administration, or when the local Word
+    // reader above could not open the file. Otherwise the file is recorded by name
+    // and the screen says so.
     const live = liveService("extraction");
     if (live) {
       const label = kind.toUpperCase();
@@ -171,7 +208,10 @@ export const extractPolicyFile = async (file: File): Promise<ExtractedPolicyFile
       kind,
       extracted: false,
       text: "",
-      status: `Text extraction (Mock) — recorded by name; ${kind.toUpperCase()} text is not read in this build.`,
+      status:
+        kind === "docx"
+          ? "Not read — the Word document held no readable text in its body."
+          : "Text extraction (Mock) — recorded by name; PDF text is not read in this build.",
     };
   }
 

@@ -71,12 +71,15 @@ describe("policy file extraction", () => {
     expect(result.status).toMatch(/\(Mock\)/);
   });
 
-  it("does not read a .docx and says so plainly", async () => {
+  it("reads a .docx from a real Word file, and says plainly when it cannot", async () => {
+    // The specification CHANGED in BATCH D: a .docx is now read in the browser. The
+    // end-to-end gates for that live in `src/test/docx-read.test.ts`. What must still
+    // hold here is that a file that cannot be opened is never claimed to have been read.
     const result = await extractPolicyFile(makeFile("brief.docx", "PK"));
     expect(result.kind).toBe("docx");
     expect(result.extracted).toBe(false);
-    expect(result.status).toContain("DOCX");
-    expect(result.status).toMatch(/\(Mock\)/);
+    expect(result.text).toBe("");
+    expect(result.status).toMatch(/^Not read — /);
   });
 
   it("makes no network call for any file type", async () => {
