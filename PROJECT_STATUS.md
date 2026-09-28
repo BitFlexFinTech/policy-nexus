@@ -2024,7 +2024,7 @@ SUPERSEDED by this decision** — it must be rewritten down to three documents a
 | # | Item | Status |
 |---|---|---|
 | **AB-1** | **Graph quality and per-group colour** (the graph only — *not* the platform palette) | **DONE — verified this session (see below)** |
-| **AB-2** | **More stakeholder groups, with real ZIMSTAT weights** | **DEFERRED at the user's instruction (2026-09-28)** — the user chose *"Retrieve more official Zimbabwe figures first (AB-6), then decide the groups and their weights afterwards"*. Do NOT add groups until AB-6 is done. The group list is still an open decision |
+| **AB-2** | **More stakeholder groups, with real ZIMSTAT weights** | **UNBLOCKED — all the figures it needed are now retrieved (2026-09-28, see AB-6b).** Real official shares exist for public administration 82,040 · education 148,470 · health 61,358 (2022 census, Table 6.6) and the diaspora 908,914. **The remaining decision is the user's: which groups to add.** Once that is given, the weights are set from these figures, and any segment without an official share is labelled **modelled**. |
 | **AB-3** | **Real reference documents** for the departments shown in the demo | NOT STARTED |
 | **AB-4** | **AI "Draft the policy"** — department prompt library, grounding, citation verification, provenance | NOT STARTED |
 | **AB-5** | **"Real data, and where it comes from"** — a short named-source statement on the platform, and the reference-rate reconciliation | NOT STARTED |
@@ -2144,6 +2144,67 @@ split formal 29.9% · informal 39.5% · household 5.7% · agriculture 24.8%**. E
 development partners, women-led enterprises, local authorities) still has **no official share** among these
 sources and would need either a further retrieval or a clearly-labelled **modelled** weight. That is the
 choice AB-2 now faces.
+
+#### AB-6b — second retrieval (2026-09-28): the industry-level shares and the diaspora — all FOUND
+
+**Status: DONE.** Retrieved at the user's direction after AB-6, because AB-2 needs these before any weight can
+be set. **The source that settled it is ZIMSTAT's own 2022 census main report,
+`zimstat.co.zw/wp-content/uploads/Census/2022_PHC_Report_27012023_Final.pdf` (259 pages), Table 6.6 —
+"Distribution of Employed Persons by Industry and Sex" (p.190).** It answers the three items the QLFS charts
+could not, because the QLFS draws them as images while the census prints them as a table.
+
+**Employed persons by industry, 2022 census (Table 6.6; total employed 2,501,887):**
+
+| Industry (named exactly as ZIMSTAT names it) | Total |
+|---|---|
+| Agriculture, forestry and fishing | 582,138 |
+| Wholesale trade; retail trade; repair of motor vehicles | 443,742 |
+| Manufacturing | 257,740 |
+| Mining and quarrying | 227,079 |
+| **Education** | **148,470** |
+| Administrative and support service activities | 142,257 |
+| Construction | 128,186 |
+| Activities of households as employers (domestic) | 88,204 |
+| Transportation and storage | 87,730 |
+| **Public administration and defence; compulsory social security** | **82,040** |
+| Other service activities | 79,634 |
+| **Human health and social work activities** | **61,358** |
+| Professional, scientific and technical activities | 51,478 |
+| Accommodation and food service activities | 40,921 |
+| Information and communication | 22,747 |
+| Insurance activities | 16,282 |
+| Financial activities | 15,768 |
+| Arts, entertainment and recreation | 9,978 |
+| Water supply; sewerage, waste management and remediation | 7,140 |
+| Electricity, gas, steam and air conditioning supply | 5,614 |
+| Real estate activities | 2,712 |
+| Activities of extraterritorial organizations and bodies | 669 |
+| **Total** | **2,501,887** |
+
+The same table carries the sex split: public administration 54,108 male / 27,932 female · education 58,574
+male / 89,896 female · health 20,499 male / 40,859 female · mining 207,072 male / 20,007 female.
+
+**Diaspora — FOUND, officially (same report, Tables 3.6–3.14).** The 2022 census counted **908,914
+emigrants** (536,999 male · 371,915 female) from **520,240 households**. By destination: **South Africa
+773,246** · Botswana 47,928 · United Kingdom 23,166 · Mozambique 9,477 · Other European countries 8,754 ·
+United States 8,565 · Asian countries 6,965 · Australia 6,473 · Other African countries 6,207 · Namibia 5,660 ·
+Zambia 5,076 · Canada 3,420 · China 2,067 · Malawi 1,080, remainder small. **74.8% of emigrants were aged
+15–34** (679,589 of 908,914) — a real and striking figure. 84% had left for employment.
+**The disagreement is recorded rather than smoothed over:** independent estimates put the diaspora at
+**3–5 million** (Wikipedia: "generally accepted at over 5 million", range 4–7 million; a World Bank blog says
+"more than 3 million"), and **FactCheckZW (2022) states the available data "cannot be substantiated"**.
+The **ZIMSTAT census count of 908,914 is treated as the authoritative figure** (the national statistics
+office's own count, with a stated method); any larger number is presented as an *independent estimate*, never
+as official. The gap is understood to be under-reporting of undocumented emigrants, not a fault in the method.
+
+**Also confirmed from the same report:** population in private households 15,115,479 · households 3,818,734 ·
+average household size 4.0.
+
+**Why this matters for AB-2:** official shares now exist for all three of the items the user named
+(**public administration, education, health**) and for the diaspora, plus mining, manufacturing, trade,
+agriculture, finance, insurance, ICT, transport, construction and accommodation. Only a few segments
+(civil servants as distinct from general public administration, local authorities, development partners,
+exporters, women-led enterprises, youth) still rest on a **modelled** weight, and each will be labelled as such.
 
 #### AB-1 — the graph, diagnosed from the code so a cold session does not re-derive it
 
@@ -2336,11 +2397,14 @@ measurement test). **No file was deleted, no dependency or schema changed, and `
   model — do not resurrect them), the graph diagnosis with the exact current stroke values, the agreed
   graph-only colour exemption, and the **official Zimbabwean figures already gathered** so they are never
   re-researched.
-- **The next action, exactly:** **AB-6 is DONE (2026-09-28)** — all four figures retrieved and recorded in the
-  *AB-6 — retrieved in this session* section above; **do not re-fetch them**. The next action is **AB-2 — more
-  stakeholder groups, with real ZIMSTAT weights**, and it is **waiting on one user decision**: which groups to
-  add, and how to weight the ten segments that have no official share. **Do not add a group or invent a weight
-  before that decision is given.**
+- **The next action, exactly:** **AB-6 and AB-6b are DONE (2026-09-28)** — every figure is retrieved and
+  recorded in the two *AB-6* sections above; **do not re-fetch them.** The next action is **AB-2 — more
+  stakeholder groups, with real ZIMSTAT weights.** The data that was blocking it is gone: official shares now
+  exist for **public administration 82,040 · education 148,470 · health 61,358 · diaspora 908,914 · mining
+  227,079 · manufacturing 257,740 · trade 443,742 · agriculture 582,138 · financial+insurance 32,050 · ICT
+  22,747 · transport 87,730 · construction 128,186** (2022 census, Table 6.6). **The group list is still the
+  user's decision** — ask which groups to add, then set the weights from these figures. **Never invent a weight
+  for a segment with no official share: label it modelled.**
   **AB-1 is finished and verified** (its own section above holds the evidence: pixel-pinned strokes, per-group
   colour, per-kind shape, a shape-first legend, the measured before/after, and the four mutated gates). Read
   `src/config/reference.ts` (`STAKEHOLDER_SEGMENTS` — **16** today) and `src/config/departments.ts` (which
