@@ -33,6 +33,16 @@ export default function Simulations() {
             ? `Completed runs for this department are listed first; each opens to its executive summary. The ${VOCABULARY.simulationCore} is deterministic, so re-running identical inputs reproduces the same result.`
             : `No simulation has been run for this department yet. Each row below is a policy draft prepared for the ${VOCABULARY.simulationCore}; results appear in this register once a draft is run.`}
         </p>
+        {runs.length >= 2 && (
+          <p className="mt-2">
+            <Link
+              to={`/app/compare/${encodeURIComponent(runs[1].id)}/${encodeURIComponent(runs[0].id)}`}
+              className="text-xs font-medium text-primary hover:underline"
+            >
+              Compare the two most recent runs →
+            </Link>
+          </p>
+        )}
       </header>
 
       {runs.length > 0 && (
