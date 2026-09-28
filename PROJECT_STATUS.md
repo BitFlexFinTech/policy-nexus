@@ -2311,9 +2311,11 @@ measurement test). **No file was deleted, no dependency or schema changed, and `
   verified in a real browser against the live origin (2/2 checks, 0 console errors, 0 off-origin
   requests, SSL token intact). To publish any further change: `npm run build`, then the `.env`-based
   FTPS `mirror -R dist .` command below.
-- **Branch:** `feature/unified-platform` · **HEAD:** `c5ee2ef` (`feat(phase-ab)` — the graph drawn in
-  pixels), followed by the `docs(phase-ab)` record commit — always run `git rev-parse HEAD` rather than
-  trusting this line. `tree:` clean. **Phase AB-1 is the last code change.** The previous two commits were
+- **Branch:** `feature/unified-platform` · **HEAD: always run `git rev-parse HEAD`** rather than trusting
+  this line; `git log --oneline -6 | cat` is the second opinion on state. The AB-1 sequence is
+  `c5ee2ef` (`feat(phase-ab)` — the graph drawn in pixels) → `b87d0b4` (its record) → `2d5a92f` (the
+  measured stroke widths moved into the code comment), each followed by the `docs(phase-ab)` commits in
+  this file. `tree:` clean. **Phase AB-1 is the last code change.** The two commits before it were
   `81e7e21` (`feat(phase-ab)` — the graph colour foundation) and `2094248` (`docs(phase-ab)` — the funding
   plan). Earlier functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B ·
   `6b69dfb` Phase C · Phase D = the commit whose message begins `feat(phase-d)` · Phase J =
