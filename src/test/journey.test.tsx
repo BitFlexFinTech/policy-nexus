@@ -172,6 +172,18 @@ describe("journey — run a policy, then read its assessment", () => {
     ["Preamble", "1. Objective", "2. Scope and application", "3. Policy measures"].forEach((heading) => {
       expect(screen.getByRole("heading", { name: heading })).toBeInTheDocument();
     });
+    // AB-4: the draft states the instruments it rests on, and where it came from.
+    expect(screen.getByRole("heading", { name: "8. Citations" })).toBeInTheDocument();
+    expect(
+      screen.getByText(/Public Finance Management Act \[Chapter 22:19\]/),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Provenance" })).toBeInTheDocument();
+    expect(screen.getByText("Produced by")).toBeInTheDocument();
+    // The provenance row names the producer exactly; the notice above says it in a sentence.
+    expect(screen.getByText("The Nzwisiso simulation core (Mock)")).toBeInTheDocument();
+    expect(
+      screen.getByText(/listed in clause 8 — every one checked against the instrument table/),
+    ).toBeInTheDocument();
     ["Print", "Save as PDF", "Download Word", "Share"].forEach((label) => {
       expect(screen.getByRole("button", { name: label })).toBeInTheDocument();
     });

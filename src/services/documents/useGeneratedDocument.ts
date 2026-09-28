@@ -4,6 +4,7 @@ import { describeCapability } from "@/config/platform";
 import { usePlatformConfig } from "@/config/usePlatformConfig";
 import { buildLongReport, buildPolicyDraft } from "@/services/assessment/documents";
 import type { AssessmentRun, GeneratedDocument } from "@/services/assessment/types";
+import { buildDraftingGrounding, type DraftingSource } from "./drafting";
 import { remoteDraftingClient } from "./remoteDraftingClient";
 
 export type DocumentKind = "report" | "policy-draft";
@@ -13,6 +14,11 @@ export interface GeneratedDocumentResult {
   /** True only while the configured drafting service is answering. */
   pending: boolean;
   error: string | null;
+  /**
+   * Who produced the document. The same value the provenance record is built from, so a
+   * reader is never told a document came from somewhere it did not.
+   */
+  source: DraftingSource;
 }
 
 /**
@@ -24,6 +30,9 @@ export interface GeneratedDocumentResult {
  * drafting capability on, it waits for the service instead and reports what
  * happened — and a failure is reported as a failure, never replaced by the local
  * text dressed up as the model's answer.
+ *
+ * Either way the department's grounding is assembled here from its own configuration
+ * and handed to whichever implementation is active.
  */
 export const useGeneratedDocument = (
   kind: DocumentKind,
@@ -43,20 +52,31 @@ export const useGeneratedDocument = (
     [kind, run, department],
   );
 
+  const grounding = useMemo(
+    () => (run && department ? buildDraftingGrounding(run, department) : null),
+    [run, department],
+  );
+
   const key = run ? `${kind}:${run.id}` : "";
   const [fetched, setFetched] = useState<
     { key: string; document?: GeneratedDocument; error?: string } | null
   >(null);
 
+  const serviceSource: DraftingSource = useMemo(
+    () => ({ producer: "configured-service", model: config.drafting.model }),
+    [config.drafting.model],
+  );
+  const localSource: DraftingSource = useMemo(() => ({ producer: "local-generator" }), []);
+
   useEffect(() => {
     const client = live ? remoteDraftingClient() : null;
-    if (!client || !run || !key) {
+    if (!client || !run || !grounding || !key) {
       setFetched(null);
       return;
     }
     let active = true;
     client
-      .generate({ kind, model: "", run })
+      .generate({ kind, model: "", run, grounding })
       .then((document) => {
         if (active) setFetched({ key, document });
       })
@@ -72,11 +92,16 @@ export const useGeneratedDocument = (
     return () => {
       active = false;
     };
-  }, [live, key, kind, run]);
+  }, [live, key, kind, run, grounding]);
 
-  if (!live) return { document: simulated, pending: false, error: null };
+  if (!live) return { document: simulated, pending: false, error: null, source: localSource };
   if (fetched && fetched.key === key) {
-    return { document: fetched.document ?? null, pending: false, error: fetched.error ?? null };
+    return {
+      document: fetched.document ?? null,
+      pending: false,
+      error: fetched.error ?? null,
+      source: serviceSource,
+    };
   }
-  return { document: null, pending: true, error: null };
+  return { document: null, pending: true, error: null, source: serviceSource };
 };

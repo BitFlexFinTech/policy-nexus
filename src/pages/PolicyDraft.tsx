@@ -7,6 +7,7 @@ import { RunError, RunNotFound, RunPending } from "@/components/assessment/Asses
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
 import { findDepartment } from "@/config/departments";
 import { renderDocumentText } from "@/services/assessment/documents";
+import { buildDraftingProvenance, verifyDocumentCitations } from "@/services/documents/drafting";
 import { useGeneratedDocument } from "@/services/documents/useGeneratedDocument";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
 
@@ -19,7 +20,10 @@ import { useRun } from "@/services/assessment/useAssessmentRuns";
  * The draft is editable in place. Unedited it is fully deterministic (the same
  * run always yields the same text); editing is local state only, and whatever is
  * in the box is exactly what Print / Save as PDF / Download Word / Share export.
- * No network call is made.
+ *
+ * AB-4: the screen also states the draft's provenance — who produced it, from what
+ * inputs, and whether every citation it lists was checked against the platform's
+ * cited-instrument table. With nothing configured, no network call is made.
  */
 export default function PolicyDraft() {
   const params = useParams();
@@ -31,10 +35,23 @@ export default function PolicyDraft() {
     document: generated,
     pending: documentPending,
     error: documentError,
+    source,
   } = useGeneratedDocument("policy-draft", run, department);
   const generatedText = useMemo(
     () => (generated ? renderDocumentText(generated) : ""),
     [generated],
+  );
+
+  const verification = useMemo(
+    () => (generated && department ? verifyDocumentCitations(generated, department) : null),
+    [generated, department],
+  );
+  const provenance = useMemo(
+    () =>
+      run && department && verification
+        ? buildDraftingProvenance(run, department, verification, source)
+        : null,
+    [run, department, verification, source],
   );
 
   // null means "still the generated text". A string means the officer has edited it.
@@ -49,6 +66,32 @@ export default function PolicyDraft() {
 
   const isEdited = edited !== null;
   const text = edited ?? generatedText;
+
+  const provenanceRows: ReadonlyArray<[string, string]> = provenance
+    ? [
+        [
+          "Produced by",
+          source.producer === "local-generator"
+            ? `The ${VOCABULARY.simulationCore} (Mock)`
+            : `The configured drafting service — ${provenance.model}`,
+        ],
+        ["Run reference", provenance.reference],
+        ["Seed", provenance.seed],
+        ["Reference date", provenance.referenceDate],
+        [
+          "Grounded in",
+          `${provenance.groupsModelled} modelled groups · ${provenance.indicatorsUsed} reference indicators`,
+        ],
+        [
+          "Citations",
+          `${provenance.instrumentsCited} listed in clause 8 — ${
+            provenance.citationsVerified
+              ? "every one checked against the instrument table"
+              : "some could not be verified"
+          }`,
+        ],
+      ]
+    : [];
 
   return (
     <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
@@ -66,8 +109,30 @@ export default function PolicyDraft() {
 
       <div className="rounded-lg border border-warning/40 bg-warning/5 p-3 text-xs leading-relaxed text-foreground">
         {DISCLAIMER.short} This document is a starting text for the responsible officer to edit — it is
-        not an adopted instrument. It was generated locally by the {VOCABULARY.simulationCore} (Mock).
+        not an adopted instrument.{" "}
+        {source.producer === "local-generator"
+          ? `It was generated locally by the ${VOCABULARY.simulationCore} (Mock).`
+          : `It was produced by the configured drafting service (${provenance?.model}).`}
       </div>
+
+      {provenance && (
+        <section className="rounded-lg border bg-card p-3">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Provenance
+          </h3>
+          <dl className="mt-1.5 grid gap-1 sm:grid-cols-2">
+            {provenanceRows.map(([label, value]) => (
+              <div
+                key={label}
+                className="flex items-baseline justify-between gap-3 border-b border-border/60 pb-1 text-[10px] last:border-0"
+              >
+                <dt className="uppercase tracking-wide text-muted-foreground">{label}</dt>
+                <dd className="text-right text-foreground">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
 
       <DocumentActions
         document={{ title: generated.title, text, fileStem: generated.fileStem }}

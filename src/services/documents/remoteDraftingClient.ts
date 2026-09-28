@@ -11,6 +11,7 @@
 
 import { liveService, type CapabilityConfig } from "@/config/platform";
 import type { AssessmentRun, GeneratedDocument, GeneratedSection } from "@/services/assessment/types";
+import type { DraftingGrounding } from "./drafting";
 
 export type DraftingKind = "report" | "policy-draft";
 
@@ -19,6 +20,13 @@ export interface RemoteDraftingRequest {
   /** Model or route name the administrator chose. */
   model: string;
   run: AssessmentRun;
+  /**
+   * The department's grounding: its mandate, priorities, modelled groups with the share
+   * each carries, the instruments it may cite, and the document structure it must
+   * produce. A service is given exactly what the local generator is given, so swapping
+   * the two cannot change what a draft is allowed to rest on.
+   */
+  grounding: DraftingGrounding;
 }
 
 const isObject = (value: unknown): value is Record<string, unknown> =>

@@ -18,6 +18,12 @@ import type { Department } from "@/config/departments";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
 import { REFERENCE_DATE_LABEL } from "@/config/reference";
 import { createRng } from "@/lib/prng";
+import {
+  assertCitationsVerified,
+  citationsSectionFor,
+  provenanceParagraphs,
+  verifyDocumentCitations,
+} from "@/services/documents/drafting";
 import type {
   AssessmentRun,
   GeneratedDocument,
@@ -360,32 +366,56 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
     listStyle: "clauses",
   };
 
-  const note: GeneratedSection = {
+  const citations = citationsSectionFor(department);
+
+  const note = (paragraphs: string[]): GeneratedSection => ({
     id: "note",
     heading: "Note on this draft",
-    paragraphs: [
-      `This is a drafted instrument produced from simulation ${run.reference}. It is a starting text for the responsible officer to edit; it is not an adopted policy and not legal drafting advice.`,
-      DISCLAIMER.long,
-    ],
-  };
+    paragraphs,
+  });
 
-  return {
-    kind: "policy-draft",
+  const noteBase: string[] = [
+    `This is a drafted instrument produced from simulation ${run.reference}. It is a starting text for the responsible officer to edit; it is not an adopted policy and not legal drafting advice.`,
+    DISCLAIMER.long,
+  ];
+
+  const core: GeneratedSection[] = [
+    preamble,
+    objective,
+    scope,
+    measures,
+    mitigation,
+    engagement,
+    transitional,
+    monitoring,
+    citations,
+  ];
+
+  const identity = {
+    kind: "policy-draft" as const,
     title: `Draft policy — ${run.policyTitle}`,
     subtitle: `${department.name} · derived from ${run.reference} · reference date ${REFERENCE_DATE_LABEL}`,
     fileStem: `${run.reference}-policy-draft`,
-    sections: [
-      preamble,
-      objective,
-      scope,
-      measures,
-      mitigation,
-      engagement,
-      transitional,
-      monitoring,
-      note,
-    ],
   };
+
+  // The provenance sentence states how many citations were verified, so it is written
+  // from the check of the document's own citations clause. The closing note carries no
+  // citation of its own, which is why the note may be written after the check below.
+  const verification = verifyDocumentCitations(
+    { ...identity, sections: [...core, note(noteBase)] },
+    department,
+  );
+
+  const document: GeneratedDocument = {
+    ...identity,
+    sections: [...core, note([...noteBase, ...provenanceParagraphs(run, department, verification)])],
+  };
+
+  // Fail-closed: a draft that names an instrument outside the department's register, or a
+  // chapter no known citation carries, is not returned at all.
+  assertCitationsVerified(document, department);
+
+  return document;
 };
 
 /* ------------------------------------------------------------------------- */

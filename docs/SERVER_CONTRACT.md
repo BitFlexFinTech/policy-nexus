@@ -65,8 +65,37 @@ Also required by the same client:
 ## 2. Drafting service — `POST <drafting endpoint>`
 
 ```json
-{ "kind": "report" | "policy-draft", "model": "…", "run": { …the completed AssessmentRun… } }
+{
+  "kind": "report" | "policy-draft",
+  "model": "…",
+  "run": { …the completed AssessmentRun… },
+  "grounding": {
+    "departmentId": "fin",
+    "departmentName": "…",
+    "reference": "FIN-02",
+    "seed": "…",
+    "referenceDate": "24 September 2026",
+    "policyTitle": "…",
+    "policyText": "…",
+    "horizonLabel": "Medium term",
+    "indicators": [ { "label": "…", "value": 0, "unit": "…", "source": "…" } ],
+    "groups": [ { "id": "…", "label": "…", "share": "38.6% of …", "source": "…" } ],
+    "instruments": [ { "id": "banking-act", "citation": "Banking Act [Chapter 24:20]", "source": "…" } ],
+    "prompt": {
+      "departmentId": "fin",
+      "instructions": "…the department's own prompt…",
+      "citations": [ "Banking Act [Chapter 24:20]", "…" ],
+      "structure": [ "Preamble", "1. Objective", "…", "8. Citations", "Note on this draft" ]
+    }
+  }
+}
 ```
+
+`grounding` is the department's own evidence, assembled from the platform's configuration
+(`src/config/draftingPrompts.ts`, `departments.ts`, `reference.ts`, `instruments.ts`) and
+handed to the local generator and to this service alike — so swapping the two cannot change
+what a draft is allowed to rest on. `prompt.citations` is the closed list a draft may cite;
+`prompt.structure` is the section list it must produce.
 
 Expected: **200** with a complete `GeneratedDocument`
 (`src/services/assessment/types.ts`): `kind`, `title`, `subtitle`, `fileStem`, and a
@@ -74,7 +103,10 @@ non-empty `sections` array whose entries each carry `id`, `heading` and
 `paragraphs` (optionally `bullets`, `listStyle`).
 
 The platform rejects a document with no sections rather than rendering an empty
-instrument.
+instrument, **and verifies every citation before the draft is shown**: any instrument
+that is not in `prompt.citations`, any `[Chapter …]` marker no listed citation carries,
+and any title belonging to another department's register is reported and the document is
+refused rather than presented as verified.
 
 ## 3. Document text extraction — `POST <extraction endpoint>`
 

@@ -10,7 +10,9 @@ import {
   isGeneratedDocument,
   remoteDraftingClient,
 } from "@/services/documents/remoteDraftingClient";
+import { buildDraftingGrounding } from "@/services/documents/drafting";
 import type { AssessmentRequest, AssessmentRun } from "@/services/assessment/types";
+import { getDepartment } from "@/config/departments";
 
 /** Local addresses only, so no reachable remote address appears in this file. */
 const ASSESSMENT = "http://localhost:8787/assess";
@@ -49,6 +51,9 @@ const run: AssessmentRun = {
 };
 
 const request: AssessmentRequest = { departmentId: "fin", policyText: "A draft", source: "paste" };
+
+/** The department's grounding, assembled exactly as the screen assembles it. */
+const grounding = buildDraftingGrounding(run, getDepartment("fin"));
 
 const document = {
   kind: "report" as const,
@@ -133,17 +138,22 @@ describe("remote drafting client", () => {
     vi.stubGlobal("fetch", fetchMock);
     const client = createRemoteDraftingClient(service(DRAFTING));
 
-    await expect(client.generate({ kind: "report", model: "", run })).resolves.toMatchObject({
+    await expect(client.generate({ kind: "report", model: "", run, grounding })).resolves.toMatchObject({
       fileStem: "FIN-01-report",
     });
     const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(JSON.stringify(init.body)).toContain("model-1"); // falls back to the configured model
+    // AB-4: the service is handed the department's own prompt, its allowed citations and
+    // the grounding the local generator uses — not just the raw run.
+    const body = JSON.parse(String(init.body)) as { grounding: { prompt: { citations: string[]; instructions: string } } };
+    expect(body.grounding.prompt.instructions).toContain("Ministry of Finance");
+    expect(body.grounding.prompt.citations).toContain("Public Finance Management Act [Chapter 22:19]");
   });
 
   it("refuses an incomplete document", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, json: async () => ({ kind: "report" }) })));
     const client = createRemoteDraftingClient(service(DRAFTING));
-    await expect(client.generate({ kind: "report", model: "m", run })).rejects.toThrow(
+    await expect(client.generate({ kind: "report", model: "m", run, grounding })).rejects.toThrow(
       /complete document/,
     );
   });
