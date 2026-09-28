@@ -46,9 +46,13 @@ export const GRAPH_INK = "#111827";
  * Stroke weights, in REAL SCREEN PIXELS. Every stroke that uses one of these is drawn
  * with `vector-effect="non-scaling-stroke"`, so a line keeps the same weight however
  * small the card is scaled. Before this, weights were expressed in the 1000×750 virtual
- * space and multiplied by the card's scale: at roughly a 0.5 scale a 1.5-unit outline
- * became 0.75 real pixels and anti-aliased into grey, which is the "low quality" that
- * was reported. `src/test/graph-palette.test.ts` keeps these in a usable pixel band.
+ * space and multiplied by the card's scale. MEASURED in Chromium before the fix, at
+ * 1280 / 900 / 640 px: the card rendered at scale 0.445 / 0.792 / 0.532 and a mark's
+ * 1.25-unit outline painted **0.56 / 0.99 / 0.67 real pixels**, anti-aliasing into grey —
+ * that is the "low quality" that was reported. After the fix the same measurement reads
+ * 2 px / 1.25 px / 1.36 px at every one of those widths.
+ * `src/test/graph-palette.test.ts` keeps these in a usable pixel band, and
+ * `e2e/journey.spec.ts` re-measures the painted widths in a real browser.
  */
 export const GRAPH_EDGE_STROKE = 1;
 /** How much a stronger relationship thickens its edge, on top of the base weight. */
