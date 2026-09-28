@@ -1,7 +1,10 @@
 import { findDepartment } from "@/config/departments";
 import { BRAND, DISCLAIMER, SOVEREIGNTY_STATEMENT, VOCABULARY } from "@/config/brand";
 import {
+  getNamedSource,
   MODELLED_SHARE_LABEL,
+  NAMED_SOURCES,
+  NAMED_SOURCE_STATEMENT,
   REFERENCE_DATE_LABEL,
   REFERENCE_FISCAL_YEAR,
   REFERENCE_RATES,
@@ -45,11 +48,31 @@ export default function Reference() {
                 <td className="py-1.5 pr-3 align-top whitespace-nowrap font-mono text-foreground">
                   {rate.value} {rate.unit}
                 </td>
-                <td className="py-1.5 align-top text-muted-foreground">{rate.note}</td>
+                <td className="py-1.5 align-top text-muted-foreground">
+                  {rate.note}
+                  <span className="block text-[10px]">
+                    {getNamedSource(rate.sourceId).name} · {rate.sourceDetail} · as at {rate.asOf}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </section>
+
+      <section className="rounded-lg border bg-card p-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Named sources</h3>
+        <p className="mt-1 text-xs leading-relaxed text-foreground">{NAMED_SOURCE_STATEMENT}</p>
+        <ul className="mt-2 space-y-1.5">
+          {NAMED_SOURCES.map((source) => (
+            <li key={source.id} className="text-xs text-foreground">
+              {source.name}
+              <span className="block text-[10px] text-muted-foreground">
+                {source.figures} · {source.publication}
+              </span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="rounded-lg border bg-card p-3">

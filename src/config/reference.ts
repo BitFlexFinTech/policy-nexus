@@ -16,30 +16,102 @@ export const REFERENCE_DATE_LABEL = "24 September 2026";
 /** The fiscal year the department indicators are stated for. */
 export const REFERENCE_FISCAL_YEAR = "2026";
 
+/** The one word used wherever a share is modelled rather than published. */
+export const MODELLED_SHARE_LABEL = "Modelled";
+
 /**
- * Reference rates. These are labelled reference inputs, not live market data.
+ * NAMED SOURCES (AB-5). One entry per body the platform's own figures come from,
+ * so a figure can never appear without saying who publishes it. The reference
+ * rates point here by `id` and the reference screen prints this list, so a source
+ * cannot be named on one screen and missing from the other.
+ *
+ * `figures` says what the body publishes; `publication` names the publication.
+ */
+export const NAMED_SOURCES = [
+  {
+    id: "zimstat",
+    name: "Zimbabwe National Statistics Agency (ZIMSTAT)",
+    figures: "Population, household, labour, poverty and inflation figures",
+    publication:
+      "2022 Population and Housing Census; Quarterly Labour Force Survey; monthly price statistics",
+  },
+  {
+    id: "rbz",
+    name: "Reserve Bank of Zimbabwe",
+    figures: "The official ZiG exchange rate and the bank policy rate",
+    publication: "Published exchange-rate and interest-rate statistics",
+  },
+  {
+    id: "acts-index",
+    name: "veritaszim A–Z List of Acts (official consolidated index)",
+    figures: "The title and chapter of every Act the platform cites",
+    publication: "The official consolidated index of Zimbabwean Acts",
+  },
+] as const;
+
+export type NamedSourceId = (typeof NAMED_SOURCES)[number]["id"];
+
+/** Look-up helper so callers never index into the array by position. */
+export const getNamedSource = (id: NamedSourceId) => {
+  const source = NAMED_SOURCES.find((s) => s.id === id);
+  if (!source) throw new Error(`Unknown named source: ${id}`);
+  return source;
+};
+
+/**
+ * The named-source statement (AB-5). Each sentence is a rule the platform
+ * actually follows, so it stays true whatever the data does. It is rendered on
+ * the reference screen by the "Named sources" section.
+ */
+export const NAMED_SOURCE_STATEMENT =
+  "Stakeholder shares are ZIMSTAT's published 2022 census figures, each naming the figure and the " +
+  "base it is a share of; where no official figure exists the share is labelled " +
+  `${MODELLED_SHARE_LABEL} rather than estimated. The reference inputs name the body that publishes ` +
+  "them and the period the figure is for. Every instrument cited in a department's documents is a " +
+  "real Zimbabwean Act, named from the consolidated Acts index.";
+
+/**
+ * Reference rates — the published figures the workspace states as its assumptions.
+ *
+ * AB-5: each one names the body that publishes it (`sourceId` → NAMED_SOURCES) and
+ * the period the figure is for (`asOf`), so no rate can be shown as an unattributed
+ * number. The values are the published figures themselves, not the platform's own
+ * guesses: the earlier 13.56 ZiG, 19.5% policy rate and 8.4% inflation were stale
+ * placeholders that matched no published figure and contradicted the inflation
+ * release — they were reconciled to the sources in AB-5.
+ *
  * The live-feed swap point is documented in PRODUCTION_READINESS.md §5.
  */
 export const REFERENCE_RATES = [
   {
     id: "zig-usd",
     label: "ZiG exchange rate",
-    value: 13.56,
+    value: 26.85,
     unit: "ZiG per USD",
-    note: "Reference input used for all currency conversion in this workspace.",
+    asOf: "September 2026",
+    sourceId: "rbz",
+    sourceDetail: "Official weighted-average exchange rate",
+    note: "Used for currency conversion in this workspace.",
   },
   {
     id: "policy-rate",
-    label: "Policy rate",
-    value: 19.5,
+    label: "Bank policy rate",
+    value: 30,
     unit: "% per annum",
+    asOf: "September 2026",
+    sourceId: "rbz",
+    sourceDetail:
+      "Benchmark lending rate, set at the Monetary Policy Committee meeting of 15 June 2026 and in force since",
     note: "Reference input for financing-cost assumptions.",
   },
   {
     id: "inflation",
-    label: "Annual inflation",
-    value: 8.4,
-    unit: "% year on year",
+    label: "Inflation rate",
+    value: 0.25,
+    unit: "%",
+    asOf: "August 2026",
+    sourceId: "zimstat",
+    sourceDetail: "National consumer price inflation",
     note: "Reference input for purchasing-power assumptions.",
   },
 ] as const;
@@ -60,9 +132,6 @@ const SHARE_BASE_POPULATION = "people counted in Zimbabwe in the 2022 census (15
 const SHARE_BASE_POPULATION_5PLUS = "people aged 5 and over counted in the 2022 census (13,102,643)";
 /** A fourth base: the labour-force survey counts employed people on its own definition, so its total differs. */
 const SHARE_BASE_QLFS_EMPLOYED = "employed persons counted in the QLFS Q2 2025 (3,186,598)";
-
-/** The one word used wherever a share is modelled rather than published. */
-export const MODELLED_SHARE_LABEL = "Modelled";
 
 /**
  * Canonical stakeholder segments. These are the population groups the
