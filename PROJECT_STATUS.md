@@ -2580,12 +2580,18 @@ measurement test). **No file was deleted, no dependency or schema changed, and `
   `src/components/relationship/RelationshipGraphCard.tsx` (how it is drawn) before touching the graph**,
   then `src/components/public/SimulationVisuals.tsx` (the derived figure).
   Measured in a real browser in **AB-1**, superseding the Phase AA figures: the public page shows
-  **2,763 agents over 140 marks** (the compact cap exactly, at both 1440 px and 390 px); a
-  Finance-department run shows **15 / 15 entities**, **2,495 agents over 274 marks**, captioned *"Each
-  mark stands for about 8 agents"*. (Before Phase S that same card drew **15 circles** and said
-  "1,000+".)
+  **2,763 agents over 140 marks** (the compact cap exactly, at both 1440 px and 390 px) — **still exactly
+  true after E-2**, because the population total is seeded from the run, not from the group list, and the
+  compact cap is unchanged. **E-2 did change the group split, so the entity, relationship and mark counts
+  moved.** Measured from the code itself in E-2: the public preview now draws **8 group marks over 305
+  full-card agent marks**, captioned *"Each mark stands for about 9 agents — 2,763 simulated across the
+  modelled groups."*, and a Finance run now draws **17 entities · 40 relationships** (1 policy + 4 priorities
+  + 4 corpus + **8** stakeholder groups — it was **15 · 32** when Finance modelled 6 groups). A Finance run's
+  *agent total* is seeded from the draft's own text, so it differs draft to draft: AB-1's browser draft
+  modelled **2,495 agents over 274 marks**, while Finance's first preset measured **2,918 agents over 293
+  marks** in E-2. (Before Phase S that same card drew **15 circles** and said "1,000+".)
   Open item, flagged not fixed: the scale strip still reads *"Hundreds · Relationships"* while a run
-  draws 32 structural relationships.
+  draws 40 structural relationships.
 - **Phase S is the current state of the run view and the public "Simulated population" block**
   (Phase AA changed what the block *draws* and what the graph *models*; everything else stands).
   Inside a run (`/app/simulations/:id`) the left column is the **Graph Relationship Visualization**
