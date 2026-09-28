@@ -2504,7 +2504,9 @@ re-anchored to the mark classes), `src/test/network.test.ts` (the legend guard n
 measurement test). **No file was deleted, no dependency or schema changed, and `dist/` was rebuilt.**
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`, HEAD `87ec018`, working tree clean.** Baseline `main` is untouched at
+- **Branch `feature/unified-platform`; the E-1 work is committed as `87ec018`** (followed by the docs commit that
+  recorded this line — run `git log --no-pager --oneline -3` for the exact tip, which is the second opinion on
+  state). Working tree clean. Baseline `main` is untouched at
   `7451db0`; `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*.
   Everything is committed, so a cold session can start from this file alone.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
