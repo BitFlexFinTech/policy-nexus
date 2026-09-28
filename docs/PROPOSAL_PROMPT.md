@@ -294,11 +294,14 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is Part 1 of this prompt's output.
-- **The live site is current as at 2026-09-28.** The host `nzwisiso.bitflex.app` was redeployed that day
-  and serves `assets/index-BeggQU9V.js`, so the authority line, the modelled agent population and the
-  named sources are all on the live host. (The paragraph that used to sit here told the reader to
-  "deploy before you present" because the live site was a much older build; that is no longer true, and
-  the prompt below is being rewritten down to three documents under **AB-7** in `PROJECT_STATUS.md`.)
+- **What the live site actually is today (checked 2026-09-28).** The host `nzwisiso.bitflex.app` serves
+  `assets/index-BeggQU9V.js`, and that bundle **does** carry the authority line, the modelled agent
+  population and the named sources — so it is a real demonstration, not the stale build the older
+  paragraphs warned about. **But it is behind the current code**: Phases AD R1, AD R2 and AE rebuilt the
+  bundle after that deploy, so the live host shows the earlier Coat of Arms and has no favicon set, while
+  a local `npm run build` emits `assets/index-Cz472pbV.js`. **Do not tell anyone the live site is the
+  finished build until `R7` redeploys it** (`R7` is recorded in `PROJECT_STATUS.md`). The prompt below is
+  still to be rewritten down to three documents under **AB-7**.
 
 ---
 

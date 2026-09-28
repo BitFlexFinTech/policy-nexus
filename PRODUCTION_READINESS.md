@@ -96,6 +96,12 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
+- **Status today (2026-09-28, after Phase AE): the live host is behind this build.** Phases AD R1, AD R2
+  and AE rebuilt the bundle after that deploy, so `npm run build` now emits `assets/index-Cz472pbV.js`
+  while the live host **serves** `assets/index-BeggQU9V.js`
+  (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`). Until **R7** redeploys, the
+  deployed site is **not** the current platform: it shows the earlier Coat of Arms and carries no
+  favicon set.
 
 ## 6d. Verified in a real browser (Phase K — report + drafted policy)
 - `npx playwright test` → **5/5**: the 4 Phase H journeys plus one that opens **Open full report**

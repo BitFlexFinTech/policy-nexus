@@ -1446,6 +1446,15 @@ because the block it sits in already names itself.
 | 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (Phase AD R1, final bytes) | **ALL GREEN**: validate **PASS — all checks green** (13 checks) · typecheck **exit 0** · lint **0 errors** (the same 7 pre-existing warnings in `src/components/ui/**`) · **379/379 across 32 files** — the 369 before R1 plus its 10 gates · build **✓**, emitting `assets/index-DZDVvf8v.js` (a new bundle, so validate check 12 now prints the local build beside the live bundle as INFO — the live host is behind until R7 redeploys, and that is stated rather than hidden) |
 | 2026-09-28 | `npx playwright test` (Phase AD R1, final bytes) | **PASS — 11 passed (28.1 s)** against the production preview, 0 console errors and 0 off-origin requests per test. The migration changed a field name, a label and six sentences, so the end-to-end journey needed re-running and it holds |
 | 2026-09-28 | **R2 — real published figures retrieved and written in** (Phase AD) | **13 of the 63 indicators now carry a published figure**, all from one named publication fetched this session in its own words: **World Bank Open Data → World Development Indicators** (dataset last updated 2026-07-13). Every value was read from the World Bank's own API during the session, never from memory: electricity access **62% of population (2024)** · terrestrial protected areas **28.3% of land (2025)** · forest area **44.7% of land (2023)** · mobile cellular subscriptions **94.2 per 100 (2024)** · fixed broadband subscriptions **1.9 per 100 (2024)** · primary net enrolment **94.1% (2013)** · pupil–teacher ratio **36.4:1 (2013)** · measles immunisation **90% (2024)** · basic drinking water **67.2% of population (2024)** · basic sanitation **34.6% of population (2024)** · ores and metals exports **33.8% of merchandise exports (2024)** · personal remittances received **US$3.51bn (2024)** · tertiary enrolment **7.7% gross (2024)**. Six indicators were **re-framed to the published measure** rather than quietly re-valued, because the published series measures something different from the earlier wording: "Population mobile coverage" → **Mobile subscriptions**, "Broadband penetration" → **Fixed broadband subscriptions**, "Urban water availability" → **Basic drinking water access**, "Sewerage coverage" → **Basic sanitation access**, "Forest cover change" (no published figure for the change) → **Forest area**, "Mining share of exports" → **Ores and metals share of exports**. Each indicator's bar score was set to its published value, so the bar cannot contradict the number. **Two figures are old and the app says so:** primary enrolment and the pupil–teacher ratio are the **2013** values, because no later Zimbabwean figure exists in that series. **The other 50 stay labelled `Modelled`** and are researched further in R3–R5; anything that cannot be matched to a named publication stays modelled rather than being filled with a guess. **Files:** `src/config/departments.ts` (the 13 indicator lines) and `src/config/reference.ts` (one new `NAMED_SOURCES` entry, and the fourth clause of the sourcing statement) |
+| 2026-09-28 | **Phase AE-1 delivered** (the official Coat of Arms, and a real favicon set) | **Changed — 3 repo files, 3 new assets.** `src/assets/zimbabwe-coat-of-arms.png` **replaced** (356,613 bytes, 1024×1024 RGBA, transparent) — it had been a *different, stylised* drawing (691,264 bytes). `public/favicon.ico` **replaced** (7,335 bytes; 16/32/48 — it had been a single 256 px icon, 20,373 bytes). `index.html` gained the four icon declarations; its `description` and `og:description` were **not touched** (validate checks them against `BRAND.description`). **New:** `public/favicon-32.png` (2,304 B), `public/favicon-192.png` (39,955 B), `public/apple-touch-icon.png` (24,249 B). Source: Wikimedia Commons `File:Coat of arms of Zimbabwe.svg`, fetched this session at **448,046 bytes — the exact size the Commons API reports for that file**; rendered once at 1024×1024 transparent with the project's own Playwright/Chromium, every other size derived with Pillow. Scratch scripts live in `/tmp/coa/`, outside the repo |
+| 2026-09-28 | **Phase AE-2 delivered** ("Digitalize Zimbabwe" pilot case, written into the proposal) | **Changed — 1 repo file.** `docs/PROPOSAL_PROMPT.md`: a new verified-facts block on the programme, opening *"Use these facts and no others"*; **honesty rail 6** (do not invent programme detail); **Part 1 gains section 5 "The pilot case — Digitalize Zimbabwe"**, with old sections 5–10 renumbered to 6–11 and the endorsement risk added to the risk section and the programme's owning office added to the consultation section; **Part 2** deck spine gains the pilot slide; **Part 5** now opens by naming the pilot and folds the endorsement into the ask; **checklist item 8** added as a gate; and a **Research record** below `END OF THE PROMPT` (fact-to-source table + "What could not be confirmed" + method note). **Eight sourced facts from three publications** (263Chat ×3, ZimEye, TechAfrica News ×4) plus Herald headlines verified present in the Google News index. **The `firecrawl-search` skill was invoked; the `firecrawl` CLI is not installed on this machine** — recorded rather than glossed over |
+| 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (Phase AE, final bytes) | **ALL GREEN**: validate **PASS — all checks green**, all 13 checks, including *deployment claim stated, agreed and evidenced* after `docs/PROPOSAL_PROMPT.md` was edited · typecheck **exit 0** · lint **0 errors** (the same 7 pre-existing warnings, all in `src/components/ui/**`) · **379/379 across 32 files** — unchanged from R1, because AE added no tests · build **✓**, emitting `assets/index-Cz472pbV.js` and `assets/zimbabwe-coat-of-arms-B6JLUdpD.png`, with all four icon files copied into `dist/` verbatim |
+| 2026-09-28 | `npx playwright test` (Phase AE, final bytes) | **PASS — 11 passed**, 0 console errors and 0 off-origin requests per test — so the new `<link rel="icon">` declarations introduce no failed request |
+| 2026-09-28 | the four icon routes served from the **production preview** (Phase AE) | **PASS** — `/favicon.ico` → `200 image/x-icon 7335 bytes`; `/favicon-32.png` → `200 image/png 2304 bytes`; `/favicon-192.png` → `200 image/png 39955 bytes`; `/apple-touch-icon.png` → `200 image/png 24249 bytes` |
+| 2026-09-28 | rendered `/` and `/app` in real Chromium and inspected the images (Phase AE) | **PASS** — the public masthead and the workspace header bar both draw the **official** arms (the two kudu, the wavy chief, the red star with the bird, `UNITY · FREEDOM · WORK`); the header bar still reads `Nzwisiso AI · PSC · Public Service Commission`, `Entry: one-click (Mock)` and `Scenario engine (Scenario mode)`; **0 console errors** |
+| 2026-09-28 | **defect inventory (Phase AE session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. **(1) A false statement in this file.** RESUME HERE told a cold session to expect **369/369 tests across 31 files**, while this file's own Phase AD R1 row records **379/379 across 32 files** — the number was stale by the ten gates R1 had added. Corrected in RESUME HERE. **(2) The wrong national arms were on screen.** `src/assets/zimbabwe-coat-of-arms.png` was a stylised drawing (banner reading "ZIMBABWE", one eagle above the shield) displayed under `alt="Zimbabwe Coat of Arms"` inside a masthead headed `Government of Zimbabwe`. Replaced with the official artwork from its Wikimedia source, and the favicon set derived from the same render. **(3) Not a defect but worth naming:** `index.html` declared **no icon at all** — the tab icon worked only because browsers request `/favicon.ico` implicitly, and no 192 px or iOS icon existed. Both now declared. **The gate for (2):** the artwork is one file used in all four icon sizes and all three on-screen placements, so a re-introduced wrong drawing would have to be a deliberate act on that one file; the four icon routes are verifiable in one command, run above |
+
+
 
 
 ### Phase AB-6 — the defect sweep and the simulation-power batches (2026-09-28)
@@ -1528,6 +1537,92 @@ whole of `src/**`; and the drafted policy writes a modelled baseline as modelled
 expected 9 to be less than or equal to 8`; (2) putting "Published department measures" back on the
 engine vitals → **3 gates failed** (the rendered text, the source-text scan and the derived split).
 `sha256` before and after: `5b7a66a4…` (departments.ts) and `2f6922b9…` (EngineStatus.tsx), unchanged.
+### Phase AE — the official Coat of Arms, and the "Digitalize Zimbabwe" pilot case (2026-09-28, requested by the user this session)
+
+**Requested by the user, verbatim:** *"use the attached image for the logo across the platform and the
+favicon"* and *"we need to highlight how this projcet would be a great pilot program for the Digitalize
+Zimbabwe initiative. do deep research on this and how best to include it in the proposal"*.
+
+Two batches. **AE-1 is DONE and verified; AE-2 is DONE and verified.**
+
+#### AE-1 — the national Coat of Arms replaces a stylised drawing
+
+The user attached the **official Coat of Arms of Zimbabwe**. The asset the platform had been using —
+`src/assets/zimbabwe-coat-of-arms.png`, in place since the baseline — was a **different, stylised
+drawing** (a banner reading "ZIMBABWE", a single eagle above the shield). Everywhere it appeared it was
+labelled `alt="Zimbabwe Coat of Arms"`, inside a masthead headed `Government of Zimbabwe`. Displaying a
+non-official drawing of the national arms under that heading is a misstatement of national identity, so
+it is **fixed at source**, not documented.
+
+The attached artwork is Wikimedia Commons **`File:Coat of arms of Zimbabwe.svg`** (the official arms:
+the two kudu, the wavy chief, the Great Zimbabwe bird on the red star, `UNITY · FREEDOM · WORK`). It was
+fetched from Wikimedia's own servers this session — **448,046 bytes, which is the size the Commons API
+reports for that file** — rendered once with the project's own Playwright/Chromium at 1024×1024 on a
+**transparent background**, and every other size derived from that single render with Pillow, so the
+masthead, the tab icon and the iOS icon cannot disagree:
+
+| File | Size | Where it is used |
+|---|---|---|
+| `src/assets/zimbabwe-coat-of-arms.png` | 1024×1024, RGBA, transparent | the workspace header bar (`h-8 w-8`), the public masthead (`h-10 w-10`), the public footer — **same imports, same layout boxes, only the artwork changed** |
+| `public/favicon.ico` | 16 / 32 / 48 in one ICO | browser tabs, pinned tabs, older browsers |
+| `public/favicon-32.png` | 32×32, RGBA | modern tabs |
+| `public/favicon-192.png` | 192×192, RGBA | Android / PWA |
+| `public/apple-touch-icon.png` | 180×180, RGB on white | iOS home screen (iOS composites its own tile, so transparency is deliberately not used) |
+
+`index.html` now declares all four icons. **Nothing else in that file changed** — the description and
+`og:description` that validate checks against `BRAND.description` are byte-for-byte untouched.
+
+The rendering script and the Pillow script live in **`/tmp/coa/`**, outside the repository, so no scratch
+tooling was added to the project. The three placement sites were **not** expanded: the user asked for the
+logo they already show to be the right one. Adding the arms to the generated/exported documents is a
+separate, deliberate decision and has **not** been made.
+
+
+#### AE-2 — "Digitalize Zimbabwe": the pilot case, researched and written into the proposal
+
+**The programme is real and named.** Research this session established that **Digitalize Zimbabwe** is a
+named initiative of the **Ministry of Information Communication Technology, Postal and Courier
+Services**, launched by **Hon. Tatenda A. Mavetera, MP** at **Domboshava in April 2024**, with a stated
+**2030** horizon; that the **Presidential Internet Scheme** and the **Digitalize Zimbabwe Magazine** were
+unveiled at that launch; that **Cabinet approved the Presidential Internet Scheme in April 2025** for
+**all 2,400 administrative wards** (LEO satellite and fibre, reaching schools, information centres,
+police stations, health institutions, traditional leaders' homesteads, agriculture extension offices and
+courts); that **8,000 Starlink kits** for schools and a **free public Wi-Fi programme** followed (January
+2026); and that in **June 2026 the Government launched the National Artificial Intelligence Strategy**
+("AI for Impact") with an **AI Grand Challenge**, naming **healthcare, agriculture, education and
+financial inclusion** as its priority sectors. **Eight sourced facts, from three publications** — 263Chat
+(three articles), ZimEye and TechAfrica News (four articles) — **plus Herald headlines confirmed present
+in the Google News index whose article text could not be read**, because the Herald blocks automated
+access.
+
+**How it was included — six edits to `docs/PROPOSAL_PROMPT.md`, not one add-on:**
+
+1. A new fact block, **"The national programme this belongs to — 'Digitalize Zimbabwe' (verified
+   facts)"**, placed immediately after the platform's own fact list and opening with *"Use these facts
+   and no others"*.
+2. A new honesty rail (**rail 6**): do not invent anything about the programme; ask for what is missing.
+3. **Part 1 (the Cabinet memorandum) gains section 5, "The pilot case — Digitalize Zimbabwe"** — arguing
+   the fit in the programme's own terms, quoting the programme's own words, and **closing on the
+   boundary**: this is a proposal to the programme's owners, not an announcement of their decision.
+4. **Part 2 (the pitch deck)** gains a dedicated slide in the spine: *why this is the pilot for
+   Digitalize Zimbabwe*, carrying the no-endorsement line.
+5. **Part 5 (the stated ask)** now **opens by naming the pilot**, and the ask explicitly includes **the
+   programme's endorsement** alongside funding and hosting.
+6. **The hand-over checklist gains item 8** — a gate: if any statement in the pack implies the programme
+   has already adopted the platform, the pack fails.
+
+A **Research record** was added below `END OF THE PROMPT`: a fact-to-source table, a **"What could not be
+confirmed"** list (no public text of the AI Strategy, the Cybersecurity Strategy or the Smart Zimbabwe
+2030 Strategy was found; no reachable official Digitalize Zimbabwe web presence — `digitalize.gov.zw`
+does not resolve and `ictministry.gov.zw` now serves unrelated commercial content; no budget, owning
+office or pilot-intake process), and an honest **method note** recording that the **firecrawl** skill was
+invoked but **`firecrawl` is not installed on this machine**, so direct HTTP requests to the publications
+and the Google News index were used instead.
+
+**Deliberately not done:** the **AB-7** restructure of `docs/PROPOSAL_PROMPT.md` from five documents to
+three is **still outstanding and still last** — see the R8 row in Phase AD. The pilot material was added
+in a way that survives that rewrite unchanged.
+
 ## Known-red / open items
 
 - **RESOLVED in the defect sweep (Batches A–G): four items that used to be listed here are fixed.**
@@ -1580,7 +1675,7 @@ engine vitals → **3 gates failed** (the rendered text, the source-text scan an
   hashed, and the local `dist/assets/index-BeggQU9V.js` hashes to the same value, so the deployed bundle
   is **byte-for-byte the local build** (`dist/index.html` references the same file). Confirmed again in
   the E-4 session by fetching the served file and comparing the two hashes. The fetch also confirms every
-  marker of this session's work is in it: "Named sources", "Draft read:", "Scenario
+  marker of that session's work is in it: "Named sources", "Draft read:", "Scenario
   assumptions", "Compare two drafts", "Structural relationships", and "population-weighted support
   index" — with **no** vendor terminology (MiroFish / OASIS / Puter all absent). The deploy was
   `lftp` over explicit FTPS on port 21, `mirror -R --only-newer` into the account's web root,
@@ -1590,6 +1685,13 @@ engine vitals → **3 gates failed** (the rendered text, the source-text scan an
   cannot `cd` into — the account is already chrooted to the web root, so the mirror lands correctly
   from the login directory; the harmless "550 Can't change directory" line is recorded here so the next
   session does not chase it.
+- **STATUS TODAY (2026-09-28, after Phase AE): the live host is behind this build.** Everything above was
+  true when it was written. Phases AD **R1**, AD **R2** and **AE** have rebuilt the bundle since, so
+  `npm run build` now emits **`assets/index-Cz472pbV.js`** while the live host still serves
+  **`assets/index-BeggQU9V.js`** (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`).
+  **Do not describe the deployed site as current until `R7` redeploys it** — and note that it currently
+  shows the *earlier* Coat of Arms and carries no favicon set. `npm run validate` prints the difference
+  as an INFO line, so this can never drift in silence.
 - **RESOLVED (Phase Z) — the run path is asynchronous, so every capability is now connected.**
   `AssessmentService` returns promises (`buildRun`/`run`/`getRun`/`listRuns`), and `assessmentService`
   is a **dispatcher** that chooses the simulated engine or the live service at the moment of the
@@ -2804,13 +2906,42 @@ the two honest notes).
 `src/index.css`, the route map, the determinism rules, `LICENSE` / `NOTICE`, and `package.json` — **no
 dependency was added or removed**. `dist/` was rebuilt.
 
+## Files touched in Phase AE (the official Coat of Arms, and the "Digitalize Zimbabwe" pilot case)
+
+**Changed — 3 code/config assets and 1 document.** `src/assets/zimbabwe-coat-of-arms.png` (**replaced**:
+356,613 bytes, 1024×1024 RGBA transparent — the official arms, from Wikimedia Commons
+`File:Coat of arms of Zimbabwe.svg`, 448,046 bytes, the exact size the Commons API reports).
+`public/favicon.ico` (**replaced**: 7,335 bytes, 16/32/48 — the old one was a single 256 px icon, 20,373
+bytes). `index.html` (the four icon declarations). `docs/PROPOSAL_PROMPT.md` (the pilot case).
+
+**New — 3 repo files.** `public/favicon-32.png` (2,304 B), `public/favicon-192.png` (39,955 B),
+`public/apple-touch-icon.png` (24,249 B; 180×180 RGB on white, because iOS composites its own tile).
+
+**Status documents.** `PROJECT_STATUS.md` (the Phase AE section, seven verification-log rows including the
+defect inventory, and RESUME HERE) and `PRODUCTION_READINESS.md` §6c — **four false deployment statements
+corrected**: the Known-red DEPLOYED entry's "byte-for-byte the local build", the K‑row's "THE LIVE SITE IS
+NOW THIS BUILD", §6c's "the same value as the local build", and `docs/PROPOSAL_PROMPT.md`'s "the live site
+is current". Each now says plainly that the deployed host is still on `assets/index-BeggQU9V.js` while the
+local build emits `assets/index-Cz472pbV.js`, so **the deployed site is behind** until R7.
+
+**Not in the repo, deliberately:** the Wikimedia SVG itself, and the render and Pillow scripts, live in
+`/tmp/coa/` — no scratch tooling, and no second copy of the artwork, was added to the project. The artwork
+exists once, in the one file every icon size and all three placements are derived from.
+
+**Not changed, deliberately:** the emerald/gold palette, Inter + JetBrains Mono, `src/components/ui/**`,
+`src/index.css`, the route map, the determinism rules, `LICENSE` / `NOTICE`, and `package.json` — **no
+dependency was added or removed**. No component was rewritten: the three placements keep their existing
+imports and layout boxes, and only the pixels behind them changed. `dist/` was rebuilt.
+
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`.** The two commits to know are **`f4e253f`** (Phase AD **R1** — the
-  indicator basis and its 11 gates) and **`bde486d`** (Phase AD **R2** — 13 real published figures), on top
-  of `0d6a670` and the stale-document sweep `1d7c5d3` before that. **Run `git log --oneline -8 | cat` as
-  the second opinion on state**, and treat any commit after `bde486d` that touches only documents as part
-  of the same record. **Working tree clean.** Baseline `main` is untouched at `7451db0`; `origin/main` is
+- **Branch `feature/unified-platform`.** The commits to know are **`bde486d`** (Phase AD **R2** — 13 real
+  published figures) and **`f4e253f`** (Phase AD **R1** — the indicator basis and its 11 gates), then
+  **`8512e9f`** (the status commit that recorded both), then Phase AE: **`8dea07a`** (AE-1 — the official
+  Coat of Arms and the favicon set) and **`09c2ef8`** (AE-2 — the Digitalize Zimbabwe pilot case), with the
+  status commit that carries this line sitting on top of them. **Run `git log --oneline -8 | cat` as the
+  second opinion on state**, and treat any commit that touches only documents as part of the same record.
+  **Working tree clean.** Baseline `main` is untouched at `7451db0`; `origin/main` is
   still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything is committed, so
   a cold session can start from this file alone.
 - **What to do next, in order:** **R3** — the next research cluster (finance, revenue, investment and the
@@ -2820,17 +2951,28 @@ dependency was added or removed**. `dist/` was rebuilt.
   build right now, which `npm run validate` states as INFO); then **R8 = AB-7**. **Read first:**
   `src/config/departments.ts` (the indicator lines), `src/config/reference.ts` (`NAMED_SOURCES` and the
   sourcing statement), `src/test/indicator-basis.test.tsx` (the gates), then the **Phase AD** section below.
-- **THE LIVE SITE IS NOW THIS BUILD.** `nzwisiso.bitflex.app` serves `assets/index-BeggQU9V.js`, the same
-  file `npm run build` emits — verified by fetching the served file and hashing it:
-  `c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`, identical to the local
-  `dist/assets/index-BeggQU9V.js` (checked again in the E-4 session). The deployed bundle contains this
-  session's work and no vendor terminology. **Anyone can be shown the real platform now** — see the
-  DEPLOYED entry in *Known-red*. `npm run validate` now checks this claim directly (check 12), so it
-  cannot drift in silence.
+- **THE LIVE SITE IS BEHIND THIS BUILD.** `nzwisiso.bitflex.app` serves `assets/index-BeggQU9V.js`
+  (sha256 `c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`), while `npm run build` on
+  the current tree emits `assets/index-Cz472pbV.js`. **Phase AE changed the artwork and the icons, so the
+  deployed site currently shows the old drawing and has no favicon set.** The gap grew first with Phase
+  AD R1 and again with Phase AE; **`R7` closes it**, and until then **the live host must not be described
+  as current**. `npm run validate` states the difference as INFO (check 12), so this can never drift in
+  silence. *(This bullet previously read "THE LIVE SITE IS NOW THIS BUILD", which stopped being true the
+  moment R1 rebuilt the bundle — corrected here.)*
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test` — expected **all green** (**369/369 tests across 31 files**, **11/11** Playwright,
+  then `npx playwright test` — expected **all green** (**379/379 tests across 32 files**, **11/11** Playwright,
   validate **13/13**: the `--destructive` known-red is **retired**, and the two checks added in this
   defect sweep cover the *retired document statements* and the *deployment claim and its evidence*).
+  (This line said **369/369 across 31 files** until Phase AE; that number was stale by the ten gates
+  R1 had added, and the Phase AD R1 row in this same file already recorded the real one.)
+- **Phase AE is DONE (2026-09-28), and it changed no behaviour.** Two things, both verified: **(1)** the
+  platform now displays the **official** Coat of Arms — the asset it had been using was a stylised
+  drawing — across its three existing placements, with a real favicon set (`favicon.ico` 16/32/48,
+  `favicon-32.png`, `favicon-192.png`, `apple-touch-icon.png`) declared in `index.html`; **(2)**
+  `docs/PROPOSAL_PROMPT.md` now carries the **"Digitalize Zimbabwe"** pilot case as researched fact,
+  with a Part 1 section, a deck slide, the ask, and a hand-over gate. Read the **Phase AE** section
+  below for the sources, the six edits, and what could not be confirmed. **This does not change the
+  order of what remains** — R3–R5, then R7, then R8.
 - **The order of what remains.** (1) **R3–R5** — research the remaining indicators, department by
   department, upgrading each one to a published figure or leaving it plainly labelled `Modelled`.
   (2) **R7** — update the documents and **redeploy** (the live host is behind this build). (3) **R8 =
