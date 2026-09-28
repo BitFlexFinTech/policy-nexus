@@ -1411,6 +1411,12 @@ because the block it sits in already names itself.
 | 2026-09-28 | `npx playwright test` (E-4, final bytes) | **PASS — 10 passed (21.8 s)**; each test asserts 0 console errors and 0 off-origin requests. The registers journey now also asserts the citation is visible **in the real rail** and named **in the dialog** |
 | 2026-09-28 | **review zip refreshed** (E-5) | `Review Zip/nzwisiso-policy-dashboard-review-10.zip`, written **inside the project** from the clean committed working tree (the rule that governs this is `always-export-review-zip`). Exclusions: `node_modules`, `dist`, `.git`, `Review Zip`, `playwright-report`, `test-results`, `*.zip`, and every `.env*`. **Secret check:** `unzip -Z1 … | grep -E '(^\|/)\.env'` printed **no entry at all** — the real `.env` in this project is therefore not inside the archive. **The exact size and entry count are the `ls -la` / `unzip -Z1 | wc -l` output in that session's report** (not repeated here, so this row can never go stale against a later rebuild). `npm run build` had already rebuilt `dist/` before the zip was made, and the build is excluded as required |
 | 2026-09-28 | **defect inventory (E-4 session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. (1) **A stale status row**: AB-2 still read *“GROUPS STILL TO COME”* and *“Remaining: the user's group list”* after E-1/E-2 had delivered the groups — corrected to **DONE** with the real counts (36 groups, 20 published / 16 `Modelled`, 123 assignments). (2) **AB-3 still read `NOT STARTED`** although E-3 wired all 49 documents to real instruments — corrected to **DONE via E-3 + E-4**, with the register-vs-files caveat stated. (3) **AB-5 still read `NOT STARTED`** although E-4 delivers the share/source half — corrected to **IN PROGRESS** with the remaining work named. (4) **The “Honest state” paragraph was false**: it said E-4/E-5 were not started and the citation was not in the interface — rewritten to the true state. (5) **RESUME HERE was false in three places**: “E-1, E-2 and E-3 are DONE … none of the citations are visible” (citations now visible), the expected test count **302/302** (the real number is **313/313**), and the committed tip `87ec018` (the E-3 tip was `b8daca9`, and E-4 is now `06f33ff`). (6) **A self-inflicted typo** — the phrase *“and HONEST LIMIT.”* accidentally left inside the AB-5 row — removed in the same session. Each of (1)–(5) is a gate of its own in the sense that the string can be re-checked by `grep`; the fix is the corrected text itself |
+| 2026-09-28 | **AB-4 code delivered** (prompt library · grounding · citation verification · provenance) | **New:** `src/config/draftingPrompts.ts` — `POLICY_DRAFT_STRUCTURE` (the 10 headings), `DRAFTING_RULES`, and `draftingPromptFor(department)` which DERIVES the whole prompt from that department's mandate, priorities, modelled groups with their shares, and its instrument register (so the prompt cannot drift from the interface). `src/services/documents/drafting.ts` — `buildDraftingGrounding` (deterministic; the same object goes to the local generator and to a service), `citationsSectionFor`, `documentScanText`, `verifyDocumentCitations`, `isCitationVerified`, `assertCitationsVerified` (fail-closed), `buildDraftingProvenance`, `provenanceParagraphs`. **Changed:** `src/services/assessment/documents.ts` — `buildPolicyDraft` now emits clause **8. Citations** and writes the provenance into the closing note, then asserts its own citations before returning. `src/services/documents/remoteDraftingClient.ts` — the request carries `grounding` (prompt + citations + groups + indicators). `src/services/documents/useGeneratedDocument.ts` — builds the grounding and reports who produced the document (`source`). `src/pages/PolicyDraft.tsx` — a **Provenance** panel, and (defect fix) the notice now names the **actual** producer. `docs/SERVER_CONTRACT.md` §2 and `PRODUCTION_READINESS.md` §1/§9 updated. **No dependency, colour, font, route or layout changed** (`package.json` untouched; no `src/components/ui/**` edit) |
+| 2026-09-28 | `npx vitest run src/test/drafting.test.ts` (AB-4) | PASS — **10/10 new gates**: every one of the 16 departments gets a prompt derived from its own register; every group's share (or the exact `Modelled` word) is stated; the prompt's structure equals the headings the generator actually produces; grounding is byte-identical on replay and carries every group's share and source, every indicator and the whole register; **all 16 departments' drafted policies verify with zero unknown, zero outside-register and zero stray chapters**; a fabricated chapter is rejected; a borrowed instrument is caught; a shorter title inside a longer one is not falsely flagged; provenance records the local generator honestly and names the model when a service produced it; the provenance is written into the closing note |
+| 2026-09-28 | **mutation proofs of the AB-4 gates** | Three mutations at once, each attributable. (1) `draftingPrompts.ts`: the citation list hand-written instead of derived → *gives every one of the 16 departments a prompt, derived from its own register* **FAIL**. (2) `drafting.ts`: the substring safeguard reduced to a plain `text.includes` → the collision test **FAIL** (re-run alone after the first fix: **1 failed / 9 passed**). (3) `documents.ts`: the citations section removed from the generator → *asks for exactly the sections the local generator produces* **FAIL**, *verifies every drafted policy for all 16 departments* **FAIL**, and *records the local generator honestly* **FAIL**. **4 failed / 6 passed** as expected, then **1 failed / 9 passed** for (2); all three files restored with `shasum -a 256` **identical** (`draftingPrompts.ts` `ff07d16d74e90674f21688a18761cc1bc2329e85108a71a6131acc0907599769`, `drafting.ts` `814fd06ba4096471163c8e9d537fe2dbd9b497b95d1bd454481966dfb510846a`, `documents.ts` `2f6b239d701fbdd4af8328e7ddd49f29a5d818fa335bcfdefc188016fda30e7d`) |
+| 2026-09-28 | **defect inventory (AB-4 session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. (1) **A false claim baked into the screen**: `PolicyDraft.tsx` hard-coded *"It was generated locally by the Nzwisiso simulation core (Mock)"* — true today, **false the moment an administrator switches the drafting service on**. Now conditional on the actual producer, and asserted by the journey test. (2) **A test that could not fail**: my first version of the "shorter title inside a longer title" test claimed `Education Act` sits inside `Zimbabwe Council for Higher Education Act`; a scan of all 71 labels proved the table contains **exactly one** substring pair (`Constitution of Zimbabwe (Amendment No. 20) Act, 2013` inside the same title `…, ss. 202–203`), and it built on a case that does not exist. Replaced with a test on the **real** pair, which was then proved to fail under mutation. (3) **A latent false positive in the verifier itself**: a naive substring scan would have flagged a shorter title contained in a longer one; fixed with the residue rule, pinned by the corrected test. (4) **A stale status line**: Phase AC still read *"NO code from it has been written yet"* after E-1…E-5 had shipped — corrected. (5) **A self-inflicted documentation slip**: an `### Phase AC` heading was deleted by one of my own edits and restored in the same session |
+| 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (AB-4, final bytes) | **ALL GREEN**: validate `PASS — all checks green` · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **323/323 (25 files)** — the 313 after E-4 plus the 10 AB-4 gates · build **✓ in 499 ms** (only the pre-existing chunk-size note) |
+| 2026-09-28 | `npx playwright test` (AB-4, final bytes) | **PASS — 10 passed (21.8 s)**; 0 console errors, 0 off-origin requests per test. Expected to be unchanged: AB-4 changes the drafted policy's content and adds a provenance panel, and the journey that reads the long-form report and drafts the policy still passes in a real browser |
 
 
 
@@ -2060,7 +2066,7 @@ SUPERSEDED by this decision** — it must be rewritten down to three documents a
 | **AB-1** | **Graph quality and per-group colour** (the graph only — *not* the platform palette) | **DONE — verified this session (see below)** |
 | **AB-2** | **More stakeholder groups, with real ZIMSTAT weights** | **DONE (2026-09-28).** The weights landed in the AB-2 session; the **groups** landed in E-1 (**20 new groups → 36 in total**: **20 carry a real published share**, **16 are explicitly `Modelled`** with `share: null`) and E-2 gave each department the **6–8** groups its mandate covers (**123 assignments**, all 36 used). Gates: `src/test/stakeholder-weights.test.ts` (6 guards — every share equals the census count it cites, the modelled set is exact) and `src/test/departments.test.ts` (6–8 per department, no orphan group, the exact 16→group mapping). See *AB-2 — the weights are IN* below and the E-1/E-2 rows in the verification log |
 | **AB-3** | **Real reference documents** for the departments shown in the demo | **DONE via E-3 + E-4 (2026-09-28).** Every one of the **49** documents now cites a **real, verified instrument** from `src/config/instruments.ts` (71 instruments, each inside its own department's register), and **E-4 makes that citation visible** — in both document rails and in the detail dialog. **Honest caveat, unchanged and deliberate:** the platform holds the department document **register**, not the document files; the dialog says so plainly, and no invented filename is presented as a real file |
-| **AB-4** | **AI "Draft the policy"** — department prompt library, grounding, citation verification, provenance | NOT STARTED |
+| **AB-4** | **AI "Draft the policy"** — department prompt library, grounding, citation verification, provenance | **DONE (2026-09-28).** All four parts are built and gated: a **department prompt library** derived from each department's own configuration (never hand-written, so it cannot drift), the **grounding** handed to the local generator and to a configured service alike, **citation verification** that refuses any draft naming an instrument the register does not hold, and a **provenance record** in the draft's closing note and on the screen. The drafted policy gains clause **8. Citations**. The remote seam now carries the prompt and grounding. **10 new gates in `src/test/drafting.test.ts`**, plus a provenance render assertion added to the journey test and a grounding assertion added to the remote-client test — see the AB-4 rows in the verification log; three code mutations were proved to fail before restore. **No colour, font, layout, route or dependency changed.** |
 | **AB-5** | **"Real data, and where it comes from"** — a short named-source statement on the platform, and the reference-rate reconciliation | **IN PROGRESS (2026-09-28).** The share-and-source half is delivered by **E-4**: the Reference screen now states every group's share, its base and its named source, printing **`Modelled`** where no official figure exists. **Remaining:** the **reference-rate reconciliation** (the three reference rates against their named sources) and a short named-source statement as its own item |
 | **AB-6** | **Retrieve the missing official figures** — ZIMSTAT employment-by-sector, the 2022 urban/rural split, the 2022 age structure, and the **NDS pillars** (NDS1 and any NDS2) | **DONE — every item retrieved and recorded this session (2026-09-28).** See *AB-6 — retrieved in this session* below for the figures, the named sources, and the one honest remaining limit (the 21-industry QLFS break-up exists only as chart images). |
 | **AB-7** | **The final Claude prompt** — memo + deck + ask. **Must be last.** | NOT STARTED |
@@ -2297,9 +2303,41 @@ and 0 off-origin requests.
 weights and their sources. Both are the next actions; the screen is the honest home for them (AB-5 is the
 "named source" item).
 
+### Phase AB-4 — "AI Draft the policy": the prompt library, grounding, verified citations, provenance
+
+**Status: DONE — verified this session (2026-09-28).**
+
+AB-4 was recorded as four parts: **department prompt library**, **grounding**, **citation
+verification**, **provenance**. All four are built, and none of them needed a new dependency,
+a new colour, a new font, a new route or a layout change.
+
+**Why the shape is what it is.** Phases Y and Z had already built the mock-first seam: a
+`drafting` capability on `/platform-admin`, `remoteDraftingClient`, and `useGeneratedDocument`
+(which uses the local generator when nothing is configured and the service when it is). What was
+missing was everything a real drafting model *needs in order to be trustworthy*.
+
+| Part | What was built | Where |
+|---|---|---|
+| **Department prompt library** | One prompt per department, **derived** from that department's own configuration — its mandate and priorities, the groups it models with the share each carries, the instruments it may cite, the sections it must produce, and the rules. Nothing is written a second time, so the prompt a model receives cannot drift from the interface. | `src/config/draftingPrompts.ts` (`draftingPromptFor`, `POLICY_DRAFT_STRUCTURE`, `DRAFTING_RULES`) |
+| **Grounding** | The real evidence a draft may rest on: the submitted draft, the department's published reference indicators, the modelled groups with their **published shares and named sources** (or the word `Modelled`), and the allowed citation list read out of the instrument table. The **same object** is handed to the local generator and to a configured service, so swapping them cannot change what a draft may rest on. | `src/services/documents/drafting.ts` (`buildDraftingGrounding`), sent in the remote request (`docs/SERVER_CONTRACT.md` §2) |
+| **Citation verification** | Clause **8. Citations** lists the department's own register, each entry derived (`citedInstrumentLabel`). An **independent check** then refuses a document that names an instrument not in the register, carries a `[Chapter …]` marker no listed citation supports, or names an instrument belonging to **another** department. The generator runs the check on its own output and throws — fail-closed. | `citationsSectionFor`, `verifyDocumentCitations`, `assertCitationsVerified` |
+| **Provenance** | A record of how the draft was produced — producer (local generator or the configured service, with the model name), run reference, seed, reference date, how many groups and indicators it was grounded in, and the verified citation count. Stated **in the draft's own closing note** (so an exported file still says it) and in a small panel on the screen. | `buildDraftingProvenance`, `provenanceParagraphs`; `src/pages/PolicyDraft.tsx` |
+
+**The drafted policy is still deterministic** — same department + same submitted draft ⇒
+byte-identical text, with no clock and no randomness — and with nothing configured the screen
+still answers in the same render, because the local generator is synchronous.
+
+**Two real defects were found and fixed while building this** (both listed in the defect
+inventory in the verification log): the screen **hard-coded** the sentence *"It was generated
+locally by the Nzwisiso simulation core (Mock)"*, which becomes a **lie** the moment an
+administrator switches the drafting service on — it now states the actual producer; and the
+first version of the "shorter title inside a longer title" test was **vacuous** (the collision it
+described does not exist in the table), so it was replaced with a test built on the one real
+collision the table does contain.
+
 ### Phase AC — platform enrichment: deep research DONE, implementation batched (2026-09-28)
 
-**Status: research DONE and written to `docs/PLATFORM_ENRICHMENT_PLAN.md`; NO code from it has been written yet.**
+**Status: research DONE and written to `docs/PLATFORM_ENRICHMENT_PLAN.md`; batches E-1 … E-5 are ALL DONE and verified (2026-09-28).**
 Requested by the user, verbatim: *"we need to add anything that make the platform more powerful … there should
 also be documents that are cited like the constitution … the banking act … why didnt you do deep research into
 what things we can add to make this platform a powerhouse without breaking anything and also optimizing it for
@@ -2564,15 +2602,35 @@ asserting each published line exactly and the exact `Modelled` line for each mod
 the route map, the determinism rules, `LICENSE` / `NOTICE`, and `package.json` — **no dependency was added
 or removed**. `dist/` was rebuilt.
 
+## Files touched in Phase AB-4 (prompt library, grounding, verified citations, provenance)
+
+**New — 2 repo files.** `src/config/draftingPrompts.ts` (the prompt library: `POLICY_DRAFT_STRUCTURE`,
+`DRAFTING_RULES`, `draftingPromptFor` — the whole prompt derived from the department's own
+configuration). `src/services/documents/drafting.ts` (the drafting concern: `buildDraftingGrounding`,
+`groundItems`/`groundGroup`, `citationsSectionFor`, `documentScanText`, `verifyDocumentCitations`,
+`isCitationVerified`, `assertCitationsVerified`, `buildDraftingProvenance`, `provenanceParagraphs`).
+**Changed — 5 repo files.** `src/services/assessment/documents.ts` (clause 8, provenance in the closing
+note, the fail-closed self-check). `src/services/documents/remoteDraftingClient.ts` (`grounding` in the
+request). `src/services/documents/useGeneratedDocument.ts` (builds the grounding; returns `source`).
+`src/pages/PolicyDraft.tsx` (Provenance panel; the notice names the actual producer).
+**Docs:** `docs/SERVER_CONTRACT.md` (§2 now specifies `grounding` and the citation check),
+`PRODUCTION_READINESS.md` (§1 drafted-policy row, §9 drafting row).
+**Tests:** **new** `src/test/drafting.test.ts` (10 gates); `src/test/journey.test.tsx` (the draft screen
+must show clause 8, the citation, the Provenance panel and the Mock producer);
+`src/test/remote-clients.test.ts` (the request must carry the prompt and its citations).
+**Not changed, deliberately:** the emerald/gold palette, Inter + JetBrains Mono, `src/components/ui/**`,
+the route map, the determinism rules, `LICENSE` / `NOTICE`, and `package.json` — **no dependency added or
+removed**. `dist/` was rebuilt.
+
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`; the E-4 work is committed as `06f33ff`** (followed by the docs commit that
+- **Branch `feature/unified-platform`; the AB-4 work is committed as `2cf8aee`** (followed by the docs commit that
   recorded this line — run `git log --no-pager --oneline -3` for the exact tip, which is the second opinion on
   state). Working tree clean. Baseline `main` is untouched at
   `7451db0`; `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*.
   Everything is committed, so a cold session can start from this file alone.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test` — expected **all green** (**313/313 tests across 24 files**, 10/10 Playwright).
+  then `npx playwright test` — expected **all green** (**323/323 tests across 25 files**, 10/10 Playwright).
 - **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
   FIRST (it is below, in the phase list).** It holds: the goal in the user's words (*"we just want to get
   this platform funded … this is just a tool that will help each department research and draft policies"*),
@@ -2598,14 +2656,15 @@ or removed**. `dist/` was rebuilt.
   [Chapter 13:19], Mines and Minerals Act [Chapter 21:05], Traditional Leaders Act [Chapter 29:17], War Veterans
   Act [Chapter 11:15], and the Constitution (Amendment No. 20) Act, 2013) — **all of them now in the code and
   shown in the interface (E-3, E-4).**
-  **The next action is AB-4 — "AI 'Draft the policy'"** (the department prompt library, grounding, citation
-  verification and provenance), the next unfinished item in the agreed order in *Phase AB — the funding plan*
-  above. It must obey the mock-first rule (`.clinerules/02-mock-first-policy.md`): the drafting generator sits
-  behind the same swappable seam the assessment service already uses, so **scenario mode keeps working with no
-  runtime network**, and every placeholder is listed in `PRODUCTION_READINESS.md`. After AB-4: **AB-5** (the
-  reference-rate reconciliation and the short named-source statement — the share/source half is already delivered
-  by E-4), then **AB-7, the final Claude prompt, which MUST be last**. AB-3 is DONE via E-3 + E-4, and AB-6 is
-  already DONE.
+  **AB-4 is now DONE too** — the department prompt library, the grounding, verified citations and provenance
+  are built and gated (**10 new gates** in `src/test/drafting.test.ts`; see *Phase AB-4* above), and the drafted
+  policy carries clause **8. Citations** and its own provenance. **The next action is AB-5 — "Real data, and
+  where it comes from"**: the **reference-rate reconciliation** (the three rates in `src/config/reference.ts` —
+  the ZiG exchange rate, the policy rate and inflation — are labelled reference inputs but name **no source**,
+  and that is the gap to close) and the short **named-source statement** as its own item. The share-and-source
+  half of AB-5 is **already delivered by E-4**. After AB-5: **AB-7, the final Claude prompt, which MUST be
+  last** (the funding memo, the pitch deck and the one-page ask; `docs/PROPOSAL_PROMPT.md` is superseded and must
+  be rewritten down to three documents). AB-3 is DONE via E-3 + E-4, and AB-6 is already DONE.
   **Never invent a share — an official figure or the `Modelled` label, nothing in between; and never print a
   chapter the index did not confirm.**
   **AB-1 is finished and verified** (its own section above holds the evidence: pixel-pinned strokes, per-group
