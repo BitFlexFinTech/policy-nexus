@@ -1373,6 +1373,12 @@ because the block it sits in already names itself.
 
 ## Known-red / open items
 
+- **Phase AB — scope decisions the user made, recorded so they are not mistaken for gaps:**
+  a legal instrument, a procurement-route document, a ministry AI-governance framework and a full cost model
+  are **deliberately out of scope**. The reasoning: the goal is to get a working tool funded, and added
+  paperwork slows the money down. If Cabinet or Treasury later requires a costed business case, it is
+  **post-funding work** — the funding memo carries a short estimate table and one procurement paragraph so
+  the question can be answered in the room.
 - **Phase AA — two items are known and deliberately open, stated rather than hidden:**
   1. **On a 390 px phone the hero's primary action is below the fold** (bottom 922 px in an 844 px
      viewport), because the authority line stacks above the hero. On 1440 and 1024 it is still above
@@ -1981,6 +1987,102 @@ part of the request, so it was reported rather than changed under cover of this 
 | `src/test/swarm.test.ts` | The single-node fixture spreads the real graph, so it stays valid as the graph grew |
 | `e2e/journey.spec.ts` | The authority line asserted by real geometry (above the heading); the placeholder figure replaced by a read-the-page assertion in the thousands, twice; the agent field counted in the real DOM on the public page and mid-run; the drag aims at `:scope > circle` |
 
+### Phase AB — the funding plan: agreed scope, order and status
+**Status: AGREED with the user; work starting here.** Nothing in this section is `DONE` until it is verified
+in the session that wrote it.
+
+**The goal, in the user's own words:** *"we just want to get this platform funded … this is just a tool that
+will help each department research and draft policies."* So the deliverable is a **tool that is obviously
+already working**, plus **three short documents** — and **no bureaucracy**.
+
+**Deliberately OUT of scope — dropped at the user's instruction. Do not resurrect these:**
+- a legal instrument
+- a procurement-route document (it becomes **one paragraph inside the funding memo**)
+- a ministry AI-governance framework / "Annex A"
+- a full sources register as a project (a **short named-source statement** instead)
+- a cost model or a Treasury business case (a **short estimate table** inside the memo; a full business case
+  is **post-funding** work if it is ever asked for). Recorded here so it is a decision the user made, not a
+  gap nobody noticed.
+
+**The final deliverable is LAST.** When the build is finished and verified, the session says — in these
+words — *"Now the build is complete. Here is the prompt to copy and paste into Claude."* That prompt
+produces the **funding memo (2 pages), the pitch deck (10–12 slides) and the one-page ask**, nothing heavier.
+**`docs/PROPOSAL_PROMPT.md` (written in Phase AA) describes the older six-document version and is
+SUPERSEDED by this decision** — it must be rewritten down to three documents at the end, not used as-is.
+
+#### Work items, in the agreed order
+
+| # | Item | Status |
+|---|---|---|
+| **AB-1** | **Graph quality and per-group colour** (the graph only — *not* the platform palette) | **IN PROGRESS** |
+| **AB-2** | **More stakeholder groups, with real ZIMSTAT weights** | NOT STARTED |
+| **AB-3** | **Real reference documents** for the departments shown in the demo | NOT STARTED |
+| **AB-4** | **AI "Draft the policy"** — department prompt library, grounding, citation verification, provenance | NOT STARTED |
+| **AB-5** | **"Real data, and where it comes from"** — a short named-source statement on the platform, and the reference-rate reconciliation | NOT STARTED |
+| **AB-6** | **Retrieve the missing official figures** — ZIMSTAT employment-by-sector, the 2022 urban/rural split, the 2022 age structure, and the **NDS pillars** (NDS1 and any NDS2) | NOT STARTED |
+| **AB-7** | **The final Claude prompt** — memo + deck + ask. **Must be last.** | NOT STARTED |
+
+#### AB-6 — evidence already gathered, so a cold session does NOT re-do it
+
+- **Zimbabwe's 10 provincial populations, 2022 census** (citypopulation.de, sourced to ZIMSTAT): Harare
+  **2,427,231** · Manicaland **2,037,703** · Mashonaland West **1,893,584** · Midlands **1,811,905** ·
+  Mashonaland East **1,731,173** · Masvingo **1,638,528** · Mashonaland Central **1,384,891** ·
+  Matabeleland North **827,645** · Matabeleland South **760,345** · Bulawayo **665,952**. The ten sum to
+  **exactly 15,178,957**, matching ZIMSTAT's own headline. Gender 7,287,922 M / 7,891,035 F (also exact).
+  Density 38.85/km². **Every district is listed at the same source**, so district-level weighting is
+  available without further research.
+- **ZIMSTAT's own site, retrieved in Phase AB:** population **15,178,957** (2022 census) · average household
+  size **4** · unemployment **20.7%** (QLFS Q2 2025) · GDP growth **7.04%** (Q4 2025) · inflation **0.25%**
+  (August 2026) · poverty headcount **57%** (2019) · **Economic Census 2023: 76.9% of establishments are
+  informal, 23.9% formal**. Named publications: Population & Housing Census 2022 · Quarterly Labour Force
+  Survey · Household Budget Survey (2024–2026) · Poverty Datum Lines (June 2026) · Vital Statistics Report
+  2023–2024 · Economic Census 2023 · Population Projections 2022–2042 · NSDP · NADA microdata archive.
+- **STILL MISSING and NOT to be invented (AB-6):** employment-by-sector; the **2022** urban/rural split
+  (only **2012** was found: rural 8,777,093 / urban 4,284,146 = **32.8% urban**); the **2022** age structure
+  (only 2012 was found); and the **NDS pillars** — the African Development Bank page returned **403** and no
+  Wikipedia article exists for it. The plan is to retrieve ZIMSTAT's published PDFs directly.
+- **Correction recorded:** the app's reference rate states **inflation 8.4%**, while ZIMSTAT's published
+  figure is **0.25% (August 2026)**. Reconcile or relabel — handled in AB-5.
+- **UK reference material already read in Phase AB** (for AB-7, not for the build): the **AI Playbook for the
+  UK Government** (GDS, 10 February 2025, ISBN 9781036688745) — its section structure and its **ten
+  principles verbatim**: (1) You know what AI is and what its limitations are; (2) You use AI lawfully,
+  ethically and responsibly; (3) You know how to use AI securely; (4) You have meaningful human control at
+  the right stages; (5) You understand how to manage the full AI life cycle; (6) You use the right tool for
+  the job; (7) You are open and collaborative; (8) You work with commercial colleagues from the start;
+  (9) You have the skills and expertise needed to implement and use AI solutions; (10) You use these
+  principles alongside your organisation's policies and have the right assurance in place. The **2024
+  Generative AI Framework for HMG** (Cabinet Office/GDS/CDDO, 18 January 2024, withdrawn 10 February 2025)
+  was read in structure and in its procurement/regulation/ethics sections, but **its own Principles section
+  could not be read** — the fetch cut off at 50,000 of 157,633 characters. **Do not quote the 2024 principles.**
+
+#### AB-1 — the graph, diagnosed from the code so a cold session does not re-derive it
+
+Every stroke is set in **virtual** units on a fixed **1000×750** canvas, so its on-screen weight depends on
+how wide the card happens to be. At roughly a 0.5 scale the node outline becomes **0.75 real pixels** and
+anti-aliases into grey — that is the "low quality" the user reported.
+
+| Element | Current value |
+|---|---|
+| graph edges | `1.5 + strength × 2.5`, **×1.6** in the compact card |
+| node outline | `1.5` |
+| selection ring | `2.5` |
+| label halo / edge-label halo | `4` / `5` |
+| **agent marks (added in Phase AA)** | `r = 2.1`, `fill-gold/60`, **up to 600 of them** — these read as fog, and are the user's specific complaint |
+
+**The agreed fix:** pin strokes to real pixels (`vector-effect="non-scaling-stroke"`; widths of roughly
+**1.0** for edges and **1.25** for outlines), fix the agent field so its marks read as *distinct agents*
+rather than a wash, stop stacking outlines and halos, align straight lines to the pixel grid, and **measure
+at three widths before fixing the density**.
+
+**The agreed colour rule — the graph only. This is an explicit, user-granted exemption from the locked
+palette (`03-preserve-existing-ui-and-no-break.md`), recorded so a future session does not "correct" it
+back:** colour carries the **tier**, **shape** carries the **kind**, **size** carries the **weight**, and
+the **label always names the group**. Supporting evidence (retrieved): **one in 25 African males (4%) is
+red–green colour-blind**, and the documented method is *"not only different colors but also a combination
+of different shapes, positions, line types and coloring patterns"* — Okabe & Ito, *Colour Universal Design*
+(jfly.uni-koeln.de). A **new validator check** will simulate colour-blindness and **fail the build** if two
+tiers, or two kinds, collapse into each other — so "no ambiguity" becomes a test, not a claim.
+
 ## Files touched this session (redeploy of Phases R–S + PR opened + Lovable removal + PR merged + Phase X + Phase Y + Phase Z)
 
 **Repo — Phase V (Lovable removal):** `vite.config.ts`
@@ -2043,6 +2145,24 @@ on the server (not deleted, by design).
 
 ## RESUME HERE
 
+- **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
+  FIRST (it is below, in the phase list).** It holds: the goal in the user's words (*"we just want to get
+  this platform funded … this is just a tool that will help each department research and draft policies"*),
+  the **seven work items in the agreed order** (AB-1 graph → AB-2 groups + real ZIMSTAT weights → AB-3 real
+  reference documents → AB-4 AI "Draft the policy" → AB-5 the named-source statement + rate reconciliation →
+  AB-6 the missing official figures → **AB-7 the final Claude prompt, which MUST be last**), the items
+  **deliberately dropped** (no legal instrument, no procurement paper, no governance framework, no cost
+  model — do not resurrect them), the graph diagnosis with the exact current stroke values, the agreed
+  graph-only colour exemption, and the **official Zimbabwean figures already gathered** so they are never
+  re-researched.
+- **The next action, exactly:** continue **AB-1 — graph quality and per-group colour**. Open
+  `http://localhost:8080/` (the landing page's compact graph) and `/app/simulations/:id` (a run) and look at
+  the lines, then apply the agreed fix: `vector-effect="non-scaling-stroke"`, ~1.0 px edges and ~1.25 px
+  outlines, a fixed agent field, tier colours with per-kind shapes, and the colour-blind validator check.
+- **The final deliverable is spoken, not built:** when the build is done and verified, say the words
+  *"Now the build is complete. Here is the prompt to copy and paste into Claude."* and produce the **funding
+  memo, the pitch deck and the one-page ask**. `docs/PROPOSAL_PROMPT.md` still describes the older
+  six-document version — it is **superseded** and must be rewritten down to three.
 - **Phase AA is the current state of the landing page and of the relationship graph.**
   The page now opens with the **authority line** — proposal status, the one-line description,
   **Ministerial champion** + the minister + the ministry + the platform credit — as the first thing
