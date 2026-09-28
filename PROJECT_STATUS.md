@@ -55,6 +55,7 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
 /app/assessments/:id/policy-draft  Drafted policy from the run (Phase K)
 /app/documents             Secondary: department document library
 /app/reference             Secondary: methodology & limitations
+/app/compare/:a/:b         Two drafts of the same department, side by side  (Batch F)
 *                          NotFound (preserved)
 ```
 
@@ -1426,9 +1427,78 @@ because the block it sits in already names itself.
 
 
 
+| 2026-09-28 | **defect sweep + simulation-power batches A–G** (evidence per batch) | **A** `npx vitest run src/test/policy-reading.test.ts src/test/simulation-power.test.ts` → PASS, 8/8 and 16/16. **B** weighted index recomputed independently in the test from `segmentWeight` and matched the metric exactly, with the equal-weight figure stated beside it. **C** 10 derived risk rules; a draft with no transition clause raises `risk-transition` and one that carries it does not, and the recommendation goes with it. **D** `npx vitest run src/test/docx-read.test.ts` → PASS 8/8, including a **deflated** `.docx` built with the test runtime's own compressor — the path Word actually writes. **E** 16/16 in `simulation-power.test.ts` + 3/3 in `scenario-levers.test.tsx`, the latter driven through the interface. **F** 6/6 in `compare.test.tsx`, including a render gate on the new route. **G** `npm run validate` → **PASS 12/12** (two new checks: served-HTML/brand description, and both danger contrast pairs enforced) |
+| 2026-09-28 | **mutation proofs — every batch's gates shown to fail, then restored byte-identical** | **A/B/C:** removing the reading (`readPolicy("", …)`) and the weighting made **6 of 10** simulation-power gates fail. **D:** breaking the document part name made **3** gates fail. **E:** ignoring the request levers (`resolveLevers(undefined)`) made **4** gates fail. **F:** removing the cross-department refusal made **1** gate fail. **G:** reverting `--destructive` to `4 90% 58%` made validate **FAIL** ("3.73:1 is below the 4.5:1 floor"); editing one word of the served HTML description made validate **FAIL**. Every restore was verified with `shasum -a 256` identical before and after |
+| 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (final bytes of Batches A–G) | **ALL GREEN**: validate **PASS — all checks green**, 12 checks, and the `--destructive` KNOWN-RED note is **retired** (that pair is now enforced and measures 4.85:1) · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing warnings, all in `src/components/ui/**`) · **369/369 across 31 files** (was 346/28 after Batch C; 323 at AB-5) · build **✓ in 684 ms** |
+| 2026-09-28 | `npx playwright test` (final bytes of Batches A–G) | **PASS — 11/11** (was 10; the new gate is the phone fold). The phone-fold gate prints its measured number on every run: **`primary action bottom edge at 842px of 844px`** — it fits by **2 px**, which is why the margin is recorded rather than trusted |
+| 2026-09-28 | **DEPLOYED (Batch H) — build, FTPS mirror, and verified on the live host** | `npm run build` → `dist/` referencing **`assets/index-BeggQU9V.js`**. Deployed with `lftp` over explicit FTPS port 21, `mirror -R --only-newer`, **never `--delete`**. **Verified live:** `curl https://nzwisiso.bitflex.app/` returns **200** and its script tag is **`assets/index-BeggQU9V.js`** — the same file the local build emits. The deployed bundle (644,383 bytes) contains **"Named sources"**, **"Draft read:"**, **"Scenario assumptions"**, **"Compare two drafts"**, **"Structural relationships"** and **"population-weighted support index"**, and contains **no** "MiroFish" / "OASIS" / "Puter". A listing afterwards shows `cgi-bin/` and `.well-known/pki-validation/` **untouched** (still dated 25 Sep), so the SSL token survived. The credentials were read from `.env` into a 600-perm temporary script and never printed or passed as a shell argument |
+| 2026-09-28 | **the live host was NOT this build — measured, not assumed** | `curl` of `https://nzwisiso.bitflex.app/` returned a shell whose asset was **`assets/index-qUyirbLr.js`**; the local build emitted **`assets/index-DPSBMRok.js`**. The live bundle contained "Zimbabwe AI Policy Intelligence Initiative" and "Nzwisiso simulation core" but **not** "Named sources" — so AB-5 and Batches A–G were not live. **This is what Batch H fixed, in the row above.** The credentials are present in `.env` as `FTP_HOST` / `FTP_USER` / `FTP_PASS` / `FTP_REMOTE_ROOT` (variable names only were read; no value was copied anywhere) |
+
+
+### Phase AB-6 — the defect sweep and the simulation-power batches (2026-09-28)
+
+**Requested by the user, verbatim:** *"why are you rushing to the prompt. are all the bugs and issues
+fixed ? does the platform work end to end with zero issues? are there any other things we can add to the
+platform to make running the simulation much more powerful? do deep research and give me a plan before
+making any changes."* — and then: *"no, you need to make all the changes and then deploy last."*
+
+**The honest answer to the first two questions, recorded because it was wrong the first time:** the
+session before this one reported "NEXT: AB-7" from a green test run. A green suite is **not** the
+page-by-page functional audit these rules require, and the open-items list had not been read. Seven
+batches of real work followed. **The most important finding was that the live site is not the platform**:
+its bundle (`assets/index-qUyirbLr.js`) differs from the build (`assets/index-DPSBMRok.js`) and does not
+contain the AB-5 work. That is Batch H.
+
+| # | Batch | What it changed | Gates |
+|---|---|---|---|
+| **A** | **The engine reads the policy** | New `src/services/assessment/policyReading.ts`: a pure, deterministic reader that states the sentences assigning an action, the modelled groups the draft's own words concern, the instruments it names (inside the register, and outside it), and which of **seven** clause kinds it carries or lacks. Every figure in the run now answers to it, and the reading is stated as its own round and as the `metric-draft-reach` card | 8 in `policy-reading.test.ts` + 3 in `simulation-power.test.ts` |
+| **B** | **Population-weighted indices** | `segmentWeight` is now used in the ENGINE, not only in the picture: the composite support index is weighted by each group's published share, with the equal-weight figure stated beside it, so a group of 51,478 people no longer counts for as much as 7,891,035 | 3 in `simulation-power.test.ts` |
+| **C** | **Risks derived, not a fixed bank** | Ten `RISK_RULES`, each with a stated condition and a severity that answers to the run, replacing a fixed bank of four; recommendations pair one-for-one with the risks actually raised, plus clause-gap remedies, so a run never advises on a problem it did not find | 4 in `simulation-power.test.ts` |
+| **D** | **A real Word `.docx` is read** | New `zipRead.ts` (a ZIP reader that walks the central directory and unpacks with the browser's own `DecompressionStream`) and `docxText.ts` (paragraphs, runs, entities, breaks, tabs). **No dependency, no server.** PDF stays honestly labelled as not read | 8 in `docx-read.test.ts` + the corrected gate in `extraction.test.ts` |
+| **E** | **Scenario levers and a horizon that means something** | New `levers.ts`: funding, capacity, enforcement and phasing, each with a stated effect; the controls are rendered FROM the definitions, so a control cannot exist that the engine ignores. The horizon now produces 1/2/3 interaction rounds per group and widens the modelled range, and the assumptions are stated as their own round, block and report bullet list | 9 + 3 in `scenario-levers.test.tsx` |
+| **F** | **Compare two drafts** | New `compare.ts` (pure; **refuses in words** to compare across two departments) and `/app/compare/:a/:b`, with a link from the simulation register. Verdict names both runs and keeps the decision-support wording | 6 in `compare.test.tsx` |
+| **G** | **Four defects fixed at source** | The false "Hundreds" relationships count → the measured count; `--destructive` 3.73:1 → 4.85:1 with **both** danger pairs enforced; the served-HTML/brand drift → **checked**; the phone fold 922px → **842px of 844px**. See the top of *Known-red* | 1 new Playwright gate + 2 validator checks, each proved to fail |
+
+**Two stale statements corrected in passing**, both found by reading rather than assuming:
+`remoteAssessmentClient.ts` claimed `AssessmentService` was still **synchronous** and that wiring it would
+need an asynchronous refactor — Phase Z made it asynchronous, so the claim was false and is corrected in
+place. And `PRODUCTION_READINESS.md` §5 claimed **16** canonical segments when `STAKEHOLDER_SEGMENTS`
+holds **36** — corrected, and the neighbouring counts (63 indicators, 48 templates, 49 documents) were
+**re-counted rather than assumed** and were already right.
+
+**One item remains BLOCKED, unchanged and stated in the strict form in the AB-5 defect inventory above:**
+the **63 department indicator values are authored scenario content**, not figures read from a named
+publication, so they must never be described as sourced official figures. Fixing that needs the user's
+decision plus 63 real per-department values, and if it is ever done it must happen **before AB-7**.
+
 
 ## Known-red / open items
 
+- **RESOLVED in the defect sweep (Batches A–G): four items that used to be listed here are fixed.**
+  Kept with their evidence so the fixes are visible rather than silently absorbed:
+  1. **`--destructive` as RISK TEXT on `--card` measured 3.73:1**, below AA, and was printed as a
+     known-red note instead of failing. **FIXED** — the token is `4 80% 48%`, it now measures **4.85:1**,
+     and *both* danger pairs (text on a card, and white on danger) are in the **enforced** contrast table.
+     Proven: reverting the token to `4 90% 58%` makes `npm run validate` **FAIL** with "3.73:1 is below
+     the 4.5:1 floor"; restoring it is byte-identical. The known-red note is retired.
+  2. **"Hundreds · Relationships"** on the landing page while the drawn structure has 32. **FIXED** —
+     the scale strip now reads the **measured** relationship count and the **measured** group count from
+     the same structure it draws, so the words cannot overstate the picture. (Was: "a brief-level
+     decision". The decision taken: state what is drawn.)
+  3. **On a 390 px phone the primary action sat below the fold** (bottom at 922 px of an 844 px screen).
+     **FIXED** — the authority line is compacted into **two short columns instead of four stacked lines**
+     and the hero spacing is tightened **below `sm` only**; **nothing was removed**, so the Minister stays
+     on the page. Measured at a real viewport: **842 px of 844 px** — it fits, **by 2 px**, and a new
+     Playwright gate prints that number on every run. **The 2 px margin is thin and stated here on
+     purpose:** a future change to the h1 size, the font faces or the shared masthead padding will break
+     it, and the robust alternatives (a smaller h1 on phones, or an action in the masthead) are design
+     decisions that belong to the user, not to a silent tweak.
+  4. **`index.html` duplicates `BRAND.description` by hand** — a static HTML file cannot import
+     TypeScript. **FIXED AS FAR AS IT CAN BE** — the duplication cannot be removed without a build step, so
+     the two copies are now **checked against each other** by `npm run validate` ("served HTML description
+     matches the brand description"), which turns a silent drift into a failed build. It caught real drift
+     on its first run. Proven: editing the HTML description by one word makes validate **FAIL**; restoring
+     it is byte-identical.
 - **Phase AB — scope decisions the user made, recorded so they are not mistaken for gaps:**
   a legal instrument, a procurement-route document, a ministry AI-governance framework and a full cost model
   are **deliberately out of scope**. The reasoning: the goal is to get a working tool funded, and added
@@ -1445,10 +1515,19 @@ because the block it sits in already names itself.
      relationships. It is a conceptual indicator from the brief and was **not** part of the Phase AA
      request, so it was reported rather than changed under cover of an unrelated change. Fixing it
      means deciding whether the strip should carry measured counts — a brief-level decision.
-- **Phases X–Z and AA are built but NOT deployed.** The live host (`nzwisiso.bitflex.app`) still
-  serves the **Phase S** bundle as of this record. Deploying is a `npm run build` + FTPS
-  `mirror -R dist .` (never `--delete`). **The presentation build is therefore local until this is
-  run** — do it before showing anything to the Minister.
+- **DEPLOYED — Batches A–G and Phases X–Z are live (2026-09-28).** The live host
+  (`nzwisiso.bitflex.app`) now serves **`assets/index-BeggQU9V.js`**, which is **byte-for-byte the local
+  build** (`dist/index.html` references the same file). Verified by fetching the deployed bundle and
+  finding every marker of this session's work in it: "Named sources", "Draft read:", "Scenario
+  assumptions", "Compare two drafts", "Structural relationships", and "population-weighted support
+  index" — with **no** vendor terminology (MiroFish / OASIS / Puter all absent). The deploy was
+  `lftp` over explicit FTPS on port 21, `mirror -R --only-newer` into the account's web root,
+  **never with `--delete`**, and a listing afterwards proves `cgi-bin/` and
+  `.well-known/pki-validation/` are **untouched** (both still dated 25 Sep), so the live SSL
+  validation token survived. `FTP_REMOTE_ROOT` in `.env` names a filesystem path that the FTP session
+  cannot `cd` into — the account is already chrooted to the web root, so the mirror lands correctly
+  from the login directory; the harmless "550 Can't change directory" line is recorded here so the next
+  session does not chase it.
 - **RESOLVED (Phase Z) — the run path is asynchronous, so every capability is now connected.**
   `AssessmentService` returns promises (`buildRun`/`run`/`getRun`/`listRuns`), and `assessmentService`
   is a **dispatcher** that chooses the simulated engine or the live service at the moment of the
@@ -1494,7 +1573,8 @@ because the block it sits in already names itself.
 - **Recorded correction:** the Phase 0 verification log claimed `npm run typecheck` was PASS.
   That was wrong — the test files failed to typecheck at HEAD. It has been fixed (see Phase B
   bug 1) and the log row is retained with a note rather than quietly deleted.
-- **Playwright is GREEN as of Phase M — 6/6.** Chromium is present (`chromium-1208` / `chromium-1234`
+- **Playwright is GREEN — 11/11 as of the defect sweep** (was 6/6 at Phase M; the journey has grown with
+  each phase). Chromium is present (`chromium-1208` / `chromium-1234`
   in the Playwright cache), `e2e/journey.spec.ts` exists, and `npx playwright test` passes against the
   production preview build, now entering through the **two-step** flow (`/` → `/start` → `/app`).
   The browser journey, the reload-persistence check, and the
@@ -1519,13 +1599,10 @@ because the block it sits in already names itself.
   the baseline build PASSED, so this is not blocking.
 - Node 26.8.1 defines an experimental global `localStorage` that shadows jsdom's. Handled in the
   test environment (see Phase B bug 3). No production impact — browsers provide a real one.
-- **Phase O — `--destructive` as RISK TEXT on `--card` measures 3.73:1, below the 4.5:1 AA floor.**
-  A real gap, and it is **not fixed**, deliberately: `--destructive` is the workspace risk-state
-  colour *and* the fill behind destructive buttons app-wide, so changing it restyles every dashboard
-  — outside "this task is specifically about the landing page and its supporting content/config".
-  It is printed by `npm run validate` on every run under `KNOWN-RED (not enforced)` so it cannot be
-  forgotten. Fixing it is one token edit (4 90% 58% → ~4 80% 48% measures 4.85:1, white-on-it 4.85:1)
-  plus a render check of the ~16 dashboards that use it.
+- **Phase O — `--destructive` as RISK TEXT on `--card` used to measure 3.73:1, below the 4.5:1 AA
+  floor.** **RESOLVED in the defect sweep** — see item 1 at the top of this section. The token is
+  `4 80% 48%`, both danger pairs are enforced, and the entry is kept only as the record of what was
+  wrong and how it was proven fixed (the check FAILS at the old value).
 - **Phase O — `index.html` duplicates `BRAND.summary` by hand.** A static HTML file cannot import
   TypeScript, so the description and `og:description` are written twice. Both were updated to the new
   wording this session (the retired "national policy simulation workspace" phrase is gone from the
@@ -2646,13 +2723,18 @@ dependency was added or removed**. `dist/` was rebuilt.
 
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`; the AB-5 work is committed on top of `2cf8aee` (AB-4)** (run
-  `git log --oneline -4 | cat` for the exact tip, which is the second opinion on state). Working tree clean.
-  Baseline `main` is untouched at
+- **Branch `feature/unified-platform`; the defect sweep is committed on top of `8f4d4c3` (Batch E) and
+  `3645764` (Batch F)**, with `5a918ea` (Batch G, the four defect fixes) as the last code commit and a docs
+  commit after it (run `git log --oneline -8 | cat` for the exact tip, which is the second opinion on
+  state). Working tree clean. Baseline `main` is untouched at
   `7451db0`; `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*.
   Everything is committed, so a cold session can start from this file alone.
+- **THE LIVE SITE IS NOW THIS BUILD.** `nzwisiso.bitflex.app` serves `assets/index-BeggQU9V.js`, the same
+  file `npm run build` emits, and the deployed bundle contains this session's work and no vendor
+  terminology. **Anyone can be shown the real platform now** — see the DEPLOYED entry in *Known-red*.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test` — expected **all green** (**328/328 tests across 26 files**, 10/10 Playwright).
+  then `npx playwright test` — expected **all green** (**369/369 tests across 31 files**, **11/11** Playwright,
+  validate **12/12** with the `--destructive` known-red **retired**).
 - **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
   FIRST (it is below, in the phase list).** It holds: the goal in the user's words (*"we just want to get
   this platform funded … this is just a tool that will help each department research and draft policies"*),
@@ -2690,7 +2772,10 @@ dependency was added or removed**. `dist/` was rebuilt.
   **Named sources** section carrying `NAMED_SOURCE_STATEMENT`. The old 13.56 / 19.5% / 8.4% matched no
   published figure and are gone. **Five gates** in `src/test/reference-sources.test.tsx`; the figures,
   publishers and periods are recorded in **PART 6 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** so they are never
-  re-researched. **The next action is AB-7 — the final Claude prompt, which MUST be last** (the funding
+  re-researched. **The engine now reads the policy, weights the figures by what each group stands for,
+  derives its risks, reads a real Word file, takes scenario assumptions, and compares two drafts — and all
+  of it is LIVE (Batches A–H).** See *Phase AB-6* below for the batch-by-batch record and the mutation
+  proofs. **The next action is AB-7 — the final Claude prompt, which MUST be last** (the funding
   memo, the pitch deck and the one-page ask; `docs/PROPOSAL_PROMPT.md` is superseded and must be rewritten
   down to three documents). **One item is BLOCKED and is stated in full in the AB-5 defect inventory above:**
   the **63 department indicator values are authored scenario content**, not figures read from a named

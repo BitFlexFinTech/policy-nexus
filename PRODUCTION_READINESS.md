@@ -30,7 +30,8 @@ client is registered.
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
 | `.txt` upload | **REAL — Phase X.** The file is read in the browser (`src/services/extraction/extractPolicyText.ts`) and its own text becomes the run's policy text; `source` still reads `upload`. Deterministic, no dependency, no network call. | unchanged for `.txt` | `extractPolicyFile()` — the extraction seam |
-| `.pdf` / `.docx` upload | **Mock — Phase X.** Recorded by name; the screen shows `Text extraction (Mock) — recorded by name; PDF/DOCX text is not read in this build`, so nothing implies the file was parsed. The fixed-step progress animation was removed along with it. | Server-side document extraction (PDF/DOCX parsers) | Replace `extractPolicyFile()` in `src/services/extraction/extractPolicyText.ts` with a server call — one function, no UI change |
+| `.docx` upload | **REAL — Batch D.** Unpacked **in the browser**, with no dependency and no server: `src/services/extraction/zipRead.ts` walks the ZIP central directory the format defines and unpacks a compressed entry with the browser's own `DecompressionStream`; `src/services/extraction/docxText.ts` takes the paragraphs and text runs out of `word/document.xml`. Handles both stored and deflated entries. A file it cannot open is reported in plain words as **not read** — never claimed to have been read. If the local reader fails and a service is configured, the service is tried next. | unchanged | `readDocxText()` behind `extractPolicyFile()` |
+| `.pdf` upload | **Mock — Phase X, unchanged.** Recorded by name; the screen shows `Text extraction (Mock) — recorded by name; PDF text is not read in this build`, so nothing implies the file was parsed. Only the PDF half is outstanding; the `.docx` half is real as of Batch D. | Server-side PDF parsing | Replace the PDF branch of `extractPolicyFile()` in `src/services/extraction/extractPolicyText.ts` with a server call — one function, no UI change |
 | Preset chips | Department-aware: read from `department.policyTemplates` (`src/config/departments.ts`); selecting a chip also records its `templateId`, so the run's reference and horizon come from the department's own draft | unchanged | n/a |
 | Reading progress | **REAL — Phase X.** The bar advances one step per accepted file as that file is actually read, and each file lists what happened to it. The fixed-step `PARSE_STEP`/`PARSE_TICK_MS` animation is gone. | unchanged | `src/components/PolicyInput.tsx` |
 | Run Simulation action | **Real, deterministic, and labelled.** The button is `Run Simulation`; it calls `assessmentService.run()`, records the request and opens `/app/simulations/:id`. The engine is the scenario engine (Mock) — the UI says so on the run, the register and the assessment. | Unchanged button; the service behind it changes | `src/components/PolicyInput.tsx` → `AssessmentService` seam |
@@ -61,7 +62,9 @@ client is registered.
 - ~~Derive a long-form report and a drafted policy from a completed run~~ — **DONE (Phase K):**
   `src/services/assessment/documents.ts` (deterministic), routes `/app/assessments/:id/report` and
   `/app/assessments/:id/policy-draft`, editable draft text, exported through the Phase G seam.
-- **PDF/DOCX text extraction (server-side).** The `.txt` half is **DONE (Phase X)** — read in the browser, no server needed. The PDF/DOCX half still needs a server or a parser, and stays Mock and labelled until it exists.
+- **PDF text extraction (server-side).** The `.txt` half is **DONE (Phase X)** and the **`.docx` half is
+  DONE (Batch D)** — both read in the browser, no server needed. Only **PDF** still needs a server or a
+  parser, and it stays Mock and labelled until it exists.
 - ~~Real `.docx` rendering.~~ — **DONE (Phase X):** `src/services/documents/docx.ts` + `zip.ts` write a genuine OOXML `.docx` with zero dependencies (`file` reports “Microsoft Word 2007+”). **Native PDF rendering** — beyond the browser print dialogue — is still outstanding.
 - Remote assessment service endpoint + client construction in `CLIENTS` (`src/services/assessment/AssessmentService.ts`).
 - Government SSO integration.
