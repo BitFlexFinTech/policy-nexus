@@ -102,12 +102,22 @@ describe("department indicators — published with a named source, or plainly mo
         `${where} → ${indicator.basis.sourceId} is a named source`,
       ).toBe(true);
       expect(indicator.basis.publication.length, `${where} publication`).toBeGreaterThan(3);
+      // A published figure states its period. Some publications are monthly and some
+      // are annual or one-off (a census year, a survey year), so the period is either
+      // "<Month> <Year>" or "<Year>" — but it must always be stated, and never in the
+      // future relative to the workspace's own reference date.
       const parts = indicator.basis.asOf.split(" ");
-      expect(parts, `${where} period is "<Month> <Year>"`).toHaveLength(2);
-      const [month, year] = parts;
-      expect(year, `${where} is dated in the reference year`).toBe(REFERENCE_YEAR);
+      expect(parts.length, `${where} period is "<Month> <Year>" or "<Year>"`).toBeLessThanOrEqual(2);
+      const year = parts[parts.length - 1];
+      expect(year, `${where} states a four-digit year: ${indicator.basis.asOf}`).toMatch(/^\d{4}$/);
+      expect(Number(year), `${where} is not dated after the reference year`).toBeLessThanOrEqual(
+        Number(REFERENCE_YEAR),
+      );
+      if (parts.length !== 2) return;
+      const [month] = parts;
       const index = MONTHS_IN_ORDER.indexOf(month);
       expect(index, `${where} names a real month: ${indicator.basis.asOf}`).toBeGreaterThanOrEqual(0);
+      if (Number(year) !== Number(REFERENCE_YEAR)) return;
       expect(index, `${where} is not dated after the reference month`).toBeLessThanOrEqual(
         REFERENCE_MONTH_INDEX,
       );

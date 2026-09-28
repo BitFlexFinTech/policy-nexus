@@ -50,6 +50,14 @@ export const NAMED_SOURCES = [
     publication: "Published exchange-rate and interest-rate statistics",
   },
   {
+    id: "worldbank",
+    name: "World Bank Open Data",
+    figures:
+      "Country figures compiled from national statistical agencies and international bodies — electricity access, protected areas, forest area, internet and mobile use, school enrolment, immunisation, water and sanitation, commodity exports and remittances",
+    publication:
+      "World Development Indicators — each series compiled from national sources and, where the series requires it, from WHO/UNICEF, ITU, UNESCO or UN Comtrade, as the series metadata states",
+  },
+  {
     id: "acts-index",
     name: "veritaszim A–Z List of Acts (official consolidated index)",
     figures: "The title and chapter of every Act the platform cites",
