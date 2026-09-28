@@ -2083,6 +2083,41 @@ of different shapes, positions, line types and coloring patterns"* — Okabe & I
 (jfly.uni-koeln.de). A **new validator check** will simulate colour-blindness and **fail the build** if two
 tiers, or two kinds, collapse into each other — so "no ambiguity" becomes a test, not a claim.
 
+**AB-1 progress — updated in this session:**
+
+- **DONE — the colour foundation, measured.** `src/lib/graph/palette.ts` holds the graph's own palette,
+  its shape map, the colour-blindness simulation and the CIE-Lab distance maths used to check it.
+  `src/test/graph-palette.test.ts` holds **6 guards; all green.**
+  **What the measurement found — this is why the values are what they are.** The first candidate set
+  (an Okabe–Ito-style eight) was tested and **failed**: under **protanopia**, bluish green `#009E73` fell to
+  a distance of **2.5** from the paper grey — indistinguishable; under **deuteranopia**, sky blue `#56B4E9`
+  fell to **7.3** from the priority violet. The probe also showed blues collapsing into blues and every
+  green collapsing into grey, and that orange and dark yellow-brown sit only **10.9** apart for both
+  red-green types. **The measured ceiling is FIVE mutually-distinct group colours** at a CIE-Lab distance of
+  **14 or better** under both simulations — so the palette is five colours, and **past the fifth the
+  always-drawn label carries the distinction.** That is why labels are never dropped. The enforced threshold
+  is 14 (not 20) because 14 is already a margin above the ~10 at which two colours become distinct at a
+  glance, and demanding more would force colours a colour-blind reader genuinely cannot separate.
+  A second defect was found and fixed **in my own diagnostic**: `closestPair` printed the *simulated*
+  colours, so it named colours that do not exist in the palette; it now reports the original pair.
+- **NOT YET DONE — the next step, in this order.** Wire the palette into
+  `src/components/relationship/RelationshipGraphCard.tsx`:
+  1. **Pixel-pinned strokes** — add `vector-effect="non-scaling-stroke"` to the edges and to every mark's
+     outline, and express their widths in real pixels (~1.0 for edges, ~1.25 for outlines) instead of
+     `× visualScale`, so a line stops blurring when the card is scaled down.
+  2. **A fixed agent field** — the Phase AA field of up to 600 `fill-gold/60` marks reads as fog. Redraw it
+     from the group's own palette colour, fewer and better defined, and measure at three widths before
+     fixing the density.
+  3. **Per-group colour and per-kind shape** — `ring` for the draft (no fill, ink outline), `circle` for a
+     group, `square` for a priority, `diamond` for a document, with the group's colour from
+     `graphGroupColour(index)`.
+  4. **A legend that shows shape and colour**, not colour alone.
+  5. **Re-anchor two test selectors**, because a mark stops being a `<circle>` for every kind:
+     `src/test/graph-card.test.tsx` (`g[role='button'] > circle`) and `e2e/journey.spec.ts`
+     (`:scope > circle`). Give the mark element a stable class and select on that.
+- **Verified green at this point:** `npm run validate` PASS · `typecheck` exit 0 · `lint` 0 errors ·
+  `npm test` **288/288 (23 files)** · `build` ✓.
+
 ## Files touched this session (redeploy of Phases R–S + PR opened + Lovable removal + PR merged + Phase X + Phase Y + Phase Z)
 
 **Repo — Phase V (Lovable removal):** `vite.config.ts`
