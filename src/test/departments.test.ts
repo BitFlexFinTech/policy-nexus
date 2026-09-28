@@ -11,6 +11,32 @@ import {
 import { STAKEHOLDER_SEGMENTS, TIME_HORIZONS, REFERENCE_DATE } from "@/config/reference";
 
 /**
+ * The groups each department models, pinned exactly (Phase AC, batch E-2).
+ *
+ * This list is the one the run, the assessment and the relationship graph all derive
+ * their participant groups from, so a change here changes what a simulation models.
+ * Pinning it makes any later change deliberate instead of silent drift.
+ */
+const DEPARTMENT_SEGMENTS: Record<string, string[]> = {
+  opc: ["civil-servants", "local-authorities", "development-partners", "formal-business", "youth", "traditional-leaders", "faith-groups", "media"],
+  fin: ["exporters", "formal-business", "financial-sector", "civil-servants", "informal-traders", "diaspora", "manufacturers", "pensioners"],
+  agri: ["smallholder-farmers", "rural-households", "informal-traders", "exporters", "women-led-enterprises", "development-partners", "cooperatives", "informal-workers"],
+  health: ["health-workers", "urban-households", "rural-households", "civil-servants", "development-partners", "women-led-enterprises", "persons-with-disabilities", "women"],
+  edu: ["educators", "rural-households", "urban-households", "youth", "development-partners", "women-led-enterprises", "faith-groups", "persons-with-disabilities"],
+  hedu: ["youth", "educators", "formal-business", "diaspora", "development-partners", "researchers", "employer-federations"],
+  ict: ["urban-households", "rural-households", "financial-sector", "formal-business", "youth", "informal-traders", "ict-operators", "researchers"],
+  mines: ["mining-operators", "rural-households", "exporters", "local-authorities", "formal-business", "artisanal-miners", "conservation-communities"],
+  energy: ["formal-business", "urban-households", "rural-households", "mining-operators", "informal-traders", "energy-water-utilities", "transport-operators"],
+  psc: ["civil-servants", "youth", "women-led-enterprises", "local-authorities", "development-partners", "pensioners", "trade-unions"],
+  lg: ["local-authorities", "urban-households", "rural-households", "informal-traders", "women-led-enterprises", "traditional-leaders", "energy-water-utilities", "transport-operators"],
+  mfa: ["exporters", "diaspora", "development-partners", "formal-business", "financial-sector", "tourism-operators", "cross-border-traders", "media"],
+  env: ["rural-households", "smallholder-farmers", "mining-operators", "development-partners", "local-authorities", "conservation-communities", "tourism-operators", "energy-water-utilities"],
+  def: ["civil-servants", "rural-households", "development-partners", "local-authorities", "war-veterans", "pensioners", "persons-with-disabilities"],
+  zimra: ["formal-business", "informal-traders", "exporters", "financial-sector", "mining-operators", "informal-workers", "cross-border-traders", "manufacturers"],
+  zida: ["formal-business", "exporters", "diaspora", "development-partners", "financial-sector", "manufacturers", "employer-federations", "tourism-operators"],
+};
+
+/**
  * Department config regression guard. These are real, failable checks: the
  * homepage, the dashboard, the preset chips and the reports all depend on this
  * data being complete and internally consistent. A missing department or a
@@ -89,6 +115,32 @@ describe("department config (src/config/departments.ts)", () => {
         for (const segment of t.segments) expect(allowed, `${t.id} segment ${segment}`).toContain(segment);
       }
     }
+  });
+
+  it("gives every department between 6 and 8 stakeholder groups, with no repeats", () => {
+    for (const d of DEPARTMENTS) {
+      expect(d.segments.length, `${d.id} models ${d.segments.length} groups`).toBeGreaterThanOrEqual(6);
+      expect(d.segments.length, `${d.id} models ${d.segments.length} groups`).toBeLessThanOrEqual(8);
+      expect(new Set(d.segments).size, `${d.id} repeats a group`).toBe(d.segments.length);
+    }
+  });
+
+  it("models every canonical group in at least one department", () => {
+    // A group no department models is dead weight: the run, the assessment and the
+    // graph would never draw on it, so it would sit on the reference screen only.
+    const modelled = new Set<string>(DEPARTMENTS.flatMap((d) => [...d.segments]));
+    const orphans = STAKEHOLDER_SEGMENTS.filter((s) => !modelled.has(s.id)).map((s) => s.id);
+    expect(orphans, "canonical groups no department models").toEqual([]);
+    const allowed = new Set<string>(STAKEHOLDER_SEGMENTS.map((s) => s.id));
+    for (const id of modelled) expect(allowed, `${id} is not a canonical group`).toContain(id);
+  });
+
+  it("keeps each department's groups exactly as agreed — a deliberate change, not drift", () => {
+    for (const d of DEPARTMENTS) {
+      expect(d.segments, `${d.id} groups changed`).toEqual(DEPARTMENT_SEGMENTS[d.id]);
+    }
+    // The pin covers every department, so a new department cannot slip past this gate.
+    expect(Object.keys(DEPARTMENT_SEGMENTS).sort()).toEqual([...DEPARTMENT_IDS].sort());
   });
 
   it("references only canonical time horizons", () => {

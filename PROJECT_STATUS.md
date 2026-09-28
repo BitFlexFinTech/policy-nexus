@@ -1387,6 +1387,12 @@ because the block it sits in already names itself.
 | 2026-09-28 | **mutation proofs of the three E-1 gates** | (1) `faith-groups` `share: 85.2` → `85.3` → *makes every published share equal the count it cites* **FAIL**, `AssertionError: expected 0.06486823172369327 to be less than or equal to 0.05`; (2) traditional-leaders note with `"272"` and `"24,000"` removed → *keeps a real count in a modelled group's note instead of dressing it up as a share* **FAIL**, `expected '…about a nu…' to match /\b272\b/`; (3) the count pin `toHaveLength(36)` → `37` → **FAIL**, `expected [ …(36) ] to have a length of 37 but got 36` — which also **proves the real length is 36**. Every mutated file restored; `shasum` of `reference.ts` back to `344a56c25d06c83e8182db995eba35a2239adaf6` and the stray-mutation grep (`share: 85.3` / `a number of chiefs` / `toHaveLength(37)`) prints **CLEAN** |
 | 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (E-1, final bytes) | **ALL GREEN**: validate `PASS — all checks green` · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing `react-refresh` warnings, all inside `src/components/ui/**`) · **302/302 (24 files)** — the 301 before plus the 1 new gate · build ✓ (no new warnings) |
 | 2026-09-28 | `npx playwright test` (E-1, final bytes) | **PASS — 10 passed (17.7 s)**; each test asserts 0 console errors and 0 off-origin requests. Includes *the landing page hands off to the chooser, which lists all 16 departments* and the registers/report/policy-draft journeys |
+| 2026-09-28 | **E-2 code delivered** (Phase AC batch 2) | `src/config/departments.ts`: **exactly 16 lines changed** (the 16 department-level `segments` lists) — every other line byte-identical. Participants per department: **6–8** (was 4–6); **123 department-to-group assignments** (was 84); all **36** groups modelled by at least one department. `src/test/departments.test.ts`: a pinned `DEPARTMENT_SEGMENTS` map for all 16 departments plus **3 new gates** (6–8 groups with no repeats; every canonical group modelled somewhere; the exact mapping). No `network.ts`, `scenario.ts` or component needed a change — they read `department.segments` dynamically, which is the seam working as designed |
+| 2026-09-28 | `npm run typecheck` (E-2) | PASS — `tsc -b --pretty false`, no output |
+| 2026-09-28 | `npx vitest run src/test/departments.test.ts src/test/assessment.test.ts src/test/network.test.ts src/test/workspace.test.tsx src/test/stakeholder-weights.test.ts` (E-2) | PASS — **90/90** (departments 17, stakeholder-weights 6, assessment 22, network 16, workspace 29). The AB-2 weight ordering (`rural > smallholder > informal-traders > exporters`) still holds for `agri` with its two new groups |
+| 2026-09-28 | **mutation proofs of the three new E-2 gates** | (1) `opc` loses `"media"` (7 groups) → *keeps each department's groups exactly as agreed* **FAIL** (`opc groups changed: expected [ 'civil-servants', …(6) ] to deeply equal [ …(7) ]`); (2) `ict` loses `"ict-operators"` → *models every canonical group in at least one department* **FAIL** (`canonical groups no department models: expected [ 'ict-operators' ] to deeply equal []`) **and** the exact-mapping gate FAIL; (3) `def` grown to 9 groups → *gives every department between 6 and 8 stakeholder groups* **FAIL** (`def models 9 groups: expected 9 to be less than or equal to 8`). All three restored; `shasum` of `departments.ts` back to `d4175a463e696f132975eacab4c7096ff8cf5e9f`, and all **16** department-level `segments:` lines present |
+| 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (E-2, final bytes) | **ALL GREEN**: validate `PASS — all checks green` · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **305/305 (24 files)** — the 302 after E-1 plus the 3 new department gates · build ✓ (no new warnings) |
+| 2026-09-28 | `npx playwright test` (E-2, final bytes) | **PASS — 10 passed (22.0 s)**; each test asserts 0 console errors and 0 off-origin requests |
 
 
 
@@ -2304,24 +2310,27 @@ each department?"*
 - **Implementation batches E-1…E-5**, each with its own gate, and an explicit list of what must NOT change
   (palette, typography, `src/components/ui/**`, route map, determinism, `package.json`).
 
-**Honest state (updated 2026-09-28 — batch E-1 is now DONE):** the 20 new groups are **in the code**.
-E-2…E-5 are still NOT STARTED, so **no department models a new group yet** and the document rail still holds
-the old invented filenames. Two wrong figures in the plan document were **found and fixed at source** this
-session: the Christian share was written **85.3%** and is **85.2%** (12,937,804 ÷ 15,178,957), and the
-informal-sector share was written **64.9%** and is **65.0%** (2,069,901 ÷ 3,186,598). Two rows of the modelled
-table were also mis-numbered (9 and 10 → 19 and 20).
+**Honest state (updated 2026-09-28 — batches E-1 and E-2 are DONE):** the 20 new groups are **in the code**,
+and **every one is now modelled by at least one department** — so a real run draws on them. The participant
+groups changed for all 16 departments (each now models **6–8**, up from 4–6). **E-3…E-5 are still NOT STARTED**,
+so the document rail still holds the old invented filenames and no citation is shown anywhere yet. Two wrong
+figures in the plan document were **found and fixed at source** during E-1: the Christian share was written
+**85.3%** and is **85.2%** (12,937,804 ÷ 15,178,957), and the informal-sector share was written **64.9%** and is
+**65.0%** (2,069,901 ÷ 3,186,598). Two rows of the modelled table were also mis-numbered (9 and 10 → 19 and 20).
 
 | Batch | Work | Status |
 |---|---|---|
 | **E-1** | Add the 20 new groups to `src/config/reference.ts`, each with a real share or the `Modelled` label; extend the weight gate | **DONE** — 36 groups in total. **9 new groups carry a real published share** (persons with disabilities, faith-based organisations, tourism operators, manufacturers, transport operators, researchers, pensioners, informal-sector workers, women) and **11 new groups are `Modelled`** (traditional leaders, energy and water utilities, ICT and network operators, communities by protected areas, media, cooperatives, trade unions, employer federations, artisanal miners, cross-border traders, war veterans). Two extra named bases were added, because two shares are **not** percentages of the two bases already in use: people aged 5 and over (**13,102,643**, the disability base) and the QLFS Q2 2025 employed total (**3,186,598**, the informal-sector base). The weight gate now checks all four bases, pins the modelled set exactly, and carries a specific gate for the traditional-leaders case (a real count in the note, a `Modelled` weight, never a share) |
-| **E-2** | Give each of the 16 departments the groups that belong to its mandate (6–8 each, up from 4–6) | NOT STARTED |
+| **E-2** | Give each of the 16 departments the groups that belong to its mandate (6–8 each, up from 4–6) | **DONE** — every department now models **6–8** groups (eleven model 8, five model 7; none below 6), **123 department-to-group assignments in total** (was 84). All **36** canonical groups are modelled by at least one department, so nothing sits unused. Each group was placed only where the department's own mandate reaches it: **war veterans → `def`** (whose mandate is literally "the welfare of war veterans") · **traditional leaders → `opc` + `lg`** · **faith-based organisations → `opc` + `edu`** · **media → `opc` + `mfa`** · **manufacturers → `fin` + `zimra` + `zida`** · **pensioners → `fin` + `psc` + `def`** · **trade unions → `psc`** · **cooperatives → `agri`** · **informal-sector workers → `agri` + `zimra`** · **persons with disabilities → `health` + `edu` + `def`** · **women → `health` + `edu`** · **researchers → `hedu` + `ict`** · **employer federations → `hedu` + `zida`** · **ICT and network operators → `ict`** · **artisanal miners → `mines`** · **communities by protected areas → `mines` + `env`** · **energy and water utilities → `energy` + `lg` + `env`** · **transport operators → `energy` + `lg`** · **tourism operators → `mfa` + `env` + `zida`** · **cross-border traders → `mfa` + `zimra`**. **Three new gates added** (6–8 groups per department with no repeats; every canonical group modelled somewhere; an exact pin of all 16 department→group lists) |
 | **E-3** | Add the `CITED_INSTRUMENTS` table plus `citation`/`instrument` on `DepartmentDocument`, and wire each department's documents to real instruments | NOT STARTED |
 | **E-4** | Render the citation in the document rail; show each group's share and source on the Reference screen | NOT STARTED |
 | **E-5** | Full suite green + review zip | NOT STARTED |
 
-**One test pins the group count — it was updated deliberately this session, not silently:** `src/test/workspace.test.tsx`
-line 88 now asserts `STAKEHOLDER_SEGMENTS` has length **36** (was 16). The landing test and `coverage.ts` read
-the length from the source, so they needed no change — and both were confirmed to render 36 without edit.
+**Two counts are pinned deliberately, never silently:** (1) `src/test/workspace.test.tsx` line 88 asserts
+`STAKEHOLDER_SEGMENTS` has length **36** (was 16) — the landing test and `coverage.ts` read the length from the
+source, so they needed no change and both render 36 without an edit. (2) `src/test/departments.test.ts` now pins
+**every** department's group list exactly (`DEPARTMENT_SEGMENTS`), together with 6–8 groups per department and no
+orphan group, so any future change to what a department models must be deliberate.
 
 #### AB-1 — the graph, diagnosed from the code so a cold session does not re-derive it
 
@@ -2521,22 +2530,30 @@ measurement test). **No file was deleted, no dependency or schema changed, and `
   model — do not resurrect them), the graph diagnosis with the exact current stroke values, the agreed
   graph-only colour exemption, and the **official Zimbabwean figures already gathered** so they are never
   re-researched.
-- **The next action, exactly:** **E-1 is DONE (2026-09-28)** — the 20 new groups are now in
+- **The next action, exactly:** **E-1 and E-2 are DONE (2026-09-28)** — the 20 new groups are in
   `src/config/reference.ts` (**36 in total**), the weight gate covers all four bases and pins the exact modelled
-  set, and the pinned count in `src/test/workspace.test.tsx` reads **36**. The whole ladder is green (302/302
-  tests, 10/10 Playwright). **Do not re-fetch any figure; every one is recorded above and in
+  set, **every department now models 6–8 groups** (all 36 groups used by at least one department), and the pinned
+  count in `src/test/workspace.test.tsx` reads **36**. The whole ladder is green (305/305 tests, 10/10 Playwright).
+  **Do not re-fetch any figure; every one is recorded above and in
   `docs/PLATFORM_ENRICHMENT_PLAN.md`.** The deeper research remains **DONE** and written to that plan (Phase AC):
   **20 new stakeholder groups → 36 in total** (9 with a real published share, 11 explicitly `Modelled`), plus
   **real citable instruments for each of the 16 departments** (Banking Act [Chapter 24:20], Education Act
   [Chapter 25:04], Electricity Act [Chapter 13:19], Mines and Minerals Act [Chapter 21:05], Traditional Leaders
   Act [Chapter 29:17], War Veterans Act [Chapter 11:15], and the Constitution (Amendment No. 20) Act, 2013) —
   **the instruments are still NOT in the code.**
-  **The next action is batch E-2:** give each of the 16 departments the groups that belong to its mandate
-  (6–8 each, up from 4–6), then **E-3** (the `CITED_INSTRUMENTS` table + `citation`/`instrument` on
-  `DepartmentDocument`, wiring each department's documents to real instruments) → **E-4** (render the citation in
-  the document rail; each group's share and source on the Reference screen) → **E-5** (full suite + review zip).
-  E-2 is where the run's group split actually changes, so write its gate carefully: every department's segments
-  resolve, every group is used by at least one department, and no department models an irrelevant group.
+  **The next action is batch E-3:** add the `CITED_INSTRUMENTS` table plus the optional `citation`/`instrument`
+  fields on `DepartmentDocument`, and wire each department's documents to real instruments — the full
+  per-department list is **PART 2.2 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** (for example the Banking
+  Act [Chapter 24:20] + Reserve Bank of Zimbabwe Act [Chapter 22:15] to `fin`; Education Act [Chapter 25:04] to
+  `edu`; Electricity Act [Chapter 13:19] to `energy`; Mines and Minerals Act [Chapter 21:05] to `mines`;
+  Traditional Leaders Act [Chapter 29:17], Urban Councils Act [Chapter 29:15] and Rural District Councils Act
+  [Chapter 29:13] to `lg`; War Veterans Act [Chapter 11:15] and Veterans of the Liberation Struggle Act
+  [Chapter 17:12] to `def`; Public Health Act [Chapter 15:17] to `health`; plus the Constitution (Amendment
+  No. 20) Act, 2013 and NDS2 2026–2030 for every department). **Show a chapter number only where the
+  consolidated index confirms it — otherwise the title alone, never a guessed number.** Its gate: every citation
+  resolves to the table, so a fabricated citation cannot be added. Then **E-4** (render the citation in the
+  document rail; each group's share and source on the Reference screen) → **E-5** (full suite + review zip).
+  **The instruments are still NOT in the code** — E-3 is the batch that puts them there.
   **Never invent a share — an official figure or the `Modelled` label, nothing in between.**
   **AB-1 is finished and verified** (its own section above holds the evidence: pixel-pinned strokes, per-group
   colour, per-kind shape, a shape-first legend, the measured before/after, and the four mutated gates). Read

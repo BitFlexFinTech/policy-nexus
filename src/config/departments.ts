@@ -141,7 +141,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "opc-milestone", label: "Reform milestones met", value: "41 of 60", score: 68, tone: "primary", note: "Milestones completed against the public sector reform programme.", source: "Reform programme tracker" },
       { id: "opc-response", label: "Cross-ministry turnaround", value: "23", unit: "days", score: 54, tone: "warning", note: "Average time to resolve a matter referred between ministries.", source: "Cabinet committee secretariat" },
     ],
-    segments: ["civil-servants", "local-authorities", "development-partners", "formal-business", "youth"],
+    segments: ["civil-servants", "local-authorities", "development-partners", "formal-business", "youth", "traditional-leaders", "faith-groups", "media"],
     policyTemplates: [
       {
         id: "opc-tpl-coordination",
@@ -198,7 +198,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "fin-taxbase", label: "Registered taxpayer growth", value: "+6.8", unit: "% YoY", score: 68, tone: "primary", note: "Growth in the active taxpayer register year on year.", source: "Revenue authority register" },
       { id: "fin-investment", label: "Approved investment value", value: "USD 1.9B", score: 62, tone: "gold", note: "Value of investment licences approved in the period.", source: "Investment agency pipeline" },
     ],
-    segments: ["exporters", "formal-business", "financial-sector", "civil-servants", "informal-traders", "diaspora"],
+    segments: ["exporters", "formal-business", "financial-sector", "civil-servants", "informal-traders", "diaspora", "manufacturers", "pensioners"],
     policyTemplates: [
       {
         id: "fin-tpl-settlement",
@@ -256,7 +256,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "agri-herd", label: "National cattle herd", value: "5.4M", score: 62, tone: "gold", note: "Estimated national herd after the annual veterinary survey.", source: "Veterinary services survey" },
       { id: "agri-input", label: "Input support delivery", value: "76", unit: "%", score: 76, tone: "warning", note: "Share of enrolled households receiving inputs before planting.", source: "Input programme monitoring" },
     ],
-    segments: ["smallholder-farmers", "rural-households", "informal-traders", "exporters", "women-led-enterprises", "development-partners"],
+    segments: ["smallholder-farmers", "rural-households", "informal-traders", "exporters", "women-led-enterprises", "development-partners", "cooperatives", "informal-workers"],
     policyTemplates: [
       {
         id: "agri-tpl-inputs",
@@ -313,7 +313,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "health-staffing", label: "Nurse posts filled", value: "81", unit: "%", score: 81, tone: "primary", note: "Funded nursing posts with an officer in place.", source: "Establishment returns" },
       { id: "health-immune", label: "Child immunisation coverage", value: "87", unit: "%", score: 87, tone: "gold", note: "Children completing the scheduled course before age one.", source: "Expanded programme returns" },
     ],
-    segments: ["health-workers", "urban-households", "rural-households", "civil-servants", "development-partners", "women-led-enterprises"],
+    segments: ["health-workers", "urban-households", "rural-households", "civil-servants", "development-partners", "women-led-enterprises", "persons-with-disabilities", "women"],
     policyTemplates: [
       {
         id: "health-tpl-workforce",
@@ -370,7 +370,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "edu-transition", label: "Secondary transition", value: "82", unit: "%", score: 82, tone: "primary", note: "Grade 7 completers progressing to form one.", source: "Examinations returns" },
       { id: "edu-feeding", label: "Feeding coverage", value: "1.6M", unit: "learners", score: 70, tone: "gold", note: "Learners receiving a daily meal under the programme.", source: "Programme monitoring returns" },
     ],
-    segments: ["educators", "rural-households", "urban-households", "youth", "development-partners", "women-led-enterprises"],
+    segments: ["educators", "rural-households", "urban-households", "youth", "development-partners", "women-led-enterprises", "faith-groups", "persons-with-disabilities"],
     policyTemplates: [
       {
         id: "edu-tpl-fees",
@@ -427,7 +427,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "hedu-graduation", label: "Graduation rate", value: "78", unit: "%", score: 78, tone: "success", note: "Registered students completing their programme within the standard duration.", source: "Institutional returns" },
       { id: "hedu-research", label: "Research outputs registered", value: "212", score: 66, tone: "gold", note: "Publications and intellectual property registrations in the year.", source: "Research council register" },
     ],
-    segments: ["youth", "educators", "formal-business", "diaspora", "development-partners"],
+    segments: ["youth", "educators", "formal-business", "diaspora", "development-partners", "researchers", "employer-federations"],
     policyTemplates: [
       {
         id: "hedu-tpl-funding",
@@ -484,7 +484,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "ict-data-cost", label: "Data cost", value: "4.1", unit: "% of GNI", score: 58, tone: "warning", note: "Entry-level mobile data basket as a share of average income.", source: "Regulator market report" },
       { id: "ict-egov", label: "Services online", value: "38 of 120", score: 32, tone: "gold", note: "High-volume public services available end to end online.", source: "e-Government programme office" },
     ],
-    segments: ["urban-households", "rural-households", "financial-sector", "formal-business", "youth", "informal-traders"],
+    segments: ["urban-households", "rural-households", "financial-sector", "formal-business", "youth", "informal-traders", "ict-operators", "researchers"],
     policyTemplates: [
       {
         id: "ict-tpl-data-cost",
@@ -541,7 +541,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "mines-licences", label: "Licence turnaround", value: "48", unit: "days", score: 42, tone: "primary", note: "Average time from complete application to decision.", source: "Mining cadastre" },
       { id: "mines-incidents", label: "Reportable incidents", value: "31", unit: "per year", score: 62, tone: "success", note: "Reportable accidents recorded across inspected operations.", source: "Inspectorate returns" },
     ],
-    segments: ["mining-operators", "rural-households", "exporters", "local-authorities", "formal-business"],
+    segments: ["mining-operators", "rural-households", "exporters", "local-authorities", "formal-business", "artisanal-miners", "conservation-communities"],
     policyTemplates: [
       {
         id: "mines-tpl-royalty",
@@ -598,7 +598,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "energy-supply", label: "Unserved demand", value: "410", unit: "MW", score: 48, tone: "gold", note: "Average shortfall met through load management.", source: "System operator returns" },
       { id: "energy-losses", label: "Distribution losses", value: "12.6", unit: "%", score: 60, tone: "success", note: "Energy lost between transmission and billing.", source: "Utility performance report" },
     ],
-    segments: ["formal-business", "urban-households", "rural-households", "mining-operators", "informal-traders"],
+    segments: ["formal-business", "urban-households", "rural-households", "mining-operators", "informal-traders", "energy-water-utilities", "transport-operators"],
     policyTemplates: [
       {
         id: "energy-tpl-tariff",
@@ -655,7 +655,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "psc-appraisal", label: "Appraisals completed", value: "64", unit: "%", score: 64, tone: "primary", note: "Officers with a completed and countersigned annual appraisal.", source: "Performance management returns" },
       { id: "psc-training", label: "Training days per officer", value: "4.2", score: 42, tone: "gold", note: "Average recorded training days per officer in the year.", source: "Training records" },
     ],
-    segments: ["civil-servants", "youth", "women-led-enterprises", "local-authorities", "development-partners"],
+    segments: ["civil-servants", "youth", "women-led-enterprises", "local-authorities", "development-partners", "pensioners", "trade-unions"],
     policyTemplates: [
       {
         id: "psc-tpl-establishment",
@@ -712,7 +712,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "lg-roads", label: "Feeder roads in good condition", value: "48", unit: "%", score: 48, tone: "gold", note: "Assessed feeder road length in fair or better condition.", source: "Road condition survey" },
       { id: "lg-absorption", label: "Devolution absorption", value: "71", unit: "%", score: 71, tone: "success", note: "Allocated devolution funds spent within the financial year.", source: "Devolution fund returns" },
     ],
-    segments: ["local-authorities", "urban-households", "rural-households", "informal-traders", "women-led-enterprises"],
+    segments: ["local-authorities", "urban-households", "rural-households", "informal-traders", "women-led-enterprises", "traditional-leaders", "energy-water-utilities", "transport-operators"],
     policyTemplates: [
       {
         id: "lg-tpl-water",
@@ -769,7 +769,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "mfa-trade-util", label: "Preferential access utilisation", value: "58", unit: "%", score: 58, tone: "gold", note: "Exports eligible for preferential terms that actually claim them.", source: "Trade statistics" },
       { id: "mfa-remittance", label: "Recorded remittances", value: "USD 2.1B", score: 70, tone: "success", note: "Formal remittance inflows recorded in the year.", source: "Balance of payments" },
     ],
-    segments: ["exporters", "diaspora", "development-partners", "formal-business", "financial-sector"],
+    segments: ["exporters", "diaspora", "development-partners", "formal-business", "financial-sector", "tourism-operators", "cross-border-traders", "media"],
     policyTemplates: [
       {
         id: "mfa-tpl-trade-utilisation",
@@ -826,7 +826,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "env-licences", label: "Environmental licence turnaround", value: "62", unit: "days", score: 38, tone: "gold", note: "Average time from complete application to decision.", source: "Environmental agency records" },
       { id: "env-climate", label: "Adaptation plans in place", value: "31 of 92", score: 34, tone: "primary", note: "Local authorities with an adopted climate adaptation plan.", source: "Climate programme returns" },
     ],
-    segments: ["rural-households", "smallholder-farmers", "mining-operators", "development-partners", "local-authorities"],
+    segments: ["rural-households", "smallholder-farmers", "mining-operators", "development-partners", "local-authorities", "conservation-communities", "tourism-operators", "energy-water-utilities"],
     policyTemplates: [
       {
         id: "env-tpl-catchment",
@@ -883,7 +883,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "def-response", label: "Civil support response", value: "14", unit: "hrs", score: 66, tone: "gold", note: "Average time from a request by civil authorities to deployment.", source: "Operations records" },
       { id: "def-equipment", label: "Equipment serviceability", value: "71", unit: "%", score: 71, tone: "warning", note: "Major equipment assessed as serviceable.", source: "Technical services returns" },
     ],
-    segments: ["civil-servants", "rural-households", "development-partners", "local-authorities"],
+    segments: ["civil-servants", "rural-households", "development-partners", "local-authorities", "war-veterans", "pensioners", "persons-with-disabilities"],
     policyTemplates: [
       {
         id: "def-tpl-veterans",
@@ -940,7 +940,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "zimra-filing", label: "On-time filing rate", value: "69", unit: "%", score: 69, tone: "primary", note: "Registered taxpayers filing by the due date.", source: "Taxpayer register" },
       { id: "zimra-audit", label: "Audit yield per case", value: "USD 18k", score: 62, tone: "gold", note: "Average additional assessment raised per completed audit.", source: "Audit performance report" },
     ],
-    segments: ["formal-business", "informal-traders", "exporters", "financial-sector", "mining-operators"],
+    segments: ["formal-business", "informal-traders", "exporters", "financial-sector", "mining-operators", "informal-workers", "cross-border-traders", "manufacturers"],
     policyTemplates: [
       {
         id: "zimra-tpl-clearance",
@@ -997,7 +997,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "zida-zones", label: "Zone occupancy", value: "63", unit: "%", score: 63, tone: "success", note: "Developable area in designated zones occupied by operating firms.", source: "Zone administration returns" },
       { id: "zida-retention", label: "Investor retention", value: "89", unit: "%", score: 89, tone: "primary", note: "Licensed investors still operating three years after licensing.", source: "Aftercare survey" },
     ],
-    segments: ["formal-business", "exporters", "diaspora", "development-partners", "financial-sector"],
+    segments: ["formal-business", "exporters", "diaspora", "development-partners", "financial-sector", "manufacturers", "employer-federations", "tourism-operators"],
     policyTemplates: [
       {
         id: "zida-tpl-onestop",
