@@ -155,7 +155,7 @@ client is registered.
   transition to the officer's journey), then **five approved scale indicators**, then a two-column
   body: the **eight-stage process** (policy draft → policy understanding → knowledge map → simulated
   population → agent interactions → scenario run → policy intelligence → policy assessment) and the
-  compact **simulated-environment schematic** with a 40-mark agent field.
+  compact **simulated-environment schematic** with a **140**-mark agent field (40 before Phase AA).
 - **Measured in the browser, not eyeballed:** h2 24px/600 vs the statement's 20px; five indicators on
   one aligned row at 1440 and 1024 (the `Scenario-based` figure wraps, so its height is reserved —
   without the reserve its label sat 16px low, which the render caught); columns 559/505px of 1104
@@ -190,22 +190,33 @@ client is registered.
 - **Determinism:** seeded layout, fixed `dt = 1/60` steps, no `Math.random`/`Date.now`/`new Date`; a
   repeated run produces a byte-identical graph, and a re-settled swarm lands on identical
   coordinates. Both are asserted, not assumed.
-- **Accessibility, verified in the DOM:** four kinds distinguished by size **and** a legend entry in
-  words (never colour alone — `--warning` and `--gold` are the same value in this palette, which is
-  why documents are drawn in `--muted-foreground`); every mark is a `role="button"` with an
-  accessible name, operable by keyboard; selecting a mark states **all** of its relationships as
-  text; the SVG's edge labels are `aria-hidden` because the panel is the same information, read once;
-  `prefers-reduced-motion` starts no animation and keeps drag interactive.
+- **Accessibility, verified in the DOM — four independent channels (sharpened in Phase AB-1):** a
+  mark's **shape** carries its kind (the draft a ring, a group a circle, a priority a square, a
+  document a diamond), its **fill** carries the group, its **size** carries its weight, and its
+  **written label** is always drawn beside it — so nothing on the surface is carried by colour alone,
+  which is the point: **one in 25 African males (4%)** is red–green colour-blind (Okabe & Ito,
+  *Colour Universal Design*). The legend draws each kind **as its own shape** (`MarkSwatch`) and states
+  *"Shape is the kind · colour is the group"*. Because the palest group fill measures only **1.32:1**
+  against the white card, **every filled mark carries a pinned ink outline**, and a guard measures every
+  fill against the real `--card` token parsed out of `src/index.css`. (`--warning` and `--gold` are the
+  same value in this palette, which is why the kinds are never separated by token colour alone.) Every
+  mark is a `role="button"` with an accessible name, operable by keyboard; selecting a mark states
+  **all** of its relationships as text; the SVG's edge labels are `aria-hidden` because the panel is the
+  same information, read once; `prefers-reduced-motion` starts no animation and keeps drag interactive.
 - **Measured, not eyeballed:** settled layouts for five departments keep every pair of marks
   **≥ 88 units** apart inside the 1000×750 virtual frame; the model reaches a **true rest** (600
   further steps change nothing) in 249–2570 steps; the compact form draws at `visualScale` 1.6 so its
-  labels are legible in the smaller card.
-- **Runtime:** `npm run validate` **PASS**, `npm run typecheck` exit 0, `npm run lint` 0 errors,
-  `npm test` **190/190**, `npm run build` ✓, `npx playwright test` **8/8** with **0 console errors and
-  0 off-origin requests** — the new browser test asserts the graph is incomplete at the start, grows
-  on its own while the rounds run, states exactly the declared number of relationships on selection,
-  keeps edge labels off until asked, moves a mark by drag, and is complete when *Assessment Complete*
-  appears.
+  labels are legible in the smaller card. **Phase AB-1 added the measurement that mattered most:** in
+  the real browser at 1280 / 900 / 640 px the draft's ring paints **2 px**, a group's outline **1.25 px**
+  and an edge **1.36 px** at *every* width — against **0.56 / 0.99 / 0.67 px** for the outline before
+  the fix, which is the sub-pixel grey line that was reported.
+- **Runtime (re-run on the Phase AB-1 bytes):** `npm run validate` **PASS**, `npm run typecheck` exit 0,
+  `npm run lint` 0 errors, `npm test` **296/296 (23 files)**, `npm run build` ✓, `npx playwright test`
+  **10/10** with **0 console errors and 0 off-origin requests** per test. The graph's browser test
+  asserts the graph is incomplete at the start, grows on its own while the rounds run, states exactly the
+  declared number of relationships on selection, keeps edge labels off until asked, moves a mark by drag,
+  and is complete when *Assessment Complete* appears; the newest test measures the stroke weights at
+  three card widths.
 - **Making the reveal longer is what makes the growth visible:** `ROUND_TICK_MS` went **320 → 1150 ms**
   (exported as `RUN_ROUND_TICK_MS`), so a run now takes ~10–18 s. The unit test that drives the reveal
   derives its step count from that exported constant instead of hardcoding one, and additionally
@@ -222,21 +233,24 @@ Minister who counts would find it. Phase AA made the population **real and singu
 - The **caption, the on-screen figure and the marks drawn** are all derived from that one record
   (`AgentPopulation`), and `marks` is read from the field actually drawn — so the words can never
   claim a different number of marks from the ones on the screen.
-- The field is **capped** (600 marks on the full card, 180 on the compact one) and, whenever the cap
+- The field is **capped** (**320** marks on the full card, **140** on the compact one — lowered from
+  600/180 in Phase AB-1, because 600 marks of one colour merged into a smudge) and, whenever the cap
   bites, the card says in plain words how many agents one mark stands for
-  (*"Each mark stands for about 4 agents"*). This is deliberate: drawing one vector mark per agent at
+  (*"Each mark stands for about 8 agents"*). This is deliberate: drawing one vector mark per agent at
   this population would be a smudge, not a picture.
 
 | Item | Status now | What replaces it | Where it is entered |
 |---|---|---|---|
 | Modelled agent population (2,000–3,200 per run) | **Mock / scenario mode** — a seeded modelled figure, **not** a measured count of real people | The engine's own agent count, reported per run | `buildAgentField()` in `src/services/assessment/network.ts` — one function, no UI change |
 | Split of the population across stakeholder groups | **Mock / scenario mode** — seeded weights, so group sizes differ believably but are not real census shares | Real population shares per segment | same function |
-| Drawn marks (600 / 180 cap) and the stated ratio | **Presentation, deliberately capped** — an honesty device, not a limitation of the model | Nothing: a real engine with the same population should keep a cap and keep stating the ratio | `AGENT_MARK_CAP`, `AGENT_COMPACT_MARK_CAP` in the same file |
+| Drawn marks (320 / 140 cap) and the stated ratio | **Presentation, deliberately capped** — an honesty device, not a limitation of the model | Nothing: a real engine with the same population should keep a cap and keep stating the ratio | `AGENT_MARK_CAP`, `AGENT_COMPACT_MARK_CAP` in the same file |
 
-**Verified in a real browser (Chromium, built preview):** the public page reads **2,763** modelled
-agents over **180** marks; a `fin` run reads **2,191** agents over **495** marks and
-*"15 / 15 entities · 32 / 32 relationships"*. Guards: 9 new unit tests plus real-DOM counts in
-`e2e/journey.spec.ts`.
+**Verified in a real browser (Chromium, built preview) — re-measured in Phase AB-1 after the caps
+changed:** the public page reads **2,763** modelled agents over **140** marks (the compact cap exactly,
+at both 1440 px and 390 px); a Finance-department run reads **2,495** agents over **274** marks and
+*"15 / 15 entities"*, captioned *"Each mark stands for about 8 agents"*. (The Phase AA figures were
+2,763 over 180 marks and 2,191 over 495.) Guards: 10 palette guards, 19 card tests and real-DOM counts
+in `e2e/journey.spec.ts`.
 
 **Outside the estate:** front-end only, so the deploy rule is unchanged — remember this is a new
 build, so it must actually be deployed before it is presented. As at this record the live host still

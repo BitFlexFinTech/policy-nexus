@@ -1368,6 +1368,15 @@ because the block it sits in already names itself.
 | 2026-09-27 | `npx playwright test` (Phase AA) | **9 passed (17.7 s)**, 0 console errors, 0 off-origin requests. New assertions: the authority line sits **above** the h1 by real geometry; the landing figure matches `/^\d{1,3}(,\d{3})+$/`, is **≥ 2,000** and appears exactly **twice**; the public page draws **> 50** nested agent circles; the run draws **> 100** and shows the stated ratio; the drag aims at `:scope > circle` |
 | 2026-09-27 | **real-browser measurement of the field** (Phase AA) | Read from the built preview in Chromium, not from the unit tests. **Public page:** `Simulated agents` = **2,763**, caption *"Each mark stands for about 5 agents — 2,763 simulated across the modelled groups."*, **180** agent marks + **6** group marks; `scrollWidth` = `clientWidth` at 1440/1024/390. **A `fin` run, after the run finished:** *"15 / 15 entities · 32 / 32 relationships"*, **2,191** agents, *"Each mark stands for about 4 agents"*, **495** agent marks, **510** circles in total (was 15) |
 | 2026-09-27 | **real-browser measurement of the authority line** (Phase AA) | 1440×820: line **161 px** tall, top 210 → h1 439, hero action bottom **754 — above the fold**. 1024×768: identical, action bottom **754 — above the fold**. 390×844: line **272 px**, h1 577, action bottom **922 — below the fold**. No sideways scroll at any width (`scrollWidth` = `clientWidth`) |
+| 2026-09-28 | `npm run validate` (Phase AB-1) | **PASS — all checks green.** No check was added, removed or loosened by this item; the graph's own colours live in `src/lib/graph/palette.ts` under the recorded Phase AB exemption, so the locked platform palette and the measured-contrast check are untouched |
+| 2026-09-28 | `npm run typecheck` (Phase AB-1) | **exit 0** (`tsc -b --pretty false`, no output) |
+| 2026-09-28 | `npm run lint` (Phase AB-1) | **0 errors**, the same **7** pre-existing `react-refresh` warnings in `src/components/ui/**` — none in the new or changed files |
+| 2026-09-28 | `npm test` (Phase AB-1) | **296 passed / 23 files** (was 288/23). `graph-palette.test.ts` **6 → 10** and `graph-card.test.tsx` **15 → 19**; `network.test.ts` keeps its count but its legend guard now tests shapes instead of a colour token |
+| 2026-09-28 | `npm run build` (Phase AB-1) | **✓ built in 455 ms** (also 477 ms on the intermediate run) — no new warnings beyond the pre-existing chunk-size note |
+| 2026-09-28 | `npx playwright test` (Phase AB-1) | **10 passed (17.6 s)**, 0 console errors, 0 off-origin requests per test (was 9). The four re-anchored selectors and the new three-width measurement all pass |
+| 2026-09-28 | **real-browser measurement before/after the stroke fix** (Phase AB-1) | The new e2e test reads the card's rendering scale and what each stroke really paints, at 1280 / 900 / 640 px. **AFTER (pinned):** scale 0.445 / 0.792 / 0.532 → ring **2 px**, group outline **1.25 px**, edge **1.36 px** at **every** width; agent mark **3.42 / 6.08 / 4.09 px**. **BEFORE (mutation: every `vector-effect="non-scaling-stroke"` removed, rebuilt):** ring 0.89 / 1.58 / 1.06 px, outline **0.56 / 0.99 / 0.67 px**, edge 0.61 / 1.08 / 0.72 px — the outline painted about **half a pixel**, the reported grey smear. Card file restored byte-identical (`467984cabb041d2730bce5d5b40e7e3a8e74237dfed3be8c985fed266ca15c0f`) |
+| 2026-09-28 | **mutation proofs of the four new gates** (Phase AB-1) | Mutations: (1) unpin every stroke → `graph-card.test.tsx` *pins every stroke to real pixels* FAIL + the browser measurement FAIL; (2) `GRAPH_NODE_SHAPE.priority` `square` → `circle` → *gives every kind of mark a shape of its own* FAIL and `network.test.ts` *names all four kinds … with a shape of its own* FAIL; (3) the document fill → `#F7F7F7` → *keeps every fill far enough from the card surface* FAIL; (4) the agent field drawn in one gold → *colours each group with its own palette colour, outlined in ink* FAIL. **4 failed / 41 passed** as expected; `palette.ts` and the card both restored with hashes **identical** to before the mutation (`44ea86c6…`, `467984ca…`) |
+| 2026-09-28 | `npm run validate && typecheck && lint && npm test && build && npx playwright test` (Phase AB-1, final bytes) | **ALL GREEN**: validate PASS · typecheck exit 0 · lint 0 errors · **296/296 (23 files)** · build ✓ · playwright **10/10**. `EXIT:0` |
 
 
 
@@ -2014,8 +2023,8 @@ SUPERSEDED by this decision** — it must be rewritten down to three documents a
 
 | # | Item | Status |
 |---|---|---|
-| **AB-1** | **Graph quality and per-group colour** (the graph only — *not* the platform palette) | **IN PROGRESS** |
-| **AB-2** | **More stakeholder groups, with real ZIMSTAT weights** | NOT STARTED |
+| **AB-1** | **Graph quality and per-group colour** (the graph only — *not* the platform palette) | **DONE — verified this session (see below)** |
+| **AB-2** | **More stakeholder groups, with real ZIMSTAT weights** | NOT STARTED — **this is the next item** |
 | **AB-3** | **Real reference documents** for the departments shown in the demo | NOT STARTED |
 | **AB-4** | **AI "Draft the policy"** — department prompt library, grounding, citation verification, provenance | NOT STARTED |
 | **AB-5** | **"Real data, and where it comes from"** — a short named-source statement on the platform, and the reference-rate reconciliation | NOT STARTED |
@@ -2100,23 +2109,58 @@ tiers, or two kinds, collapse into each other — so "no ambiguity" becomes a te
   glance, and demanding more would force colours a colour-blind reader genuinely cannot separate.
   A second defect was found and fixed **in my own diagnostic**: `closestPair` printed the *simulated*
   colours, so it named colours that do not exist in the palette; it now reports the original pair.
-- **NOT YET DONE — the next step, in this order.** Wire the palette into
-  `src/components/relationship/RelationshipGraphCard.tsx`:
-  1. **Pixel-pinned strokes** — add `vector-effect="non-scaling-stroke"` to the edges and to every mark's
-     outline, and express their widths in real pixels (~1.0 for edges, ~1.25 for outlines) instead of
-     `× visualScale`, so a line stops blurring when the card is scaled down.
-  2. **A fixed agent field** — the Phase AA field of up to 600 `fill-gold/60` marks reads as fog. Redraw it
-     from the group's own palette colour, fewer and better defined, and measure at three widths before
-     fixing the density.
-  3. **Per-group colour and per-kind shape** — `ring` for the draft (no fill, ink outline), `circle` for a
-     group, `square` for a priority, `diamond` for a document, with the group's colour from
-     `graphGroupColour(index)`.
-  4. **A legend that shows shape and colour**, not colour alone.
-  5. **Re-anchor two test selectors**, because a mark stops being a `<circle>` for every kind:
-     `src/test/graph-card.test.tsx` (`g[role='button'] > circle`) and `e2e/journey.spec.ts`
-     (`:scope > circle`). Give the mark element a stable class and select on that.
-- **Verified green at this point:** `npm run validate` PASS · `typecheck` exit 0 · `lint` 0 errors ·
-  `npm test` **288/288 (23 files)** · `build` ✓.
+- **DONE — the drawing, verified this session.** The palette is wired into
+  `src/components/relationship/RelationshipGraphCard.tsx`, and all five agreed steps are in:
+  1. **Pixel-pinned strokes — DONE.** Edges, every mark's outline, the focus indicator and each agent mark
+     carry `vector-effect="non-scaling-stroke"`, and their widths are real pixels: `GRAPH_EDGE_STROKE` 1 +
+     strength×0.6, `GRAPH_MARK_OUTLINE_STROKE` 1.25, `GRAPH_RING_STROKE` 2, `GRAPH_FOCUS_STROKE` 1.5 — all in
+     `src/lib/graph/palette.ts`, so the weights live beside the colours instead of being scattered through the
+     JSX. Nothing is multiplied by `visualScale` any more. **One deliberate exception:** the label and
+     edge-label halos stay scaled, because a halo has to stay proportional to the text it backs; the reason is
+     written at the code. The focus indicator is now **dashed**, so it is never read as a mark's outline.
+  2. **The agent field — DONE, and measured at three widths before the density was fixed.** Marks are drawn in
+     THEIR OWN GROUP'S colour at 90% opacity with a pinned hairline (class `graph-agent-mark`), caps came down
+     from 600/180 to **320/140**, and the radius went up from 2.1 to 2.4. In the real browser the compact card
+     now paints each mark at **3.4–6.1 px** (measured, below).
+  3. **Per-group colour and per-kind shape — DONE.** `GRAPH_NODE_SHAPE` gives the draft a `ring` (no fill, ink
+     outline), a group a `circle`, a priority a `square`, a document a `diamond`; a group's fill is
+     `graphGroupColour(index)`. **Every filled mark is outlined in ink (`GRAPH_INK`)**, because the fills
+     measure as little as **1.32:1** against the white card (the yellow) — a guard now pins that down.
+  4. **The legend — DONE.** Each of the four entries draws the REAL SHAPE for its kind (an inline SVG swatch,
+     class `graph-legend-swatch`, reading the same map the surface draws with), and the legend says *"Shape is
+     the kind · colour is the group"* in words.
+  5. **The test selectors — DONE.** The mark carries a stable class (`graph-mark`, the field
+     `graph-agent-mark`) and every old element-name selector was re-anchored: `graph-card.test.tsx`
+     (`g[role='button'] > circle`) and `e2e/journey.spec.ts` (`:scope > circle`, plus its three
+     `g[role='button'] g circle` field counts).
+- **Two further defects found and fixed at source while wiring it (not parked):** `radiusOf` in the card
+  re-declared the radius table `src/lib/graph/swarm.ts` already owns — it now reads `NODE_RADIUS`, so the mark
+  drawn and the space the physics keeps cannot drift; and `RELATIONSHIP_KINDS` in `network.ts` carried a `tone`
+  colour-token field that became a second source of truth for something the palette owns once the legend drew
+  shapes — the field is **deleted**, and the legend guard was rewritten to guard SHAPES, which is what the
+  legend really draws.
+- **Measured before and after in a real browser — this is the evidence for the whole item.** The new test
+  *"the drawing stays crisp at three card widths"* reads the card's rendering scale and what each stroke
+  actually paints, at 1280 / 900 / 640 px. **After:** scale 0.445 / 0.792 / 0.532, with the ring at **2 px**,
+  a group outline at **1.25 px** and an edge at **1.36 px** at **every** width. **Before (proved by mutation
+  against the same test):** ring 0.89 / 1.58 / 1.06 px and **outline 0.56 / 0.99 / 0.67 px** — the outline
+  really did paint about half a pixel, which is exactly the grey smear that was reported.
+- **Gates added, each proved able to fail (mutated, observed failing, restored byte-identical):**
+  `graph-palette.test.ts` **6 → 10** (fills ≥ 25 Lab from the real `--card` token parsed out of `index.css`;
+  ink ≥ 25 from every fill; the pinned weights in a usable pixel band; one shape per kind),
+  `graph-card.test.tsx` **15 → 19** (per-kind shape, the group's own colour in the mark AND in its agent field,
+  the reserved fills, every stroke pinned, the legend drawn as four shapes), and `e2e/journey.spec.ts`
+  **9 → 10**. Mutations used: unpinning every stroke (`467984ca…`), `priority: "square"` → `"circle"`, the
+  document fill → near-white, and the field drawn in one gold — **four guards fired**, and both files were
+  restored with hashes identical to before.
+- **One agreed fix item deliberately NOT applied, with the reason recorded:** *"align straight lines to the
+  pixel grid"*. In SVG the only way is `shape-rendering="crispEdges"`, which switches anti-aliasing **off** for
+  a whole element — right for axis-aligned rules, visibly jagged for the diagonal edges a force-directed graph
+  actually draws. The pinned 1 px weight (measured above) is the correct treatment for these lines; the
+  decision is recorded here rather than left as a silent omission.
+- **Verified green this session, on the final bytes:** `npm run validate` PASS · `typecheck` exit 0 · `lint`
+  **0 errors** (the same 7 pre-existing `react-refresh` warnings) · `npm test` **296/296 (23 files)** ·
+  `build` ✓ · `npx playwright test` **10/10**, each test asserting 0 console errors and 0 off-origin requests.
 
 ## Files touched this session (redeploy of Phases R–S + PR opened + Lovable removal + PR merged + Phase X + Phase Y + Phase Z)
 
@@ -2178,6 +2222,27 @@ on the server (not deleted, by design).
 **Verified intact after the deploy:** `.well-known/pki-validation/01a0d6ee-8023-7203-9abc-a37b9060f00d.txt`,
 `cgi-bin/`.
 
+## Files touched in Phase AB-1 (the graph drawn in pixels)
+
+**Repo:** `src/lib/graph/palette.ts` — the ink (`GRAPH_INK`, renamed from `GRAPH_RING_COLOUR` so one
+value serves both the draft's ring and every mark's outline), the pinned pixel weights
+(`GRAPH_EDGE_STROKE`, `GRAPH_EDGE_STROKE_STRENGTH`, `GRAPH_MARK_OUTLINE_STROKE`, `GRAPH_RING_STROKE`,
+`GRAPH_FOCUS_STROKE`), `GRAPH_NODE_SHAPE` now keyed by `RelationshipNodeKind` (the kind union is declared
+once, in `network.ts`), and the corrected header (the measured limit is **five** colours, not eight).
+`src/components/relationship/RelationshipGraphCard.tsx` — `vector-effect="non-scaling-stroke"` and real
+pixel widths on the edges, every mark outline, the focus indicator and each agent mark; the mark drawn
+per kind (`ring`/`circle`/`square`/`diamond`) and filled with the group's own colour; `MarkSwatch` (the
+legend, one real shape per kind) plus the line *"Shape is the kind · colour is the group"*; the agent
+field drawn in its group's colour; `radiusOf` now reads `NODE_RADIUS` instead of re-declaring the table;
+the stable classes `graph-mark`, `graph-agent-mark`, `graph-focus-ring`, `graph-legend-swatch`.
+`src/services/assessment/network.ts` — `AGENT_MARK_CAP` 600 → **320**, `AGENT_COMPACT_MARK_CAP` 180 →
+**140**, `AGENT_MARK_RADIUS` 2.1 → **2.4**, with the measured reason written beside them; the dead `tone`
+field removed from `RELATIONSHIP_KINDS`.
+**Tests:** `src/test/graph-palette.test.ts` (6 → 10 guards: both files' `cardColour` is parsed out of
+`index.css`, plus the stroke-band and shape guards), `src/test/graph-card.test.tsx` (15 → 19; selectors
+re-anchored to the mark classes), `src/test/network.test.ts` (the legend guard now tests shapes),
+`e2e/journey.spec.ts` (9 → 10: the four field/mark selectors re-anchored, and the new three-width
+measurement test). **No file was deleted, no dependency or schema changed, and `dist/` was rebuilt.**
 ## RESUME HERE
 
 - **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
@@ -2190,10 +2255,15 @@ on the server (not deleted, by design).
   model — do not resurrect them), the graph diagnosis with the exact current stroke values, the agreed
   graph-only colour exemption, and the **official Zimbabwean figures already gathered** so they are never
   re-researched.
-- **The next action, exactly:** continue **AB-1 — graph quality and per-group colour**. Open
-  `http://localhost:8080/` (the landing page's compact graph) and `/app/simulations/:id` (a run) and look at
-  the lines, then apply the agreed fix: `vector-effect="non-scaling-stroke"`, ~1.0 px edges and ~1.25 px
-  outlines, a fixed agent field, tier colours with per-kind shapes, and the colour-blind validator check.
+- **The next action, exactly:** start **AB-2 — more stakeholder groups, with real ZIMSTAT weights.**
+  **AB-1 is finished and verified** (its own section above holds the evidence: pixel-pinned strokes, per-group
+  colour, per-kind shape, a shape-first legend, the measured before/after, and the four mutated gates). Read
+  `src/config/reference.ts` (`STAKEHOLDER_SEGMENTS` — **16** today) and `src/config/departments.ts` (which
+  segments each department models) **before adding any**, because the run, the assessment and the graph all
+  derive their groups from those two files; the ZIMSTAT figures already gathered are listed under
+  **AB-6 — evidence already gathered** so they are never re-researched. Nothing about the graph needs doing
+  again. If any graph drawing is touched, read `src/lib/graph/palette.ts` (colours, shapes and the pinned
+  pixel weights) and `src/components/relationship/RelationshipGraphCard.tsx` (how they are drawn) first.
 - **The final deliverable is spoken, not built:** when the build is done and verified, say the words
   *"Now the build is complete. Here is the prompt to copy and paste into Claude."* and produce the **funding
   memo, the pitch deck and the one-page ask**. `docs/PROPOSAL_PROMPT.md` still describes the older
@@ -2204,12 +2274,17 @@ on the server (not deleted, by design).
   inside `<main>` (`src/pages/Landing.tsx`, ~lines 100–140), and the old bottom ministerial panel is
   **deleted**, not duplicated. The graph now carries a real **agent population**
   (`src/services/assessment/network.ts`): 2,000–3,200 modelled agents per run, drawn as up to
-  **600** marks on the full card and **180** on the compact card, with the ratio stated in words on
-  the card. **A cold session must read `src/services/assessment/network.ts` (the population and the
-  field) and `src/components/relationship/RelationshipGraphCard.tsx` (how it is drawn) before
-  touching the graph**, then `src/components/public/SimulationVisuals.tsx` (the derived figure).
-  Measured in a real browser this session: the public page shows **2,763 agents over 180 marks**;
-  a `fin` run shows **2,191 agents over 495 marks** (it used to draw 15 circles and say "1,000+").
+  **320** marks on the full card and **140** on the compact card — the caps came down from 600/180 in
+  **AB-1** because 600 read as fog — with the ratio stated in words on the card. **A cold session must
+  read `src/services/assessment/network.ts` (the population and the field), `src/lib/graph/palette.ts`
+  (colours, shapes and the pinned pixel weights) and
+  `src/components/relationship/RelationshipGraphCard.tsx` (how it is drawn) before touching the graph**,
+  then `src/components/public/SimulationVisuals.tsx` (the derived figure).
+  Measured in a real browser in **AB-1**, superseding the Phase AA figures: the public page shows
+  **2,763 agents over 140 marks** (the compact cap exactly, at both 1440 px and 390 px); a
+  Finance-department run shows **15 / 15 entities**, **2,495 agents over 274 marks**, captioned *"Each
+  mark stands for about 8 agents"*. (Before Phase S that same card drew **15 circles** and said
+  "1,000+".)
   Open item, flagged not fixed: the scale strip still reads *"Hundreds · Relationships"* while a run
   draws 32 structural relationships.
 - **Phase S is the current state of the run view and the public "Simulated population" block**
@@ -2236,9 +2311,11 @@ on the server (not deleted, by design).
   verified in a real browser against the live origin (2/2 checks, 0 console errors, 0 off-origin
   requests, SSL token intact). To publish any further change: `npm run build`, then the `.env`-based
   FTPS `mirror -R dist .` command below.
-- **Branch:** `feature/unified-platform` · **HEAD:** `d90db02` (`feat(phase-aa)`), followed by the
-  `docs(phase-aa)` record commit — run `git rev-parse HEAD`. `tree:` clean. Phase AA is the last
-  **code** change; earlier functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B ·
+- **Branch:** `feature/unified-platform` · **HEAD:** `c5ee2ef` (`feat(phase-ab)` — the graph drawn in
+  pixels), followed by the `docs(phase-ab)` record commit — always run `git rev-parse HEAD` rather than
+  trusting this line. `tree:` clean. **Phase AB-1 is the last code change.** The previous two commits were
+  `81e7e21` (`feat(phase-ab)` — the graph colour foundation) and `2094248` (`docs(phase-ab)` — the funding
+  plan). Earlier functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B ·
   `6b69dfb` Phase C · Phase D = the commit whose message begins `feat(phase-d)` · Phase J =
   `feat(phase-j)` · Phases E–G = `feat(phase-e)` · Phase H = `test(phase-h)` · Phase M =
   `feat(phase-m)` · Phase N = `feat(phase-n)` · Phase O = `feat(phase-o)` · Phase P =
