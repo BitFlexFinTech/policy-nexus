@@ -2806,14 +2806,20 @@ dependency was added or removed**. `dist/` was rebuilt.
 
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`.** The commit to know is **`1d7c5d3`** — the stale-document sweep
-  (six false statements corrected at source; validate checks 11 and 12 added) — on top of `76a38d3`
-  (Batches A–G, the deploy, the retirements); the last **code** commit before the sweep was `5a918ea`
-  (Batch G). A status-only commit recording this file follows `1d7c5d3`, so **run `git log --oneline -8 |
-  cat` as the second opinion on state** and treat any commit after `1d7c5d3` that touches only documents
-  as part of the same record. **Working tree clean.** Baseline `main` is untouched at `7451db0`;
-  `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything
-  is committed, so a cold session can start from this file alone.
+- **Branch `feature/unified-platform`.** The two commits to know are **`f4e253f`** (Phase AD **R1** — the
+  indicator basis and its 11 gates) and **`bde486d`** (Phase AD **R2** — 13 real published figures), on top
+  of `0d6a670` and the stale-document sweep `1d7c5d3` before that. **Run `git log --oneline -8 | cat` as
+  the second opinion on state**, and treat any commit after `bde486d` that touches only documents as part
+  of the same record. **Working tree clean.** Baseline `main` is untouched at `7451db0`; `origin/main` is
+  still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything is committed, so
+  a cold session can start from this file alone.
+- **What to do next, in order:** **R3** — the next research cluster (finance, revenue, investment and the
+  remaining infrastructure measures: `fin`, `zimra`, `zida`, `agri`, and what R2 left in `energy` and
+  `mines`), researching each figure from its own publication exactly as R2 did with the World Bank; then
+  **R4** and **R5** for whatever is left; then **R7** (docs and **redeploy** — the live host is behind this
+  build right now, which `npm run validate` states as INFO); then **R8 = AB-7**. **Read first:**
+  `src/config/departments.ts` (the indicator lines), `src/config/reference.ts` (`NAMED_SOURCES` and the
+  sourcing statement), `src/test/indicator-basis.test.tsx` (the gates), then the **Phase AD** section below.
 - **THE LIVE SITE IS NOW THIS BUILD.** `nzwisiso.bitflex.app` serves `assets/index-BeggQU9V.js`, the same
   file `npm run build` emits — verified by fetching the served file and hashing it:
   `c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`, identical to the local
@@ -2825,13 +2831,13 @@ dependency was added or removed**. `dist/` was rebuilt.
   then `npx playwright test` — expected **all green** (**369/369 tests across 31 files**, **11/11** Playwright,
   validate **13/13**: the `--destructive` known-red is **retired**, and the two checks added in this
   defect sweep cover the *retired document statements* and the *deployment claim and its evidence*).
-- **The order of what remains. (1) Put the 63 department indicator values to the user** — it is the only
-  BLOCKED item; it needs their decision plus 63 real per-department figures that are not in this
-  repository, and by the agreed order it must be settled **before AB-7**. **(2) Then AB-7, the final
-  Claude prompt** — the funding memo, the pitch deck and the one-page ask — by rewriting
+- **The order of what remains.** (1) **R3–R5** — research the remaining indicators, department by
+  department, upgrading each one to a published figure or leaving it plainly labelled `Modelled`.
+  (2) **R7** — update the documents and **redeploy** (the live host is behind this build). (3) **R8 =
+  AB-7**, the final Claude prompt — the funding memo, the pitch deck and the one-page ask — by rewriting
   `docs/PROPOSAL_PROMPT.md` down from the six-document version to three. **AB-7 is the last item, and
-  nothing follows it.** The goal, the dropped items and the decision rules are in the **Phase AB**
-  section below.
+  nothing follows it.** The user's decision on the 63 indicator values was taken this session, so that
+  question is **closed** and is recorded in **Phase AD**.
 - **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
   FIRST (it is below, in the phase list).** It holds: the goal in the user's words (*"we just want to get
   this platform funded … this is just a tool that will help each department research and draft policies"*),
