@@ -17,8 +17,11 @@
  * 11. Retired statements absent from the documents — false facts that were corrected at
  *     source, so a cold session cannot reintroduce one by copying an old paragraph
  * 12. The deployment claim is stated, agreed across documents, and carries its evidence
+ * 13. The Coat of Arms carries a recorded sha256 that matches the file, and every icon size
+ *     index.html declares actually exists on disk
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join, relative } from "node:path";
 
 const ROOT = process.cwd();
@@ -394,6 +397,68 @@ if (!existsSync(cssPath)) {
               ? "  (the same file — the live host is current)"
               : "  (a different file — the live host is behind this build until it is redeployed)")
           : "    no local build in this working copy (run `npm run build` to compare)"),
+    );
+  }
+}
+
+// 13 — THE COAT OF ARMS, AND THE ICON SET. A picture is the one thing no other check can watch:
+//      nothing in the source code names what is inside it, so swapping the drawing is invisible to
+//      every other validator — which is exactly how a stylised drawing came to be shown under a
+//      "Government of Zimbabwe" masthead. So the record must carry the file's sha256 and this check
+//      compares the recorded value against the bytes on disk: the document is the claim, the file is
+//      the reality. The icon hrefs are read out of index.html rather than listed here, so a declared
+//      size that no longer exists cannot pass, and there is no second copy of that list to drift.
+{
+  const artwork = join(ROOT, "src/assets/zimbabwe-coat-of-arms.png");
+  const problems = [];
+  let actual = null;
+  if (!existsSync(artwork)) {
+    problems.push(
+      "src/assets/zimbabwe-coat-of-arms.png is missing — the masthead, the tab icon and the iOS tile all derive from this one file",
+    );
+  } else {
+    actual = createHash("sha256").update(readFileSync(artwork)).digest("hex");
+    const recorded = [];
+    for (const f of ["PROJECT_STATUS.md", "PRODUCTION_READINESS.md"].map((n) => join(ROOT, n)).filter(existsSync)) {
+      const text = readFileSync(f, "utf8").replace(/\s+/g, " ");
+      for (const m of text.matchAll(/zimbabwe-coat-of-arms\.png/g)) {
+        for (const h of text.slice(m.index, m.index + 400).matchAll(/[0-9a-f]{64}/g)) {
+          recorded.push({ file: rel(f), hash: h[0] });
+        }
+      }
+    }
+    if (!recorded.length) {
+      problems.push(
+        "no sha256 is recorded beside src/assets/zimbabwe-coat-of-arms.png, so nobody can check whether the artwork in the build is the official one",
+      );
+    }
+    for (const r of recorded) {
+      if (r.hash !== actual) {
+        problems.push(
+          `${r.file} records sha256 ${r.hash} for the Coat of Arms, but the file on disk hashes to ${actual} — either the artwork was swapped or the record is stale`,
+        );
+      }
+    }
+  }
+
+  const html = existsSync(join(ROOT, "index.html")) ? readFileSync(join(ROOT, "index.html"), "utf8") : "";
+  const declared = new Set(
+    [...html.matchAll(/href="\/([A-Za-z0-9._-]+\.(?:ico|png))"/g)].map((m) => m[1]),
+  );
+  if (!declared.size) {
+    problems.push("index.html declares no icon — the browser tab would show a blank page symbol");
+  }
+  for (const name of declared) {
+    const p = join(ROOT, "public", name);
+    if (!existsSync(p) || statSync(p).size === 0) {
+      problems.push(`index.html declares /${name} but public/${name} is missing or empty`);
+    }
+  }
+
+  check("Coat of Arms fingerprinted and every declared icon present", problems);
+  if (actual) {
+    notes.push(
+      `INFO  Coat of Arms sha256 ${actual.slice(0, 12)}…  ·  ${declared.size} icon file(s) declared in index.html, all present in public/`,
     );
   }
 }
