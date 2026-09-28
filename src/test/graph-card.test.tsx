@@ -2,10 +2,23 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { RelationshipGraphCard } from "@/components/relationship/RelationshipGraphCard";
 import { findDepartment } from "@/config/departments";
+import {
+  GRAPH_EDGE_STROKE,
+  GRAPH_EDGE_STROKE_STRENGTH,
+  GRAPH_GROUP_COLOURS,
+  GRAPH_INK,
+  GRAPH_MARK_OUTLINE_STROKE,
+  GRAPH_NODE_FILL,
+  GRAPH_NODE_SHAPE,
+  GRAPH_RING_STROKE,
+  graphGroupColour,
+  shapePoints,
+} from "@/lib/graph/palette";
 import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
 import {
   AGENT_COMPACT_MARK_CAP,
   RELATION_BANK,
+  RELATIONSHIP_KINDS,
   buildPreviewRelationshipGraph,
   buildRelationshipGraph,
   relationshipKindLabel,
@@ -259,9 +272,12 @@ describe("relationship graph card — being read and used", () => {
   it("draws the compact form larger, because it is read in a smaller card", () => {
     const graph = buildPreviewRelationshipGraph();
     const radiusOfFirstMark = (container: HTMLElement) =>
-      // Direct-child circles only: the agent field is drawn inside a nested group
-      // around each stakeholder mark, and it must not be mistaken for the mark.
-      Number(container.querySelector("g[role='button'] > circle")?.getAttribute("r"));
+      // The mark is selected by its own class, not by its element name: a mark is a
+      // circle only for the draft (a ring) and a group — a priority is a square and a
+      // document a diamond. The draft is drawn first, so the first mark is the ring.
+      // The agent field sits inside a nested group and carries a different class, so it
+      // can never be mistaken for the mark.
+      Number(container.querySelector("g[role='button'] > .graph-mark")?.getAttribute("r"));
 
     const full = render(<RelationshipGraphCard graph={graph} seed="same-seed" />);
     const fullRadius = radiusOfFirstMark(full.container);
@@ -330,7 +346,7 @@ describe("relationship graph card — the agent field", () => {
     // The field is nested INSIDE the group marks, which is exactly what makes it
     // ride the group's transform — so the whole school of agents moves for free
     // rather than costing a calculation per mark per frame.
-    const field = container.querySelectorAll("g[role='button'] g circle");
+    const field = container.querySelectorAll("g[role='button'] .graph-agent-mark");
     expect(field.length).toBeGreaterThan(100);
     expect(field.length).toBeLessThanOrEqual(graph.population.marks);
 
@@ -352,7 +368,7 @@ describe("relationship graph card — the agent field", () => {
       <RelationshipGraphCard graph={graph} seed="landing::structure" compact />,
     );
 
-    const field = container.querySelectorAll("g[role='button'] g circle");
+    const field = container.querySelectorAll("g[role='button'] .graph-agent-mark");
     expect(field.length).toBeGreaterThan(30);
     expect(field.length).toBeLessThanOrEqual(AGENT_COMPACT_MARK_CAP + 6);
     // The marks are a sample of the population, not the population — which is why
@@ -369,6 +385,131 @@ describe("relationship graph card — the agent field", () => {
 
     // One mark so far, and it is the draft — not a modelled group, so there is no
     // agent field yet: the population arrives with the groups that stand for it.
-    expect(container.querySelectorAll("g[role='button'] g circle").length).toBe(0);
+    expect(container.querySelectorAll("g[role='button'] .graph-agent-mark").length).toBe(0);
+  });
+});
+/**
+ * THE DRAWING ITSELF.
+ *
+ * These guards exist because the surface was reported as looking poor: outlines were
+ * expressed in the 1000×750 virtual space and then scaled down, so a mark's outline
+ * became a fraction of a pixel and anti-aliased into grey; every group was drawn in one
+ * colour; and the agent field read as a smudge. Each guard below fails if any of that
+ * comes back, which is what makes the fix more than a one-off tidy-up.
+ */
+describe("relationship graph card — the drawing", () => {
+  /** The `<g role="button">` that a given node is drawn as, found by its own label. */
+  const groupFor = (container: HTMLElement, node: { label: string; kind: string }) => {
+    const group = Array.from(container.querySelectorAll("g[role='button']")).find((element) =>
+      (element.getAttribute("aria-label") ?? "").startsWith(
+        `${node.label}, ${relationshipKindLabel(node.kind as never)},`,
+      ),
+    );
+    expect(group, `no mark drawn for "${node.label}"`).toBeTruthy();
+    return group as SVGGElement;
+  };
+
+  /** The drawn mark for a node — selected by its class, never by its element name. */
+  const markFor = (container: HTMLElement, node: { label: string; kind: string }) => {
+    const mark = groupFor(container, node).querySelector(":scope > .graph-mark");
+    expect(mark, `no mark element for "${node.label}"`).toBeTruthy();
+    return mark as SVGElement;
+  };
+
+  it("gives every kind its own shape, so shape carries the kind and colour the group", () => {
+    const { graph, seed } = scenario("fin");
+    const { container } = render(<RelationshipGraphCard graph={graph} seed={seed} />);
+
+    graph.nodes.forEach((node) => {
+      const mark = markFor(container, node);
+      // A round kind is a circle, a pointed kind a polygon — taken from the palette's
+      // own map, so the surface and the legend cannot drift apart.
+      const expected = shapePoints(GRAPH_NODE_SHAPE[node.kind], 1) ? "polygon" : "circle";
+      expect(mark.tagName.toLowerCase(), `${node.kind} drawn`).toBe(expected);
+    });
+
+    // The draft is the RING: no fill at all, the heaviest line on the surface.
+    const draft = markFor(container, graph.nodes.find((node) => node.kind === "policy")!);
+    expect(draft.getAttribute("fill")).toBe("none");
+    expect(Number(draft.getAttribute("stroke-width"))).toBe(GRAPH_RING_STROKE);
+  });
+it("colours each group with its own palette colour, outlined in ink", () => {
+    const { graph, seed } = scenario("fin");
+    const { container } = render(<RelationshipGraphCard graph={graph} seed={seed} />);
+
+    const groups = graph.nodes.filter((node) => node.kind === "stakeholder");
+    const fills = groups.map((node, position) => {
+      const mark = markFor(container, node);
+      const fill = mark.getAttribute("fill");
+      expect(fill, `${node.label} is drawn in its own group colour`).toBe(
+        graphGroupColour(position),
+      );
+      // The ink outline is what defines the shape: the palest group fill measures
+      // 1.32:1 against the white card, so colour alone could never carry it.
+      expect(mark.getAttribute("stroke")).toBe(GRAPH_INK);
+      expect(Number(mark.getAttribute("stroke-width"))).toBe(GRAPH_MARK_OUTLINE_STROKE);
+      return fill;
+    });
+
+    // `fin` models six groups, so the whole five-colour palette is really reached —
+    // including the fifth colour, which only a fifth group can produce.
+    expect(new Set(fills).size).toBe(GRAPH_GROUP_COLOURS.length);
+
+    // And the field of agents standing for a group is drawn in that group's colour,
+    // so the picture and the field say the same thing.
+    groups.forEach((node, position) => {
+      const field = groupFor(container, node).querySelectorAll(".graph-agent-mark");
+      expect(field.length, `${node.label} has an agent field`).toBeGreaterThan(0);
+      field.forEach((mark) => {
+        expect(mark.getAttribute("fill")).toBe(graphGroupColour(position));
+      });
+    });
+
+    // The two reserved kinds keep their own fills, so a priority or a document is
+    // never mistaken for a modelled group.
+    const priority = markFor(container, graph.nodes.find((node) => node.kind === "priority")!);
+    expect(priority.getAttribute("fill")).toBe(GRAPH_NODE_FILL.priority);
+    const corpus = markFor(container, graph.nodes.find((node) => node.kind === "corpus")!);
+    expect(corpus.getAttribute("fill")).toBe(GRAPH_NODE_FILL.corpus);
+  });
+it("pins every stroke to real pixels, so nothing thins into a grey smear", () => {
+    const { graph, seed } = scenario("fin");
+    const { container } = render(<RelationshipGraphCard graph={graph} seed={seed} />);
+
+    // Edges: a pixel weight, pinned, so the line does not shrink with the card.
+    const edges = container.querySelectorAll("svg line");
+    expect(edges.length).toBeGreaterThan(0);
+    edges.forEach((edge) => {
+      expect(edge.getAttribute("vector-effect")).toBe("non-scaling-stroke");
+      const width = Number(edge.getAttribute("stroke-width"));
+      expect(width).toBeGreaterThanOrEqual(GRAPH_EDGE_STROKE);
+      expect(width).toBeLessThanOrEqual(GRAPH_EDGE_STROKE + GRAPH_EDGE_STROKE_STRENGTH);
+    });
+
+    // Marks: one outline each, pinned, and never thinner than the outline weight.
+    const marks = container.querySelectorAll("svg .graph-mark");
+    expect(marks).toHaveLength(graph.nodes.length);
+    marks.forEach((mark) => {
+      expect(mark.getAttribute("vector-effect")).toBe("non-scaling-stroke");
+      const width = Number(mark.getAttribute("stroke-width"));
+      expect(width).toBeGreaterThanOrEqual(GRAPH_MARK_OUTLINE_STROKE);
+      expect(width).toBeLessThanOrEqual(GRAPH_RING_STROKE);
+    });
+  });
+
+  it("draws the legend as four shapes, one per kind — not four colour dots", () => {
+    const graph = buildPreviewRelationshipGraph();
+    const { container } = render(<RelationshipGraphCard graph={graph} seed="legend::seed" />);
+
+    const swatches = container.querySelectorAll(".graph-legend-swatch");
+    expect(swatches).toHaveLength(RELATIONSHIP_KINDS.length);
+    swatches.forEach((swatch) => {
+      const drawn = swatch.querySelector("circle, polygon");
+      expect(drawn, "a legend swatch with no shape in it").not.toBeNull();
+      expect(drawn!.getAttribute("stroke")).toBe(GRAPH_INK);
+    });
+
+    // And the legend states which channel carries what, so it is not left to inference.
+    expect(screen.getByText(/Shape is the kind/)).toBeInTheDocument();
   });
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { findDepartment } from "@/config/departments";
 import { getStakeholderSegment } from "@/config/reference";
+import { GRAPH_NODE_SHAPE } from "@/lib/graph/palette";
 import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
 import {
   AGENT_MARK_CAP,
@@ -143,18 +144,19 @@ describe("relationship graph — derived from the run", () => {
     });
   });
 
-  it("names all four kinds in the legend, one entry each, with a swatch of its own", () => {
+  it("names all four kinds in the legend, one entry each, with a shape of its own", () => {
     expect(RELATIONSHIP_KINDS.map((entry) => entry.kind).sort()).toEqual([
       "corpus",
       "policy",
       "priority",
       "stakeholder",
     ]);
-    // The legend is colour-coded, so no two kinds may share a swatch token: two
-    // kinds drawn in one colour would be indistinguishable on the surface.
-    expect(new Set(RELATIONSHIP_KINDS.map((entry) => entry.tone)).size).toBe(
-      RELATIONSHIP_KINDS.length,
-    );
+    // The legend draws each kind AS ITS SHAPE, read from the same map the surface draws
+    // with — so this guard is about shapes, not about a colour class. Two kinds drawn as
+    // one shape would be indistinguishable on the surface, however they were coloured.
+    const shapes = RELATIONSHIP_KINDS.map((entry) => GRAPH_NODE_SHAPE[entry.kind]);
+    expect(new Set(shapes).size).toBe(RELATIONSHIP_KINDS.length);
+    shapes.forEach((shape) => expect(shape).toBeTruthy());
   });
 });
 

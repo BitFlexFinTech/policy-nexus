@@ -105,17 +105,21 @@ export interface AgentPopulation {
   caption: string;
 }
 
-/** The four node kinds, with the one label each kind is shown under. */
+/** The four node kinds, with the one label each kind is shown under.
+ *
+ *  NOTE: the legend used to carry a `tone` (a Tailwind background token) per kind. It
+ *  is gone deliberately: the legend now draws each kind AS ITS SHAPE, read from
+ *  `@/lib/graph/palette` — the same map the surface draws with — so the legend cannot
+ *  drift from the picture. A second colour field here would be a second source of truth
+ *  for something the palette already owns. */
 export const RELATIONSHIP_KINDS: ReadonlyArray<{
   kind: RelationshipNodeKind;
   label: string;
-  /** Palette token for the legend mark — an existing token, not a new colour. */
-  tone: string;
 }> = [
-  { kind: "policy", label: "Policy draft", tone: "bg-primary" },
-  { kind: "stakeholder", label: "Stakeholder group", tone: "bg-gold" },
-  { kind: "priority", label: "Stated priority", tone: "bg-success" },
-  { kind: "corpus", label: "Reference document", tone: "bg-muted-foreground" },
+  { kind: "policy", label: "Policy draft" },
+  { kind: "stakeholder", label: "Stakeholder group" },
+  { kind: "priority", label: "Stated priority" },
+  { kind: "corpus", label: "Reference document" },
 ];
 
 export const relationshipKindLabel = (kind: RelationshipNodeKind): string =>
@@ -240,13 +244,25 @@ const finalise = (spec: GraphSpec): RelationshipGraph => {
 export const AGENT_POPULATION_FLOOR = 2000;
 export const AGENT_POPULATION_CEILING = 3200;
 
-/** The most marks ever drawn on the full card, and on the compact schematic. */
-export const AGENT_MARK_CAP = 600;
-export const AGENT_COMPACT_MARK_CAP = 180;
+/**
+ * The most marks ever drawn on the full card, and on the compact schematic.
+ *
+ * WHY THESE NUMBERS: the Phase AA field drew its marks at 600 and read as fog rather
+ * than as a field of agents. Measured on a six-group department, that was about 92 marks
+ * of radius 2.1 inside each group's 32-unit cluster — the marks covered roughly 40% of
+ * the cluster's area, and at 60% opacity they merged. At 320 the same cluster carries
+ * about 51 marks of radius 2.4, covering about 30%, with each mark drawn in its own
+ * group's colour at 90% opacity: the density is what changed least, and the separation,
+ * the colour and the definition are what make the individual marks readable. The count
+ * is still two orders of magnitude above a handful, and the caption states what one mark
+ * stands for, so lowering it costs no honesty.
+ */
+export const AGENT_MARK_CAP = 320;
+export const AGENT_COMPACT_MARK_CAP = 140;
 
 /** How far a group's agents spread from its centre, and how big each mark is. */
 export const AGENT_CLUSTER_RADIUS = 32;
-export const AGENT_MARK_RADIUS = 2.1;
+export const AGENT_MARK_RADIUS = 2.4;
 
 /** The golden angle: the cheapest way to scatter points evenly over a disc. */
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));

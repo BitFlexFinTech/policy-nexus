@@ -14,6 +14,20 @@ import {
   type RelationshipNodeKind,
 } from "@/services/assessment/network";
 import {
+  GRAPH_EDGE_STROKE,
+  GRAPH_EDGE_STROKE_STRENGTH,
+  GRAPH_FOCUS_STROKE,
+  GRAPH_GROUP_COLOURS,
+  GRAPH_INK,
+  GRAPH_MARK_OUTLINE_STROKE,
+  GRAPH_NODE_FILL,
+  GRAPH_NODE_SHAPE,
+  GRAPH_RING_STROKE,
+  graphGroupColour,
+  shapePoints,
+} from "@/lib/graph/palette";
+import {
+  NODE_RADIUS,
   SWARM_HEIGHT,
   SWARM_WIDTH,
   createSwarm,
@@ -74,26 +88,62 @@ const POINTER_PUSH = 1.6;
 const shortLabel = (label: string, limit = 26): string =>
   label.length > limit ? `${label.slice(0, limit - 1).trimEnd()}\u2026` : label;
 
-/** Node radius by kind, read from the same ranking the physics uses. */
-const radiusOf = (node: RelationshipNode): number => {
-  if (node.kind === "policy") return 26;
-  if (node.kind === "stakeholder") return 15;
-  if (node.kind === "priority") return 11;
-  return 9;
+/** Node radius by kind, read from the ONE ranking (`@/lib/graph/swarm`), so the mark
+ *  that is drawn and the space the physics keeps for it can never disagree. */
+const radiusOf = (node: RelationshipNode): number => NODE_RADIUS[node.kind];
+
+/**
+ * What a mark is filled with.
+ *
+ * Colour answers "which group", so a stakeholder group is filled with ITS OWN colour
+ * from `@/lib/graph/palette`. A stated priority and a reference document take the two
+ * reserved fills. The draft takes no fill at all — it is drawn as a ring, the one mark
+ * that never competes for a colour, because it is unique on the surface already.
+ */
+const fillOf = (kind: RelationshipNodeKind, groupColour: string | undefined): string => {
+  if (kind === "stakeholder") return groupColour ?? GRAPH_INK;
+  if (kind === "priority") return GRAPH_NODE_FILL.priority;
+  if (kind === "corpus") return GRAPH_NODE_FILL.corpus;
+  return "none";
 };
 
-/** Node fill by kind — existing palette tokens only, no new colour literal.
- *  Four visually distinct marks: the hub is the institutional green, the groups
- *  the gold, the priorities the success green, and the documents the neutral
- *  grey they are drawn from. Note the corpus mark is NOT `warning`: `--warning`
- *  and `--gold` are the same colour in this palette, so a document drawn in
- *  `warning` would be indistinguishable from a stakeholder group. */
-const NODE_FILL: Record<RelationshipNodeKind, string> = {
-  policy: "fill-primary",
-  stakeholder: "fill-gold",
-  priority: "fill-success",
-  corpus: "fill-muted-foreground",
-};
+/**
+ * One legend swatch, drawn as the SAME SHAPE the surface draws for that kind — so the
+ * legend answers "what does a square mean" rather than "what does green mean". The
+ * swatch is decorative (the written label beside it says the kind), and it is not
+ * scaled by the card, so its strokes are plain pixels.
+ */
+function MarkSwatch({ kind }: { kind: RelationshipNodeKind }) {
+  const shape = GRAPH_NODE_SHAPE[kind];
+  const points = shapePoints(shape, 5);
+  const fill = fillOf(kind, GRAPH_GROUP_COLOURS[0]);
+  return (
+    <svg
+        width={14}
+        height={14}
+        viewBox="-7 -7 14 14"
+        aria-hidden="true"
+        className="graph-legend-swatch shrink-0"
+      >
+      {points ? (
+        <polygon
+          points={points}
+          fill={fill}
+          stroke={GRAPH_INK}
+          strokeWidth={1.2}
+          strokeLinejoin="round"
+        />
+      ) : (
+        <circle
+          r={5}
+          fill={shape === "ring" ? "none" : fill}
+          stroke={GRAPH_INK}
+          strokeWidth={shape === "ring" ? 2 : 1.2}
+        />
+      )}
+    </svg>
+  );
+}
 
 export interface RelationshipGraphCardProps {
   graph: RelationshipGraph;
@@ -252,6 +302,20 @@ export function RelationshipGraphCard({
       window.cancelAnimationFrame(frame);
     };
   }, [layout, paint, reducedMotion]);
+
+  /**
+   * The colour each modelled group is drawn in. A group's place among the groups fixes
+   * its colour, and the field of agents that stand for it is drawn in the same colour —
+   * so the picture, the field and the mark all say the same thing. Past the fifth group
+   * the palette repeats, which is why every mark also carries its written label.
+   */
+  const groupColourById = useMemo(() => {
+    const colours = new Map<string, string>();
+    graph.nodes
+      .filter((node) => node.kind === "stakeholder")
+      .forEach((node, position) => colours.set(node.id, graphGroupColour(position)));
+    return colours;
+  }, [graph]);
 
   /** How many relationships touch each node — read once, not per row. */
   const degreeOf = useMemo(() => {
@@ -454,7 +518,11 @@ export function RelationshipGraphCard({
                     y1={source.y}
                     x2={target.x}
                     y2={target.y}
-                    strokeWidth={(1.5 + edge.strength * 2.5) * visualScale}
+                    // A real pixel weight, pinned with `non-scaling-stroke`: the line
+                    // keeps its weight however far the card is scaled down, instead of
+                    // thinning into a grey smear in a small card.
+                    strokeWidth={GRAPH_EDGE_STROKE + edge.strength * GRAPH_EDGE_STROKE_STRENGTH}
+                    vectorEffect="non-scaling-stroke"
                     className={cn(
                       emphasised ? "stroke-primary/45" : "stroke-foreground/15",
                       !emphasised && "opacity-40",
@@ -506,6 +574,9 @@ export function RelationshipGraphCard({
                 const dimmed =
                   Boolean(selectedId) && !isSelected && !connectedToSelection.has(node.id);
                 const radius = radiusOf(node) * visualScale;
+                const groupColour = groupColourById.get(node.id);
+                const shape = GRAPH_NODE_SHAPE[node.kind];
+                const markPoints = shapePoints(shape, radius);
                 return (
                   <g
                     key={node.id}
@@ -553,35 +624,72 @@ export function RelationshipGraphCard({
                             cx={agent.dx * visualScale}
                             cy={agent.dy * visualScale}
                             r={AGENT_MARK_RADIUS * visualScale}
-                            className="fill-gold/60"
+                            // The agents are drawn in THEIR OWN GROUP'S colour, so the
+                            // field says which group it belongs to instead of every
+                            // group's marks reading as one grey-gold fog.
+                            fill={groupColour}
+                            fillOpacity={0.9}
+                            // A pinned hairline of the same colour: it keeps each mark's
+                            // edge crisp when the card is small, so the field reads as
+                            // marks rather than as a smudge.
+                            stroke={groupColour}
+                            strokeWidth={0.6}
+                            vectorEffect="non-scaling-stroke"
+                            className="graph-agent-mark"
                           />
                         ))}
                       </g>
                     )}
-                    {/* The ring is the focus, selection and hover indicator — a shape,
-                        not a colour change, so it survives any colour perception. */}
+                    {/* The focus, selection and hover indicator. It is drawn DASHED and
+                        in the platform's own primary, so it is never mistaken for the
+                        mark's solid ink outline — a shape difference, not a colour one,
+                        which is what makes it survive any colour perception. */}
                     {isRinged && (
                       <circle
                         r={radius + 5 * visualScale}
                         fill="none"
-                        strokeWidth={2.5 * visualScale}
-                        className="stroke-primary"
+                        strokeWidth={GRAPH_FOCUS_STROKE}
+                        strokeDasharray="4 3"
+                        vectorEffect="non-scaling-stroke"
+                        className="stroke-primary graph-focus-ring"
                       />
                     )}
-                    {/* Every mark carries a dark outline, so a mark drawn in the gold
-                        token stays defined against the card. */}
-                    <circle
-                      r={radius}
-                      strokeWidth={1.5 * visualScale}
-                      className={cn(NODE_FILL[node.kind], "stroke-foreground/40")}
-                    />
+                    {/* The mark itself. SHAPE answers "what kind is this", COLOUR answers
+                        "which group", and both are backed up by the written label below
+                        — so nothing on this surface is carried by colour alone. The
+                        draft is a ring (no fill); a group is a circle, a priority a
+                        square, a document a diamond. Every filled mark is outlined in
+                        ink, because the fills measure as little as 1.32:1 against the
+                        white card (the yellow) and the outline is what defines the shape. */}
+                    {markPoints ? (
+                      <polygon
+                        points={markPoints}
+                        fill={fillOf(node.kind, groupColour)}
+                        stroke={GRAPH_INK}
+                        strokeWidth={GRAPH_MARK_OUTLINE_STROKE}
+                        strokeLinejoin="round"
+                        vectorEffect="non-scaling-stroke"
+                        className="graph-mark"
+                      />
+                    ) : (
+                      <circle
+                        r={radius}
+                        fill={shape === "ring" ? "none" : fillOf(node.kind, groupColour)}
+                        stroke={GRAPH_INK}
+                        strokeWidth={shape === "ring" ? GRAPH_RING_STROKE : GRAPH_MARK_OUTLINE_STROKE}
+                        vectorEffect="non-scaling-stroke"
+                        className="graph-mark"
+                      />
+                    )}
                     <text
                       y={radius + 18 * visualScale}
                       textAnchor="middle"
                       fontSize={15 * visualScale}
                       className={cn("fill-foreground", node.kind === "policy" && "font-semibold")}
                       // A card-coloured halo under the glyphs, so an edge crossing a
-                      // label does not run through the text.
+                      // label does not run through the text. Unlike the marks' outlines
+                      // this is NOT pinned to pixels: a halo has to stay proportional to
+                      // the text it backs, so it scales with the glyph.
                       style={{ paintOrder: "stroke" }}
                       stroke="hsl(var(--card))"
                       strokeWidth={4 * visualScale}
@@ -609,7 +717,10 @@ export function RelationshipGraphCard({
         )}
       </div>
 
-      {/* The legend names the four kinds, so a mark is never read by colour alone. */}
+      {/* The legend names the four kinds and draws each one AS ITS SHAPE, so the legend
+          answers "what does a square mean" rather than "what does green mean" — colour
+          alone is never the only channel. The trailing line states the division of labour
+          the whole surface follows. */}
       {!compact && (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t px-4 py-2.5">
           {RELATIONSHIP_KINDS.map((kind) => (
@@ -617,10 +728,13 @@ export function RelationshipGraphCard({
               key={kind.kind}
               className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground"
             >
-              <span aria-hidden="true" className={cn("h-2 w-2 rounded-full", kind.tone)} />
+              <MarkSwatch kind={kind.kind} />
               {kind.label}
             </span>
           ))}
+          <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+            Shape is the kind · colour is the group
+          </span>
         </div>
       )}
 

@@ -13,23 +13,51 @@
  * channels — colour, SHAPE, SIZE and its written label — and the shape repeats whatever
  * the colour says, so nothing is carried by colour alone.
  *
- * HONEST LIMIT, measured rather than assumed: eight colours is where distinct identity
- * ends. A department models five to twelve groups, so beyond the eighth the colour
- * repeats and the LABEL carries the distinction. That is why labels are never dropped,
- * however crowded the picture gets. `src/test/graph-palette.test.ts` enforces this —
- * change a value here and it fails.
+ * HONEST LIMIT, measured rather than assumed: FIVE colours is where distinct identity
+ * ends for a red-green colour-blind reader (the probe that produced this number is
+ * recorded in PROJECT_STATUS.md, Phase AB). A department models five to twelve groups,
+ * so beyond the fifth the colour repeats and the LABEL carries the distinction. That is
+ * why labels are never dropped, however crowded the picture gets.
+ * `src/test/graph-palette.test.ts` enforces this — change a value here and it fails.
  *
  * DETERMINISM: pure data and pure arithmetic. No clock, no randomness.
  */
+
+import type { RelationshipNodeKind } from "@/services/assessment/network";
 
 /** A shape a node can be drawn as. Shape is the redundant channel for the node's kind. */
 export type GraphNodeShape = "ring" | "circle" | "square" | "diamond";
 
 /**
- * The draft itself is a RING — no fill at all, a thick ink outline, the largest mark on
- * the surface. It is unique by construction, so it never competes with a group's colour.
+ * The graph's ink. One value, used for two things that must look like the same pen:
+ * the draft's outline (it is drawn as a RING — no fill at all, a thick ink outline, the
+ * largest mark on the surface, unique by construction so it never competes with a
+ * group's colour) and the outline every filled mark carries.
+ *
+ * WHY EVERY FILLED MARK IS OUTLINED IN INK, measured rather than assumed: on the white
+ * card the group fills measure 5.19:1 (blue), 6.85:1 (deep pink), 3.06:1 (magenta),
+ * 2.25:1 (orange) and 1.32:1 (yellow) against the surface. A pale fill with no boundary
+ * would be hard to see at all, so the ink outline carries the mark's SHAPE while the
+ * fill carries the group — which is the whole point of splitting colour from shape.
  */
-export const GRAPH_RING_COLOUR = "#111827";
+export const GRAPH_INK = "#111827";
+
+/**
+ * Stroke weights, in REAL SCREEN PIXELS. Every stroke that uses one of these is drawn
+ * with `vector-effect="non-scaling-stroke"`, so a line keeps the same weight however
+ * small the card is scaled. Before this, weights were expressed in the 1000×750 virtual
+ * space and multiplied by the card's scale: at roughly a 0.5 scale a 1.5-unit outline
+ * became 0.75 real pixels and anti-aliased into grey, which is the "low quality" that
+ * was reported. `src/test/graph-palette.test.ts` keeps these in a usable pixel band.
+ */
+export const GRAPH_EDGE_STROKE = 1;
+/** How much a stronger relationship thickens its edge, on top of the base weight. */
+export const GRAPH_EDGE_STROKE_STRENGTH = 0.6;
+export const GRAPH_MARK_OUTLINE_STROKE = 1.25;
+/** The draft's ring is the heaviest line on the surface — it is the hub. */
+export const GRAPH_RING_STROKE = 2;
+/** The focus/selection indicator, drawn dashed so it is never read as a mark's outline. */
+export const GRAPH_FOCUS_STROKE = 1.5;
 
 /** Everything else is drawn as a filled shape with a dark outline. */
 export const GRAPH_NODE_FILL = {
@@ -58,10 +86,7 @@ export const GRAPH_GROUP_COLOURS = [
 ] as const;
 
 /** The shape each kind of node is drawn as. No two kinds share a shape. */
-export const GRAPH_NODE_SHAPE: Record<
-  "policy" | "stakeholder" | "priority" | "corpus",
-  GraphNodeShape
-> = {
+export const GRAPH_NODE_SHAPE: Record<RelationshipNodeKind, GraphNodeShape> = {
   policy: "ring",
   stakeholder: "circle",
   priority: "square",

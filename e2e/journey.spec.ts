@@ -212,8 +212,13 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     expect(Number(agentFigure.replace(/,/g, ""))).toBeGreaterThanOrEqual(2000);
     await expect(behind.getByText(agentFigure, { exact: true })).toHaveCount(2);
     // And the field those agents are drawn as: the marks nested inside the group
-    // marks, counted in the real DOM. A handful of circles would fail here.
-    expect(await behind.locator("svg g[role='button'] g circle").count()).toBeGreaterThan(50);
+    // marks, counted in the real DOM. A handful of circles would fail here. The marks
+    // are found by their own class rather than by element name, because the group
+    // marks themselves are no longer all circles — a priority is a square and a
+    // document a diamond.
+    expect(await behind.locator("svg g[role='button'] .graph-agent-mark").count()).toBeGreaterThan(
+      50,
+    );
 
     // The eight-stage pipeline, in order, with its supporting lines.
     await expect(behind.locator("ol > li")).toHaveCount(8);
@@ -381,8 +386,11 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     // the diagram both carry it, and it is a real number in the thousands.
     await expect(behind.getByRole("term").first()).toHaveText(/^\d{1,3}(,\d{3})+$/);
     // The agent field is drawn on the compact card too, which is what makes the
-    // claim visible on the page the Minister is most likely to see first.
-    expect(await behind.locator("svg g[role='button'] g circle").count()).toBeGreaterThan(50);
+    // claim visible on the page the Minister is most likely to see first. The marks
+    // are found by class, since the group marks are no longer all circles.
+    expect(
+      await behind.locator("svg g[role='button'] .graph-agent-mark").count(),
+    ).toBeGreaterThan(50);
     await expect(behind.getByText("The simulated environment", { exact: true })).toBeVisible();
 
     const width = await page.evaluate(() => ({
@@ -403,6 +411,113 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     expectCleanRuntime();
   });
 
+/**
+ * THE DRAWING AT THREE WIDTHS — measured in a real browser, not asserted from the code.
+ *
+ * This is the guard for the "low quality" report. The old drawing expressed every
+ * stroke in the 1000×750 virtual space and then multiplied it by the card's scale, so
+ * as the card shrank the outline did too: at roughly a 0.3 scale a 1.5-unit outline
+ * painted about 0.45 of a pixel and anti-aliased into grey. Nothing about that can be
+ * caught by a jsdom test, because jsdom has no layout and no scale.
+ *
+ * So the numbers are MEASURED here: the card's real rendering scale, and what each
+ * stroke actually paints in device pixels (a `non-scaling-stroke` paints its own width;
+ * an unpinned stroke is multiplied by the scale, which is exactly the old defect). Every
+ * assertion prints all three widths in its message, so a failure says what was measured.
+ */
+test("the drawing stays crisp at three card widths", async ({ page }) => {
+  await page.goto("/");
+
+  const measure = () =>
+    page.evaluate(() => {
+      // Found from a mark outwards: the page's first `svg` is an icon in the header,
+      // not the graph, so the surface is identified by what it draws.
+      const mark = document.querySelector(".graph-mark") as SVGElement;
+      const svg = mark.closest("svg") as SVGSVGElement;
+      const edge = svg.querySelector("line") as SVGLineElement;
+      const agent = svg.querySelector(".graph-agent-mark") as SVGCircleElement;
+      // The mark of the group that carries that field — a group's mark outline, which is
+      // the lightest stroke on the surface and therefore the one that used to disappear.
+      const group = agent.closest("g[role='button']") as SVGGElement;
+      const groupMark = group.querySelector(":scope > .graph-mark") as SVGElement;
+
+      const scale = Math.hypot(mark.getScreenCTM()!.a, mark.getScreenCTM()!.b);
+      const paintedPx = (element: SVGElement) => {
+        const width = Number(element.getAttribute("stroke-width"));
+        if (element.getAttribute("vector-effect") === "non-scaling-stroke") return width;
+        return width * Math.hypot(element.getScreenCTM()!.a, element.getScreenCTM()!.b);
+      };
+
+      return {
+        scale: Number(scale.toFixed(3)),
+        ringPx: Number(paintedPx(mark).toFixed(2)),
+        outlinePx: Number(paintedPx(groupMark).toFixed(2)),
+        edgePx: Number(paintedPx(edge).toFixed(2)),
+        agentMarkPx: Number((2 * Number(agent.getAttribute("r")) * scale).toFixed(2)),
+        marksPinned: svg.querySelectorAll(".graph-mark[vector-effect='non-scaling-stroke']").length,
+        marksTotal: svg.querySelectorAll(".graph-mark").length,
+        edgesPinned: svg.querySelectorAll("line[vector-effect='non-scaling-stroke']").length,
+        edgesTotal: svg.querySelectorAll("line").length,
+      };
+    });
+
+  const measured: Array<{ width: number } & Awaited<ReturnType<typeof measure>>> = [];
+  for (const width of [1280, 900, 640]) {
+    await page.setViewportSize({ width, height: 900 });
+    measured.push({ width, ...(await measure()) });
+  }
+
+  const report = measured
+    .map(
+      (entry) =>
+        `${entry.width}px → scale ${entry.scale}, ring ${entry.ringPx}px, ` +
+        `outline ${entry.outlinePx}px, edge ${entry.edgePx}px, agent mark ${entry.agentMarkPx}px`,
+    )
+    .join(" | ");
+
+  measured.forEach((entry) => {
+    // The card really is rendered at a fraction of its virtual size — which is the
+    // condition that used to thin the drawing, so it must really be happening.
+    expect(entry.scale, report).toBeGreaterThan(0);
+    // Pinned: each stroke paints a whole pixel at EVERY width.
+    expect(entry.ringPx, report).toBeGreaterThanOrEqual(1);
+    expect(entry.ringPx, report).toBeLessThanOrEqual(3);
+    expect(entry.outlinePx, report).toBeGreaterThanOrEqual(1);
+    expect(entry.outlinePx, report).toBeLessThanOrEqual(3);
+    expect(entry.edgePx, report).toBeGreaterThanOrEqual(1);
+    expect(entry.edgePx, report).toBeLessThanOrEqual(3);
+    // Every stroke on the surface is pinned, none left in the old scaled form.
+    expect(entry.marksPinned, report).toBe(entry.marksTotal);
+    expect(entry.edgesPinned, report).toBe(entry.edgesTotal);
+    // And an agent mark never becomes a sub-pixel dot. The compact card is the smallest
+    // surface the platform draws, and it measured 3.4–6.1px across these three widths.
+    expect(entry.agentMarkPx, report).toBeGreaterThanOrEqual(2);
+  });
+
+  // The scale really does change between the widths — the landing page reflows its own
+  // column at its breakpoints, so this is not one measurement taken three times. It is
+  // deliberately NOT asserted to rise or fall with the viewport: the column is wider at
+  // 900px than at either 1280px (two-column) or 640px, and a test that assumed otherwise
+  // would be asserting a layout opinion rather than a fact.
+  const scales = measured.map((entry) => entry.scale);
+  expect(Math.max(...scales) - Math.min(...scales), report).toBeGreaterThan(0.1);
+
+  // THE GUARD ITSELF: the scale changes, and the painted stroke weight does NOT. Before
+  // the fix these three values fell as the card shrank, which is exactly the grey,
+  // sub-pixel outline that was reported.
+  (
+    [
+      ["the draft's ring", "ringPx"],
+      ["a group's outline", "outlinePx"],
+      ["an edge", "edgePx"],
+    ] as const
+  ).forEach(([what, key]) => {
+    const painted = new Set(measured.map((entry) => entry[key]));
+    expect(painted.size, `${what} changed weight across the three widths: ${report}`).toBe(1);
+  });
+
+  expectCleanRuntime();
+});
   test("department context survives navigation and a full reload", async ({ page }) => {
     await page.goto("/");
     await enterWorkspace(page);
@@ -586,8 +701,10 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     // which can fall in the gap between the mark and its label.
     const before = await group.getAttribute("transform");
     // Direct children only: the agent field is drawn as circles inside a nested
-    // group around the mark, and the drag must aim at the mark itself.
-    const mark = group.locator(":scope > circle").last();
+    // group around the mark, and the drag must aim at the mark itself. The mark is
+    // found by its own class, because it is a circle for a group but a square for a
+    // priority and a diamond for a document.
+    const mark = group.locator(":scope > .graph-mark").last();
     // Scrolled in first: a pointer event aimed below the fold lands nowhere, and
     // this page is taller than the viewport.
     await mark.scrollIntoViewIfNeeded();
@@ -610,7 +727,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     // ringed by the agents they stand for, counted in the real DOM. This is the
     // guard that stops the page saying "thousands of agents" over a handful of
     // circles ever again.
-    const agentMarks = await graphCard.locator("svg g[role='button'] g circle").count();
+    const agentMarks = await graphCard.locator("svg g[role='button'] .graph-agent-mark").count();
     expect(agentMarks).toBeGreaterThan(100);
     // And the card says in words what each mark stands for, so the density is never
     // mistaken for one mark per agent.
