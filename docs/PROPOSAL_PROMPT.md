@@ -80,6 +80,61 @@ Courier Services, Hon. Tatenda A. Mavetera, MP**, and delivered on the **Nzwisis
   *"an additional analytical lens to support informed human judgement"*. Every generated document
   carries a decision-support disclaimer. **Do not soften these lines and do not contradict them.**
 
+### The national programme this belongs to — "Digitalize Zimbabwe" (verified facts)
+
+Use these facts and **no others**. Do not add detail about the programme that is not written here,
+and do not rename it. The spelling the Government uses is **"Digitalize Zimbabwe"**.
+
+- **Digitalize Zimbabwe is a real, named initiative of the Ministry of Information Communication
+  Technology, Postal and Courier Services.** It was launched by the Minister of that ministry,
+  **Hon. Tatenda A. Mavetera, MP**, at **Domboshava** in **April 2024**, together with the
+  ministry's Permanent Secretary. Its stated horizon is **2030** — internet access and personal
+  computers for citizens, young people first.
+- Two things were unveiled at that launch: the **Digitalize Zimbabwe Magazine** and the
+  **Presidential Internet Scheme**.
+- The ministry has stated that its digitalisation drive sits inside the **Zimbabwe National ICT
+  Policy 2022–2027** framework, and it names five workstreams: expanding digital infrastructure;
+  affordable devices with rural areas first; **e-Government** services — its own examples are
+  e-tax filing, e-health and e-payment systems; digital literacy training with schools, colleges
+  and private partners; and innovation and entrepreneurship through technology hubs and funding
+  programmes. It works with **Econet, NetOne and Telecel** on affordable devices and coverage.
+- In **April 2025, Cabinet approved implementation of the Presidential Internet Scheme**: reliable
+  broadband to **all 2,400 administrative wards**, using low-earth-orbit satellite and fibre,
+  reaching **schools, information centres, police stations, health institutions, traditional
+  leaders' homesteads, agriculture extension offices and courts**. It is grounded in the
+  **Digital Economy thematic area of the National Development Strategy 1 (NDS1)**.
+- Progress since: **8,000 Starlink kits** for schools and a **free public Wi-Fi programme**
+  (January 2026). The work is now framed under **NDS2 (2026–2030)** and **Vision 2030**, and the
+  Government states it is **"committed to full digitalisation by 2030"**.
+- In **June 2026 the Government launched the National Artificial Intelligence Strategy** at an
+  event in Harare themed **"AI for Impact"**, alongside an **AI Grand Challenge** for young
+  innovators. The strategy's named priority sectors are **healthcare, agriculture, education and
+  financial inclusion**, and it commits to AI that reflects **Zimbabwe's linguistic and cultural
+  diversity**. A **National Cybersecurity Strategy** was finalised at the same time.
+- The programme also runs **Digitalize Zimbabwe Expos** in the provinces — for example the
+  **Manicaland Expo in June 2025**.
+
+**Why this platform is the natural pilot for that programme — the only claim you may make:**
+
+- The Government has already decided *that* Zimbabwe will digitalise public administration, and the
+  **National AI Strategy (June 2026)** sets the direction. What does not yet exist is a **working,
+  sovereign example inside the Government estate**. Nzwisiso AI is exactly that: it is not a
+  concept or a mock-up, it runs today in a browser, and it makes **no network request at all**.
+- It answers the AI Strategy's own criteria in one product: applied AI in a public service
+  (policy assessment), reproducible and reviewable, and keeping **every policy text and every
+  result inside national custody** — the sovereignty property the programme is built on.
+- It is a **delivery-against-existing-commitments** proposal, not a new programme: it needs no new
+  national infrastructure to start, because the demonstration runs in a browser on machines
+  departments already own.
+- It is the right **size** for a pilot: one institution, one policy question, one run, with the
+  result reviewable by a person — which is how a national capability can be assessed before any
+  national rollout is committed to.
+
+**Never claim** that the Government, the Ministry, or the Digitalize Zimbabwe programme has
+endorsed, approved, funded or adopted this platform, or that it is an official digitalisation
+project. The correct framing, everywhere, is: **"proposed as a pilot for the Digitalize Zimbabwe
+initiative"** — a proposal put to the programme's owners, not a statement of their decision.
+
 ### What you must NOT claim — the honesty rails
 
 1. **This is scenario mode.** The current build models stakeholder responses deterministically. It
@@ -96,6 +151,11 @@ Courier Services, Hon. Tatenda A. Mavetera, MP**, and delivered on the **Nzwisis
 5. **Mark what you do not know.** Every cost, legal basis, procurement route and date you produce
    must be labelled `[ASSUMPTION — to be confirmed]` or `[QUESTION — needs a decision]`. A proposal
    with visible gaps is trustworthy; invented precision destroys the whole case.
+6. **Do not invent anything about Digitalize Zimbabwe.** Every fact you use about the programme is
+   in the section above and nowhere else. If you need a detail that is not there — the programme's
+   budget, its owning office, its internal approval route, whether it has an open pilot intake —
+   write it as a `[QUESTION — needs a decision]` and list it under "What we could not confirm".
+   **Never** state or imply that the programme has endorsed this platform.
 
 ### The five deliverables, and the exact shape each must take
 
@@ -110,24 +170,40 @@ in tone, and **carrying a recommendation**. Sections, in this order:
    likely stakeholder responses first; the cost of that is discovered after implementation.
 4. **What has already been delivered** — the verified facts above, stated plainly and without
    inflation, including that it runs inside the Government estate with no external service.
-5. **What approval would enable** — the transition from a demonstration to a supported national
+5. **The pilot case — Digitalize Zimbabwe.** The section that argues the fit, in the programme's
+   own terms. State what Digitalize Zimbabwe is, using **only** the verified facts above; name the
+   programme's own workstreams that this platform delivers against (information held
+   programmatically, sovereign compute, no external service, reproducible results); and state
+   plainly that what is being proposed is a **pilot** — one institution, assessed on its results,
+   before any national rollout is committed to. Quote the programme's own wording where the facts
+   above supply it: *"committed to full digitalisation by 2030"*, the National AI Strategy's four
+   named priority sectors, and the Presidential Internet Scheme's **2,400 wards**. **Close the
+   section with the boundary**: this is a proposal put to the programme's owners, not an
+   announcement of their decision.
+6. **What approval would enable** — the transition from a demonstration to a supported national
    capability: which institutions come first, and what changes for them.
-6. **Legal and governance considerations** — see Part 3; summarise and cross-reference here.
-7. **Financial implications** — a cost table, every figure marked as an assumption, with the
+7. **Legal and governance considerations** — see Part 3; summarise and cross-reference here.
+8. **Financial implications** — a cost table, every figure marked as an assumption, with the
    recurring and one-off costs separated and no figure presented as approved.
-8. **Implementation approach and timeframe** — phased, with the three named build items first
-   (server-side extraction, server-side identity verification, a deployed production host).
-9. **Risk and mitigation** — including the reputational risk of overclaiming, and how the product
-   design already mitigates it.
-10. **Consultation** — which offices must be consulted before submission (Treasury, the Public
+9. **Implementation approach and timeframe** — phased, with the three named build items first
+   (server-side extraction, server-side identity verification, a deployed production host), and the
+   **pilot institution named as the first milestone**.
+10. **Risk and mitigation** — including the reputational risk of overclaiming, how the product
+    design already mitigates it, and the *specific* risk of borrowing a national programme's name:
+    say plainly that the platform holds **no** endorsement from Digitalize Zimbabwe or the Ministry,
+    and that obtaining one is part of what is being asked for.
+11. **Consultation** — which offices must be consulted before submission (Treasury, the Public
     Service Commission, the Attorney General's office, the data protection authority), each marked
-    as a question if the correct list is not known.
+    as a question if the correct list is not known — plus **the office that owns Digitalize
+    Zimbabwe**, marked as a question.
 
 **Part 2 — The pitch deck (12 to 16 slides, outline plus speaker notes).**
 It must survive being read *without* a presenter, and it must never claim more than the platform
-does. Suggested spine: the problem · what is different here · a live demonstration, not a promise ·
-what one run actually produces · the governance boundary · who it serves first · what has been
-built already · what approval unlocks · the cost, marked as estimates · the roadmap · the ask ·
+does. Suggested spine: the problem · what is different here · **why this is the pilot for Digitalize
+Zimbabwe** (one slide: what the programme is, in its own words, using only the verified facts above,
+**and the line that no endorsement is held and is being asked for**) · a live demonstration, not a
+promise · what one run actually produces · the governance boundary · who it serves first · what has
+been built already · what approval unlocks · the cost, marked as estimates · the roadmap · the ask ·
 the close. **Speaker notes must say what to click and in what order during a live demonstration**,
 including what to do if the network is unavailable.
 
@@ -151,9 +227,11 @@ threshold, timeline and figure as an assumption.
 
 **Part 5 — The stated ask.**
 One page, unmistakable: exactly what approval is being requested, from whom, by when, and what
-happens if it is granted. Separate what is needed **now** from what is needed at each later stage.
-If the correct approval route is unknown, say so and list the questions to resolve rather than
-guessing.
+happens if it is granted. **Open it by naming the pilot**: this platform is put forward as a pilot
+for the **Digitalize Zimbabwe** initiative, and the ask therefore includes **the programme's
+endorsement** alongside the funding and the hosting decision. Separate what is needed **now** from
+what is needed at each later stage. If the correct approval route is unknown, say so and list the
+questions to resolve rather than guessing.
 
 
 ### Research you must do, and how to handle what you cannot confirm
@@ -197,6 +275,9 @@ do not omit it to look authoritative.
    click, in order?
 6. Is there a **"What we could not confirm"** paragraph, and does it name who to ask?
 7. Could a Minister read Part 1 and know, within one minute, exactly what is being asked of them?
+8. Does Part 1's **pilot case** name the programme exactly as **"Digitalize Zimbabwe"**, use only the
+   verified facts supplied, and carry the line that **no endorsement is held**? If any statement in
+   the pack implies the programme has already adopted the platform, that is a failure — fix it.
 
 ---
 
@@ -218,4 +299,46 @@ do not omit it to look authoritative.
   named sources are all on the live host. (The paragraph that used to sit here told the reader to
   "deploy before you present" because the live site was a much older build; that is no longer true, and
   the prompt below is being rewritten down to three documents under **AB-7** in `PROJECT_STATUS.md`.)
+
+---
+
+## Research record — the "Digitalize Zimbabwe" facts (kept here so they are never re-researched)
+
+Researched **2026-09-28**. Every fact in the prompt's Digitalize Zimbabwe section comes from one of the
+rows below, and nothing is asserted in the prompt that is not in this table. If a fact is not here, it
+is not known.
+
+| Verified fact | Source, and the date it carries |
+|---|---|
+| The initiative's name, and that it was launched by **Hon. Tatenda A. Mavetera, MP** (Minister of ICT, Postal and Courier Services) with the ministry's Permanent Secretary, at **Domboshava**, April 2024; the **2030** horizon; the unveiling of the **Digitalize Zimbabwe Magazine** and the **Presidential Internet Scheme**; the work with **Econet, NetOne and Telecel**; the Domboshava network booster | 263Chat, *"Minister of ICT Launches 'Digitalize Zimbabwe' Initiative in Domboshava"*, **16 April 2024** — `263chat.com/minister-of-ict-launches-digitalize-zimbabwe-initiative-in-domboshava/`. The same report ran on ZimEye, **16 April 2024** |
+| The **Zimbabwe National ICT Policy 2022–2027** framework; the five workstreams (infrastructure; affordable devices, rural first; e-Government with e-tax filing, e-health and e-payment named; digital literacy with educational institutions and private partners; innovation and entrepreneurship through technology hubs and funding programmes); the **Digitalize Zimbabwe 2024 Expos** with **Video Promotions Africa** | 263Chat, *"ICT Ministry Launches Ambitious Digitalization Initiative for Rural and Urban Areas"*, **8 April 2024** |
+| **Cabinet approved the Presidential Internet Scheme**; **2,400 administrative wards**; low-earth-orbit satellite and fibre; schools, information centres, police stations, health institutions, traditional leaders' homesteads, agriculture extension offices and courts; grounded in the **Digital Economy thematic area of NDS1** | TechAfrica News, *"Zimbabwe Cabinet Approves Nationwide Presidential Internet Scheme"*, **11 April 2025** |
+| The **Manicaland Digitalize Zimbabwe Expo** | 263Chat, *"All Set for Manicaland Digitalize Zimbabwe Expo"*, **20 June 2025** |
+| **8,000 Starlink kits** for schools | TechAfrica News, *"Zimbabwe Donates 8,000 Starlink Kits to Expand Internet Access in Schools"*, **21 January 2026** |
+| The 2025 milestones review; **NDS2 and Vision 2030** framing; the **finalisation of Zimbabwe's National Artificial Intelligence Strategy and National Cybersecurity Strategy**; the Presidential Internet Scheme named as progress | TechAfrica News, *"Zimbabwe Charts Digital Future as ICT Investment Grows and Connectivity Expands"*, **22 January 2026** |
+| The **National Artificial Intelligence Strategy** launched at Golden Conifer, Harare, June 2026, theme **"AI for Impact"**, with the **AI Grand Challenge**; priority sectors **healthcare, agriculture, education, financial inclusion**; the commitment to AI reflecting **Zimbabwe's linguistic and cultural diversity**; the youth-innovation emphasis | TechAfrica News, *"Zimbabwe Launches National AI Strategy and Grand Challenge to Drive Innovation"*, **4 June 2026** |
+| **"Govt committed to full digitalisation by 2030"**, *"Digital drive gathers pace in rural areas"*, *"Digitisation of public services key to NDS2 aspirations"* | Herald headlines (heraldonline.co.zw), confirmed present in the Google News index on **2026-09-28**. **Headlines only — the article text could not be read**, because the Herald blocks automated access |
+
+### What could not be confirmed — do not fill these in from guesswork
+
+- **No public text of the National AI Strategy, the National Cybersecurity Strategy or the Smart
+  Zimbabwe 2030 Strategy was found.** Their *existence* is sourced; their *contents and targets* are
+  not. Anything beyond "these strategies exist, and the AI Strategy's named sectors are the four
+  above" must be marked `[QUESTION — needs a decision]`.
+- **No dedicated official Digitalize Zimbabwe web presence was reachable.** `digitalize.gov.zw` did
+  not resolve, and `ictministry.gov.zw` (the ministry's address as recorded on its own Wikipedia
+  entry) now serves unrelated commercial content. **The current official address for the programme
+  is therefore unknown** and must be asked for, not guessed.
+- **No budget figures, no office named as owning the programme, and no published pilot-intake
+  process** were found for Digitalize Zimbabwe.
+- **What was published after June 2026 was not researched** (search engines blocked automated
+  queries; the findings above came from the Google News index and from the publications' own pages).
+
+### Method note, stated honestly
+
+The **firecrawl** search skill was invoked for this research but the `firecrawl` command is **not
+installed on this machine**, so it could not be used — the findings above come from direct HTTP
+requests to the publications and the Google News index instead. DuckDuckGo, Mojeek, Marginalia and
+the Herald all blocked automated access, so the method was: find the article titles in the Google
+News index, then read the article from the publisher's own site wherever it allowed it.
 
