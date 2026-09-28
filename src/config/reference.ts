@@ -56,6 +56,10 @@ export const getReferenceRate = (id: ReferenceRateId) => {
 /** The two bases the published shares are percentages of, each named once. */
 const SHARE_BASE_EMPLOYED = "employed persons counted in the 2022 census (2,501,887)";
 const SHARE_BASE_POPULATION = "people counted in Zimbabwe in the 2022 census (15,178,957)";
+/** A third base: the disability figure is published for people aged 5 and over, not for everyone. */
+const SHARE_BASE_POPULATION_5PLUS = "people aged 5 and over counted in the 2022 census (13,102,643)";
+/** A fourth base: the labour-force survey counts employed people on its own definition, so its total differs. */
+const SHARE_BASE_QLFS_EMPLOYED = "employed persons counted in the QLFS Q2 2025 (3,186,598)";
 
 /** The one word used wherever a share is modelled rather than published. */
 export const MODELLED_SHARE_LABEL = "Modelled";
@@ -205,6 +209,169 @@ export const STAKEHOLDER_SEGMENTS = [
     share: 5.9,
     shareBase: SHARE_BASE_EMPLOYED,
     shareSource: "ZIMSTAT 2022 census — education (148,470)",
+  },
+  // ——— Phase AC (E-1): the groups the platform did not model before. ———
+  // A published figure is used as published; where none exists the source reads "Modelled".
+  {
+    id: "persons-with-disabilities",
+    label: "Persons with disabilities",
+    note: "People living with a disability — 206,447, or 1.6% of people aged 5 and over",
+    share: 1.6,
+    shareBase: SHARE_BASE_POPULATION_5PLUS,
+    shareSource: "ZIMSTAT 2022 PHC Disability Thematic Report — persons with disabilities (206,447)",
+  },
+  {
+    id: "faith-groups",
+    label: "Faith-based organisations",
+    note: "Churches and their social wings — 12,937,804 people, or 85.2% of the population, are Christian",
+    share: 85.2,
+    shareBase: SHARE_BASE_POPULATION,
+    shareSource: "ZIMSTAT 2022 census, Table 2.14(c) — Christians (12,937,804)",
+  },
+  {
+    id: "tourism-operators",
+    label: "Tourism operators",
+    note: "Accommodation, food service and tour operators — 40,921 employed",
+    share: 1.6,
+    shareBase: SHARE_BASE_EMPLOYED,
+    shareSource: "ZIMSTAT 2022 census, Table 6.6 — accommodation and food service (40,921)",
+  },
+  {
+    id: "manufacturers",
+    label: "Manufacturers",
+    note: "Registered manufacturing employers and their workforces — 257,740 employed",
+    share: 10.3,
+    shareBase: SHARE_BASE_EMPLOYED,
+    shareSource: "ZIMSTAT 2022 census, Table 6.6 — manufacturing (257,740)",
+  },
+  {
+    id: "transport-operators",
+    label: "Transport operators",
+    note: "Road, rail and freight operators — 87,730 employed",
+    share: 3.5,
+    shareBase: SHARE_BASE_EMPLOYED,
+    shareSource: "ZIMSTAT 2022 census, Table 6.6 — transportation and storage (87,730)",
+  },
+  {
+    id: "researchers",
+    label: "Researchers and technical professionals",
+    note: "Research institutes, laboratories and technical services — 51,478 employed",
+    share: 2.1,
+    shareBase: SHARE_BASE_EMPLOYED,
+    shareSource: "ZIMSTAT 2022 census, Table 6.6 — professional, scientific and technical activities (51,478)",
+  },
+  {
+    id: "pensioners",
+    label: "Pensioners",
+    note: "Pensioners administered by the Public Service Commission — 209,360 (145,872 contributory, 63,488 non-contributory)",
+    share: 1.4,
+    shareBase: SHARE_BASE_POPULATION,
+    shareSource: "Public Service Commission, The Public Service Sentinel, Q1 2026 — pensioners administered (209,360)",
+  },
+  {
+    id: "informal-workers",
+    label: "Informal-sector workers",
+    note: "People working informally — 2,069,901, or 65% of the 3,186,598 employed",
+    share: 65,
+    shareBase: SHARE_BASE_QLFS_EMPLOYED,
+    shareSource: "ZIMSTAT QLFS Q2 2025 — informally employed persons (2,069,901)",
+  },
+  {
+    id: "women",
+    label: "Women",
+    note: "Half the country — 7,891,035, or 52% of the population",
+    share: 52,
+    shareBase: SHARE_BASE_POPULATION,
+    shareSource: "ZIMSTAT 2022 census, Table 2.7 — female population (7,891,035)",
+  },
+  // No published share exists for these → share is null and the source reads "Modelled".
+  {
+    id: "traditional-leaders",
+    label: "Traditional leaders",
+    note: "Chiefs and village heads — about 272 chiefs and more than 24,000 village heads; no population share is published",
+    share: null,
+    shareBase: null,
+    shareSource: MODELLED_SHARE_LABEL,
+  },
+  {
+    id: "energy-water-utilities",
+    label: "Energy and water utilities",
+    note: "Power, fuel and water utilities — institutions, not a measured population",
+    share: null,
+    shareBase: null,
+    shareSource: MODELLED_SHARE_LABEL,
+  },
+  {
+    id: "ict-operators",
+    label: "ICT and network operators",
+    note: "Licensed telecommunications, internet and broadcasting network operators",
+    share: null,
+    shareBase: null,
+    shareSource: MODELLED_SHARE_LABEL,
+  },
+  {
+    id: "conservation-communities",
+    label: "Communities by protected areas",
+    note: "Communities living beside national parks and conservancies",
+    share: null,
+    shareBase: null,
+    shareSource: MODELLED_SHARE_LABEL,
+  },
+  {
+    id: "media",
+    label: "Media and broadcasting",
+    note: "Registered newspapers, broadcasters and online publishers",
+    share: null,
+    shareBase: null,
+    shareSource: MODELLED_SHARE_LABEL,
+  },
+  {
+    id: "cooperatives",
+    label: "Cooperatives",
+    note: "Registered agricultural, savings and marketing cooperatives",
+    share: null,
+    shareBase: null,
+    shareSource: MODELLED_SHARE_LABEL,
+  },
+  {
+    id: "trade-unions",
+    label: "Trade unions",
+    note: "Registered unions and their federations — no membership figure is published",
+    share: null,
+    shareBase: null,
+    shareSource: MODELLED_SHARE_LABEL,
+  },
+  {
+    id: "employer-federations",
+    label: "Employer federations",
+    note: "Chambers of commerce and employer bodies — no membership figure is published",
+    share: null,
+    shareBase: null,
+    shareSource: MODELLED_SHARE_LABEL,
+  },
+  {
+    id: "artisanal-miners",
+    label: "Artisanal and small-scale miners",
+    note: "Small-scale and artisanal miners, counted within mining but not published separately",
+    share: null,
+    shareBase: null,
+    shareSource: MODELLED_SHARE_LABEL,
+  },
+  {
+    id: "cross-border-traders",
+    label: "Cross-border traders",
+    note: "Traders moving goods across Zimbabwe's borders — no published count",
+    share: null,
+    shareBase: null,
+    shareSource: MODELLED_SHARE_LABEL,
+  },
+  {
+    id: "war-veterans",
+    label: "War veterans and their dependants",
+    note: "Veterans of the liberation struggle and their dependants, governed by the War Veterans Act [Chapter 11:15] and the Veterans of the Liberation Struggle Act [Chapter 17:12]",
+    share: null,
+    shareBase: null,
+    shareSource: MODELLED_SHARE_LABEL,
   },
 ] as const;
 

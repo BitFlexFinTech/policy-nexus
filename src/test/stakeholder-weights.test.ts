@@ -21,8 +21,11 @@ import type { AssessmentRequest } from "@/services/assessment/types";
  * never presented as official when it is not.
  */
 
-/** The published census counts each share is derived from, transcribed from the source. */
-const PUBLISHED: Record<string, { count: number; base: "employed" | "population" }> = {
+/** The four real bases a share may be a percentage of, each named where it is used. */
+type ShareBase = "employed" | "population" | "population5plus" | "qlfs-employed";
+
+/** The published counts each share is derived from, transcribed from the source. */
+const PUBLISHED: Record<string, { count: number; base: ShareBase }> = {
   "civil-servants": { count: 82_040, base: "employed" },
   "urban-households": { count: 5_855_099, base: "population" },
   "rural-households": { count: 9_323_858, base: "population" },
@@ -34,11 +37,29 @@ const PUBLISHED: Record<string, { count: number; base: "employed" | "population"
   "financial-sector": { count: 32_050, base: "employed" },
   "health-workers": { count: 61_358, base: "employed" },
   educators: { count: 148_470, base: "employed" },
+  // Phase AC (E-1) additions — a real, published figure for each.
+  "persons-with-disabilities": { count: 206_447, base: "population5plus" },
+  "faith-groups": { count: 12_937_804, base: "population" },
+  "tourism-operators": { count: 40_921, base: "employed" },
+  manufacturers: { count: 257_740, base: "employed" },
+  "transport-operators": { count: 87_730, base: "employed" },
+  researchers: { count: 51_478, base: "employed" },
+  pensioners: { count: 209_360, base: "population" },
+  "informal-workers": { count: 2_069_901, base: "qlfs-employed" },
+  women: { count: 7_891_035, base: "population" },
 };
 
-/** The census totals the shares are percentages of — ZIMSTAT 2022, Tables 6.6 and 2.7. */
-const EMPLOYED_TOTAL = 2_501_887;
-const POPULATION_TOTAL = 15_178_957;
+/** The totals the shares are percentages of, each from its own named source. */
+const BASE_TOTALS: Record<ShareBase, number> = {
+  // ZIMSTAT 2022 census, Table 6.6 — employed persons by industry.
+  employed: 2_501_887,
+  // ZIMSTAT 2022 census, Table 2.7 — total population.
+  population: 15_178_957,
+  // ZIMSTAT 2022 PHC Disability Thematic Report — people aged 5 and over.
+  population5plus: 13_102_643,
+  // ZIMSTAT QLFS Q2 2025 — employed persons on the survey's own definition.
+  "qlfs-employed": 3_186_598,
+};
 
 /**
  * The segments with NO official figure, named one by one. If a later session adds a
@@ -51,6 +72,18 @@ const MODELLED_IDS = [
   "exporters",
   "local-authorities",
   "development-partners",
+  // Phase AC (E-1) additions — no published share exists for any of these.
+  "traditional-leaders",
+  "energy-water-utilities",
+  "ict-operators",
+  "conservation-communities",
+  "media",
+  "cooperatives",
+  "trade-unions",
+  "employer-federations",
+  "artisanal-miners",
+  "cross-border-traders",
+  "war-veterans",
 ];
 
 const requestFor = (departmentId: string): AssessmentRequest => {
@@ -90,10 +123,10 @@ describe("stakeholder weights — published or modelled, never invented", () => 
     });
   });
 
-  it("makes every published share equal the census count it cites", () => {
+  it("makes every published share equal the count it cites", () => {
     Object.entries(PUBLISHED).forEach(([id, { count, base }]) => {
       const segment = getStakeholderSegment(id as (typeof STAKEHOLDER_SEGMENTS)[number]["id"]);
-      const total = base === "employed" ? EMPLOYED_TOTAL : POPULATION_TOTAL;
+      const total = BASE_TOTALS[base];
       const expected = (count / total) * 100;
       // The stored share is rounded to one decimal place; anything further off means
       // the figure and the claim it makes have drifted apart.
@@ -108,6 +141,17 @@ describe("stakeholder weights — published or modelled, never invented", () => 
     // And the published set is the remainder, so a new segment cannot slip in unlabelled.
     const published = STAKEHOLDER_SEGMENTS.filter((s) => s.share !== null).map((s) => s.id);
     expect([...published].sort()).toEqual(Object.keys(PUBLISHED).sort());
+  });
+
+  it("keeps a real count in a modelled group's note instead of dressing it up as a share", () => {
+    // Traditional leaders have real published counts (about 272 chiefs and more than
+    // 24,000 village heads) but no published population share, so the count stays in the
+    // note and the weight stays Modelled — never a handful mis-scaled against everyone.
+    const leaders = getStakeholderSegment("traditional-leaders");
+    expect(leaders.share).toBeNull();
+    expect(leaders.shareSource).toBe(MODELLED_SHARE_LABEL);
+    expect(leaders.note).toMatch(/\b272\b/);
+    expect(leaders.note).toMatch(/24,000/);
   });
 
   it("hands the split each segment's own weight, with a neutral weight for modelled ones", () => {

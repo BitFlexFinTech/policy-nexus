@@ -1381,6 +1381,12 @@ because the block it sits in already names itself.
 | 2026-09-28 | `npm run validate; npm run typecheck; npm run lint; npm test; npm run build` (Phase AB-2 weights, final bytes) | **ALL GREEN**: validate `PASS — all checks green` · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing `react-refresh` warnings) · **301/301 (24 files)** — the 296 before plus the 5 new guards · build ✓ (586.94 kB JS / 175.75 kB gzip) |
 | 2026-09-28 | `npx playwright test` (Phase AB-2 weights) | **PASS — 10 passed (18.0s)**; each test asserts 0 console errors and 0 off-origin requests |
 | 2026-09-28 | mutation proofs of the AB-2 weight guards | (1) civil servants `share: 3.3` → `9.9` → *makes every published share equal the census count it cites* **FAIL**; (2) formal business `share: null` → `5` → *marks exactly the segments with no published figure as modelled* **AND** *declares a source and a base for every segment* **FAIL** (2 failed / 3 passed, as expected). `src/config/reference.ts` restored with the hash **identical** before and after both mutations (`d3f3c746e511da1dd2a5bc63073a937daec6346317deb7ac17074312ed4fb36a`) |
+| 2026-09-28 | **E-1 code delivered** (Phase AC batch 1) | `src/config/reference.ts`: **+167 lines, 0 existing lines changed** (`git diff --stat`). 20 new segments appended after the existing 16; two new base constants (`SHARE_BASE_POPULATION_5PLUS`, `SHARE_BASE_QLFS_EMPLOYED`). `src/test/stakeholder-weights.test.ts`: `PUBLISHED` grew 11 → 20 entries, `MODELLED_IDS` 5 → 16, one `base === "employed" ? … : …` branch replaced by a four-base `BASE_TOTALS` lookup, and one new gate added. `src/test/workspace.test.tsx` line 88: **16 → 36**. Total segments: **36** |
+| 2026-09-28 | `npm run typecheck` (E-1) | PASS — `tsc -b --pretty false`, no output |
+| 2026-09-28 | `npx vitest run src/test/stakeholder-weights.test.ts src/test/departments.test.ts src/test/workspace.test.tsx` (E-1) | PASS — **49/49** (departments 14, stakeholder-weights 6, workspace 29) |
+| 2026-09-28 | **mutation proofs of the three E-1 gates** | (1) `faith-groups` `share: 85.2` → `85.3` → *makes every published share equal the count it cites* **FAIL**, `AssertionError: expected 0.06486823172369327 to be less than or equal to 0.05`; (2) traditional-leaders note with `"272"` and `"24,000"` removed → *keeps a real count in a modelled group's note instead of dressing it up as a share* **FAIL**, `expected '…about a nu…' to match /\b272\b/`; (3) the count pin `toHaveLength(36)` → `37` → **FAIL**, `expected [ …(36) ] to have a length of 37 but got 36` — which also **proves the real length is 36**. Every mutated file restored; `shasum` of `reference.ts` back to `344a56c25d06c83e8182db995eba35a2239adaf6` and the stray-mutation grep (`share: 85.3` / `a number of chiefs` / `toHaveLength(37)`) prints **CLEAN** |
+| 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (E-1, final bytes) | **ALL GREEN**: validate `PASS — all checks green` · typecheck exit 0 · lint **0 errors** (the same 7 pre-existing `react-refresh` warnings, all inside `src/components/ui/**`) · **302/302 (24 files)** — the 301 before plus the 1 new gate · build ✓ (no new warnings) |
+| 2026-09-28 | `npx playwright test` (E-1, final bytes) | **PASS — 10 passed (17.7 s)**; each test asserts 0 console errors and 0 off-origin requests. Includes *the landing page hands off to the chooser, which lists all 16 departments* and the registers/report/policy-draft journeys |
 
 
 
@@ -2298,21 +2304,24 @@ each department?"*
 - **Implementation batches E-1…E-5**, each with its own gate, and an explicit list of what must NOT change
   (palette, typography, `src/components/ui/**`, route map, determinism, `package.json`).
 
-**Honest state:** this phase has produced a **plan and its evidence**, nothing more. No segment, document or
-citation has been added to the code yet. The only code change in this area this session is the AB-2 weights
-work above.
+**Honest state (updated 2026-09-28 — batch E-1 is now DONE):** the 20 new groups are **in the code**.
+E-2…E-5 are still NOT STARTED, so **no department models a new group yet** and the document rail still holds
+the old invented filenames. Two wrong figures in the plan document were **found and fixed at source** this
+session: the Christian share was written **85.3%** and is **85.2%** (12,937,804 ÷ 15,178,957), and the
+informal-sector share was written **64.9%** and is **65.0%** (2,069,901 ÷ 3,186,598). Two rows of the modelled
+table were also mis-numbered (9 and 10 → 19 and 20).
 
 | Batch | Work | Status |
 |---|---|---|
-| **E-1** | Add the 20 new groups to `src/config/reference.ts`, each with a real share or the `Modelled` label; extend the weight gate | NOT STARTED |
+| **E-1** | Add the 20 new groups to `src/config/reference.ts`, each with a real share or the `Modelled` label; extend the weight gate | **DONE** — 36 groups in total. **9 new groups carry a real published share** (persons with disabilities, faith-based organisations, tourism operators, manufacturers, transport operators, researchers, pensioners, informal-sector workers, women) and **11 new groups are `Modelled`** (traditional leaders, energy and water utilities, ICT and network operators, communities by protected areas, media, cooperatives, trade unions, employer federations, artisanal miners, cross-border traders, war veterans). Two extra named bases were added, because two shares are **not** percentages of the two bases already in use: people aged 5 and over (**13,102,643**, the disability base) and the QLFS Q2 2025 employed total (**3,186,598**, the informal-sector base). The weight gate now checks all four bases, pins the modelled set exactly, and carries a specific gate for the traditional-leaders case (a real count in the note, a `Modelled` weight, never a share) |
 | **E-2** | Give each of the 16 departments the groups that belong to its mandate (6–8 each, up from 4–6) | NOT STARTED |
 | **E-3** | Add the `CITED_INSTRUMENTS` table plus `citation`/`instrument` on `DepartmentDocument`, and wire each department's documents to real instruments | NOT STARTED |
 | **E-4** | Render the citation in the document rail; show each group's share and source on the Reference screen | NOT STARTED |
 | **E-5** | Full suite green + review zip | NOT STARTED |
 
-**One test pins the group count — it must be updated deliberately, not silently:** `src/test/workspace.test.tsx`
-line 88 asserts `STAKEHOLDER_SEGMENTS` has length **16**. The landing test and `coverage.ts` read the length
-from the source, so they need no change.
+**One test pins the group count — it was updated deliberately this session, not silently:** `src/test/workspace.test.tsx`
+line 88 now asserts `STAKEHOLDER_SEGMENTS` has length **36** (was 16). The landing test and `coverage.ts` read
+the length from the source, so they needed no change — and both were confirmed to render 36 without edit.
 
 #### AB-1 — the graph, diagnosed from the code so a cold session does not re-derive it
 
@@ -2505,20 +2514,26 @@ measurement test). **No file was deleted, no dependency or schema changed, and `
   model — do not resurrect them), the graph diagnosis with the exact current stroke values, the agreed
   graph-only colour exemption, and the **official Zimbabwean figures already gathered** so they are never
   re-researched.
-- **The next action, exactly:** **AB-6, AB-6b and the AB-2 weights are DONE (2026-09-28)** — **do not re-fetch
-  any figure; every one is recorded above.** The user then asked for a deeper pass, and that research is **DONE**
-  and written to **`docs/PLATFORM_ENRICHMENT_PLAN.md`** (Phase AC): **20 new stakeholder groups → 36 in total**
-  (9 with a real published share, 11 explicitly `Modelled`), plus **real citable instruments for each of the 16
-  departments** (Banking Act [Chapter 24:20], Education Act [Chapter 25:04], Electricity Act [Chapter 13:19],
-  Mines and Minerals Act [Chapter 21:05], Traditional Leaders Act [Chapter 29:17], War Veterans Act [Chapter
-  11:15], and the Constitution (Amendment No. 20) Act, 2013). **Nothing from that plan is in the code yet.**
-  **The next action is batch E-1:** add the 20 groups to `src/config/reference.ts`, each with a real share or the
-  `Modelled` label; extend `src/test/stakeholder-weights.test.ts` so the modelled set stays exactly the named
-  list; and update the single pinned count in `src/test/workspace.test.tsx` (16 → 36). Then E-2 → E-5 in order.
+- **The next action, exactly:** **E-1 is DONE (2026-09-28)** — the 20 new groups are now in
+  `src/config/reference.ts` (**36 in total**), the weight gate covers all four bases and pins the exact modelled
+  set, and the pinned count in `src/test/workspace.test.tsx` reads **36**. The whole ladder is green (302/302
+  tests, 10/10 Playwright). **Do not re-fetch any figure; every one is recorded above and in
+  `docs/PLATFORM_ENRICHMENT_PLAN.md`.** The deeper research remains **DONE** and written to that plan (Phase AC):
+  **20 new stakeholder groups → 36 in total** (9 with a real published share, 11 explicitly `Modelled`), plus
+  **real citable instruments for each of the 16 departments** (Banking Act [Chapter 24:20], Education Act
+  [Chapter 25:04], Electricity Act [Chapter 13:19], Mines and Minerals Act [Chapter 21:05], Traditional Leaders
+  Act [Chapter 29:17], War Veterans Act [Chapter 11:15], and the Constitution (Amendment No. 20) Act, 2013) —
+  **the instruments are still NOT in the code.**
+  **The next action is batch E-2:** give each of the 16 departments the groups that belong to its mandate
+  (6–8 each, up from 4–6), then **E-3** (the `CITED_INSTRUMENTS` table + `citation`/`instrument` on
+  `DepartmentDocument`, wiring each department's documents to real instruments) → **E-4** (render the citation in
+  the document rail; each group's share and source on the Reference screen) → **E-5** (full suite + review zip).
+  E-2 is where the run's group split actually changes, so write its gate carefully: every department's segments
+  resolve, every group is used by at least one department, and no department models an irrelevant group.
   **Never invent a share — an official figure or the `Modelled` label, nothing in between.**
   **AB-1 is finished and verified** (its own section above holds the evidence: pixel-pinned strokes, per-group
   colour, per-kind shape, a shape-first legend, the measured before/after, and the four mutated gates). Read
-  `src/config/reference.ts` (`STAKEHOLDER_SEGMENTS` — **16** today) and `src/config/departments.ts` (which
+  `src/config/reference.ts` (`STAKEHOLDER_SEGMENTS` — **36** today) and `src/config/departments.ts` (which
   segments each department models) **before adding any**, because the run, the assessment and the graph all
   derive their groups from those two files; the ZIMSTAT figures already gathered are listed under
   **AB-6 — evidence already gathered** so they are never re-researched. Nothing about the graph needs doing
