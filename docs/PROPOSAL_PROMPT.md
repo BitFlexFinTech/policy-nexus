@@ -213,6 +213,9 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is Part 1 of this prompt's output.
-- **Deploy before you present.** As at this record the live site still serves the older build, so the
-  authority line and the modelled agent population are not yet on the live host.
+- **The live site is current as at 2026-09-28.** The host `nzwisiso.bitflex.app` was redeployed that day
+  and serves `assets/index-BeggQU9V.js`, so the authority line, the modelled agent population and the
+  named sources are all on the live host. (The paragraph that used to sit here told the reader to
+  "deploy before you present" because the live site was a much older build; that is no longer true, and
+  the prompt below is being rewritten down to three documents under **AB-7** in `PROJECT_STATUS.md`.)
 

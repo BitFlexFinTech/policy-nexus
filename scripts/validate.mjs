@@ -13,6 +13,10 @@
  *  7. REFERENCE_DATE pinned to 2026-09-24 (once config exists)
  *  8. Decision-support disclaimer present (once assessment/brand files exist)
  *  9. @media print rules present (once report screens exist)
+ * 10. Rendered-pair contrast, MEASURED from the declared tokens in src/index.css
+ * 11. Retired statements absent from the documents — false facts that were corrected at
+ *     source, so a cold session cannot reintroduce one by copying an old paragraph
+ * 12. The deployment claim is stated, agreed across documents, and carries its evidence
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join, relative } from "node:path";
@@ -302,6 +306,95 @@ if (!existsSync(cssPath)) {
         `danger text on a card regressed to ${ratio.toFixed(2)}:1 — the token is what fixed this, not a check exemption`,
       );
     }
+  }
+}
+
+// 11 — RETIRED STATEMENTS. Every one of these was a FALSE FACT in a document rather than a code bug:
+//      a fix reported as still open (in two separate places), a deployment state three phases out of
+//      date (in three separate files, one of which then told the reader to deploy before presenting),
+//      and a duplication described as unsolvable after it had in fact been checked every build. The
+//      fix was the corrected text; THIS is the gate, so a cold session cannot reintroduce the claim by
+//      pasting an old paragraph back in. Matches whitespace-normalised text, so a claim re-wrapped
+//      across two lines is still caught.
+{
+  const docs = [
+    join(ROOT, "PROJECT_STATUS.md"),
+    join(ROOT, "PRODUCTION_READINESS.md"),
+    join(ROOT, "README.md"),
+    ...walk(join(ROOT, "docs"), [".md"]),
+  ].filter(existsSync);
+  const retired = [
+    ["the scale strip's retired count", /scale strip still reads/i],
+    ["the retired \"Hundreds\" claim", /still reads[^.]{0,40}Hundreds/i],
+    ["a live host described as behind", /still serves the\b/i],
+    ["work described as not yet live", /not yet on the live host/i],
+    ["a fix described as not made", /flagged not fixed:\s*the scale strip/i],
+    ["items described as open after they were fixed", /known and deliberately open/i],
+    ["duplication described as unchecked", /can drift from\s*`?brand\.ts`?\s*silently/i],
+  ];
+  const hits = [];
+  for (const file of docs) {
+    const text = readFileSync(file, "utf8").replace(/\s+/g, " ");
+    for (const [label, re] of retired) {
+      const m = text.match(re);
+      if (m) {
+        const from = Math.max(0, m.index - 50);
+        hits.push(`${rel(file)}  [${label}]  ...${text.slice(from, m.index + m[0].length + 50)}...`);
+      }
+    }
+  }
+  check("retired document statements absent", hits);
+}
+
+// 12 — THE DEPLOYMENT CLAIM. Three documents said the live host was serving an older bundle long
+//      after it had been redeployed, and one of them told the reader to deploy before presenting for
+//      that reason. A local validator cannot fetch the site, so this enforces what CAN be checked
+//      here: the two record files must both still state which bundle is live, they must agree with
+//      each other, and each must carry the sha256 that proves the claim came from fetching the served
+//      file. When dist/ exists the locally built name is printed beside the claim, so a reader can see
+//      at a glance whether the live host is behind.
+{
+  const claimFiles = ["PROJECT_STATUS.md", "PRODUCTION_READINESS.md", "docs/PROPOSAL_PROMPT.md"]
+    .map((f) => join(ROOT, f))
+    .filter(existsSync);
+  const claims = [];
+  for (const file of claimFiles) {
+    const text = readFileSync(file, "utf8").replace(/\s+/g, " ");
+    for (const m of text.matchAll(/serves\s*\*{0,2}\s*`?(assets\/index-[A-Za-z0-9_-]+\.js)/g)) {
+      claims.push({ file: rel(file), name: m[1], text, at: m.index });
+    }
+  }
+  const problems = [];
+  for (const must of ["PROJECT_STATUS.md", "PRODUCTION_READINESS.md"]) {
+    if (claimFiles.some((p) => rel(p) === must) && !claims.some((c) => c.file === must)) {
+      problems.push(`${must} no longer states which bundle the live host serves — the deployment state must be stated, not dropped`);
+    }
+  }
+  const names = [...new Set(claims.map((c) => c.name))];
+  if (names.length > 1) {
+    problems.push(`the documents disagree about which bundle the live host serves: ${names.join(", ")} — at least one of them is stale`);
+  }
+  for (const c of claims) {
+    if (c.file !== "PROJECT_STATUS.md" && c.file !== "PRODUCTION_READINESS.md") continue;
+    if (!/[0-9a-f]{64}/.test(c.text.slice(c.at, c.at + 600))) {
+      problems.push(`${c.file} says the live host serves ${c.name} without the sha256 that proves the served file was fetched and compared`);
+    }
+  }
+  check("deployment claim stated, agreed and evidenced", problems);
+  if (names.length === 1) {
+    const distHtml = join(ROOT, "dist/index.html");
+    const built = existsSync(distHtml)
+      ? (readFileSync(distHtml, "utf8").match(/assets\/index-[A-Za-z0-9_-]+\.js/) || [])[0]
+      : null;
+    notes.push(
+      `INFO  live bundle stated in the documents: ${names[0]}\n` +
+        (built
+          ? `    the local build produces: ${built}` +
+            (built === names[0]
+              ? "  (the same file — the live host is current)"
+              : "  (a different file — the live host is behind this build until it is redeployed)")
+          : "    no local build in this working copy (run `npm run build` to compare)"),
+    );
   }
 }
 

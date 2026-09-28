@@ -487,9 +487,12 @@ coverage is the jsdom `workspace.test.tsx` suite, not the browser test)
   (homepage → pick department → `/app` → registers → sign-out). No Playwright Chromium binary was
   installed and no `e2e/` spec existed, so **no real browser interaction was run** in Phase J.
   Server-level responses and bundle content were verified; click-through behaviour was **unverified**.
-  **Now closed by Phase H:** `npx playwright test` → 4/4 against the local production preview. The
-  *live* host still serves the **Phase D** bundle, so the Phase H journey verified the Phases E–H
-  build locally, not the deployed one.
+  **Now closed by Phase H:** `npx playwright test` → 4/4 against the local production preview. At that
+  time the *live* host was still on the **Phase D** bundle, so the Phase H journey verified the local
+  Phases E–H build rather than the deployed one. **Superseded 2026-09-28:** the live host was redeployed
+  that day and serves `assets/index-BeggQU9V.js`
+  (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`) — see the DEPLOYED entry under
+  **Known-red / open items**.
 - **⚠ SECURITY ACTION REQUIRED:** the FTP password was supplied in plaintext in chat. It is live
   and grants **full write access to the web root**. **Rotate it** in cPanel → FTP Accounts after
   this session. Nothing was written into the repo — it was passed only via the `LFTP_PASSWORD`
@@ -1433,6 +1436,11 @@ because the block it sits in already names itself.
 | 2026-09-28 | `npx playwright test` (final bytes of Batches A–G) | **PASS — 11/11** (was 10; the new gate is the phone fold). The phone-fold gate prints its measured number on every run: **`primary action bottom edge at 842px of 844px`** — it fits by **2 px**, which is why the margin is recorded rather than trusted |
 | 2026-09-28 | **DEPLOYED (Batch H) — build, FTPS mirror, and verified on the live host** | `npm run build` → `dist/` referencing **`assets/index-BeggQU9V.js`**. Deployed with `lftp` over explicit FTPS port 21, `mirror -R --only-newer`, **never `--delete`**. **Verified live:** `curl https://nzwisiso.bitflex.app/` returns **200** and its script tag is **`assets/index-BeggQU9V.js`** — the same file the local build emits. The deployed bundle (644,383 bytes) contains **"Named sources"**, **"Draft read:"**, **"Scenario assumptions"**, **"Compare two drafts"**, **"Structural relationships"** and **"population-weighted support index"**, and contains **no** "MiroFish" / "OASIS" / "Puter". A listing afterwards shows `cgi-bin/` and `.well-known/pki-validation/` **untouched** (still dated 25 Sep), so the SSL token survived. The credentials were read from `.env` into a 600-perm temporary script and never printed or passed as a shell argument |
 | 2026-09-28 | **the live host was NOT this build — measured, not assumed** | `curl` of `https://nzwisiso.bitflex.app/` returned a shell whose asset was **`assets/index-qUyirbLr.js`**; the local build emitted **`assets/index-DPSBMRok.js`**. The live bundle contained "Zimbabwe AI Policy Intelligence Initiative" and "Nzwisiso simulation core" but **not** "Named sources" — so AB-5 and Batches A–G were not live. **This is what Batch H fixed, in the row above.** The credentials are present in `.env` as `FTP_HOST` / `FTP_USER` / `FTP_PASS` / `FTP_REMOTE_ROOT` (variable names only were read; no value was copied anywhere) |
+| 2026-09-28 | **stale-document sweep — six false statements corrected at source, and two new validate checks as their gates** (this session) | Found by reading the documents rather than trusting them. **(1)** The Phase AA bullet listing two items as open presented the phone fold (922 px) and the "Hundreds · Relationships" strip as open although **Batch G had already fixed both**; rewritten as FIXED with the measured result. **(2)** The same Phase AA section said *"Known remaining mismatch, deliberately NOT changed"* about the strip — the same false claim a second time; corrected. **(3)** RESUME HERE still carried an open item saying the strip reported a word rather than a measured count — the same false claim a third time; corrected. **(4)** `PRODUCTION_READINESS.md` claimed in **three** places that the live host was still on an older bundle (Phase D twice, Phase S once), and `docs/PROPOSAL_PROMPT.md` plus the Phase J note in this file repeated it — **five false deployment claims across three documents**, all corrected to the fetched-and-hashed fact: `curl https://nzwisiso.bitflex.app/` → `assets/index-BeggQU9V.js`, and `shasum -a 256` on the **fetched** file and the **local** `dist/assets/index-BeggQU9V.js` both return **`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`** — byte-for-byte the same bundle. **(5)** The Phase O note said the `index.html`-vs-`brand.ts` duplication *"can drift … silently"* and was *"not solvable"*, when `npm run validate` has checked the two copies against each other since the defect sweep; corrected to say so. **Gates:** validate **check 11** (*retired document statements absent* — seven patterns, matched against whitespace-normalised text so a claim re-wrapped across two lines is still caught) and **check 12** (*deployment claim stated, agreed and evidenced*). **Check 12 found a sixth instance on its first run** — the deployment claim inside RESUME HERE carried no evidence at all — which is fixed in the same pass |
+| 2026-09-28 | **mutation proofs of the two new checks** (this session) | **Check 11:** appending the retired deployment sentence itself — the wording this check exists to catch — to `PRODUCTION_READINESS.md` → **`FAIL retired document statements absent — 1 violation(s)`**, with check 12 still PASS, so the mutation isolates the check it is meant to prove. **Check 12:** renaming the bundle to `assets/index-ZZZZZZZZ.js` in one document → **`FAIL the documents disagree about which bundle the live host serves: assets/index-BeggQU9V.js, assets/index-ZZZZZZZZ.js — at least one of them is stale`**. Both mutations restored from a `/tmp` copy with `shasum -a 256` **identical** before and after: `b9552fc32a5741e2cf5e550ae21da24d6b10221826a5daf28be18bc5735bdaff` |
+| 2026-09-28 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (final bytes of the stale-document sweep, this session) | **ALL GREEN**: validate **PASS — all checks green**, now **13 checks** (12 + the retired-statements check + the deployment-claim check), and its new INFO line prints *the local build produces: assets/index-BeggQU9V.js (the same file — the live host is current)* · typecheck **exit 0** · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **369/369 across 31 files** — unchanged, because this sweep changed **no application code** · build **✓**, emitting `assets/index-BeggQU9V.js` |
+| 2026-09-28 | `npx playwright test` (final bytes of the stale-document sweep, this session) | **PASS — 11 passed (28.3 s)**, against the production preview build, with 0 console errors and 0 off-origin requests per test |
+| 2026-09-28 | **defect inventory (stale-document sweep session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. Six defects, all false statements in the documents rather than code faults, and one of them a missing piece of evidence: (1) the Phase AA bullet listing two open items — false for **both** of them, since Batch G had fixed the phone fold and the "Hundreds" strip; (2) the Phase AA *"known remaining mismatch, deliberately NOT changed"* — the same claim again; (3) the open item repeated in RESUME HERE — the same claim a third time; (4) **five false deployment claims in three documents** (`PRODUCTION_READINESS.md` §6c, §6e, §8; `docs/PROPOSAL_PROMPT.md`; this file's Phase J note) — each corrected to the fact verified by fetching the live bundle and hashing it; (5) the Phase O bullet claiming the `index.html`/`brand.ts` duplication "can drift silently" when validate has checked it since the defect sweep; (6) the RESUME HERE deployment claim carrying **no sha256**, so a reader had no way to check it — the evidence is now recorded beside it. **Every fix carries a gate** (validate checks 11 and 12), and **both gates were proved to fail by mutation and restored byte-identical**. **One item remains BLOCKED and unchanged, in the strict form recorded in the AB-5 inventory above:** the 63 department indicator values are authored scenario content — **(a)** it needs a decision from the user plus 63 real per-department figures that do not exist in the repository, **(b)** the exact next action is to put that question to the user, **(c)** the values must **never** be described as sourced official figures, and **(d)** under the agreed order it must be settled **before AB-7**. It is work still owed, not an accepted limitation |
 
 
 ### Phase AB-6 — the defect sweep and the simulation-power batches (2026-09-28)
@@ -1505,20 +1513,26 @@ decision plus 63 real per-department values, and if it is ever done it must happ
   paperwork slows the money down. If Cabinet or Treasury later requires a costed business case, it is
   **post-funding work** — the funding memo carries a short estimate table and one procurement paragraph so
   the question can be answered in the room.
-- **Phase AA — two items are known and deliberately open, stated rather than hidden:**
-  1. **On a 390 px phone the hero's primary action is below the fold** (bottom 922 px in an 844 px
-     viewport), because the authority line stacks above the hero. On 1440 and 1024 it is still above
-     the fold, which is the presentation case. Not "fixed" by hiding the Minister on small screens,
-     because that would defeat the reason the line exists. A cold session that wants it back above
-     the phone fold should compact the line further, not remove it.
-  2. **The scale strip still reads "Hundreds · Relationships"** while a run draws **32** structural
-     relationships. It is a conceptual indicator from the brief and was **not** part of the Phase AA
-     request, so it was reported rather than changed under cover of an unrelated change. Fixing it
-     means deciding whether the strip should carry measured counts — a brief-level decision.
+- **Phase AA recorded two items as open at the time. BOTH ARE NOW FIXED (Batch G, 2026-09-28)** — kept
+  here as the record, with the live state in the *RESOLVED* list three lines above:
+  1. **On a 390 px phone the hero's primary action sat below the fold** (bottom 922 px in an 844 px
+     viewport), because the authority line stacked above the hero; on 1440 and 1024 it was already above
+     the fold, which is the presentation case. **FIXED** by compacting the line into two short columns
+     below `sm` and tightening the hero spacing — **nothing was removed**, so the Minister stays on the
+     page. Measured at a real viewport, the action now ends at **842 px of 844 px**, and a Playwright
+     gate prints that number on every run. The margin is 2 px, which is thin, and *RESOLVED* item 3
+     states that on purpose.
+  2. **The scale strip read "Hundreds · Relationships"** while a run drew only the relationships its own
+     structure contained (32 at the time). **FIXED** — the strip now reads the **measured** relationship
+     count and the **measured** group count from the structure it draws, so the words and the drawing
+     cannot disagree. See *RESOLVED* item 2.
 - **DEPLOYED — Batches A–G and Phases X–Z are live (2026-09-28).** The live host
-  (`nzwisiso.bitflex.app`) now serves **`assets/index-BeggQU9V.js`**, which is **byte-for-byte the local
-  build** (`dist/index.html` references the same file). Verified by fetching the deployed bundle and
-  finding every marker of this session's work in it: "Named sources", "Draft read:", "Scenario
+  (`nzwisiso.bitflex.app`) now serves **`assets/index-BeggQU9V.js`**, whose **sha256 is
+  `c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`** — the served file was fetched and
+  hashed, and the local `dist/assets/index-BeggQU9V.js` hashes to the same value, so the deployed bundle
+  is **byte-for-byte the local build** (`dist/index.html` references the same file). Confirmed again in
+  the E-4 session by fetching the served file and comparing the two hashes. The fetch also confirms every
+  marker of this session's work is in it: "Named sources", "Draft read:", "Scenario
   assumptions", "Compare two drafts", "Structural relationships", and "population-weighted support
   index" — with **no** vendor terminology (MiroFish / OASIS / Puter all absent). The deploy was
   `lftp` over explicit FTPS on port 21, `mirror -R --only-newer` into the account's web root,
@@ -1605,9 +1619,11 @@ decision plus 63 real per-department values, and if it is ever done it must happ
   wrong and how it was proven fixed (the check FAILS at the old value).
 - **Phase O — `index.html` duplicates `BRAND.summary` by hand.** A static HTML file cannot import
   TypeScript, so the description and `og:description` are written twice. Both were updated to the new
-  wording this session (the retired "national policy simulation workspace" phrase is gone from the
-  served HTML), but they can drift from `brand.ts` silently. Not solvable without a build-time step;
-  recorded rather than hidden.
+  wording in Phase O (the retired "national policy simulation workspace" phrase is gone from the served
+  HTML), and **the duplication can no longer drift in silence**: `npm run validate` compares the two
+  copies and fails the build if they differ (defect-sweep item 4, which caught real drift on its first
+  run). The duplication itself cannot be removed without a build-time step; it is now **checked**
+  rather than merely recorded.
 - **Phase O — the brief's §8–§16 were truncated in transmission.** Phase O implemented §1–§7 and
   §17–§23 plus what §23's closing paragraph names. Anything specified in the missing sections is
   **not** in the build.
@@ -2101,9 +2117,10 @@ the same structure the schematic draws (`formatAgentCount(PREVIEW_STRUCTURE.popu
 the thousands separator is written by hand rather than with `toLocaleString`, which would be
 machine-dependent and would break determinism.
 
-**Known remaining mismatch, deliberately NOT changed (flagged, not silently fixed):** the scale strip
-still reads *"Hundreds · Relationships"* while a run draws **32** structural relationships. It was not
-part of the request, so it was reported rather than changed under cover of this one.
+**Recorded here as a mismatch at the time; FIXED later the same day (Batch G, 2026-09-28).** The scale
+strip then read *"Hundreds · Relationships"* while a run drew only the relationships its own structure
+contains. The strip now reads the **measured** relationship count and the **measured** group count from
+the structure it draws — see *RESOLVED* item 2 under **Known-red / open items**.
 
 #### Files touched in Phase AA
 
@@ -2662,6 +2679,24 @@ field removed from `RELATIONSHIP_KINDS`.
 re-anchored to the mark classes), `src/test/network.test.ts` (the legend guard now tests shapes),
 `e2e/journey.spec.ts` (9 → 10: the four field/mark selectors re-anchored, and the new three-width
 measurement test). **No file was deleted, no dependency or schema changed, and `dist/` was rebuilt.**
+## Files touched in the stale-document sweep (2026-09-28)
+
+**Four files changed, and no application code was touched at all — which is why the test count is
+unchanged at 369/369 across 31 files.**
+
+- `PROJECT_STATUS.md` — six false statements corrected: the Phase AA bullet that listed two items as
+  open, the Phase AA *"known remaining mismatch"* paragraph, the RESUME HERE open item, the Phase J
+  deployment note, the Phase O duplication note, and the RESUME HERE deployment claim
+  (which also gains the sha256 that proves it). The three verification-log rows and this session's defect
+  inventory were added, and RESUME HERE's expected validate count was raised to **13**.
+- `PRODUCTION_READINESS.md` — the three stale deployment claims (§6c, §6e and §8) replaced with the state
+  verified this session by fetching the live bundle and hashing it.
+- `docs/PROPOSAL_PROMPT.md` — the *"Deploy before you present"* note, which existed only because of the
+  stale claim, replaced with the current state and a pointer to the AB-7 rewrite.
+- `scripts/validate.mjs` — the header's check list brought up to date (it stopped at 9 when the file
+  already had 10) and **two new checks added**: **11** *retired document statements absent* and **12**
+  *deployment claim stated, agreed and evidenced*. Both were proved able to fail by mutation, and both
+  were restored byte-identical afterwards.
 ## Files touched in Phase AC E-4 (the citations and the shares become visible)
 
 **Repo — five files changed, all inside the plan's declared scope, none of them a design-system file.**
@@ -2730,11 +2765,16 @@ dependency was added or removed**. `dist/` was rebuilt.
   `7451db0`; `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*.
   Everything is committed, so a cold session can start from this file alone.
 - **THE LIVE SITE IS NOW THIS BUILD.** `nzwisiso.bitflex.app` serves `assets/index-BeggQU9V.js`, the same
-  file `npm run build` emits, and the deployed bundle contains this session's work and no vendor
-  terminology. **Anyone can be shown the real platform now** — see the DEPLOYED entry in *Known-red*.
+  file `npm run build` emits — verified by fetching the served file and hashing it:
+  `c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`, identical to the local
+  `dist/assets/index-BeggQU9V.js` (checked again in the E-4 session). The deployed bundle contains this
+  session's work and no vendor terminology. **Anyone can be shown the real platform now** — see the
+  DEPLOYED entry in *Known-red*. `npm run validate` now checks this claim directly (check 12), so it
+  cannot drift in silence.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
   then `npx playwright test` — expected **all green** (**369/369 tests across 31 files**, **11/11** Playwright,
-  validate **12/12** with the `--destructive` known-red **retired**).
+  validate **13/13**: the `--destructive` known-red is **retired**, and the two checks added in this
+  defect sweep cover the *retired document statements* and the *deployment claim and its evidence*).
 - **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
   FIRST (it is below, in the phase list).** It holds: the goal in the user's words (*"we just want to get
   this platform funded … this is just a tool that will help each department research and draft policies"*),
@@ -2819,8 +2859,10 @@ dependency was added or removed**. `dist/` was rebuilt.
   *agent total* is seeded from the draft's own text, so it differs draft to draft: AB-1's browser draft
   modelled **2,495 agents over 274 marks**, while Finance's first preset measured **2,918 agents over 293
   marks** in E-2. (Before Phase S that same card drew **15 circles** and said "1,000+".)
-  Open item, flagged not fixed: the scale strip still reads *"Hundreds · Relationships"* while a run
-  draws 40 structural relationships.
+  (Recorded as an open item at the time: the scale strip then read *"Hundreds · Relationships"* while a
+  Finance run draws **17 entities · 40 relationships**. **FIXED in Batch G** — the strip reads the
+  measured relationship and group counts from the same structure it draws, so the words and the counts
+  in this paragraph cannot drift apart.)
 - **Phase S is the current state of the run view and the public "Simulated population" block**
   (Phase AA changed what the block *draws* and what the graph *models*; everything else stands).
   Inside a run (`/app/simulations/:id`) the left column is the **Graph Relationship Visualization**

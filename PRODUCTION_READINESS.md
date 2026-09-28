@@ -86,8 +86,16 @@ client is registered.
 - Every browser test asserts **0 console errors, 0 uncaught page errors, and 0 off-origin requests** —
   the built bundle provably makes **no runtime network call**, which is the strongest available form
   of the mock-first / no-CDN guarantee.
-- Stated plainly: the journey was verified against the **local** production preview. The live host
-  still serves the older **Phase D** bundle until `dist/` is redeployed.
+- Stated plainly: the **Phase H** journey was verified against the **local** production preview, and the
+  deployment state recorded beside it at the time — that the live host was running the Phase D bundle —
+  is **superseded**: the live host (`nzwisiso.bitflex.app`) was redeployed on 2026-09-28 and serves
+  `assets/index-BeggQU9V.js`
+  (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`), whose sha256 is **the same value
+  as the local `dist/assets/index-BeggQU9V.js`** built that day, checked with `shasum -a 256` on both the
+  fetched file and the local one. That is the strongest form of the claim a local machine can make, and
+  the fetched file was checked for this session's work markers ("Named sources", "Structural
+  relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
+  bundle name and carry the hash, so the claim cannot go stale in silence.
 
 ## 6d. Verified in a real browser (Phase K — report + drafted policy)
 - `npx playwright test` → **5/5**: the 4 Phase H journeys plus one that opens **Open full report**
@@ -148,8 +156,11 @@ client is registered.
 - **Operational note (cost a real debugging cycle):** `npm run dev` serves at
   **http://localhost:8080/** — `vite.config.ts` pins `server.port = 8080`. Opening 5173 shows a stale
   build. This, not the code, was why the new landing page appeared missing.
-- Stated plainly: this is verified against the **local** production preview. The live host still
-  serves the **Phase D** bundle until `dist/` is redeployed.
+- Stated plainly: the Phases L+M+N work recorded here was verified against the **local** production
+  preview. That deployment note is **superseded** — see §6c: the live host (`nzwisiso.bitflex.app`) was
+  redeployed on 2026-09-28 and serves `assets/index-BeggQU9V.js`
+  (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`), not the Phase D bundle named
+  here when it was written.
 
 ## 6f. Verified in a real browser (Phase R — what the engine does with a draft)
 - **Phase R** added the public **"What happens behind the assessment"** section (`#behind-the-assessment`),
@@ -256,9 +267,12 @@ at both 1440 px and 390 px); a Finance-department run reads **2,495** agents ove
 2,763 over 180 marks and 2,191 over 495.) Guards: 10 palette guards, 19 card tests and real-DOM counts
 in `e2e/journey.spec.ts`.
 
-**Outside the estate:** front-end only, so the deploy rule is unchanged — remember this is a new
-build, so it must actually be deployed before it is presented. As at this record the live host still
-serves the **Phase S** bundle.
+**Outside the estate:** front-end only, so the deploy rule is unchanged — a new build must actually be
+deployed before it is presented. **The claim made here when it was written (that the live host was still
+on the Phase S bundle) is superseded:** the live host was redeployed on 2026-09-28 and serves
+`assets/index-BeggQU9V.js`
+(`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`) — the same file the local build
+produced that day.
 
 ## 7. Disabled by default (deliberate)
 
