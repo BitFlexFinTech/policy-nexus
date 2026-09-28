@@ -2504,6 +2504,11 @@ re-anchored to the mark classes), `src/test/network.test.ts` (the legend guard n
 measurement test). **No file was deleted, no dependency or schema changed, and `dist/` was rebuilt.**
 ## RESUME HERE
 
+- **Branch `feature/unified-platform`, HEAD `87ec018`, working tree clean.** Baseline `main` is untouched at
+  `7451db0`; `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*.
+  Everything is committed, so a cold session can start from this file alone.
+- **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
+  then `npx playwright test` — expected **all green** (302/302 tests, 10/10 Playwright).
 - **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
   FIRST (it is below, in the phase list).** It holds: the goal in the user's words (*"we just want to get
   this platform funded … this is just a tool that will help each department research and draft policies"*),
