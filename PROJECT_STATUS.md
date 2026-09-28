@@ -2267,6 +2267,53 @@ and 0 off-origin requests.
 weights and their sources. Both are the next actions; the screen is the honest home for them (AB-5 is the
 "named source" item).
 
+### Phase AC — platform enrichment: deep research DONE, implementation batched (2026-09-28)
+
+**Status: research DONE and written to `docs/PLATFORM_ENRICHMENT_PLAN.md`; NO code from it has been written yet.**
+Requested by the user, verbatim: *"we need to add anything that make the platform more powerful … there should
+also be documents that are cited like the constitution … the banking act … why didnt you do deep research into
+what things we can add to make this platform a powerhouse without breaking anything and also optimizing it for
+each department?"*
+
+**What the research found, and the plan records:**
+- **20 new stakeholder groups → 36 in total.** **9 carry a real published share** — persons with disabilities
+  **1.6% / 206,447** (ZIMSTAT 2022 PHC Disability Thematic Report) · Christians **85.2%** (12,937,804, census
+  Table 2.14(c)) · tourism operators **40,921** · manufacturers **257,740** · transport operators **87,730** ·
+  researchers/technical professionals **51,478** (all census Table 6.6) · PSC pensioners **209,360** (Public
+  Service Sentinel Q1 2026) · informally employed **2,069,901** (QLFS Q2 2025) · women **52.0%** (census Table
+  2.7). **11 have their weight MODELLED and are named individually**, so no number can masquerade as official.
+  A real count that is not a population share — **272 chiefs and 24,000+ village heads** under the Traditional
+  Leaders Act [Chapter 29:17] — is carried in the group's note with a MODELLED weight, never mis-scaled.
+- **Real, citable instruments for every department.** The document rail today holds *invented* filenames.
+  **206 Acts of Zimbabwe** were extracted from the official consolidated index (veritaszim A–Z List of Acts)
+  and the plan assigns verified instruments to each of the 16 departments — e.g. **Banking Act [Chapter
+  24:20]** + Reserve Bank of Zimbabwe Act [Chapter 22:15] to `fin` · **Education Act [Chapter 25:04]** to
+  `edu` · **Electricity Act [Chapter 13:19]** to `energy` · **Mines and Minerals Act [Chapter 21:05]** to
+  `mines` · **Traditional Leaders Act [Chapter 29:17]**, Urban Councils Act [Chapter 29:15], Rural District
+  Councils Act [Chapter 29:13] to `lg` · **War Veterans Act [Chapter 11:15]** + Veterans of the Liberation
+  Struggle Act [Chapter 17:12] to `def` · **Public Health Act [Chapter 15:17]** to `health` · plus the
+  **Constitution (Amendment No. 20) Act, 2013** and **NDS2 2026–2030** as citations for every department.
+  Chapter numbers appear only where the index confirms them; where it does not, the title alone is given
+  rather than a guessed number.
+- **Implementation batches E-1…E-5**, each with its own gate, and an explicit list of what must NOT change
+  (palette, typography, `src/components/ui/**`, route map, determinism, `package.json`).
+
+**Honest state:** this phase has produced a **plan and its evidence**, nothing more. No segment, document or
+citation has been added to the code yet. The only code change in this area this session is the AB-2 weights
+work above.
+
+| Batch | Work | Status |
+|---|---|---|
+| **E-1** | Add the 20 new groups to `src/config/reference.ts`, each with a real share or the `Modelled` label; extend the weight gate | NOT STARTED |
+| **E-2** | Give each of the 16 departments the groups that belong to its mandate (6–8 each, up from 4–6) | NOT STARTED |
+| **E-3** | Add the `CITED_INSTRUMENTS` table plus `citation`/`instrument` on `DepartmentDocument`, and wire each department's documents to real instruments | NOT STARTED |
+| **E-4** | Render the citation in the document rail; show each group's share and source on the Reference screen | NOT STARTED |
+| **E-5** | Full suite green + review zip | NOT STARTED |
+
+**One test pins the group count — it must be updated deliberately, not silently:** `src/test/workspace.test.tsx`
+line 88 asserts `STAKEHOLDER_SEGMENTS` has length **16**. The landing test and `coverage.ts` read the length
+from the source, so they need no change.
+
 #### AB-1 — the graph, diagnosed from the code so a cold session does not re-derive it
 
 Every stroke is set in **virtual** units on a fixed **1000×750** canvas, so its on-screen weight depends on
@@ -2458,13 +2505,17 @@ measurement test). **No file was deleted, no dependency or schema changed, and `
   model — do not resurrect them), the graph diagnosis with the exact current stroke values, the agreed
   graph-only colour exemption, and the **official Zimbabwean figures already gathered** so they are never
   re-researched.
-- **The next action, exactly:** **AB-6, AB-6b and the AB-2 WEIGHTS are DONE (2026-09-28)** — every figure is
-  retrieved and recorded above, **do not re-fetch it**, and **11 of the 16 segments now carry a published
-  ZIMSTAT 2022 census share** (5 are labelled `Modelled`), guarded by `src/test/stakeholder-weights.test.ts`.
-  **The one remaining action is the user's group list for AB-2:** ask which stakeholder groups to add, then give
-  each new group a real share from the figures already recorded, or the `Modelled` label — **never an invented
-  weight**. After that, surface the weights and their sources on the Reference screen (AB-5 owns the named-source
-  statement).
+- **The next action, exactly:** **AB-6, AB-6b and the AB-2 weights are DONE (2026-09-28)** — **do not re-fetch
+  any figure; every one is recorded above.** The user then asked for a deeper pass, and that research is **DONE**
+  and written to **`docs/PLATFORM_ENRICHMENT_PLAN.md`** (Phase AC): **20 new stakeholder groups → 36 in total**
+  (9 with a real published share, 11 explicitly `Modelled`), plus **real citable instruments for each of the 16
+  departments** (Banking Act [Chapter 24:20], Education Act [Chapter 25:04], Electricity Act [Chapter 13:19],
+  Mines and Minerals Act [Chapter 21:05], Traditional Leaders Act [Chapter 29:17], War Veterans Act [Chapter
+  11:15], and the Constitution (Amendment No. 20) Act, 2013). **Nothing from that plan is in the code yet.**
+  **The next action is batch E-1:** add the 20 groups to `src/config/reference.ts`, each with a real share or the
+  `Modelled` label; extend `src/test/stakeholder-weights.test.ts` so the modelled set stays exactly the named
+  list; and update the single pinned count in `src/test/workspace.test.tsx` (16 → 36). Then E-2 → E-5 in order.
+  **Never invent a share — an official figure or the `Modelled` label, nothing in between.**
   **AB-1 is finished and verified** (its own section above holds the evidence: pixel-pinned strokes, per-group
   colour, per-kind shape, a shape-first legend, the measured before/after, and the four mutated gates). Read
   `src/config/reference.ts` (`STAKEHOLDER_SEGMENTS` — **16** today) and `src/config/departments.ts` (which
