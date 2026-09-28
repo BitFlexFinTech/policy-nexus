@@ -5,6 +5,17 @@ import { Progress } from "@/components/ui/progress";
 import { findDepartment } from "@/config/departments";
 import { REFERENCE_FISCAL_YEAR } from "@/config/reference";
 import { assessmentService } from "@/services/assessment/AssessmentService";
+import {
+  CAPACITY_LEVERS,
+  DEFAULT_LEVERS,
+  ENFORCEMENT_LEVERS,
+  FUNDING_LEVERS,
+  isLeverValue,
+  isNeutral,
+  LEVER_CONTROLS,
+  PHASE_IN_CHOICES,
+  type ScenarioLevers,
+} from "@/services/assessment/levers";
 import type { AssessmentRequest, AssessmentSource } from "@/services/assessment/types";
 import {
   extractPolicyFile,
@@ -32,7 +43,28 @@ export function PolicyInput() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
+  // BATCH E — the assumptions the officer sets for this run. Neutral by default, so
+  // the screen renders exactly as it did before until a lever is touched.
+  const [levers, setLevers] = useState<ScenarioLevers>(DEFAULT_LEVERS);
   const [searchParams, setSearchParams] = useSearchParams();
+
+  /**
+   * Set one lever. The value is checked against the lever's own allowed values, so a
+   * control can never put the engine into a state it does not handle.
+   */
+  const setLever = useCallback((id: string, value: string) => {
+    setLevers((previous) => {
+      if (id === "funding") return isLeverValue(FUNDING_LEVERS, value) ? { ...previous, funding: value } : previous;
+      if (id === "capacity") return isLeverValue(CAPACITY_LEVERS, value) ? { ...previous, capacity: value } : previous;
+      if (id === "enforcement")
+        return isLeverValue(ENFORCEMENT_LEVERS, value) ? { ...previous, enforcement: value } : previous;
+      if (id === "phaseInMonths") {
+        const months = Number(value);
+        return Number.isFinite(months) ? { ...previous, phaseInMonths: Math.max(0, months) } : previous;
+      }
+      return previous;
+    });
+  }, []);
 
   /**
    * A prepared draft chosen elsewhere — the policy register or the simulation
@@ -75,6 +107,9 @@ export function PolicyInput() {
       templateId: text ? templateId : undefined,
       timeHorizon: template?.timeHorizon,
       fileNames,
+      // BATCH E — the officer's assumptions travel with the request, so they are part
+      // of the stored run and part of its seed.
+      levers,
     };
     // The seam always hands back a promise. While the platform is simulated it is
     // already resolved, so the officer waits for nothing — the run opens in the
@@ -92,7 +127,7 @@ export function PolicyInput() {
     } finally {
       setIsRunning(false);
     }
-  }, [department, draft, templateId, uploadedFiles, navigate]);
+  }, [department, draft, templateId, uploadedFiles, navigate, levers]);
 
   /**
    * Read each accepted file through the extraction seam, one at a time, and show
@@ -241,6 +276,77 @@ export function PolicyInput() {
             ))}
           </div>
         )}
+      </div>
+      {/* Scenario assumptions — BATCH E. Rendered from the lever definitions, so a
+          control can never exist that the engine ignores. Neutral by default. */}
+      <div className="space-y-2 border-t px-3 py-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Scenario assumptions
+          </span>
+          {!isNeutral(levers) && (
+            <button
+              type="button"
+              onClick={() => setLevers(DEFAULT_LEVERS)}
+              className="text-[10px] font-medium text-primary hover:underline"
+            >
+              Reset
+            </button>
+          )}
+        </div>
+
+        {LEVER_CONTROLS.map((control) => (
+          <div key={control.id} className="space-y-1">
+            <span className="block text-[10px] text-foreground" title={control.note}>
+              {control.label}
+            </span>
+            <div className="flex flex-wrap gap-1">
+              {control.options.map((option) => {
+                const selected = String(levers[control.id]) === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-pressed={selected}
+                    title={control.note}
+                    onClick={() => setLever(control.id, option.value)}
+                    className={`rounded-md border px-2 py-0.5 text-[10px] leading-tight transition-colors ${
+                      selected
+                        ? "border-primary/40 bg-primary/10 text-foreground"
+                        : "bg-muted/50 text-muted-foreground hover:border-primary/30 hover:bg-primary/10"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+
+        <div className="space-y-1">
+          <span className="block text-[10px] text-foreground">Phasing before duties begin</span>
+          <div className="flex flex-wrap gap-1">
+            {PHASE_IN_CHOICES.map((option) => {
+              const selected = String(levers.phaseInMonths) === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => setLever("phaseInMonths", option.value)}
+                  className={`rounded-md border px-2 py-0.5 text-[10px] leading-tight transition-colors ${
+                    selected
+                      ? "border-primary/40 bg-primary/10 text-foreground"
+                      : "bg-muted/50 text-muted-foreground hover:border-primary/30 hover:bg-primary/10"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

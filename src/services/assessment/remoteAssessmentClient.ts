@@ -5,12 +5,16 @@
  * assessment seam: it sends a run request to the configured service and maps the
  * answer onto the canonical `AssessmentRun` schema.
  *
- * WHY IT IS NOT WIRED: `AssessmentService` — the interface every screen uses — is
- * SYNCHRONOUS (`buildRun` returns a run, not a promise). A network client cannot
- * satisfy that without the run path becoming asynchronous, which reaches the
- * policy input, both run hooks and every register that lists runs. That refactor
- * is the named next step in docs/SERVER_CONTRACT.md; until it is done this client
- * is verified against a stubbed transport but cannot serve a screen.
+ * WHY IT IS NOT WIRED: no endpoint exists yet. `AssessmentService` — the interface
+ * every screen uses — became ASYNCHRONOUS in Phase Z (`buildRun`/`run`/`getRun`/
+ * `listRuns` all return promises), so this client already satisfies it and needs no
+ * refactor; the only missing piece is an endpoint and a credential. Until one is
+ * configured, the factory selects the deterministic engine and the workspace serves
+ * simulated results, labelled as such.
+ *
+ * (An earlier version of this comment said the seam was still synchronous and that
+ * wiring this client would require an asynchronous refactor. That stopped being true
+ * when Phase Z landed, and it is corrected here rather than left to mislead.)
  *
  * It never trusts the payload: an incomplete answer is rejected rather than
  * rendered as if it were a result.
@@ -62,6 +66,15 @@ export const isAssessmentRun = (value: unknown): value is AssessmentRun => {
   for (const key of REQUIRED_ARRAYS) {
     if (!Array.isArray(value[key])) return false;
   }
+  // BATCH E — the assumptions and the horizon are part of what the screens state, so an
+  // answer that omits them is incomplete rather than renderable.
+  if (typeof value.horizonMonths !== "number" || Number.isNaN(value.horizonMonths)) return false;
+  if (!Array.isArray(value.leverNotes)) return false;
+  if (!isObject(value.levers)) return false;
+  for (const key of ["funding", "capacity", "enforcement"] as const) {
+    if (typeof value.levers[key] !== "string") return false;
+  }
+  if (typeof value.levers.phaseInMonths !== "number") return false;
   return true;
 };
 

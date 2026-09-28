@@ -9,7 +9,20 @@
  */
 
 import { hashString, normaliseSeedText, toSeedHex } from "@/lib/prng";
+import { resolveLevers, type ScenarioLevers } from "./levers";
 import type { AssessmentRequest } from "./types";
+
+/**
+ * The assumptions, flattened into one string in a fixed order. Part of the seed, so
+ * changing a lever produces a different run with a different reference instead of
+ * silently overwriting the earlier one in the register.
+ */
+export const leverSeed = (levers?: Partial<ScenarioLevers>): string => {
+  const resolved = resolveLevers(levers);
+  return [resolved.funding, resolved.capacity, resolved.enforcement, String(resolved.phaseInMonths)].join(
+    ",",
+  );
+};
 
 /** The exact string the engine is seeded from. Logged with every run. */
 export const seedForRequest = (request: AssessmentRequest): string =>
@@ -18,6 +31,7 @@ export const seedForRequest = (request: AssessmentRequest): string =>
     normaliseSeedText(request.policyText),
     request.templateId ?? "custom",
     request.timeHorizon ?? "medium",
+    leverSeed(request.levers),
   ].join("::");
 
 /** Short hex of the seed, used in identifiers. */

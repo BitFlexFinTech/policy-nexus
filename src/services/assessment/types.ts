@@ -13,6 +13,7 @@
 
 import type { DepartmentId } from "@/config/departments";
 import type { StakeholderSegmentId, TimeHorizonId } from "@/config/reference";
+import type { ScenarioLevers } from "./levers";
 
 /** How the policy text reached the engine. */
 export type AssessmentSource = "paste" | "preset" | "upload";
@@ -33,10 +34,17 @@ export interface AssessmentRequest {
   timeHorizon?: TimeHorizonId;
   /**
    * Names of uploaded files, recorded for provenance. A `.txt` upload also
-   * supplies the policy text itself (read in the browser); `.pdf` and `.docx`
-   * uploads are recorded by name only — their text is not read in this build.
+   * supplies the policy text itself (read in the browser), and a `.docx` upload
+   * supplies its own paragraphs (unpacked in the browser); `.pdf` uploads are
+   * recorded by name only — their text is not read in this build.
    */
   fileNames?: string[];
+  /**
+   * The assumptions the officer set for this run. Optional, so every stored run and
+   * every caller written before the levers existed keeps working; `resolveLevers`
+   * fills in the neutral setting.
+   */
+  levers?: ScenarioLevers;
 }
 
 export interface SimulationRound {
@@ -116,6 +124,12 @@ export interface AssessmentRun {
   seed: string;
   timeHorizon: TimeHorizonId;
   horizonLabel: string;
+  /** The horizon in months, so the run can state the length it was modelled over. */
+  horizonMonths: number;
+  /** The assumptions this run was modelled under, with the neutral setting filled in. */
+  levers: ScenarioLevers;
+  /** One plain-language line per assumption, for the screen and every export. */
+  leverNotes: string[];
   status: "complete";
   confidence: number;
   summary: string;

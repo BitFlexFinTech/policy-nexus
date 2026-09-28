@@ -190,6 +190,23 @@ export function ImpactList({ run }: { run: AssessmentRun }) {
   );
 }
 
+/**
+ * The assumptions the run was modelled under (BATCH E). Stated as its own block, in
+ * the same words the run screen and every export use, so a figure can never be read
+ * without knowing what was assumed to produce it.
+ */
+export function AssumptionList({ run }: { run: AssessmentRun }) {
+  return (
+    <Section title="Assumptions in force">
+      {run.leverNotes.map((note) => (
+        <p key={note} className="px-4 py-2 text-[10px] leading-relaxed text-muted-foreground">
+          {note}
+        </p>
+      ))}
+    </Section>
+  );
+}
+
 export function RiskList({ run }: { run: AssessmentRun }) {
   return (
     <Section title={`Risks modelled for this draft (${run.risks.length})`}>

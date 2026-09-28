@@ -275,4 +275,110 @@ describe("simulation power — the draft drives the run, and the weights are rea
     expect(complete.risks.map((risk) => risk.id)).not.toContain("risk-transition");
     expect(complete.risks.map((risk) => risk.id)).not.toContain("risk-scope");
   });
+
+  /* ------------------------------- BATCH E ------------------------------- */
+
+  const leversFor = (
+    levers: AssessmentRequest["levers"],
+    timeHorizon: AssessmentRequest["timeHorizon"] = "medium",
+  ): AssessmentRequest => ({
+    ...requestWith(
+      "fin",
+      "Each bank must register. Each bureau must report monthly. Each dealer must file a return, and a transition period of twelve months applies.",
+    ),
+    levers,
+    timeHorizon,
+  });
+
+  it("E — the neutral setting is the default, and every assumption is stated on the run", async () => {
+    const run = await build(requestWith("fin", "Each bank must register."));
+    expect(run.levers).toEqual({
+      funding: "unstated",
+      capacity: "unstated",
+      enforcement: "standard",
+      phaseInMonths: 0,
+    });
+    expect(run.leverNotes.join(" ")).toContain("Modelled horizon of");
+    expect(run.leverNotes.join(" ")).toContain("No further assumptions were set");
+    expect(run.rounds.some((round) => round.message.startsWith("Assumptions in force"))).toBe(true);
+  });
+
+  it("E — changing a lever changes the run, its reference, and what it states", async () => {
+    const neutral = await build(leversFor(undefined));
+    const levered = await build(
+      leversFor({
+        funding: "within-budget",
+        capacity: "needs-support",
+        enforcement: "strict",
+        phaseInMonths: 12,
+      }),
+    );
+    // A different setting is a DIFFERENT run, not one silently overwriting the other.
+    expect(levered.reference).not.toBe(neutral.reference);
+    expect(levered.id).not.toBe(neutral.id);
+    expect(levered.leverNotes.join(" ")).toContain("Inside the current budget");
+    expect(levered.leverNotes.join(" ")).toContain("Phasing");
+    expect(levered.leverNotes.join(" ")).not.toContain("No further assumptions were set");
+    expect(levered.reactions.map((reaction) => reaction.participation)).not.toEqual(
+      neutral.reactions.map((reaction) => reaction.participation),
+    );
+  });
+
+  it("E — money already in the budget removes the unfunded-actions risk; a new appropriation makes it worse", async () => {
+    const unstated = await build(leversFor(undefined));
+    const within = await build(leversFor({ funding: "within-budget", capacity: "unstated", enforcement: "standard", phaseInMonths: 0 }));
+    const fresh = await build(leversFor({ funding: "new-appropriation", capacity: "unstated", enforcement: "standard", phaseInMonths: 0 }));
+
+    expect(unstated.risks.map((risk) => risk.id)).toContain("risk-funding");
+    expect(within.risks.map((risk) => risk.id)).not.toContain("risk-funding");
+    expect(fresh.risks.find((risk) => risk.id === "risk-funding")!.severity).toBe("high");
+  });
+
+  it("E — the phase-in lever counts as a transition period, and outlasting the horizon is flagged", async () => {
+    const shortDraft = await build({
+      ...requestWith("fin", "Each bank must register. Each bureau must report monthly."),
+      timeHorizon: "short",
+      levers: { funding: "unstated", capacity: "unstated", enforcement: "standard", phaseInMonths: 12 },
+    });
+    // 12 months of phasing inside a 6-month horizon: no transition risk, but a phasing one.
+    expect(shortDraft.risks.map((risk) => risk.id)).not.toContain("risk-transition");
+    expect(shortDraft.risks.map((risk) => risk.id)).toContain("risk-phasing");
+    expect(shortDraft.risks.find((risk) => risk.id === "risk-phasing")!.severity).toBe("high");
+    expect(shortDraft.recommendations.map((item) => item.id)).toContain("rec-align");
+
+    // And a phase-in that fits inside a long horizon does not raise it at all.
+    const longDraft = await build({
+      ...requestWith("fin", "Each bank must register. Each bureau must report monthly."),
+      timeHorizon: "long",
+      levers: { funding: "unstated", capacity: "unstated", enforcement: "standard", phaseInMonths: 12 },
+    });
+    expect(longDraft.risks.map((risk) => risk.id)).not.toContain("risk-phasing");
+  });
+
+  it("E — the horizon means something: a longer one produces more rounds and states its length", async () => {
+    const short = await build(leversFor(undefined, "short"));
+    const long = await build(leversFor(undefined, "long"));
+    expect(short.horizonMonths).toBe(6);
+    expect(long.horizonMonths).toBe(60);
+    expect(long.rounds.length).toBeGreaterThan(short.rounds.length);
+    expect(long.summary).toContain("60 months");
+    expect(short.summary).toContain("6 months");
+  });
+
+  it("E — the capacity and enforcement levers move modelled engagement in the stated direction", async () => {
+    const ready = await build(leversFor({ funding: "unstated", capacity: "ready", enforcement: "standard", phaseInMonths: 0 }));
+    const needsSupport = await build(leversFor({ funding: "unstated", capacity: "needs-support", enforcement: "standard", phaseInMonths: 0 }));
+    const mean = (values: readonly number[]) =>
+      values.reduce((sum, value) => sum + value, 0) / values.length;
+    expect(mean(ready.reactions.map((reaction) => reaction.participation))).toBeGreaterThan(
+      mean(needsSupport.reactions.map((reaction) => reaction.participation)),
+    );
+    expect(ready.reactions[0].note).toContain("capacity is in place");
+    expect(needsSupport.reactions[0].note).toContain("capacity needs training");
+
+    const advisory = await build(leversFor({ funding: "unstated", capacity: "unstated", enforcement: "advisory", phaseInMonths: 0 }));
+    const strict = await build(leversFor({ funding: "unstated", capacity: "unstated", enforcement: "strict", phaseInMonths: 0 }));
+    expect(advisory.reactions[0].note).toContain("advisory enforcement");
+    expect(strict.reactions[0].note).toContain("strict enforcement");
+  });
 });

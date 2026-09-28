@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { DocumentActions } from "@/components/assessment/DocumentActions";
 import {
   AssessmentHeader,
+  AssumptionList,
   ImpactList,
   InputRecord,
   MetricCards,
@@ -40,6 +41,7 @@ export default function FullAssessment() {
 
       <DocumentActions run={run} scope="full" />
 
+      <AssumptionList run={run} />
       <MetricCards run={run} />
 
       <div className="rounded-lg border bg-card p-4">

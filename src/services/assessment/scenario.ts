@@ -21,6 +21,7 @@ import {
 } from "@/config/reference";
 import { VOCABULARY } from "@/config/brand";
 import { createRng, type Rng } from "@/lib/prng";
+import { resolveLevers, leverSummary, type ScenarioLevers } from "./levers";
 import { readPolicy, type PolicyClauses, type PolicyReading } from "./policyReading";
 import { runIdFor, seedHexForRequest, seedForRequest } from "./seed";
 import type {
@@ -79,6 +80,9 @@ interface RiskContext {
   reactions: readonly StakeholderReaction[];
   impacts: readonly ImpactDimension[];
   department: Department;
+  /** BATCH E — the assumptions the officer set, and the horizon they were set for. */
+  levers: ScenarioLevers;
+  horizonMonths: number;
 }
 
 interface RiskRule {
@@ -115,24 +119,51 @@ const RISK_RULES: readonly RiskRule[] = [
     id: "risk-transition",
     label: "Transition support",
     note: "No defined transition period leaves affected groups carrying the full adjustment cost in one cycle.",
+    // BATCH E — the phase-in lever counts as a transition period, so setting one removes
+    // this risk rather than sitting beside it as decoration.
     when: (context) =>
-      context.reading.actionSentences.length >= 2 && !context.reading.clauses.transition,
+      context.reading.actionSentences.length >= 2 &&
+      !context.reading.clauses.transition &&
+      context.levers.phaseInMonths === 0,
     severity: (context) => (context.reading.clauses.funding ? "medium" : "high"),
+  },
+  {
+    id: "risk-phasing",
+    label: "Phase-in outlasts the horizon",
+    note: "The time given to affected groups before the duties begin runs past the horizon the run was modelled over, so the run cannot show the policy in force.",
+    when: (context) =>
+      context.levers.phaseInMonths > 0 && context.levers.phaseInMonths > context.horizonMonths,
+    severity: () => "high",
   },
   {
     id: "risk-funding",
     label: "Unfunded actions",
     note: "The draft assigns actions without naming how they are paid for, so the cost lands on front-line budgets.",
+    // BATCH E — the funding lever answers this directly: money already inside the
+    // budget removes the risk; a fresh appropriation makes it worse.
     when: (context) =>
-      context.reading.actionSentences.length >= 2 && !context.reading.clauses.funding,
-    severity: (context) => (context.reading.actionSentences.length >= 5 ? "high" : "medium"),
+      context.reading.actionSentences.length >= 2 &&
+      !context.reading.clauses.funding &&
+      context.levers.funding !== "within-budget",
+    severity: (context) =>
+      context.levers.funding === "new-appropriation"
+        ? "high"
+        : context.reading.actionSentences.length >= 5
+          ? "high"
+          : "medium",
   },
   {
     id: "risk-absorption",
     label: "Administrative absorption",
     note: "Front-line offices absorb the new process without a matching change to establishment or training.",
     when: (context) => context.reading.actionSentences.length >= 4,
-    severity: (context) => (context.reading.actionSentences.length >= 7 ? "high" : "medium"),
+    severity: (context) => {
+      // BATCH E — the capacity lever moves this risk up or down by one step.
+      const base =
+        context.reading.actionSentences.length >= 7 ? 2 : context.reading.actionSentences.length >= 5 ? 1 : 1;
+      const adjusted = base + (context.levers.capacity === "needs-support" ? 1 : context.levers.capacity === "ready" ? -1 : 0);
+      return adjusted >= 2 ? "high" : adjusted <= 0 ? "low" : "medium";
+    },
   },
   {
     id: "risk-communication",
@@ -142,7 +173,16 @@ const RISK_RULES: readonly RiskRule[] = [
     severity: (context) => {
       const resistant = context.reactions.filter((reaction) => reaction.sentiment === "resistant");
       const share = resistant.length / Math.max(1, context.reactions.length);
-      return share >= 0.5 ? "high" : resistant.length > 0 ? "medium" : "low";
+      const base = share >= 0.5 ? 2 : resistant.length > 0 ? 1 : 0;
+      // BATCH E — the capacity and enforcement levers move this risk by one step.
+      const step =
+        context.levers.capacity === "needs-support" || context.levers.enforcement === "strict"
+          ? 1
+          : context.levers.capacity === "ready"
+            ? -1
+            : 0;
+      const adjusted = base + step;
+      return adjusted >= 2 ? "high" : adjusted === 1 ? "medium" : "low";
     },
   },
   {
@@ -197,6 +237,11 @@ const REMEDIES: Record<string, { id: string; label: string; note: string }> = {
     id: "rec-phase",
     label: "Phase the actions by readiness",
     note: "Start with the groups the model shows as ready and support the rest through a transition window.",
+  },
+  "risk-phasing": {
+    id: "rec-align",
+    label: "Align the phase-in with the horizon",
+    note: "Either shorten the transition or model a longer horizon, so the run can show the policy actually in force.",
   },
   "risk-funding": {
     id: "rec-fund",
@@ -300,46 +345,80 @@ const mean = (values: readonly number[]): number =>
 /**
  * One modelled group's reaction.
  *
- * BATCH A — the draft's own reading decides how much each group engages. A group
- * the draft's words concern engages more and its modelled position spreads further;
- * a group the draft never speaks to engages less and its position is pulled towards
- * the middle, because a draft that does not mention a group gives that group little
- * to react to. Both adjustments are stated in the reaction's note, so the officer can
- * see WHY a figure moved rather than being told to trust it.
+ * BATCH A — the draft's own reading decides how much each group engages.
+ * BATCH E — the officer's assumptions move it further: a ready front line engages
+ * more, a front line needing support engages less, and the enforcement lever widens
+ * or narrows the spread of modelled positions around the middle.
+ *
+ * Every adjustment is stated in the reaction's note, so the officer can see WHY a
+ * figure moved rather than being told to trust it.
  */
 const buildReactions = (
   department: Department,
   rng: Rng,
   reading: PolicyReading,
-): StakeholderReaction[] =>
-  department.segments.map((segmentId) => {
+  levers: ScenarioLevers,
+): StakeholderReaction[] => {
+  const capacityShift = levers.capacity === "ready" ? 8 : levers.capacity === "needs-support" ? -8 : 0;
+  const enforcementShift = levers.enforcement === "strict" ? 6 : levers.enforcement === "advisory" ? -6 : 0;
+
+  return department.segments.map((segmentId) => {
     const segment = getStakeholderSegment(segmentId);
     const addressed = reading.concernedSegmentIds.includes(segmentId);
-    const supportIndex = rng.int(18, 90);
+    const rawSupport = rng.int(18, 90);
     const rawParticipation = rng.int(32, 96);
 
     // A draft that speaks to a group draws it out; one that ignores it does not.
-    const participation = addressed
-      ? Math.min(96, rawParticipation + 12)
-      : Math.max(24, rawParticipation - 8);
-    // An unaddressed group's modelled position sits nearer the middle, because there
-    // is less in the draft for it to react to.
-    const adjustedSupport = addressed
-      ? supportIndex
-      : Math.round(supportIndex * 0.6 + NEUTRAL_SUPPORT * 0.4);
-    const sentiment = sentimentFor(adjustedSupport);
+    // An unaddressed group's modelled position also sits nearer the middle.
+    const readingSupport = addressed ? rawSupport : Math.round(rawSupport * 0.6 + NEUTRAL_SUPPORT * 0.4);
+    // Advisory duty lowers engagement and narrows the spread; strict duty raises both.
+    const enforcementSupport =
+      levers.enforcement === "advisory"
+        ? Math.round(readingSupport * 0.8 + NEUTRAL_SUPPORT * 0.2)
+        : levers.enforcement === "strict"
+          ? Math.round(NEUTRAL_SUPPORT + (readingSupport - NEUTRAL_SUPPORT) * 1.2)
+          : readingSupport;
+    const supportIndex = Math.max(0, Math.min(100, enforcementSupport));
+
+    const participation = Math.max(
+      10,
+      Math.min(
+        100,
+        rawParticipation + (addressed ? 12 : -8) + capacityShift + enforcementShift,
+      ),
+    );
+    const sentiment = sentimentFor(supportIndex);
+
+    const reasons = [
+      addressed
+        ? "The draft's own words address this group."
+        : "The draft's own words do not address this group, so its modelled position sits nearer the middle.",
+    ];
+    if (capacityShift !== 0) {
+      reasons.push(
+        levers.capacity === "ready"
+          ? "Assumed front-line capacity is in place."
+          : "Assumed front-line capacity needs training or staff.",
+      );
+    }
+    if (enforcementShift !== 0) {
+      reasons.push(
+        levers.enforcement === "strict"
+          ? "Assumed strict enforcement widens the modelled spread."
+          : "Assumed advisory enforcement narrows the modelled spread.",
+      );
+    }
 
     return {
       segmentId,
       label: segment.label,
       sentiment,
-      supportIndex: adjustedSupport,
+      supportIndex,
       participation,
-      note: addressed
-        ? `${rng.pick(REACTION_NOTES[sentiment])} The draft's own words address this group.`
-        : `${rng.pick(REACTION_NOTES[sentiment])} The draft's own words do not address this group, so its modelled position sits nearer the middle.`,
+      note: `${rng.pick(REACTION_NOTES[sentiment])} ${reasons.join(" ")}`,
     };
   });
+};
 
 /** The middle of the modelled support scale. Named once, so the pull above cannot drift. */
 const NEUTRAL_SUPPORT = 54;
@@ -423,14 +502,21 @@ const buildRounds = (
   context: Pick<AssessmentRun, "reference" | "seed" | "policyText" | "horizonLabel">,
   reactions: readonly StakeholderReaction[],
   reading: PolicyReading,
+  levers: ScenarioLevers,
+  horizonMonths: number,
   rng: Rng,
 ): SimulationRound[] => {
+  // BATCH E — the horizon now means something: a longer one produces more interaction
+  // rounds per group, so a six-month and a sixty-month run are visibly different runs
+  // rather than the same run with a different word on it.
+  const roundsPerGroup = horizonMonths <= 6 ? 1 : horizonMonths <= 18 ? 2 : 3;
+
   const rounds: SimulationRound[] = [
     {
       index: 1,
       actor: "System",
       tone: "system",
-      message: `Run ${context.reference} accepted for ${department.name}. Policy text ${context.policyText.length} characters, ${reading.wordCount} words. Horizon ${context.horizonLabel}.`,
+      message: `Run ${context.reference} accepted for ${department.name}. Policy text ${context.policyText.length} characters, ${reading.wordCount} words. Horizon ${context.horizonLabel} (${horizonMonths} months).`,
     },
     {
       // BATCH A — the reading is stated as its own round, so the officer can see what
@@ -446,11 +532,19 @@ const buildRounds = (
       tone: "info",
       message: `${VOCABULARY.knowledgeMap} loaded: ${department.indicators.length} reference indicators, ${department.priorities.length} stated priorities, ${department.documents.length} department documents.`,
     },
+    {
+      // BATCH E — the assumptions in force are stated before any figure, so a run can
+      // never be read without knowing what was assumed.
+      index: 4,
+      actor: VOCABULARY.scenarioEngine,
+      tone: "info",
+      message: `Assumptions in force — ${leverSummary(levers, horizonMonths).join(" ")}`,
+    },
   ];
 
   if (reading.outsideInstrumentTitles.length > 0) {
     rounds.push({
-      index: 4,
+      index: rounds.length + 1,
       actor: "System",
       tone: "warning",
       message: `The draft names ${reading.outsideInstrumentTitles.length} instrument ${reading.outsideInstrumentTitles.length === 1 ? "that sits" : "that sit"} outside this department's register: ${reading.outsideInstrumentTitles.join("; ")}. Worth confirming before adoption.`,
@@ -471,7 +565,9 @@ const buildRounds = (
       message: `${VOCABULARY.agentMemory} response modelled — support index ${reaction.supportIndex}/100, participation ${reaction.participation}/100 (${reaction.sentiment}).`,
     });
     index += 1;
-    if (rng.bool(0.4)) {
+    // More interaction rounds per group for a longer horizon.
+    for (let extra = 0; extra < roundsPerGroup - 1; extra += 1) {
+      if (!rng.bool(0.4)) continue;
       rounds.push({
         index,
         actor: reaction.label,
@@ -520,7 +616,12 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
   const rng = createRng(seed);
 
   const timeHorizon = request.timeHorizon ?? template?.timeHorizon ?? "medium";
-  const horizonLabel = getTimeHorizon(timeHorizon).label;
+  const horizon = getTimeHorizon(timeHorizon);
+  const horizonLabel = horizon.label;
+  const horizonMonths = horizon.months;
+  // BATCH E — the assumptions the officer set, with the neutral setting filled in.
+  const levers = resolveLevers(request.levers);
+  const leverNotes = leverSummary(levers, horizonMonths);
 
   const policyTitle = template?.title ?? titleFromText(request.policyText);
   const reference =
@@ -532,9 +633,16 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
   // below answers to it. Pure: the same text always yields the same reading.
   const reading = readPolicy(request.policyText, department);
 
-  const reactions = buildReactions(department, rng, reading);
+  const reactions = buildReactions(department, rng, reading, levers);
   const impacts = buildImpacts(department, horizonLabel, rng, reading);
-  const riskContext: RiskContext = { reading, reactions, impacts, department };
+  const riskContext: RiskContext = {
+    reading,
+    reactions,
+    impacts,
+    department,
+    levers,
+    horizonMonths,
+  };
   const risks = buildRisks(riskContext);
   const recommendations = buildRecommendations(riskContext, risks);
 
@@ -565,7 +673,11 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
       ),
     ),
   );
-  const volatility = rng.int(9, 34);
+  // BATCH E — a longer horizon widens the modelled range, inside the same stated band.
+  const volatility = Math.min(
+    34,
+    rng.int(9, 24) + (horizonMonths >= 60 ? 10 : horizonMonths >= 18 ? 5 : 0),
+  );
 
   const restrictive = reactions.filter((reaction) => reaction.sentiment === "resistant");
   const supportive = reactions.filter((reaction) => reaction.sentiment === "supportive");
@@ -575,7 +687,7 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
   const weightedGap = Math.abs(support - supportEqual);
 
   const summary =
-    `Modelled over ${horizonLabel.toLowerCase()}, the draft "${policyTitle}" draws a population-weighted support index of ` +
+    `Modelled over ${horizonLabel.toLowerCase()} (${horizonMonths} months), the draft "${policyTitle}" draws a population-weighted support index of ` +
     `${support}/100 across ${reactions.length} stakeholder groups (${supportEqual}/100 if every group is counted equally), ` +
     `with ${supportive.length} reading as supportive and ${restrictive.length} as resistant. ` +
     `The draft's own words assign ${reading.actionSentences.length} ${reading.actionSentences.length === 1 ? "action" : "actions"} ` +
@@ -635,6 +747,9 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
     seed,
     timeHorizon,
     horizonLabel,
+    horizonMonths,
+    levers,
+    leverNotes,
     status: "complete",
     confidence,
     summary,
@@ -643,6 +758,8 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
       { reference, seed, policyText: request.policyText, horizonLabel },
       reactions,
       reading,
+      levers,
+      horizonMonths,
       rng,
     ),
     reactions,

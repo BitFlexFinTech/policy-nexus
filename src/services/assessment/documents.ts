@@ -122,8 +122,12 @@ export const buildLongReport = (run: AssessmentRun, department: Department): Gen
     paragraphs: [
       `The ${VOCABULARY.simulationCore} is computed locally within the Government of Zimbabwe estate. No policy text or result leaves national custody, and no external service is contacted.`,
       rng.pick(REPORT_METHOD),
-      `This run modelled ${run.reactions.length} stakeholder groups, tested the draft against ${run.impacts.length} of ${department.shortName}'s stated priorities, and drew on ${department.indicators.length} published reference indicators over a ${run.horizonLabel.toLowerCase()} horizon.`,
+      `This run modelled ${run.reactions.length} stakeholder groups, tested the draft against ${run.impacts.length} of ${department.shortName}'s stated priorities, and drew on ${department.indicators.length} published reference indicators over a ${run.horizonLabel.toLowerCase()} horizon of ${run.horizonMonths} months.`,
+      `The draft's own words were read before anything was modelled; the run screen and the assessment state what that reading found.`,
     ],
+    // BATCH E — every assumption the run was modelled under, in the report's own words.
+    bullets: run.leverNotes.length > 0 ? run.leverNotes : undefined,
+    listStyle: "bullets",
   };
 
   const reactions: GeneratedSection = {
