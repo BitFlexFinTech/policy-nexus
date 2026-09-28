@@ -6,6 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { BRAND } from "@/config/brand";
+import { citedInstrumentLabel } from "@/config/instruments";
 import { formatReferenceDate } from "@/config/reference";
 import type { DepartmentDocument } from "@/config/departments";
 
@@ -16,6 +17,9 @@ import type { DepartmentDocument } from "@/config/departments";
  * content — so this states what the document is rather than pretending to open
  * it. Selecting a document therefore produces a real answer instead of a row that
  * looks clickable and does nothing.
+ *
+ * Where the document cites an instrument, this names it. The citation is DERIVED from
+ * `CITED_INSTRUMENTS`, so the dialog and the rail can never show different titles.
  */
 export function RecordedDocumentDialog({
   document,
@@ -30,12 +34,13 @@ export function RecordedDocumentDialog({
 }) {
   if (!document) return null;
 
-  const rows: ReadonlyArray<[string, string]> = [
+  const rows: Array<[string, string]> = [
     ["Format", document.kind.toUpperCase()],
     ["Recorded size", document.sizeLabel],
     ["Recorded date", formatReferenceDate(document.date)],
-    ["Held by", departmentName],
   ];
+  if (document.instrument) rows.push(["Prepared under", citedInstrumentLabel(document.instrument)]);
+  rows.push(["Held by", departmentName]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

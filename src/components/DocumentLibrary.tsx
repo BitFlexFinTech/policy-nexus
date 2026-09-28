@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { File, FileText } from "lucide-react";
-import { findDepartment, type DepartmentDocument } from "@/config/departments";
+import {
+  findDepartment,
+  sortDocumentsByCitation,
+  type DepartmentDocument,
+} from "@/config/departments";
+import { citedInstrumentLabel } from "@/config/instruments";
 import { formatReferenceDate } from "@/config/reference";
 import { useSession } from "@/session/useSession";
 import { RecordedDocumentDialog } from "@/components/documents/RecordedDocumentDialog";
@@ -12,6 +17,10 @@ import { RecordedDocumentDialog } from "@/components/documents/RecordedDocumentD
  * Selecting a document opens what the register knows about it, so the row's hover
  * and pointer styling is honoured by a real action (it previously advertised a
  * click and did nothing).
+ *
+ * Each row also states the instrument the document is prepared under. That caption is
+ * DERIVED from `CITED_INSTRUMENTS` — the register stores a key, never the citation text —
+ * so a title and its chapter cannot drift apart. Cited documents are listed first.
  */
 export function DocumentLibrary() {
   const session = useSession();
@@ -26,7 +35,7 @@ export function DocumentLibrary() {
         <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Document Library</span>
       </div>
       <div className="flex-1 space-y-1 overflow-y-auto p-2">
-        {department.documents.map((doc) => (
+        {sortDocumentsByCitation(department.documents).map((doc) => (
           <button
             key={doc.id}
             type="button"
@@ -44,6 +53,14 @@ export function DocumentLibrary() {
               <span className="text-[10px] text-muted-foreground">
                 {doc.sizeLabel} · {formatReferenceDate(doc.date)}
               </span>
+              {doc.instrument ? (
+                <span
+                  className="truncate text-[10px] text-muted-foreground"
+                  title={citedInstrumentLabel(doc.instrument)}
+                >
+                  {citedInstrumentLabel(doc.instrument)}
+                </span>
+              ) : null}
             </div>
           </button>
         ))}

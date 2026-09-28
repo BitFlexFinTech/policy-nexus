@@ -1,14 +1,24 @@
 import { useState } from "react";
 import { File, FileText } from "lucide-react";
-import { findDepartment, type DepartmentDocument } from "@/config/departments";
+import {
+  findDepartment,
+  sortDocumentsByCitation,
+  type DepartmentDocument,
+} from "@/config/departments";
+import { citedInstrumentLabel } from "@/config/instruments";
 import { formatReferenceDate } from "@/config/reference";
 import { useSession } from "@/session/useSession";
 import { RecordedDocumentDialog } from "@/components/documents/RecordedDocumentDialog";
 
 /**
  * Document Library — the full department document register, with each document's
- * stated kind, size, date and purpose. Every declared document is listed, and
- * every entry opens what the register knows about it.
+ * stated kind, size, date and purpose, and the instrument it is prepared under.
+ * Every declared document is listed, and every entry opens what the register
+ * knows about it.
+ *
+ * The citation is DERIVED from `CITED_INSTRUMENTS` — the register holds a key, never the
+ * citation text — so a title and its chapter cannot drift apart. Cited documents are
+ * listed first, by the same rule the workspace rail uses.
  */
 export default function Documents() {
   const session = useSession();
@@ -30,7 +40,7 @@ export default function Documents() {
       </header>
 
       <ul className="space-y-1">
-        {documents.map((doc) => (
+        {sortDocumentsByCitation(documents).map((doc) => (
           <li key={doc.id}>
             <button
               type="button"
@@ -48,6 +58,11 @@ export default function Documents() {
                   {doc.kind.toUpperCase()} · {doc.sizeLabel} · {formatReferenceDate(doc.date)}
                 </span>
                 <span className="text-[10px] text-muted-foreground">{doc.note}</span>
+                {doc.instrument ? (
+                  <span className="text-[10px] text-muted-foreground">
+                    Prepared under {citedInstrumentLabel(doc.instrument)}
+                  </span>
+                ) : null}
               </span>
             </button>
           </li>

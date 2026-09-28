@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { Buffer } from "node:buffer";
 import { readFileSync } from "node:fs";
 import { DEPARTMENTS, DEPARTMENT_COUNT, findDepartment } from "../src/config/departments";
+import { citedInstrumentLabel } from "../src/config/instruments";
 
 /**
  * Phase H — the real in-browser end-to-end journey.
@@ -551,12 +552,23 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
 
     // The document rail used to advertise a click with no handler behind it.
     const document = DEPARTMENT.documents[0];
+    expect(document.instrument).toBeTruthy();
+    const citation = citedInstrumentLabel(document.instrument!);
+
+    // E-4: the rail states the instrument the document is prepared under.
+    await expect(
+      page.getByRole("button", { name: new RegExp(escapeRegex(document.name)) }).getByText(citation),
+    ).toBeVisible();
+
     await page
       .getByRole("button", { name: new RegExp(escapeRegex(document.name)) })
       .click();
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog.getByText(document.note)).toBeVisible();
+    // E-4: and the dialog names it too — the same derived text.
+    await expect(dialog.getByText("Prepared under")).toBeVisible();
+    await expect(dialog.getByText(citation)).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
 

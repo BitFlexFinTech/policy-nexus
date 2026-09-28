@@ -1103,6 +1103,20 @@ export const ALL_DEPARTMENT_DOCUMENTS = DEPARTMENTS.flatMap((department) =>
   department.documents.map((document) => ({ department, document })),
 );
 
+/**
+ * The register's documents in the order the rails show them: the documents that cite an
+ * instrument come first, and everything else keeps the register's own order.
+ *
+ * Both rails sort by this one rule rather than each carrying its own copy of it. Today
+ * every document in the register cites an instrument, so the order is unchanged — the
+ * helper is here so a future document with no instrument can never push a cited one
+ * down the rail. It copies the array, so the authored register is never rearranged.
+ */
+export const sortDocumentsByCitation = (
+  documents: readonly DepartmentDocument[],
+): DepartmentDocument[] =>
+  [...documents].sort((a, b) => Number(Boolean(b.instrument)) - Number(Boolean(a.instrument)));
+
 /** The number of departments the platform must always render. */
 export const DEPARTMENT_COUNT = DEPARTMENTS.length;
 

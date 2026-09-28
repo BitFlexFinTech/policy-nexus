@@ -1,6 +1,7 @@
 import { findDepartment } from "@/config/departments";
 import { BRAND, DISCLAIMER, SOVEREIGNTY_STATEMENT, VOCABULARY } from "@/config/brand";
 import {
+  MODELLED_SHARE_LABEL,
   REFERENCE_DATE_LABEL,
   REFERENCE_FISCAL_YEAR,
   REFERENCE_RATES,
@@ -55,11 +56,21 @@ export default function Reference() {
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Stakeholder segments modelled ({STAKEHOLDER_SEGMENTS.length})
         </h3>
-        <ul className="mt-2 grid gap-1 sm:grid-cols-2">
+        <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+          Each group carries the share of the country it stands for, with the source the figure came
+          from. Where no official figure exists, the share is labelled {MODELLED_SHARE_LABEL} rather
+          than filled with a guess.
+        </p>
+        <ul className="mt-2 grid gap-1.5 sm:grid-cols-2">
           {STAKEHOLDER_SEGMENTS.map((segment) => (
             <li key={segment.id} className="text-xs text-foreground">
               {segment.label}
               <span className="text-muted-foreground"> — {segment.note}</span>
+              <span className="block text-[10px] text-muted-foreground">
+                {segment.share === null
+                  ? `Share: ${segment.shareSource} — no official figure, so the modelling weight is not a published share`
+                  : `Share: ${segment.share}% of ${segment.shareBase} · ${segment.shareSource}`}
+              </span>
             </li>
           ))}
         </ul>

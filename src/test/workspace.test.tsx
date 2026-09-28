@@ -2,7 +2,12 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import App from "@/App";
 import { DEPARTMENTS, findDepartment } from "@/config/departments";
-import { REFERENCE_RATES, STAKEHOLDER_SEGMENTS } from "@/config/reference";
+import { citedInstrumentLabel } from "@/config/instruments";
+import {
+  MODELLED_SHARE_LABEL,
+  REFERENCE_RATES,
+  STAKEHOLDER_SEGMENTS,
+} from "@/config/reference";
 import { clearSession, signInToDepartment } from "@/session/session";
 
 const renderAt = (path: string) => {
@@ -92,6 +97,66 @@ describe("workspace — all 16 departments, department-aware panels", () => {
     expect(REFERENCE_RATES).toHaveLength(3);
     REFERENCE_RATES.forEach((rate) => {
       expect(screen.getAllByText(new RegExp(escapeRegex(rate.label))).length).toBeGreaterThan(0);
+    });
+  });
+
+  it("names the instrument each document is prepared under, in the rail and in the detail", async () => {
+    const department = findDepartment("fin")!;
+    signInToDepartment("fin");
+    renderAt("/app");
+
+    // The rail shows the derived citation for every document it lists.
+    department.documents.forEach((doc) => {
+      expect(doc.instrument, `${doc.id} cites an instrument`).toBeTruthy();
+      const label = citedInstrumentLabel(doc.instrument!);
+      expect(
+        screen.getAllByText(new RegExp(escapeRegex(label))).length,
+        `${doc.name} shows ${label} in the rail`,
+      ).toBeGreaterThan(0);
+    });
+
+    // Opening a document names the instrument in the dialog too — same derived text.
+    const first = department.documents[0];
+    fireEvent.click(
+      screen.getByRole("button", { name: new RegExp(escapeRegex(first.name)) }),
+    );
+    const dialog = within(await screen.findByRole("dialog"));
+    expect(dialog.getByText("Prepared under")).toBeInTheDocument();
+    expect(dialog.getByText(citedInstrumentLabel(first.instrument!))).toBeInTheDocument();
+  });
+
+  it("shows each document's cited instrument on the document library screen", () => {
+    const department = findDepartment("health")!;
+    signInToDepartment("health");
+    renderAt("/app/documents");
+
+    department.documents.forEach((doc) => {
+      expect(doc.instrument, `${doc.id} cites an instrument`).toBeTruthy();
+      const label = `Prepared under ${citedInstrumentLabel(doc.instrument!)}`;
+      expect(
+        screen.getAllByText(new RegExp(escapeRegex(label))).length,
+        `${doc.name} shows "${label}"`,
+      ).toBeGreaterThan(0);
+    });
+  });
+
+  it("states every modelled group's share and source, labelling the modelled ones", () => {
+    signInToDepartment("ict");
+    renderAt("/app/reference");
+
+    const published = STAKEHOLDER_SEGMENTS.filter((segment) => segment.share !== null);
+    const modelled = STAKEHOLDER_SEGMENTS.filter((segment) => segment.share === null);
+    // Both kinds must exist, or the assertions below would prove nothing.
+    expect(published.length).toBeGreaterThan(0);
+    expect(modelled.length).toBeGreaterThan(0);
+
+    published.forEach((segment) => {
+      const line = `Share: ${segment.share}% of ${segment.shareBase} · ${segment.shareSource}`;
+      expect(screen.getAllByText(line).length, `${segment.label}: ${line}`).toBeGreaterThan(0);
+    });
+    modelled.forEach((segment) => {
+      const line = `Share: ${MODELLED_SHARE_LABEL} — no official figure, so the modelling weight is not a published share`;
+      expect(screen.getAllByText(line).length, `${segment.label}: ${line}`).toBeGreaterThan(0);
     });
   });
 
