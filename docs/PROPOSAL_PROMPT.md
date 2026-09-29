@@ -336,13 +336,15 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
-- **What the live site actually is today (re-checked in R7, 2026-09-29).** The host `nzwisiso.bitflex.app`
-  now serves `assets/index-DRweHRfT.js`
-  (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), which is byte-identical to the
+- **What the live site actually is today (re-checked 2026-09-29, after the current build was published).**
+  The host `nzwisiso.bitflex.app` serves `assets/index-BgYDS9X7.js`
+  (`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`), which is byte-identical to the
   local build, so **the live site is the finished build** — it carries the authority line, the modelled
-  agent population, the named sources, the official Coat of Arms, the favicon set and all 24 published
+  agent population, the named sources, the official Coat of Arms, the favicon set, the Nzwisiso.ai
+  positioning section and all 24 published
   figures. (When this was checked on 2026-09-28 the host served `assets/index-BeggQU9V.js`, which was
-  behind the code; **R7** closed that gap.) **AB-7 is done (2026-09-29)**: this file asks for three
+  behind the code; **R7** closed that gap, and later work rebuilt the bundle twice, so the current build
+  was published again on 2026-09-29.) **AB-7 is done (2026-09-29)**: this file asks for three
   documents — the memo, the deck and the ask — and `npm run validate` now fails if it ever drifts
   back to the heavier pack.
 

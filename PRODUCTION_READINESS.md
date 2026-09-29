@@ -96,13 +96,13 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-09-29, after the sovereignty and promoter changes): the demonstration host serves an
-  older build than the working copy.** `nzwisiso.bitflex.app` serves `assets/index-DRweHRfT.js`
-  (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`) — fetched and hashed when **R7**
-  redeployed it — carrying the official Coat of Arms, the favicon set and all 24 published figures. **The
-  latest build has NOT been redeployed.** `npm run validate` prints the served name and the locally built name
-  side by side on every run, so the current name is read from the machine output and not restated here, where
-  it could go stale.
+- **Status today (2026-09-29, after the truth-sweep session published the current build): the
+  demonstration host serves the working copy.** `nzwisiso.bitflex.app` serves `assets/index-BgYDS9X7.js`
+  (`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`) — fetched and hashed, identical to
+  the local `dist/assets/index-BgYDS9X7.js`, and driven in a real browser against the live origin (the
+  initiative `<h1>`, *Understanding before action*, the 16 department cards, 0 console errors, 0 page
+  errors, 0 off-origin requests). `npm run validate` prints the served name and the locally built name
+  side by side on every run, so any future gap shows up in the machine output rather than in prose.
 
 ## 6d. Verified in a real browser (Phase K — report + drafted policy)
 - `npx playwright test` → **5/5**: the 4 Phase H journeys plus one that opens **Open full report**
@@ -279,9 +279,11 @@ on the Phase S bundle) is superseded:** the live host was redeployed on 2026-09-
 **served**
 `assets/index-BeggQU9V.js`
 (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`) — the same file the local build
-produced that day — and it was redeployed again in **R7** (2026-09-29), so the demonstration host serves
-`assets/index-DRweHRfT.js` (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), which is
-**an older build than the working copy** — the latest build has not been redeployed.
+produced that day — and it was redeployed again in **R7** (2026-09-29). The sovereignty, promoter,
+drafted-policy, product-mark and positioning work then rebuilt the bundle twice, which left the host
+behind; the **truth-sweep session published the current build**, so the demonstration host again serves
+`assets/index-BgYDS9X7.js` (`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`), identical
+to the local build.
 
 ## 7. Disabled by default (deliberate)
 

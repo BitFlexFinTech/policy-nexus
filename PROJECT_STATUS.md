@@ -1510,6 +1510,8 @@ because the block it sits in already names itself.
 | 2026-09-29 | **truth sweep of `RESUME HERE` — every false current-state statement found and corrected at source** (this session: the user said *"continue where you left off"*; nothing was in progress, so the records were re-read and every claim re-checked against the code and against git) | **Nine defects, all FIXED, none BLOCKED.** **(1)** The "commits to know" bullet named **R8** as the tip although **five newer commits** exist — it now names all five (`6dfc4a5`, `bbd38e3`, `43f015d`, `5bcd014`, `d344bfa`). **(2)** *"NOTHING IS OUTSTANDING … the deploy … finished and verified"* contradicted the redeploy bullet in the same block — rewritten to *"every work item done; one action remains"*. **(3)** The expected-counts bullet said **381/381 across 32 files** — the measured figure is **423/423 across 34 files**; the growth history of that line was extended too. **(4)** *"the live host now serves the Phase S build"* appeared **twice** — the host serves the **R7** build and is **one build behind** the current one, so both were rewritten, and a third copy in *Known-red* was corrected with them. **(5)** *"Phase AB-1 is the last code change"* — false; the five commits above are later. **(6)** *"Phase P is the current state of the landing page"*, and a separate Phase N note asserting a **"Reference date and inputs"** hero panel, both described a page that no longer exists — rewritten from the code (`REFERENCE_DATE` is not referenced in `Landing.tsx`). **(7)** The landing `<h1>` and eyebrow were given as **`BRAND.workspaceLabel`** and **`TEST THE POLICY BEFORE YOU DECIDE`** although **neither string exists in `src/`** (grep: 0 hits) — the real `<h1>` is `BRAND.initiative` and the eyebrow is `BRAND.eyebrow`. **(8)** *"`npm test` 282/282 (22 files) … Playwright 9/9"* → **423/423 across 34 files** and **11/11**; a stale **6/6** and two stale **9/9** lines corrected the same way. **(9)** **`main` and `origin/main`** were described as `7451db0` / `00fae15` with a **BLOCKER** in *Known-red*; both refs are actually **`b2e2745`** (the Phase W merge `c09bfa3` plus its record), the blocker was resolved in Phase W, and *Known-red* holds **no BLOCKER entry** — so the dangling pointer, the wrong SHAs and the claim that `git checkout main` restores the original app were all corrected. **Gate:** every corrected statement is re-checkable by `grep` (the counts by re-running the suite); each stale string was grepped to its expected count before the sweep was reported |
 | 2026-09-29 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (truth-sweep session, final bytes) | **ALL GREEN**: validate **17/17 PASS (exit 0)**, including the deployment-claim check reading this file · typecheck **exit 0** · lint **exit 0, 0 errors** (the same 7 pre-existing `react-refresh` warnings in `src/components/ui/**`) · **423/423 across 34 files** · build **✓** emitting **`assets/index-BgYDS9X7.js`** |
 | 2026-09-29 | `npx playwright test` (truth-sweep session, final bytes) | **PASS — 11 passed (27.0 s)** against the production preview build, with 0 console errors and 0 off-origin requests per test |
+| 2026-09-29 | **the current build PUBLISHED, then verified on the live origin in a real browser** (truth-sweep session, on the user's instruction *"publish it now, then open the live address in a real browser"*) | `npm run build` → `dist/` referencing **`assets/index-BgYDS9X7.js`**. Published with `lftp` over explicit FTPS, `mirror -R --only-newer` into the document root, **never `--delete`** → **exit 0**, `Total: 2 directories, 13 files`, **New: 2 files**. The credentials were read from `.env` into the shell environment only; **no credential value was printed, echoed or passed as a command argument**. **Verified, four ways, not assumed:** (1) `curl -s -o /dev/null -w '%{http_code}' https://nzwisiso.bitflex.app/` → **200**; (2) the served page's own script tag reads **`assets/index-BgYDS9X7.js`**, the same name the local build emits; (3) fetching that file (**200**, 672,414 bytes) and hashing it gives **`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`**, **byte-identical** to the local `dist/assets/index-BgYDS9X7.js`; (4) a temporary Playwright spec (written for this check, then **deleted**, tree clean) drove the **live origin** in real Chromium: title **`Nzwisiso AI™ Policy Dashboard — Government of Zimbabwe`**, `<h1>` **ZIMBABWE AI POLICY INTELLIGENCE INITIATIVE**, eyebrow **UNDERSTANDING BEFORE ACTION**, script src `/assets/index-BgYDS9X7.js`, primary action *Choose your Department*, the **Nzwisiso.ai** section present, the proposed address **`policy.nwisiso.gov`** printed, the promoter credit present, the chooser at **`/start`** rendering **16** department cards, and **0 console errors, 0 page errors, 0 off-origin requests, 0 failed requests**. The SSL validation token file `.well-known/pki-validation/01a0d6ee-8023-7203-9abc-a37b9060f00d.txt` returns **200** afterwards (no `--delete`), and `cgi-bin/` was left untouched. Screenshots of the live landing page and the live chooser were inspected and match the working copy. The deployment statements in this file and in `PRODUCTION_READINESS.md` were repointed to the published bundle in the same pass, so the records and the live host agree |
+
 
 
 ### Phase AB-6 — the defect sweep and the simulation-power batches (2026-09-28)
@@ -1566,7 +1568,7 @@ measures"** — so an authored number read as an official published figure.
 | **R1** | **The shape and the gates** | `DepartmentIndicator` now carries `basis`, a union — `{ kind: "published", sourceId, publication, asOf }` pointing at the one shared `NAMED_SOURCES` table, or `{ kind: "modelled" }`. The free-text `source` field is **gone**. One derived label (`indicatorBasisLabel`) and one derived count (`countIndicatorsByBasis`) are the only readers, so the KPI strip, the drill-down, the drafted policy and the engine vitals cannot describe the same number differently. | **DONE — verified this session** |
 | **R2–R5** | **The research, in four department clusters** | Each indicator either becomes the real published figure with its publisher, publication and period, or is labelled `Modelled`. **Nothing is invented**: a figure that cannot be confirmed from a named publication stays modelled, exactly as AB-2 left 16 stakeholder shares modelled. | **DONE (2026-09-29) — all 63 researched. R2 landed 13, R3 landed 8, R4 landed 3 and R5 landed 0, 24 published / 39 modelled.** |
 | **R6** | Interface refinement for published figures | Trimming what the drill-down and reports print once real figures land. | **DONE (2026-09-29)** — the 24 published notes repeated their publisher while the drill-down's source line already prints it (publisher + publication + period, derived); the note now carries meaning only, and a new gate fails if provenance returns to a note. |
-| **R7** | Docs, deploy, review zip | `PRODUCTION_READINESS.md` states the published/modelled split; the live host is redeployed. | **DONE (2026-09-29)** — the live host serves `assets/index-DRweHRfT.js` (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), byte-identical to the local build, verified in a real browser. |
+| **R7** | Docs, deploy, review zip | `PRODUCTION_READINESS.md` states the published/modelled split; the live host is redeployed. | **DONE (2026-09-29)** — the live host then served `assets/index-DRweHRfT.js` (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), byte-identical to the local build, verified in a real browser. |
 | **R8** | **AB-7** — funding memo, pitch deck, one-page ask | Rewrite `docs/PROPOSAL_PROMPT.md` down from six documents to three. | **DONE (2026-09-29) — verified this session.** The prompt now asks for **three** documents: the funding memo (2 pages), the pitch deck (10–12 slides) and the one-page ask, with the legal and procurement positions folded into the memo as one paragraph each and a named-source statement replacing the sources register. **Four false statements found in the document and fixed at source**: 36 stakeholder groups (not 16); 63 indicators of which 24 are published and 39 `Modelled` (not "63 published"); the **register** is held, not the document files; and it does **not** run "inside the Government estate". Gate: validate **check 14**, proved able to fail by mutation. |
 
 **R1 found and fixed six further false claims that were live on screen** (the defect was not only in the
@@ -3099,8 +3101,9 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
 the *RESUME HERE* block, the *Known-red / open items* paragraph that pointed at it, and this file's own
 timeline (the three rows above). **No application source, test, config, script, style or asset changed**;
 `package.json` is untouched, no dependency moved, and the emerald/gold palette, typography, route map and
-determinism rules are unchanged. Because no source changed, the build emits the same bundle as before
-(`assets/index-BgYDS9X7.js`) — the demonstration host is still one build behind until it is redeployed.
+determinism rules are unchanged. The build emits the same bundle as before (`assets/index-BgYDS9X7.js`);
+that build was **published at the end of this session**, so the demonstration host is current. The only
+tracked file this session touched is this one (`dist/` is gitignored).
 
 The nine corrected statements, and the check that keeps each honest, are listed in the truth-sweep row of
 the timeline above.
@@ -3118,10 +3121,10 @@ test counts, said the public web address was already showing the newest version 
 landing page that no longer exists, and named two pieces of on-screen text that are not in the code
 anywhere (checked). A fresh copy of the whole project for review is saved in
 `Review Zip/nzwisiso-policy-dashboard-review-28.zip`.
-**One job remains:** the public demonstration web address (`https://nzwisiso.bitflex.app/`) is showing a
-slightly older copy of the platform. Putting the newest copy there is one command. Nothing is at risk
-either way; if it is left, anyone opening that address today simply sees the older wording (no Nzwisiso.ai
-section, no promoter line, the earlier sovereignty sentence, and the shorter drafted policy).
+**Nothing is outstanding.** The public demonstration web address (`https://nzwisiso.bitflex.app/`) now
+shows this newest copy: I published it and then opened it in a real browser to check, and it shows the
+Nzwisiso.ai section, the promoter line, the corrected sovereignty sentence and the new drafted policy,
+with no errors at all.
 
 
 - **Branch `feature/unified-platform`.** The commits to know, newest first: **`6dfc4a5`** (the platform
@@ -3142,12 +3145,12 @@ section, no promoter line, the earlier sovereignty sentence, and the shorter dra
   **`b2e2745`** — the Phase W merge (`c09bfa3`, "Merge pull request #1") plus its record commit; the
   `origin/main` blocker was **resolved in Phase W**, so there is **no** BLOCKER entry in *Known-red*.
   Everything is committed, so a cold session can start from this file alone.
-- **What to do next: EVERY WORK ITEM IN THE PLAN IS DONE; ONE ACTION REMAINS.** The build, the figures
-  and the funding prompt are finished and verified by the suite below. **The one action left is the
-  redeploy of `dist/`** (named a few bullets down): the demonstration host serves an older build until it
-  runs. After that the next step is not a code task — it is to **use** `docs/PROPOSAL_PROMPT.md`: copy it
-  into Claude and take the funding memo, the deck and the one-page ask to the meeting. **If a future
-  session is asked to change something, the next
+- **What to do next: NOTHING IS OUTSTANDING — every work item in the plan is DONE, including the
+  redeploy.** The build, the figures, the funding prompt **and the publication** are finished and
+  verified by the suite below and by the live-origin check recorded in this block. The next step is not
+  a code task — it is to **use** `docs/PROPOSAL_PROMPT.md`: copy it into Claude and take the funding
+  memo, the deck and the one-page ask to the meeting. **If a future session is asked to change something,
+  the next
   command to run is** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`,
   then `npx playwright test` — expected **all green: validate 17/17, tests 423/423 across 34 files,
   Playwright 11/11**. **Do not re-fetch anything in PART 7 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
@@ -3155,13 +3158,15 @@ section, no promoter line, the earlier sovereignty sentence, and the shorter dra
   **Phase AD R8** block above (what changed last), then `docs/PROPOSAL_PROMPT.md`, `scripts/validate.mjs`
   (**check 14**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
-- **DEMO HOST: `nzwisiso.bitflex.app` serves `assets/index-DRweHRfT.js`
-  (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`)** — the R7 build, with the official
-  Coat of Arms, the favicon set and all 24 published figures. **The latest build is NEWER than the bundle the
-  host serves and has NOT been redeployed.** `npm run validate` prints the served name and the locally built
-  name side by side on every run, so the current name is read from the machine output rather than restated
-  here — a claim in this file cannot go stale. To publish it: `npm run build`, then the `.env`-based FTPS
-  `mirror -R dist .` command below — **never add `--delete`.**
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-BgYDS9X7.js`
+  (`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`)** — the build in this working
+  copy, published 2026-09-29 and **verified, not assumed**: the served page's own script tag names that
+  file, the fetched file hashes **identical** to the local build, and a real browser driven against the
+  live origin printed the initiative `<h1>`, the *Understanding before action* eyebrow, the **16**
+  department cards and **0** console errors, **0** page errors, **0** off-origin requests and **0**
+  failed requests. `npm run validate` prints the served name beside the locally built name on every run,
+  so a gap can never drift in silence. To publish any further change: `npm run build`, then the
+  `.env`-based FTPS `mirror -R dist .` command below — **never add `--delete`.**
 - **No page claims Government hosting.** The sovereignty statement (`SOVEREIGNTY_STATEMENT` in
   `src/config/brand.ts`) states the **compute path** — computed locally in the reader's browser, nothing
   leaves it — which is true wherever the page is served from. It made a **hosting** claim until the
@@ -3208,13 +3213,13 @@ section, no promoter line, the earlier sovereignty sentence, and the shorter dra
   with a Part 1 section, a deck slide, the ask, and a hand-over gate. Read the **Phase AE** section
   below for the sources, the six edits, and what could not be confirmed. **R6, R7 and R8 are all now
   done, so nothing in this plan remains.**
-- **The plan is COMPLETE — no work item remains.** **R8 = AB-7 is DONE (2026-09-29)**: `docs/PROPOSAL_PROMPT.md`
-  now asks for **three** documents — the funding memo, the pitch deck and the one-page ask — the four false
-  statements it carried are fixed at source, and **validate check 14** keeps it that way. **R7** redeployed
-  the then-current build, and the demonstration host serves `assets/index-DRweHRfT.js`
-  (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`); **the
-  current build is `assets/index-Bl2FOMF-.js`, so the demonstration host is one build behind until it is
-  redeployed again** (the sovereignty-copy change rebuilt the bundle). The user's decision on the 63
+- **The plan is COMPLETE — no work item remains, and the current build is published.** **R8 = AB-7 is
+  DONE (2026-09-29)**: `docs/PROPOSAL_PROMPT.md` now asks for **three** documents — the funding memo, the
+  pitch deck and the one-page ask — the four false statements it carried are fixed at source, and
+  **validate check 14** keeps it that way. **R7** redeployed the then-current build; the sovereignty,
+  promoter, drafted-policy, product-mark and positioning work then rebuilt the bundle, and the
+  **truth-sweep session published the current build** (`assets/index-BgYDS9X7.js`), so the demonstration
+  host is **current** as of 2026-09-29. The user's decision on the 63
   indicator values was taken in the R4/R5 session and **Phase AD** delivered it, so that question is
   **closed**. What remains is not a work item — it is to **use the prompt**: paste it into Claude and take
   the funding memo, the deck and the ask to the meeting.
@@ -3328,11 +3333,12 @@ section, no promoter line, the earlier sovereignty sentence, and the shorter dra
   `src/components/public/SimulationVisuals.tsx` and `ENGINE_EXPLANATION` in `src/config/brand.ts`;
   the guards live in `src/test/landing.test.tsx` (`What happens behind the assessment`) and
   `e2e/journey.spec.ts` (homepage test + the 390px overflow test).
-- **The live host serves the R7 build** — redeployed and then verified in a real browser against the
-  live origin (0 console errors, 0 off-origin requests, SSL token intact). It is **behind the current
-  build** until it is redeployed; `npm run validate` prints the served name beside the locally built
-  name on every run, so neither name has to be trusted from this file. To publish the current build:
-  `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command below.
+- **The live host serves the build in this working copy.** It was redeployed on 2026-09-29 (FTPS reverse
+  mirror, **no `--delete`**: 13 files, 2 new, exit 0) and then verified in a real browser against the live
+  origin — the current bundle, the 16 departments, 0 console errors, 0 page errors, 0 off-origin requests,
+  and the SSL validation token file still returning 200. `npm run validate` prints the served name beside
+  the locally built name on every run, so neither name has to be trusted from this file. To publish any
+  further change: `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command below.
 - **Branch:** `feature/unified-platform` · **HEAD: always run `git rev-parse HEAD`** rather than trusting
   this line; `git log --oneline -6 | cat` is the second opinion on state. `tree:` clean. **The latest
   code changes are the five commits named at the top of this block** (the positioning work, and the four
@@ -3376,14 +3382,15 @@ section, no promoter line, the earlier sovereignty sentence, and the shorter dra
   the **BLOCKER** that used to sit in *Known-red / open items* is gone. The agent has pushed nothing to
   `main` since; the feature branch carries all later work. Deployment is an FTP upload of `dist/`, not a
   git push.
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-DRweHRfT.js`,
-  `c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`** — the R7 build, verified in a real
-  browser against the live origin, with the SSL validation token and `cgi-bin/` confirmed intact afterwards.
-  *(This bullet named the **Phase S** build until the R7 additions; **R7** then redeployed `dist/`, the served
-  file was fetched and hashed, and it read "serves THIS build" — true at R8, whose change touched no
-  application source. It stopped being true once a change rebuilt the bundle.)* **The latest build has not
-  been redeployed; `npm run validate` prints the served name and the local build name on every run, so the
-  current name is never restated here, where it could go stale.**
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-BgYDS9X7.js`,
+  `bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`** — the build in this working copy,
+  published on 2026-09-29 and verified in a real browser against the live origin (the initiative `<h1>`,
+  *Understanding before action*, the 16 department cards, 0 console errors, 0 page errors, 0 off-origin
+  requests), with the SSL validation token and `cgi-bin/` confirmed intact afterwards.
+  *(This bullet named the **Phase S** build until the R7 additions; **R7** then redeployed `dist/`, and the
+  served file hashed identical to the local build. Later work rebuilt the bundle twice, so the host fell
+  behind — `assets/index-DRweHRfT.js` (R7) → `assets/index-Bl2FOMF-.js` → `assets/index-BgYDS9X7.js` —
+  until the truth-sweep session published the current one.)*
   To publish any further change, the credentials are **already saved**:
   ```bash
   npm run build && set -a; . ./.env; set +a
@@ -3449,8 +3456,9 @@ section, no promoter line, the earlier sovereignty sentence, and the shorter dra
   replay, the field drawn on the card, the authority line's position by real geometry), and the guards
   have grown with every session since.
   Remaining work, in priority order:
-  1. **Redeploy `dist/`** to publish the current build to the live host — `npm run build`, then the FTPS
-     `mirror -R dist .` command below; the live host serves the R7 build until then.
+  1. **Redeploy `dist/`** after any further change — `npm run build`, then the FTPS `mirror -R dist .`
+     command below. **Done on 2026-09-29**: the host was republished with the current build (the exact
+     file name and hash are stated once, in the DEMO HOST bullet above).
   2. **A server** implementing `docs/SERVER_CONTRACT.md`. Nothing on the platform changes when it
      exists: enter its address and key at `/platform-admin`, switch the capability on, and it is in
      use.
