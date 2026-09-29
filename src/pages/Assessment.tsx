@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DocumentActions } from "@/components/assessment/DocumentActions";
+import { DocumentNav } from "@/components/assessment/DocumentNav";
 import {
   AssessmentHeader,
   AssumptionList,
@@ -33,6 +34,8 @@ export default function Assessment() {
     <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
       <AssessmentHeader run={run} title="Executive Summary" />
 
+      <DocumentNav runId={run.id} />
+
       <div className="rounded-lg border border-warning/40 bg-warning/5 p-3 text-xs leading-relaxed text-foreground">
         {DISCLAIMER.long}
       </div>
@@ -54,17 +57,12 @@ export default function Assessment() {
       <RiskList run={run} />
 
       <div className="flex flex-wrap items-center gap-3">
+        {/* The three other documents are reached from the run strip above, so this row
+            carries only this screen's own next step rather than a second copy of the
+            same navigation. */}
         <Button asChild size="sm" className="h-7 text-xs">
           <Link to={`/app/assessments/${encodeURIComponent(run.id)}/full`}>
             Open full assessment
-          </Link>
-        </Button>
-        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-          <Link to={`/app/assessments/${encodeURIComponent(run.id)}/report`}>Full report</Link>
-        </Button>
-        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-          <Link to={`/app/assessments/${encodeURIComponent(run.id)}/policy-draft`}>
-            Draft the policy
           </Link>
         </Button>
         <span className="text-[10px] text-muted-foreground">

@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DocumentActions } from "@/components/assessment/DocumentActions";
+import { DocumentNav } from "@/components/assessment/DocumentNav";
 import { GeneratedDocumentView } from "@/components/assessment/GeneratedDocumentView";
 import { RunError, RunNotFound, RunPending } from "@/components/assessment/AssessmentSections";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
@@ -111,6 +112,8 @@ export default function PolicyDraft() {
         </span>
       </header>
 
+      <DocumentNav runId={run.id} />
+
       <div className="rounded-lg border border-warning/40 bg-warning/5 p-3 text-xs leading-relaxed text-foreground">
         {DISCLAIMER.short} This document is a starting text for the responsible officer to edit — it is
         not an adopted instrument.{" "}
@@ -178,17 +181,8 @@ export default function PolicyDraft() {
         <GeneratedDocumentView document={generated} />
       )}
 
-      <div className="flex flex-wrap items-center gap-3">
-        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-          <Link to={`/app/assessments/${encodeURIComponent(run.id)}`}>Back to executive summary</Link>
-        </Button>
-        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-          <Link to={`/app/assessments/${encodeURIComponent(run.id)}/report`}>Full report</Link>
-        </Button>
-        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-          <Link to={`/app/assessments/${encodeURIComponent(run.id)}/full`}>Full assessment</Link>
-        </Button>
-      </div>
+      {/* The other three documents of this run are reached from the strip at the top of
+          this screen, so this row no longer repeats them. */}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import App from "@/App";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
 import { CITATIONS_ANNEX } from "@/services/assessment/documentStructure";
@@ -9,6 +9,7 @@ import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
 import { clearRuns, listRunRequests, saveRunRequest } from "@/services/assessment/runStore";
 import type { AssessmentRequest } from "@/services/assessment/types";
 import { RUN_ROUND_TICK_MS } from "@/pages/SimulationRun";
+import { DOCUMENT_VIEWS } from "@/components/assessment/documentViews";
 
 const renderAt = (path: string) => {
   window.history.pushState({}, "", path);
@@ -214,6 +215,42 @@ describe("journey — run a policy, then read its assessment", () => {
     expect(box.value).toBe("Officer-edited wording.");
     fireEvent.click(screen.getByRole("button", { name: "Reset to generated" }));
     expect(screen.getByRole("button", { name: "Edit draft wording" })).toBeInTheDocument();
+  });
+
+  it("carries the one shared document strip on all four screens of a run", () => {
+    const run = recordRun(requestFor("fin"));
+    const screens: ReadonlyArray<{ path: string; current: string }> = [
+      { path: `/app/assessments/${encodeURIComponent(run.id)}`, current: "Executive summary" },
+      { path: `/app/assessments/${encodeURIComponent(run.id)}/full`, current: "Full assessment" },
+      { path: `/app/assessments/${encodeURIComponent(run.id)}/report`, current: "Full report" },
+      {
+        path: `/app/assessments/${encodeURIComponent(run.id)}/policy-draft`,
+        current: "Drafted policy",
+      },
+    ];
+
+    screens.forEach(({ path, current }) => {
+      cleanup();
+      renderAt(path);
+
+      const strip = screen.getByRole("navigation", { name: "Documents in this run" });
+      // The destinations are defined once and every screen offers all of them.
+      expect(within(strip).getAllByRole("link")).toHaveLength(DOCUMENT_VIEWS.length);
+      DOCUMENT_VIEWS.forEach((view) => {
+        const link = within(strip).getByRole("link", { name: view.label });
+        expect(link).toHaveAttribute("href");
+        if (view.label === current) {
+          // The screen you are on is announced, not marked by colour alone.
+          expect(link).toHaveAttribute("aria-current", "page");
+        } else {
+          expect(link).not.toHaveAttribute("aria-current");
+        }
+      });
+
+      // And it is the ONLY copy: no screen repeats these destinations further down.
+      expect(screen.getAllByRole("link", { name: "Drafted policy" })).toHaveLength(1);
+      expect(screen.getAllByRole("link", { name: "Full report" })).toHaveLength(1);
+    });
   });
 
   it("shows the explicit panel for an unknown reference on both new routes", () => {

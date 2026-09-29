@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DocumentActions } from "@/components/assessment/DocumentActions";
+import { DocumentNav } from "@/components/assessment/DocumentNav";
 import {
   AssessmentHeader,
   AssumptionList,
@@ -34,6 +35,8 @@ export default function FullAssessment() {
   return (
     <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
       <AssessmentHeader run={run} title="Full Assessment" />
+
+      <DocumentNav runId={run.id} />
 
       <div className="rounded-lg border border-warning/40 bg-warning/5 p-3 text-xs leading-relaxed text-foreground">
         {DISCLAIMER.long}
@@ -73,19 +76,8 @@ export default function FullAssessment() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-          <Link to={`/app/assessments/${encodeURIComponent(run.id)}`}>
-            Back to executive summary
-          </Link>
-        </Button>
-        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-          <Link to={`/app/assessments/${encodeURIComponent(run.id)}/report`}>Full report</Link>
-        </Button>
-        <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-          <Link to={`/app/assessments/${encodeURIComponent(run.id)}/policy-draft`}>
-            Draft the policy
-          </Link>
-        </Button>
+        {/* The three other documents of this run live in the strip above; the register
+            is the one destination that is not part of the run's paperwork, so it stays. */}
         <Button asChild size="sm" variant="outline" className="h-7 text-xs">
           <Link to="/app/simulations">Simulation register</Link>
         </Button>
