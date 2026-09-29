@@ -206,7 +206,8 @@ describe("department indicators — published with a named source, or plainly mo
         );
       });
   });
-/**
+
+  /**
    * Phase AD R3 — the figures researched and written in, recorded here so a later edit
    * cannot silently change a published number or quietly turn one back into a modelled
    * one. Every row is what the publication itself reported, read from the World Bank's
