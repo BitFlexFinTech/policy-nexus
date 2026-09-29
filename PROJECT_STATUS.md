@@ -490,7 +490,7 @@ coverage is the jsdom `workspace.test.tsx` suite, not the browser test)
   **Now closed by Phase H:** `npx playwright test` → 4/4 against the local production preview. At that
   time the *live* host was still on the **Phase D** bundle, so the Phase H journey verified the local
   Phases E–H build rather than the deployed one. **Superseded 2026-09-28:** the live host was redeployed
-  that day and serves `assets/index-BeggQU9V.js`
+  that day and **served** `assets/index-BeggQU9V.js`
   (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`) — see the DEPLOYED entry under
   **Known-red / open items**.
 - **⚠ SECURITY ACTION REQUIRED:** the FTP password was supplied in plaintext in chat. It is live
@@ -1459,6 +1459,14 @@ because the block it sits in already names itself.
 | 2026-09-29 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (Phase AD R3, final bytes) | **ALL GREEN**: validate **PASS — all checks green** (14 checks, unchanged; the bundle INFO now reads *the local build produces: assets/index-DKdnGNmW.js* — the live host is still behind) · typecheck **exit 0** · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **380/380 across 32 files** (the 379 after R1/AE plus the one R3 figure gate) · build **✓ in 736 ms** |
 | 2026-09-29 | `npx playwright test` (Phase AD R3, final bytes) | **PASS — 11 passed (27.0 s)**, against the production preview build, 0 console errors and 0 off-origin requests per test |
 | 2026-09-29 | **defect inventory (Phase AD R3 session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. **(1) A false statement in `PRODUCTION_READINESS.md` §5**, made false by this session's own work: it read *"13 published / 50 modelled as at R2"*, which stopped being true the moment R3 landed the eighth new figure. Corrected to *"13 published / 50 modelled after R2, and 21 published / 42 modelled after R3 (2026-09-29)"*. **(2) The World Bank entry in `NAMED_SOURCES` under-described what that body is used for** — it listed only the R2 topics; it now also names government finances, investment inflows, food and livestock production, fertiliser use and transmission and distribution losses, so the one description of the source matches every figure drawn from it. **(3) Not a defect, but stated honestly:** the fiscal and tax-revenue figures are **2018** values, because those are the latest Zimbabwean rows in those series — the same limitation R2 recorded for its 2013 education figures, and the period is printed beside every figure. **The gate for this session's work is the new `indicator-basis` check**, proved able to fail twice by mutation and restored byte-identical (row above). **Nothing is BLOCKED in this session**, and the old AB-5 indicator blocker is closed: the user's Phase AD decision replaced it with the R2–R5 research, of which **R2 and R3 are now done** and **R4–R5 remain** |
+| 2026-09-29 | **R6 code delivered — a published figure's provenance stated once** (Phase AD) | `src/config/departments.ts`: the provenance clause trimmed from all **24** published indicators' notes (`…, as reported to the World Bank.` → `.`), because the drill-down's source line already prints the publisher, the publication and the period, derived from `indicatorBasisLabel`. The `note` field's comment now records that the note carries meaning only. `src/test/indicator-basis.test.tsx`: a **13th gate** — *keeps a figure's provenance in its source line, not repeated in the note* — which fails if any indicator's note names one of the four `NAMED_SOURCES` publisher markers or restates provenance. No layout, colour, route or dependency changed |
+| 2026-09-29 | `npx vitest run src/test/indicator-basis.test.tsx` (Phase AD R6) | **PASS — 12/12** on the migrated configuration (the 11 before R6 plus the new gate) |
+| 2026-09-29 | **the R6 gate proved able to fail, and restored byte-identical** | Putting the clause back on `fin-deficit` (`… net borrowing, as reported to the World Bank.`) → **`FAIL … fin/fin-deficit does not name world bank in the note: expected 'general government net borrowing, as …' not to contain 'world bank'`** (`1 failed | 11 passed`). `src/config/departments.ts` restored from a `/tmp` copy with `shasum -a 256` **identical** before and after: `e5aecfe44b467a2fe13f7a411e10781eef48e3632d62b28693241410dfe3d1dc` |
+| 2026-09-29 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (Phase AD R6, final bytes) | **ALL GREEN**: validate **PASS — all checks green** (14 checks) · typecheck **exit 0** · lint **0 errors** (the same 7 pre-existing warnings, all inside `src/components/ui/**`) · **381/381 across 32 files** (the 380 recorded after R4 plus the one R6 gate) · build **✓**, emitting `assets/index-DRweHRfT.js` |
+| 2026-09-29 | `npx playwright test` (Phase AD R6, final bytes) | **PASS — 11 passed (28.4 s)** against the production preview build, 0 console errors and 0 off-origin requests per test |
+| 2026-09-29 | **R7 — `dist/` redeployed over FTPS, and the live host verified** (Phase AD) | `lftp` reverse mirror of `dist/` into the document root, **no `--delete`**: **13 files** (5 new, 8 modified), **1,256,637 bytes**, exit **0**. `curl https://nzwisiso.bitflex.app/` now references `assets/index-DRweHRfT.js`; hashing the fetched file gives **`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`**, identical to the local `dist/assets/index-DRweHRfT.js`. `.well-known/pki-validation/01a0d6ee-8023-7203-9abc-a37b9060f00d.txt` and `cgi-bin/` confirmed present afterwards (no `--delete` was used) |
+| 2026-09-29 | **the live origin driven in a real browser (R7)** | **PASS** — title *Nzwisiso AI Policy Dashboard — Government of Zimbabwe* · `<h1>` *ZIMBABWE AI POLICY INTELLIGENCE INITIATIVE* · landing department-picker groups **0** · chooser department buttons **16** · workspace signed in **true** · *Entry: one-click (Mock)* visible · **0 console errors, 0 page errors, 0 off-origin requests** |
+| 2026-09-29 | **defect inventory (Phase AD R6/R7 session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. **(1) The R-ladder and RESUME HERE disagreed**: the ladder carried **R6 = NOT STARTED** while RESUME HERE said what remained was *"R7, then R8"*, silently skipping R6 — a cold session could not tell which was true. Resolved by **doing R6** and marking it DONE with its gate, so both now agree and nothing was skipped. **(2)** The published indicators printed their publisher **twice** (note + source line); trimmed and gated. **(3) `PRODUCTION_READINESS.md` §6c still described the live host as behind** after this session's redeploy — corrected to the deployed state with the new hash. **Not a defect but stated honestly:** the orphaned old bundle `assets/index-BeggQU9V.js` remains on the host (the mirror ran without `--delete`, deliberately, so the SSL token and `cgi-bin/` are never touched); it is unreferenced and harmless. **Re-verified rather than assumed:** the counts `npm run validate` prints (24 published / 39 modelled) and the 63-indicator total were checked this session, not carried over from memory |
 
 
 
@@ -1516,9 +1524,9 @@ measures"** — so an authored number read as an official published figure.
 |---|---|---|---|
 | **R1** | **The shape and the gates** | `DepartmentIndicator` now carries `basis`, a union — `{ kind: "published", sourceId, publication, asOf }` pointing at the one shared `NAMED_SOURCES` table, or `{ kind: "modelled" }`. The free-text `source` field is **gone**. One derived label (`indicatorBasisLabel`) and one derived count (`countIndicatorsByBasis`) are the only readers, so the KPI strip, the drill-down, the drafted policy and the engine vitals cannot describe the same number differently. | **DONE — verified this session** |
 | **R2–R5** | **The research, in four department clusters** | Each indicator either becomes the real published figure with its publisher, publication and period, or is labelled `Modelled`. **Nothing is invented**: a figure that cannot be confirmed from a named publication stays modelled, exactly as AB-2 left 16 stakeholder shares modelled. | **DONE (2026-09-29) — all 63 researched. R2 landed 13, R3 landed 8, R4 landed 3 and R5 landed 0, 24 published / 39 modelled.** |
-| **R6** | Interface refinement for published figures | Trimming what the drill-down and reports print once real figures land. | **NOT STARTED** |
-| **R7** | Docs, deploy, review zip | `PRODUCTION_READINESS.md` states the published/modelled split; the live host is redeployed. | **NOT STARTED** |
-| **R8** | **AB-7** — funding memo, pitch deck, one-page ask | Rewrite `docs/PROPOSAL_PROMPT.md` down from six documents to three. | **NOT STARTED — still last** |
+| **R6** | Interface refinement for published figures | Trimming what the drill-down and reports print once real figures land. | **DONE (2026-09-29)** — the 24 published notes repeated their publisher while the drill-down's source line already prints it (publisher + publication + period, derived); the note now carries meaning only, and a new gate fails if provenance returns to a note. |
+| **R7** | Docs, deploy, review zip | `PRODUCTION_READINESS.md` states the published/modelled split; the live host is redeployed. | **DONE (2026-09-29)** — the live host serves `assets/index-DRweHRfT.js` (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), byte-identical to the local build, verified in a real browser. |
+| **R8** | **AB-7** — funding memo, pitch deck, one-page ask | Rewrite `docs/PROPOSAL_PROMPT.md` down from six documents to three. | **NOT STARTED — the last item** |
 
 **R1 found and fixed six further false claims that were live on screen** (the defect was not only in the
 KPI strip): `EngineStatus` "Published department measures" → the derived split; `FullAssessment` "the
@@ -1569,6 +1577,38 @@ in the figure gate in `src/test/indicator-basis.test.tsx`, and PART 7 of
 gate was proved able to fail** by mutation — changing `hedu-research` to `520.0` fails with
 `hedu/hedu-research value: expected '520.0' to be '519.9'` — and `departments.ts` was restored
 **byte-identical** (`sha256 543081bb…` before and after).
+
+#### Phase AD R6 and R7 — the interface trim, the documents and the redeploy (2026-09-29, this session)
+
+**R6 — the drill-down printed the same fact twice.** Each of the 24 published indicators carried its
+publisher in the note — `"General government net borrowing, as reported to the World Bank."` — while the
+same card's source line already prints `"Published by World Bank — World Development Indicators: Net
+lending (+) / net borrowing (-) (% of GDP), 2018"`, derived from `indicatorBasisLabel(basis)`. Two
+wordings for one fact can drift apart, and the note's own comment defines it as *plain-language meaning*,
+so the provenance clause is **trimmed at source** from all 24 notes; `fin-deficit` now reads
+`"General government net borrowing."`. The `note` field's comment records why. **Gate:** the new check
+*"keeps a figure's provenance in its source line, not repeated in the note"* in
+`src/test/indicator-basis.test.tsx` — it fails if any indicator's note names one of the four
+`NAMED_SOURCES` publishers or restates provenance. **Proved able to fail** by mutation (putting the
+clause back on `fin-deficit` → `fin/fin-deficit does not name world bank in the note`), `departments.ts`
+restored **byte-identical** (`sha256 e5aecfe4…`).
+
+**R7 — the bundle is redeployed and the live host is current.** `npm run build` emitted
+`assets/index-DRweHRfT.js` (647,867 bytes, `sha256 c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`);
+the FTPS reverse mirror uploaded `dist/` into the document root (**no `--delete`**). The live origin now
+serves that exact file — fetching `https://nzwisiso.bitflex.app/assets/index-DRweHRfT.js` and hashing it
+gives the same `c601422c…` — and `index.html` references it. The SSL validation token
+(`.well-known/pki-validation/01a0d6ee-8023-7203-9abc-a37b9060f00d.txt`) and `cgi-bin/` were confirmed
+still present afterwards. A real browser was driven against the live origin: the title, the hero heading,
+a **pure landing page** (0 department-picker groups), the chooser listing **16** departments, one-click
+Mock entry into `/app` — with **0 console errors, 0 page errors, 0 off-origin requests**.
+
+**Files touched this session:** `src/config/departments.ts` (the `note` doc comment + 24 note strings),
+`src/test/indicator-basis.test.tsx` (the R6 gate), `PRODUCTION_READINESS.md` (§6c), this file.
+**Not changed, deliberately:** the emerald/gold palette, Inter + JetBrains Mono, `src/components/ui/**`,
+the route map, the determinism rules, `LICENSE` / `NOTICE`, and `package.json` — **no dependency was
+added or removed**.
+
 ### Phase AE — the official Coat of Arms, and the "Digitalize Zimbabwe" pilot case (2026-09-28, requested by the user this session)
 
 **Requested by the user, verbatim:** *"use the attached image for the logo across the platform and the
@@ -1702,7 +1742,7 @@ in a way that survives that rewrite unchanged.
      count and the **measured** group count from the structure it draws, so the words and the drawing
      cannot disagree. See *RESOLVED* item 2.
 - **DEPLOYED — Batches A–G and Phases X–Z are live (2026-09-28).** The live host
-  (`nzwisiso.bitflex.app`) now serves **`assets/index-BeggQU9V.js`**, whose **sha256 is
+  (`nzwisiso.bitflex.app`) then served **`assets/index-BeggQU9V.js`**, whose **sha256 is
   `c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`** — the served file was fetched and
   hashed, and the local `dist/assets/index-BeggQU9V.js` hashes to the same value, so the deployed bundle
   is **byte-for-byte the local build** (`dist/index.html` references the same file). Confirmed again in
@@ -1717,15 +1757,13 @@ in a way that survives that rewrite unchanged.
   cannot `cd` into — the account is already chrooted to the web root, so the mirror lands correctly
   from the login directory; the harmless "550 Can't change directory" line is recorded here so the next
   session does not chase it.
-- **STATUS TODAY (2026-09-28, after Phase AE): the live host is behind this build.** Everything above was
-  true when it was written. Phases AD **R1**, AD **R2** and **AE** have rebuilt the bundle since, so
-  `npm run build` now emits **`assets/index-Cz472pbV.js`** while the live host still serves
-  **`assets/index-BeggQU9V.js`** (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`).
-  **Do not describe the deployed site as current until `R7` redeploys it** — and note that it currently
-  shows the *earlier* Coat of Arms and carries no favicon set. `npm run validate` prints the difference
-  as an INFO line, so this can never drift in silence. *(Since this bullet was written, Phase AD R3 and R4
-  have rebuilt again: the local build now emits `assets/index-a8LtKHj8.js`, and the live host is still
-  unchanged at `assets/index-BeggQU9V.js`.)*
+- **STATUS THEN (2026-09-28, after Phase AE) — since superseded by R7.** Everything above was true when it
+  was written. Phases AD **R1**, AD **R2**, **AE**, **R3** and **R4** rebuilt the bundle afterwards, so
+  `npm run build` emitted a new file each time while the live host still **served**
+  **`assets/index-BeggQU9V.js`** (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`). That
+  gap is **closed**: **R7** redeployed on 2026-09-29 and the live host now carries the current build — see
+  the LIVE bullet in **RESUME HERE**. `npm run validate` prints the local build beside the live claim as an
+  INFO line, so a gap can never drift in silence.
 - **RESOLVED (Phase Z) — the run path is asynchronous, so every capability is now connected.**
   `AssessmentService` returns promises (`buildRun`/`run`/`getRun`/`listRuns`), and `assessmentService`
   is a **dispatcher** that chooses the simulated engine or the live service at the moment of the
@@ -2976,44 +3014,45 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
 
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`.** The commits to know are **`074eb75`** (Phase AD **R4** — three
-  more published figures) and **`f50240b`** (the R4/R5 document record), sitting on **`ccc2dfa`** (the
-  status commit of the R3 session). Beneath them, the stack the R3 session recorded: **`fae8916`** (R3),
-  **`beb6e61`** + **`e0184d2`** (its records), **`358b73f`** (Phase AE — the Coat of Arms fingerprint gate),
-  **`bde486d`** (R2), **`f4e253f`** (R1 — the indicator basis and its gates), with the status commit that
-  carries this line sitting on top of them all. **Run `git log --oneline -8 | cat` as the
+- **Branch `feature/unified-platform`.** The commits to know are **`d57bf68`** (Phase AD **R6** — a
+  published figure's provenance stated once) and the status commit that carries this line (**R7** — the
+  documents and the redeploy). Beneath them: **`2013733`** (the R4/R5 status commit), **`f50240b`** +
+  **`074eb75`** (R4), **`ccc2dfa`** (the R3 status commit), **`fae8916`** (R3), **`beb6e61`** + **`e0184d2`**
+  (its records), **`358b73f`** (Phase AE — the Coat of Arms fingerprint gate), **`bde486d`** (R2),
+  **`f4e253f`** (R1 — the indicator basis and its gates). **Run `git log --oneline -10 | cat` as the
   second opinion on state**, and treat any commit that touches only documents as part of the same record.
-  **Working tree clean.** Baseline `main` is untouched at `7451db0`; `origin/main` is
-  still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything is committed, so
-  a cold session can start from this file alone.
-- **What to do next, in order:** **R4 and R5 are DONE (2026-09-29)** — the last ten departments (`opc`,
-  `health`, `edu`, `hedu`, `ict`, `psc`, `lg`, `mfa`, `env`, `def`) were researched against the World Bank's
-  own API and its full indicator catalogue. **R4 wrote in three published figures** (`health-staffing`,
-  `edu-transition`, `hedu-research`) and **R5 wrote in none**, taking the published count to **24 of 63
-  (39 modelled)**; **every one of the 63 is now researched**. **What remains is `R7`** (docs and
-  **redeploy** — the live host is behind this build right now, which `npm run validate` states as INFO),
-  then **R8 = AB-7**. **Do not re-fetch anything in PART 7 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the 24
-  published figures and the 39 recorded no-equivalent reasons are both there. **Read first:**
+  **Working tree clean.** Baseline `main` is untouched at `7451db0`; `origin/main` is still `00fae15`
+  (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything is committed, so a cold session
+  can start from this file alone.
+- **What to do next, in order:** **R6 and R7 are DONE (2026-09-29).** R6 trimmed the duplicated publisher
+  from the 24 published indicators' notes and gated it; R7 published the build — the live host now serves
+  `assets/index-DRweHRfT.js` (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), checked
+  by fetching the live file and hashing it, and driven in a real browser this session. **The only work item left is `R8 = AB-7`** — the funding memo, the pitch deck
+  and the one-page ask, by rewriting `docs/PROPOSAL_PROMPT.md` down from the six-document version to three.
+  **AB-7 is last, and nothing follows it.** **Do not re-fetch anything in PART 7 of
+  `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the 24 published figures and the 39 recorded no-equivalent reasons
+  are both there. **Read first:** `docs/PROPOSAL_PROMPT.md` (what it holds now), then
   `src/config/departments.ts` (the indicator lines), `src/config/reference.ts` (`NAMED_SOURCES` and the
   sourcing statement), `src/test/indicator-basis.test.tsx` (the gates), then the **Phase AD** section below.
-- **THE LIVE SITE IS BEHIND THIS BUILD.** `nzwisiso.bitflex.app` serves `assets/index-BeggQU9V.js`
-  (sha256 `c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`), while `npm run build` on
-  the current tree emits `assets/index-a8LtKHj8.js`. **Phase AE changed the artwork and the icons, and AD
-  R2/R3/R4 turned 24 indicators into published figures, so the deployed site currently shows the old
-  drawing, has no favicon set and carries the pre-R4 figures.** The gap grew first with Phase
-  AD R1, again with Phase AE, again with R3 and again with R4; **`R7` closes it**, and until then **the live
-  host must not be described
-  as current**. `npm run validate` states the difference as INFO (check 12), so this can never drift in
-  silence. *(This bullet previously read "THE LIVE SITE IS NOW THIS BUILD", which stopped being true the
-  moment R1 rebuilt the bundle — corrected here.)*
+- **LIVE NOW: `nzwisiso.bitflex.app` serves THIS build.** **R7** redeployed `dist/` on 2026-09-29 and the
+  live origin serves `assets/index-DRweHRfT.js`
+  (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`) — the same value the local
+  `npm run build` produces, checked by fetching the live file and hashing it — with the official Coat of
+  Arms, the favicon set and all 24 published figures. A real browser was driven against the live origin this
+  session (title, hero, 16 departments, 0 console errors, 0 off-origin requests). *(This bullet read "THE
+  LIVE SITE IS BEHIND THIS BUILD" until R7 closed the gap; before that it read "THE LIVE SITE IS NOW THIS
+  BUILD", which stopped being true the moment R1 rebuilt the bundle — both corrected.)* To publish any
+  further change: `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command below — **never
+  add `--delete`.**
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test` — expected **all green** (**380/380 tests across 32 files**, **11/11** Playwright,
+  then `npx playwright test` — expected **all green** (**381/381 tests across 32 files**, **11/11** Playwright,
   validate **14/14**: the `--destructive` known-red is **retired**, and the three checks added since the
   AB-5 sweep cover the *retired document statements*, the *deployment claim and its evidence*, and the
   ***Coat of Arms fingerprint with the icon set that belongs to it***).
-  (This line said **369/369 across 31 files** until Phase AE, and **379/379** until R3 added its figure
-  gate; **R4's three rows ride inside that same existing test**, so the file and test counts did not move
-  again. The numbers in this file's own Phase AD rows are the check.)
+  (This line said **369/369 across 31 files** until Phase AE, **379/379** until R3 added its figure gate,
+  and **380/380** until R6 added the provenance gate; **R4's three rows ride inside an existing test**, so
+  the file and test counts did not move when R4 landed. The numbers in this file's own Phase AD rows are
+  the check.)
 - **Phase AD R3 is DONE (2026-09-29).** Eight more indicators became published figures, read from the
   World Bank's own API during the session: `fin-deficit`, `fin-revenue`, `fin-investment`, `agri-grain`,
   `agri-herd`, `agri-input`, `energy-losses` and `zimra-target`. The split after R3 was **21 published / 42
@@ -3040,14 +3079,13 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   `docs/PROPOSAL_PROMPT.md` now carries the **"Digitalize Zimbabwe"** pilot case as researched fact,
   with a Part 1 section, a deck slide, the ask, and a hand-over gate. Read the **Phase AE** section
   below for the sources, the six edits, and what could not be confirmed. **This does not change the
-  order of what remains** — R7, then R8 (R4–R5 are now done).
-- **The order of what remains.** (1) **R7** — update the documents and **redeploy** (the live host is behind
-  this build); `PRODUCTION_READINESS.md` already states the published/modelled split, so R7 is the deploy and
-  the final document pass. (2) **R8 =
-  AB-7**, the final Claude prompt — the funding memo, the pitch deck and the one-page ask — by rewriting
+  order of what remains** — R6 and R7 are now done, so only R8 (AB-7) remains.
+- **The order of what remains.** **R7 is DONE (2026-09-29)** — the documents are updated and the live host
+  now serves this build (`assets/index-DRweHRfT.js`, `c601422c…`). **The only item left is R8 = AB-7**, the
+  final Claude prompt — the funding memo, the pitch deck and the one-page ask — by rewriting
   `docs/PROPOSAL_PROMPT.md` down from the six-document version to three. **AB-7 is the last item, and
-  nothing follows it.** The user's decision on the 63 indicator values was taken this session, so that
-  question is **closed** and is recorded in **Phase AD**.
+  nothing follows it.** The user's decision on the 63 indicator values was taken in the R4/R5 session, so
+  that question is **closed** and is recorded in **Phase AD**.
 - **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
   FIRST (it is below, in the phase list).** It holds: the goal in the user's words (*"we just want to get
   this platform funded … this is just a tool that will help each department research and draft policies"*),
@@ -3090,10 +3128,11 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   of it is LIVE (Batches A–H).** See *Phase AB-6* below for the batch-by-batch record and the mutation
   proofs. **The next action is AB-7 — the final Claude prompt, which MUST be last** (the funding
   memo, the pitch deck and the one-page ask; `docs/PROPOSAL_PROMPT.md` is superseded and must be rewritten
-  down to three documents). **One item is BLOCKED and is stated in full in the AB-5 defect inventory above:**
-  the **63 department indicator values are authored scenario content**, not figures read from a named
-  publication, so they must never be described as sourced official figures — fixing that needs the user's
-  decision plus 63 real per-department values, and if it is ever done it must happen **before AB-7**.
+  down to three documents). **The one item the AB-5 defect inventory recorded as BLOCKED is now CLOSED:**
+  the 63 department indicator values are no longer presented as sourced official figures — **Phase AD
+  (R1–R5)** gave every one of the 63 a basis, so **24 are published figures** each naming its publisher, its
+  publication and its period, and **39 are explicitly `Modelled`**; the decision was taken and the question
+  is closed, with the evidence in **PART 7 of `docs/PLATFORM_ENRICHMENT_PLAN.md`**.
   AB-3 is DONE via E-3 + E-4, and AB-6 is already DONE.
   **Never invent a share — an official figure or the `Modelled` label, nothing in between; and never print a
   chapter the index did not confirm.**

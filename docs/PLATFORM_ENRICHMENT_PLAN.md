@@ -351,3 +351,11 @@ internet and data cost among them). Two series are **archived** and return no da
 
 **Sources for PART 7:** World Bank Open Data — World Development Indicators, read from
 `api.worldbank.org/v2/country/ZW/indicator/<series>` on 2026-09-29.
+
+**Phase AD R6 and R7 (2026-09-29) — the research above is finished and the build is live.** **R6** trimmed
+the duplicated publisher from the 24 published indicators' notes, because the drill-down's source line
+already states the publisher, the publication and the period (derived from `indicatorBasisLabel`), and
+gated it. **R7** redeployed the site: the live host serves `assets/index-DRweHRfT.js`
+(`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), byte-identical to the local build.
+**Nothing in PART 7 needs re-researching** — the 24 published figures and the 39 recorded no-equivalent
+reasons above are the record.

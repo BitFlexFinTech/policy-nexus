@@ -88,20 +88,21 @@ client is registered.
   of the mock-first / no-CDN guarantee.
 - Stated plainly: the **Phase H** journey was verified against the **local** production preview, and the
   deployment state recorded beside it at the time — that the live host was running the Phase D bundle —
-  is **superseded**: the live host (`nzwisiso.bitflex.app`) was redeployed on 2026-09-28 and serves
-  `assets/index-BeggQU9V.js`
+  is **superseded**: the live host (`nzwisiso.bitflex.app`) was redeployed on 2026-09-28 and at that date
+  **served** `assets/index-BeggQU9V.js`
   (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`), whose sha256 is **the same value
   as the local `dist/assets/index-BeggQU9V.js`** built that day, checked with `shasum -a 256` on both the
   fetched file and the local one. That is the strongest form of the claim a local machine can make, and
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-09-28, after Phase AE): the live host is behind this build.** Phases AD R1, AD R2
-  and AE rebuilt the bundle after that deploy, so `npm run build` now emits `assets/index-Cz472pbV.js`
-  while the live host **serves** `assets/index-BeggQU9V.js`
-  (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`). Until **R7** redeploys, the
-  deployed site is **not** the current platform: it shows the earlier Coat of Arms and carries no
-  favicon set.
+- **Status today (2026-09-29, after R7): the live host serves this build.** Phases AD R1–R6 rebuilt the
+  bundle after the 2026-09-28 deploy, and **R7 redeployed it** on 2026-09-29: the live origin now serves
+  `assets/index-DRweHRfT.js`
+  (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), which is **byte-identical to the
+  local `dist/assets/index-DRweHRfT.js`** — checked by fetching the live file and hashing it — carrying the
+  official Coat of Arms, the favicon set and all 24 published figures. A real browser was driven against
+  the live origin in R7 (title, hero, 16 departments, 0 console errors, 0 off-origin requests).
 
 ## 6d. Verified in a real browser (Phase K — report + drafted policy)
 - `npx playwright test` → **5/5**: the 4 Phase H journeys plus one that opens **Open full report**
@@ -163,10 +164,9 @@ client is registered.
   **http://localhost:8080/** — `vite.config.ts` pins `server.port = 8080`. Opening 5173 shows a stale
   build. This, not the code, was why the new landing page appeared missing.
 - Stated plainly: the Phases L+M+N work recorded here was verified against the **local** production
-  preview. That deployment note is **superseded** — see §6c: the live host (`nzwisiso.bitflex.app`) was
-  redeployed on 2026-09-28 and serves `assets/index-BeggQU9V.js`
-  (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`), not the Phase D bundle named
-  here when it was written.
+  preview. That deployment note is **superseded** — see §6c: when it was written the live host
+  (`nzwisiso.bitflex.app`) served the Phase D bundle, and the live host was redeployed again in **R7**
+  (2026-09-29).
 
 ## 6f. Verified in a real browser (Phase R — what the engine does with a draft)
 - **Phase R** added the public **"What happens behind the assessment"** section (`#behind-the-assessment`),
@@ -275,10 +275,12 @@ in `e2e/journey.spec.ts`.
 
 **Outside the estate:** front-end only, so the deploy rule is unchanged — a new build must actually be
 deployed before it is presented. **The claim made here when it was written (that the live host was still
-on the Phase S bundle) is superseded:** the live host was redeployed on 2026-09-28 and serves
+on the Phase S bundle) is superseded:** the live host was redeployed on 2026-09-28 and at that date
+**served**
 `assets/index-BeggQU9V.js`
 (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`) — the same file the local build
-produced that day.
+produced that day — and it was redeployed again in **R7** (2026-09-29), so the live host now serves
+`assets/index-DRweHRfT.js` (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`).
 
 ## 7. Disabled by default (deliberate)
 

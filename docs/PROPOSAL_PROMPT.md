@@ -294,14 +294,14 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is Part 1 of this prompt's output.
-- **What the live site actually is today (checked 2026-09-28).** The host `nzwisiso.bitflex.app` serves
-  `assets/index-BeggQU9V.js`, and that bundle **does** carry the authority line, the modelled agent
-  population and the named sources — so it is a real demonstration, not the stale build the older
-  paragraphs warned about. **But it is behind the current code**: Phases AD R1, AD R2 and AE rebuilt the
-  bundle after that deploy, so the live host shows the earlier Coat of Arms and has no favicon set, while
-  a local `npm run build` emits `assets/index-Cz472pbV.js`. **Do not tell anyone the live site is the
-  finished build until `R7` redeploys it** (`R7` is recorded in `PROJECT_STATUS.md`). The prompt below is
-  still to be rewritten down to three documents under **AB-7**.
+- **What the live site actually is today (re-checked in R7, 2026-09-29).** The host `nzwisiso.bitflex.app`
+  now serves `assets/index-DRweHRfT.js`
+  (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), which is byte-identical to the
+  local build, so **the live site is the finished build** — it carries the authority line, the modelled
+  agent population, the named sources, the official Coat of Arms, the favicon set and all 24 published
+  figures. (When this was checked on 2026-09-28 the host served `assets/index-BeggQU9V.js`, which was
+  behind the code; **R7** closed that gap.) The prompt below is still to be rewritten down to three
+  documents under **AB-7**.
 
 ---
 
