@@ -2949,7 +2949,8 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
 ## RESUME HERE
 
 - **Branch `feature/unified-platform`.** The commits to know are **`fae8916`** (Phase AD **R3** — eight
-  more published figures, the newest code change), **`358b73f`** (Phase AE — the Coat of Arms fingerprint
+  more published figures), followed by **`beb6e61`** (the status record) and **`e0184d2`** (a
+  comment-alignment fix in the same test file), then **`358b73f`** (Phase AE — the Coat of Arms fingerprint
   gate), **`bde486d`** (Phase AD **R2** — 13 real published figures) and **`f4e253f`** (Phase AD **R1** —
   the indicator basis and its 11 gates), with the status commit that carries this line sitting on top of
   them. **Run `git log --oneline -8 | cat` as the
