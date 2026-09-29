@@ -837,8 +837,23 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await expect(box).toHaveValue(/Draft policy —/);
     await box.fill("Officer-edited wording for the browser journey.");
     await expect(box).toHaveValue("Officer-edited wording for the browser journey.");
+
+    // Batch A item 7 — the working copy is kept in the browser, so leaving the screen
+    // and reloading the page must not lose the officer's wording.
+    await page.reload();
+    await expect(page.getByRole("heading", { name: "Drafted policy", exact: true })).toBeVisible();
+    await expect(page.getByText(/Your wording is kept in this browser, for this run/)).toBeVisible();
+    await page.getByRole("button", { name: "Edit draft wording" }).click();
+    await expect(page.getByLabel("Drafted policy text")).toHaveValue(
+      "Officer-edited wording for the browser journey.",
+    );
+
+    // "Reset to generated" forgets it, so a reload after a reset shows the generated draft.
     await page.getByRole("button", { name: "Reset to generated" }).click();
     await expect(page.getByRole("button", { name: "Edit draft wording" })).toBeVisible();
+    await page.reload();
+    await page.getByRole("button", { name: "Edit draft wording" }).click();
+    await expect(page.getByLabel("Drafted policy text")).toHaveValue(/Draft policy —/);
 
     expectCleanRuntime();
   });

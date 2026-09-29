@@ -11,6 +11,7 @@ import { renderDocumentText } from "@/services/assessment/documents";
 import { CITATIONS_ANNEX } from "@/services/assessment/documentStructure";
 import { buildDraftingProvenance, verifyDocumentCitations } from "@/services/documents/drafting";
 import { useGeneratedDocument } from "@/services/documents/useGeneratedDocument";
+import { usePolicyDraft } from "@/services/documents/usePolicyDraft";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
 
 /**
@@ -56,8 +57,11 @@ export default function PolicyDraft() {
     [run, department, verification, source],
   );
 
-  // null means "still the generated text". A string means the officer has edited it.
-  const [edited, setEdited] = useState<string | null>(null);
+  // The officer's working copy is kept in this browser, keyed by this run, so leaving
+  // the screen no longer throws their wording away. `editing` is only about which view
+  // is on screen; the text itself lives in the store (src/services/documents/).
+  const draft = usePolicyDraft(run?.id ?? "", generatedText);
+  const [editing, setEditing] = useState(false);
 
   if (runPending) return <RunPending heading="Drafted policy" />;
   if (runError) return <RunError heading="Drafted policy" message={runError} />;
@@ -66,8 +70,8 @@ export default function PolicyDraft() {
   if (documentError) return <RunError heading="Drafted policy" message={documentError} />;
   if (!generated) return <RunNotFound heading="Drafted policy" />;
 
-  const isEdited = edited !== null;
-  const text = edited ?? generatedText;
+  const isEdited = draft.isEdited;
+  const text = draft.text;
 
   const provenanceRows: ReadonlyArray<[string, string]> = provenance
     ? [
@@ -150,16 +154,19 @@ export default function PolicyDraft() {
           size="sm"
           variant="outline"
           className="h-7 text-xs"
-          onClick={() => setEdited(isEdited ? null : text)}
+          onClick={() => setEditing((previous) => !previous)}
         >
-          {isEdited ? "Preview generated version" : "Edit draft wording"}
+          {editing ? "Preview generated version" : "Edit draft wording"}
         </Button>
         <Button
           size="sm"
           variant="ghost"
           className="h-7 text-xs"
           disabled={!isEdited}
-          onClick={() => setEdited(null)}
+          onClick={() => {
+            draft.reset();
+            setEditing(false);
+          }}
         >
           Reset to generated
         </Button>
@@ -169,11 +176,16 @@ export default function PolicyDraft() {
           </span>
         )}
       </div>
+      <p className="text-[10px] text-muted-foreground" data-print="hide">
+        {draft.persistent
+          ? "Your wording is kept in this browser, for this run, so it is still here when you come back to this screen."
+          : "This browser refused to keep data between visits, so your wording lasts only until this page is closed."}
+      </p>
 
-      {isEdited ? (
+      {editing ? (
         <textarea
           value={text}
-          onChange={(event) => setEdited(event.target.value)}
+          onChange={(event) => draft.setText(event.target.value)}
           aria-label="Drafted policy text"
           className="h-[60vh] w-full resize-y rounded-lg border bg-background p-3 font-mono-code text-xs leading-relaxed text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
         />
