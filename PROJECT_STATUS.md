@@ -3108,6 +3108,22 @@ the timeline above.
 
 ## RESUME HERE
 
+**PLAIN SUMMARY (OWNER-FACING).**
+Everything the platform is supposed to do is finished and working. I re-checked it just now: every
+automatic check passes, all 423 tests pass, the code compiles into the files a browser runs, and the 11
+tests that click through the whole journey in a real browser pass with no errors.
+Today I changed **no product code at all** — only this notes file. It had nine untrue sentences about the
+present state, and all nine are now corrected: it listed the wrong "latest changes", gave two different
+test counts, said the public web address was already showing the newest version (it is not), described a
+landing page that no longer exists, and named two pieces of on-screen text that are not in the code
+anywhere (checked). A fresh copy of the whole project for review is saved in
+`Review Zip/nzwisiso-policy-dashboard-review-28.zip`.
+**One job remains:** the public demonstration web address (`https://nzwisiso.bitflex.app/`) is showing a
+slightly older copy of the platform. Putting the newest copy there is one command. Nothing is at risk
+either way; if it is left, anyone opening that address today simply sees the older wording (no Nzwisiso.ai
+section, no promoter line, the earlier sovereignty sentence, and the shorter drafted policy).
+
+
 - **Branch `feature/unified-platform`.** The commits to know, newest first: **`6dfc4a5`** (the platform
   is named the internal counterpart to the Government's own **Nzwisiso.ai** campaign, with its citation,
   its boundary and the proposed address), **`bbd38e3`** (the product mark is one setting — `TRADEMARK`
