@@ -19,6 +19,8 @@
  * 12. The deployment claim is stated, agreed across documents, and carries its evidence
  * 13. The Coat of Arms carries a recorded sha256 that matches the file, and every icon size
  *     index.html declares actually exists on disk
+ * 14. The Claude prompt asks for exactly three documents — the funding memo, the pitch deck and the
+ *     one-page ask — and still carries the pilot framing and the named-source statement
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -461,6 +463,57 @@ if (!existsSync(cssPath)) {
       `INFO  Coat of Arms sha256 ${actual.slice(0, 12)}…  ·  ${declared.size} icon file(s) declared in index.html, all present in public/`,
     );
   }
+}
+
+// 14 — THE CLAUDE PROMPT ASKS FOR THREE DOCUMENTS, NOT SIX. The pack was deliberately cut down: a
+//      separate legal instrument, a procurement paper, a governance annex and a full sources register
+//      were each dropped by the Phase AB scope decision, and `docs/PROPOSAL_PROMPT.md` went on
+//      describing the older, heavier pack until AB-7 rewrote it. This gate reads the prompt the way a
+//      reader would: the three deliverables must be named, the parts must number 1 to 3 and stop
+//      there, and the withdrawn "produce all five/six" instruction must not come back by pasting an
+//      old paragraph in. It also holds the two things the rewrite must never drop — that the pilot is
+//      proposed and not endorsed, and that the programme is named as the Government spells it.
+{
+  const promptFile = join(ROOT, "docs/PROPOSAL_PROMPT.md");
+  const problems = [];
+  if (!existsSync(promptFile)) {
+    problems.push(
+      "docs/PROPOSAL_PROMPT.md is missing — it is the deliverable prompt, and the last item of the agreed plan",
+    );
+  } else {
+    const text = readFileSync(promptFile, "utf8");
+    const flat = text.replace(/\s+/g, " ");
+    const required = [
+      ["the funding memo, with its length", /the funding memo \(2 pages\)/],
+      ["the pitch deck, with its slide count", /the pitch deck \(10[–-]12 slides\)/],
+      ["the one-page ask", /the one-page ask/],
+      ["the named-source statement", /named-source statement/],
+      ["the pilot framing — proposed, and never endorsed", /no endorsement/],
+      ["the programme named as the Government spells it", /Digitalize Zimbabwe/],
+    ];
+    for (const [label, re] of required) {
+      if (!re.test(flat)) problems.push(`the prompt no longer states ${label}`);
+    }
+
+    const parts = [...text.matchAll(/^\*\*Part\s+(\d+)\s*—/gm)].map((m) => m[1]);
+    if (parts.join(",") !== "1,2,3") {
+      problems.push(
+        `the prompt's deliverables are Part ${parts.join(", ") || "(none)"} — the agreed pack is exactly ` +
+          "Part 1, 2 and 3: the funding memo, the pitch deck and the one-page ask",
+      );
+    }
+
+    const retired = [
+      ["the withdrawn 'produce all five/six' instruction", /produce all (?:four|five|six)\b/i],
+      ["a fourth deliverable part", /^\*\*Part\s+[4-9]\s*—/m],
+      ["the withdrawn 'five/six deliverables' heading", /the (?:five|six) deliverables/i],
+    ];
+    for (const [label, re] of retired) {
+      const m = text.match(re);
+      if (m) problems.push(`${label}: "…${m[0].replace(/\s+/g, " ").trim()}…"`);
+    }
+  }
+  check("the Claude prompt asks for exactly three documents", problems);
 }
 
 // summary

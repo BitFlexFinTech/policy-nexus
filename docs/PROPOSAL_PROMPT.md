@@ -1,9 +1,17 @@
 # PROPOSAL_PROMPT.md — the copy-and-paste prompt for Claude
 
 **What this is.** A self-contained brief to paste into Claude (claude.ai, Projects, or the API) to
-produce the five documents that take the Zimbabwe AI Policy Intelligence Initiative from a working
-demonstration to an approved programme: **the full proposal, the pitch deck, the legal instrument,
-the procurement route, and the stated ask.**
+produce the **three** documents that take the Zimbabwe AI Policy Intelligence Initiative from a
+working demonstration to an approved pilot: **the funding memo (2 pages), the pitch deck
+(10–12 slides) and the one-page ask.**
+
+**Why three, and not a heavier pack.** The agreed scope is deliberately small — three documents a
+busy reader will actually finish. A separate **legal instrument**, a separate **procurement paper**,
+a ministry **governance annex** and a **full sources register** were each considered and dropped:
+the legal and procurement positions become **one short paragraph each inside the memo**, a short
+**named-source statement** replaces the sources register, and a full Treasury business case is
+**post-funding** work if it is ever asked for. Those are decisions, not gaps. (The scope decision is
+recorded in `PROJECT_STATUS.md`, Phase AB.)
 
 **Why it is a separate document and not part of the platform.** Research done in Phase AA found that,
 in Commonwealth practice, approval is decided from a memorandum and a business case — not from a
@@ -24,18 +32,21 @@ assumption or a question rather than invent them.
 You are a senior policy and legal adviser to a Zimbabwean government ministry, working with a
 technical team. You write for a **Cabinet Minister** as the first reader and for **Cabinet
 colleagues, Treasury and the Public Service Commission** as the deciding readers. Your job is to
-turn a working technical demonstration into the five documents needed to have it **approved,
-funded and procured**.
+turn a working technical demonstration into the three documents needed to have it **approved,
+funded and hosted**.
 
 ### The context in one paragraph
 
 A fully working, browser-based policy assessment platform has already been built and deployed. Its
 purpose is to let a government department test a draft policy against a simulated population before
 the policy is implemented, and to produce structured findings for human review. It is **not** a
-concept, a mock-up or a slideware promise — it runs today, inside the Government estate, and it is
-the proof of concept for a proposed national capability: the **Zimbabwe AI Policy Intelligence
-Initiative**, championed by the **Minister of Information Communication Technology, Postal and
-Courier Services, Hon. Tatenda A. Mavetera, MP**, and delivered on the **Nzwisiso AI** platform.
+concept, a mock-up or a slideware promise — it runs today in an ordinary web browser and makes **no
+network request at all**, and it is the proof of concept for a proposed national capability: the
+**Zimbabwe AI Policy Intelligence Initiative**, championed by the **Minister of Information
+Communication Technology, Postal and Courier Services, Hon. Tatenda A. Mavetera, MP**, and
+delivered on the **Nzwisiso AI** platform. It is reachable today at a demonstration address; moving
+it onto Government infrastructure is one of the build items this memo asks to fund. **Do not state
+or imply that it already runs on Government infrastructure or in the Government estate.**
 
 
 ### What already exists — treat every line below as a verified fact, and do not inflate it
@@ -51,16 +62,29 @@ Courier Services, Hon. Tatenda A. Mavetera, MP**, and delivered on the **Nzwisis
   and Public Works; Ministry of Foreign Affairs and International Trade; Ministry of Environment,
   Climate and Wildlife; Ministry of Defence and War Veterans Affairs; Zimbabwe Revenue Authority;
   Zimbabwe Investment and Development Agency.
-- **16 modelled stakeholder groups**: civil servants; urban households; rural households; informal
-  traders and transporters; formal business; mining operators; smallholder farmers; diaspora
-  households; youth; women-led enterprises; exporters; the financial sector; local authorities;
-  development partners; health workers; and educators.
-- **63 published reference indicators** authored across those 16 institutions, each with a plain
-  note and a named source.
+- **36 modelled stakeholder groups** — civil servants; urban and rural households; informal traders
+  and transporters; informal-sector workers; cross-border traders; formal business; manufacturers;
+  mining operators and artisanal small-scale miners; smallholder farmers; the diaspora; youth;
+  women; women-led enterprises; pensioners; the financial sector; exporters; local authorities;
+  development partners; health workers; educators; researchers and technical professionals;
+  traditional leaders; faith-based organisations; trade unions; employer federations; cooperatives;
+  the media and broadcasting; tourism operators; transport operators; energy and water utilities;
+  ICT and network operators; communities living by protected areas; persons with disabilities; and
+  war veterans and their dependants. **20 of the 36 stand on a published national share**, each
+  naming the figure it stands for and the publication it came from; the remaining **16 are
+  explicitly labelled `Modelled`**, because no published count exists. Each department models the
+  **6 to 8** groups its own mandate covers, drawn from these 36.
+- **63 reference indicators** across those 16 institutions, each with a plain note and a **stated
+  basis**: **24 are published figures**, each naming its publisher, its publication and its period,
+  and **39 are explicitly labelled `Modelled`**, because no publisher publishes that return. Say it
+  exactly that way. They are coverage, not evidence of outcomes or savings.
 - **48 prepared policy drafts** — three per institution — ready to be run today, so a demonstration
   needs no preparation by the department being shown.
 - **49 reference documents** and **64 stated institutional priorities** held in the same
-  configuration.
+  configuration. Each document entry cites a **real, verified instrument** — a named Act, Statutory
+  Instrument, policy or strategy, with a chapter number only where the official consolidated index
+  confirms one. **The platform holds the register and the citations, not the document files**: say
+  so plainly, and never present an entry as though the file itself were held.
 - **A complete officer journey that works end to end**: choose a department → upload or paste a
   policy draft → run the simulation → watch the modelled population and its relationships build up
   live → read an executive summary, a long-form report and a full assessment → export to PDF, Word
@@ -68,10 +92,13 @@ Courier Services, Hon. Tatenda A. Mavetera, MP**, and delivered on the **Nzwisis
 - **Reproducibility is a design property, not a claim**: the same department and the same policy
   text always produce a byte-identical result. There is no randomness and no clock in the result,
   which is what makes a finding defensible in a meeting.
-- **The assessment runs entirely inside the Government estate.** The demonstration build makes **no
+- **The assessment runs entirely in the reader's own browser.** The demonstration build makes **no
   network request at all** — no external AI service is called, no document text leaves the machine,
-  and no third-party script is loaded. This is verifiable, and it is the platform's strongest
-  governance property.
+  and no third-party script is loaded. That is what makes it **sovereign in operation**: nothing is
+  sent anywhere to be processed. It is also why the platform can be moved onto Government
+  infrastructure without being rebuilt — so the memo should **ask for that move**, not assert that
+  it has already happened. This is verifiable, and it is the platform's strongest governance
+  property.
 - **Every run models a population of 2,000–3,200 simulated agents**, drawn as the relationships
   between the modelled groups. The platform states plainly what each drawn mark represents rather
   than overstating the picture, and it should keep doing so.
@@ -118,8 +145,9 @@ and do not rename it. The spelling the Government uses is **"Digitalize Zimbabwe
 
 - The Government has already decided *that* Zimbabwe will digitalise public administration, and the
   **National AI Strategy (June 2026)** sets the direction. What does not yet exist is a **working,
-  sovereign example inside the Government estate**. Nzwisiso AI is exactly that: it is not a
-  concept or a mock-up, it runs today in a browser, and it makes **no network request at all**.
+  sovereign example that the Ministry itself hosts**. Nzwisiso AI is exactly that, one step short:
+  it is not a concept or a mock-up, it runs today in a browser, it makes **no network request at
+  all**, and hosting it inside the Ministry is a small, named step — not a rebuild.
 - It answers the AI Strategy's own criteria in one product: applied AI in a public service
   (policy assessment), reproducible and reviewable, and keeping **every policy text and every
   result inside national custody** — the sovereignty property the programme is built on.
@@ -157,47 +185,64 @@ initiative"** — a proposal put to the programme's owners, not a statement of t
    write it as a `[QUESTION — needs a decision]` and list it under "What we could not confirm".
    **Never** state or imply that the programme has endorsed this platform.
 
-### The five deliverables, and the exact shape each must take
+### The three documents, and the exact shape each must take
 
-Produce all five, in this order, as one document with clear part headings.
+Produce all three, in this order, as one document with clear part headings.
 
-**Part 1 — The proposal / Cabinet memorandum (2 to 4 pages, recommendation first).**
-Written the way a ministerial briefing is written: short, structured, numbered paragraphs, neutral
-in tone, and **carrying a recommendation**. Sections, in this order:
+**One rule applies to all three: a funding memo is not a proposal pack.** If a sentence does not
+help the Minister decide, cut it. Length is part of the specification here — the memo is two pages,
+the deck is 10 to 12 slides, and the ask is one page.
+
+**Part 1 — The funding memo (2 pages, recommendation first).**
+This is the document a Minister actually reads, so it is **two pages and no longer**, written the
+way a ministerial briefing is written: short, structured, numbered paragraphs, neutral in tone, and
+**carrying a recommendation**. Sections, in this order, each one kept as short as the memo can
+afford:
 1. **Recommendation** — what is being asked for, in three sentences, at the very top.
 2. **Background** — what the platform is, and that it already exists and works.
 3. **The problem it addresses** — policies are implemented without a structured way to examine
    likely stakeholder responses first; the cost of that is discovered after implementation.
 4. **What has already been delivered** — the verified facts above, stated plainly and without
-   inflation, including that it runs inside the Government estate with no external service.
-5. **The pilot case — Digitalize Zimbabwe.** The section that argues the fit, in the programme's
-   own terms. State what Digitalize Zimbabwe is, using **only** the verified facts above; name the
-   programme's own workstreams that this platform delivers against (information held
-   programmatically, sovereign compute, no external service, reproducible results); and state
-   plainly that what is being proposed is a **pilot** — one institution, assessed on its results,
-   before any national rollout is committed to. Quote the programme's own wording where the facts
-   above supply it: *"committed to full digitalisation by 2030"*, the National AI Strategy's four
-   named priority sectors, and the Presidential Internet Scheme's **2,400 wards**. **Close the
-   section with the boundary**: this is a proposal put to the programme's owners, not an
-   announcement of their decision.
-6. **What approval would enable** — the transition from a demonstration to a supported national
-   capability: which institutions come first, and what changes for them.
-7. **Legal and governance considerations** — see Part 3; summarise and cross-reference here.
-8. **Financial implications** — a cost table, every figure marked as an assumption, with the
-   recurring and one-off costs separated and no figure presented as approved.
+   inflation, including that it runs in a browser with no network request and is **not yet on
+   Government infrastructure**.
+5. **The pilot case — Digitalize Zimbabwe.** One short section arguing the fit, in the programme's
+   own terms. State what Digitalize Zimbabwe is using **only** the verified facts above; name the
+   programme's own workstreams this platform delivers against (services delivered digitally,
+   information held programmatically, no external service, reproducible results); and state plainly
+   that what is proposed is a **pilot** — one institution, assessed on its results, before any
+   national rollout is committed to. Quote the programme's own wording where the facts above supply
+   it: *"committed to full digitalisation by 2030"*, the National AI Strategy's four named priority
+   sectors, and the Presidential Internet Scheme's **2,400 wards**. **Close with the boundary**: this
+   is a proposal put to the programme's owners, not an announcement of their decision.
+6. **Governance and legal position, in one paragraph.** The platform informs; a human decides. Every
+   result is reproducible and reviewable, no document text leaves the machine, and every generated
+   document carries the decision-support disclaimer. State that **a legal instrument would be
+   drafted only after approval** — do not annex one.
+7. **Procurement, in one paragraph.** Recommend **one** route from: direct procurement under a
+   framework; an open tender; a managed service; or phased in-house development with contracted
+   expertise. Give the reason in two sentences, and name the approving office as a
+   `[QUESTION — needs a decision]` if it is not known. Every threshold and timeline is an
+   assumption. Do **not** produce a separate procurement paper.
+8. **Financial implications** — a short estimate table, **one-off** costs (the three build items
+   below, the pilot, and any deployment work) separated from **recurring** costs (hosting, support,
+   training). Every figure `[ASSUMPTION — to be confirmed]`, none presented as approved. A full
+   Treasury business case is **not** part of this memo.
 9. **Implementation approach and timeframe** — phased, with the three named build items first
-   (server-side extraction, server-side identity verification, a deployed production host), and the
-   **pilot institution named as the first milestone**.
+   (server-side document extraction, server-side identity verification, and deployment onto
+   Government infrastructure), and the **pilot institution named as the first milestone**.
 10. **Risk and mitigation** — including the reputational risk of overclaiming, how the product
-    design already mitigates it, and the *specific* risk of borrowing a national programme's name:
-    say plainly that the platform holds **no** endorsement from Digitalize Zimbabwe or the Ministry,
-    and that obtaining one is part of what is being asked for.
+    design already mitigates it (the disclaimer, the `Modelled` labels, reproducibility), and the
+    *specific* risk of borrowing a national programme's name: say plainly that the platform holds
+    **no** endorsement from Digitalize Zimbabwe or the Ministry, and that obtaining one is part of
+    what is being asked for.
 11. **Consultation** — which offices must be consulted before submission (Treasury, the Public
     Service Commission, the Attorney General's office, the data protection authority), each marked
     as a question if the correct list is not known — plus **the office that owns Digitalize
     Zimbabwe**, marked as a question.
 
-**Part 2 — The pitch deck (12 to 16 slides, outline plus speaker notes).**
+The memo closes with a **"What we could not confirm"** paragraph that names who to ask.
+
+**Part 2 — The pitch deck (10 to 12 slides, outline plus speaker notes).**
 It must survive being read *without* a presenter, and it must never claim more than the platform
 does. Suggested spine: the problem · what is different here · **why this is the pilot for Digitalize
 Zimbabwe** (one slide: what the programme is, in its own words, using only the verified facts above,
@@ -207,31 +252,22 @@ been built already · what approval unlocks · the cost, marked as estimates · 
 the close. **Speaker notes must say what to click and in what order during a live demonstration**,
 including what to do if the network is unavailable.
 
-**Part 3 — The legal instrument (skeleton plus drafting notes).**
-Do **not** present a finished law; present a well-formed skeleton with every substantive choice
-marked as a decision. Cover: the enabling authority; the instrument's objective; definitions;
-establishment of the capability and the body responsible for it; permitted and prohibited uses of
-the platform; **the statutory decision-support boundary** (the platform informs; it does not
-decide); data custody, sovereignty and retention; audit, logging and access control; obligations
-on departments that use it; review and reporting to Parliament; offences and penalties *if any*;
-commencement; and a schedule of the institutions in scope. Add drafting notes explaining each
-choice, and flag where the Attorney General's office must settle wording.
+**Part 3 — The one-page ask.**
+One page, unmistakable, and the only page some readers will read: exactly what approval is being
+requested, from whom, by when, and what happens if it is granted. **Open it by naming the pilot**:
+this platform is put forward as a pilot for the **Digitalize Zimbabwe** initiative, and the ask
+therefore includes **the programme's endorsement** alongside the funding and the hosting decision.
+Separate what is needed **now** from what is needed at each later stage, in a short table. If the
+correct approval route is unknown, say so and list the questions to resolve rather than guessing.
+Close with the **named-source statement** in two sentences, and a **"What we could not confirm"**
+line naming who to ask.
 
-**Part 4 — The procurement route (decision paper, with options).**
-Compare the realistic routes for a Zimbabwean public-sector technology programme and recommend one:
-direct procurement under a framework; an open tender; a build-transfer or managed-service
-arrangement; or phased in-house development with contracted expertise. For each: what it is, when it
-is appropriate, the approvals it needs, its timeline, its main risk, and its cost shape. Then
-recommend one route with reasons, and state exactly which approving office must sign it. Mark every
-threshold, timeline and figure as an assumption.
+### The named-source statement (short, and required in the memo and in the ask)
 
-**Part 5 — The stated ask.**
-One page, unmistakable: exactly what approval is being requested, from whom, by when, and what
-happens if it is granted. **Open it by naming the pilot**: this platform is put forward as a pilot
-for the **Digitalize Zimbabwe** initiative, and the ask therefore includes **the programme's
-endorsement** alongside the funding and the hosting decision. Separate what is needed **now** from
-what is needed at each later stage. If the correct approval route is unknown, say so and list the
-questions to resolve rather than guessing.
+Two to four sentences naming where the platform's figures come from — the national statistics
+office, the central bank, and the international publications used — and stating plainly which
+figures are published and which are labelled `Modelled`. This replaces a full sources register on
+purpose: it must be short enough that a reader actually finishes it.
 
 
 ### Research you must do, and how to handle what you cannot confirm
@@ -258,26 +294,32 @@ do not omit it to look authoritative.
 - **One word per idea.** Once you have named something, keep using that name.
 - British spelling. Zimbabwean English conventions. Currency in USD and ZWG, both marked as
   assumptions if you are converting.
-- Number every paragraph in Parts 1, 3, 4 and 5 so a reader in a meeting can refer to "paragraph 7.3".
+- Number every paragraph in the memo and in the one-page ask, so a reader in a meeting can refer to
+  "paragraph 7.3".
 - Put every table in a table. Do not describe a table in prose.
-- Finish with a **one-page executive summary** that can be read alone, and a **"What we could not
-  confirm"** paragraph.
+- **Fit the stated lengths**: the memo is two pages, the deck is 10 to 12 slides, the ask is one
+  page. Length is part of the specification, not a style preference.
+- Finish with a **"What we could not confirm"** paragraph that names who to ask.
 
 ### Before you hand anything over — run this checklist out loud
 
-1. Does the **recommendation** appear in the first three sentences of Part 1?
+1. Does the **recommendation** appear in the first three sentences of the memo?
 2. Is every **cost, date, threshold and legal reference** marked as an assumption or a question?
 3. Have you avoided every claim on the honesty rails — no prediction, no "the AI decided", no
    outcome attributed to the platform that it does not produce?
-4. Does the legal instrument keep the **decision-support boundary** intact — the platform informs,
-   a human decides?
+4. Does the memo's **governance paragraph** keep the **decision-support boundary** intact — the
+   platform informs, a human decides — and does it leave any legal instrument to be drafted *after*
+   approval, rather than annexing one?
 5. Is the pitch deck readable with **no presenter**, and does its demonstration script say what to
    click, in order?
 6. Is there a **"What we could not confirm"** paragraph, and does it name who to ask?
-7. Could a Minister read Part 1 and know, within one minute, exactly what is being asked of them?
-8. Does Part 1's **pilot case** name the programme exactly as **"Digitalize Zimbabwe"**, use only the
-   verified facts supplied, and carry the line that **no endorsement is held**? If any statement in
-   the pack implies the programme has already adopted the platform, that is a failure — fix it.
+7. Could a Minister read **the memo** and know, within one minute, exactly what is being asked of
+   them?
+8. Does the memo's **pilot case** name the programme exactly as **"Digitalize Zimbabwe"**, use only
+   the verified facts supplied, and carry the line that **no endorsement is held**? If any statement
+   in the pack implies the programme has already adopted the platform, that is a failure — fix it.
+9. Are there **exactly three documents** — the memo, the deck and the ask — with **no** separate
+   legal instrument, procurement paper, governance annex or sources register?
 
 ---
 
@@ -288,20 +330,21 @@ do not omit it to look authoritative.
 - Add the real figures where you have them: the budget envelope, the ministry's cost-sharing, the
   approval deadline, the number of institutions to prioritise first. The prompt will mark these as
   assumptions if you do not.
-- Ask Claude for **one part at a time** if the reply is truncated — the five parts are designed to
+- Ask Claude for **one part at a time** if the reply is truncated — the three parts are designed to
   stand alone.
 - Keep `PROJECT_STATUS.md` and `PRODUCTION_READINESS.md` for **yourself**, not for the meeting: they
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
-  Cabinet**. The document for that room is Part 1 of this prompt's output.
+  Cabinet**. The document for that room is **Part 1 — the funding memo**.
 - **What the live site actually is today (re-checked in R7, 2026-09-29).** The host `nzwisiso.bitflex.app`
   now serves `assets/index-DRweHRfT.js`
   (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), which is byte-identical to the
   local build, so **the live site is the finished build** — it carries the authority line, the modelled
   agent population, the named sources, the official Coat of Arms, the favicon set and all 24 published
   figures. (When this was checked on 2026-09-28 the host served `assets/index-BeggQU9V.js`, which was
-  behind the code; **R7** closed that gap.) The prompt below is still to be rewritten down to three
-  documents under **AB-7**.
+  behind the code; **R7** closed that gap.) **AB-7 is done (2026-09-29)**: this file asks for three
+  documents — the memo, the deck and the ask — and `npm run validate` now fails if it ever drifts
+  back to the heavier pack.
 
 ---
 
