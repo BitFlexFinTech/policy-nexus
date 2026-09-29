@@ -4,7 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicPageShell } from "@/components/public/PublicPageShell";
 import { AgentPopulationDiagram, ProcessPipeline, SIMULATION_SCALE } from "@/components/public/SimulationVisuals";
-import { BRAND, DISCLAIMER, ENGINE_EXPLANATION, GOVERNANCE, PROCESS_LABEL } from "@/config/brand";
+import { BRAND, DISCLAIMER, ENGINE_EXPLANATION, GOVERNANCE, PROCESS_LABEL, SERVICE_POSITION, SUPPORTED_INITIATIVE } from "@/config/brand";
 import { COVERAGE } from "@/lib/coverage";
 
 /**
@@ -38,6 +38,26 @@ const CAPABILITIES: Capability[] = [
     icon: ClipboardCheck,
     title: "Policy assessment",
     body: "Review structured findings, potential risks and areas requiring further consideration.",
+  },
+];
+
+/** The three steps of a run, matching the journey in the workspace. */
+/**
+ * The three ways this workspace supports the Government's own campaign — one line each, and
+ * each one a fact about what this platform does, not a claim about what the campaign has done.
+ */
+const INITIATIVE_SUPPORT = [
+  {
+    title: "Capability",
+    body: "Officials learn the technology by using it on their own department's drafts, which is how internal capability is built rather than bought.",
+  },
+  {
+    title: "Demonstration",
+    body: "Every run produces a real assessment and a drafted policy — the practical demonstration the campaign calls for, inside Government.",
+  },
+  {
+    title: "Trust",
+    body: "Nothing leaves the officer's machine, every figure is published-with-its-source or labelled Modelled, and a human decides.",
   },
 ];
 
@@ -177,6 +197,11 @@ export default function Landing() {
           <p className="mt-2 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:mt-3">
             {BRAND.description}
           </p>
+
+          {/* The address and the audience are in the notice strip at the very top of the page,
+              and the full relationship statement is in the initiative section below. Nothing is
+              added here: this gap decides whether the primary action stays on a phone's first
+              screen, which the browser test measures. */}
 
           {/* ONE primary action. The secondary link that used to sit beside it was
               removed: two side-by-side actions left the page without an obvious next
@@ -457,6 +482,53 @@ export default function Landing() {
         <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
           Counts are read directly from the department reference configuration, so this page cannot
           claim more coverage than the platform holds.
+        </p>
+      </section>
+
+      {/* How this workspace relates to the Government's own campaign: three lines, each mapped
+          to what the campaign says it is for, with the citation underneath so a reader can check
+          it. The boundary is repeated here on purpose — it belongs wherever the relationship is
+          stated, not only at the top of the page. */}
+      <section aria-labelledby="initiative-heading" className="mt-16">
+        <SectionRule />
+        <h2
+          id="initiative-heading"
+          className="mt-4 text-lg font-semibold tracking-tight text-foreground"
+        >
+          How this supports the {SUPPORTED_INITIATIVE.campaign} initiative
+        </h2>
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          {SUPPORTED_INITIATIVE.strategy} names {SUPPORTED_INITIATIVE.campaign} as one of its
+          flagship initiatives — a national campaign {SUPPORTED_INITIATIVE.campaignPurpose}. This
+          workspace is the internal counterpart to that work.
+        </p>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          {SUPPORTED_INITIATIVE.relationship}
+        </p>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-foreground">
+          {SERVICE_POSITION.dataPath} {SERVICE_POSITION.hosting}
+        </p>
+        <p className="mt-3 max-w-3xl text-[11px] leading-relaxed text-muted-foreground">
+          <span className="font-semibold uppercase tracking-wide text-primary">
+            {SERVICE_POSITION.audience}
+          </span>{" "}
+          Proposed address{" "}
+          <span className="font-mono text-foreground">{SERVICE_POSITION.proposedAddress}</span> (
+          {SERVICE_POSITION.addressStatus}).
+        </p>
+        <ul className="mt-4 grid gap-4 sm:grid-cols-3">
+          {INITIATIVE_SUPPORT.map((item) => (
+            <li key={item.title} className="rounded-lg border bg-card p-4">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-primary">
+                {item.title}
+              </h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{item.body}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+          {SUPPORTED_INITIATIVE.citation} · {SUPPORTED_INITIATIVE.strategyPublisher}.{" "}
+          <strong className="font-medium text-foreground">{SUPPORTED_INITIATIVE.boundary}</strong>
         </p>
       </section>
 

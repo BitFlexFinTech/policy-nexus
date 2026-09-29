@@ -46,6 +46,61 @@ export const WORDMARK = { base: NAME_BASE, suffix: `${NAME_SUFFIX}${TRADEMARK}` 
 /** The process label, used on the landing page and as the pipeline's screen-reader label. */
 export const PROCESS_LABEL = `The ${NAME} process`;
 
+/**
+ * THE GOVERNMENT INITIATIVE THIS PLATFORM SUPPORTS — named once, cited once.
+ *
+ * "Nzwisiso.ai" is the Ministry's own campaign: the National AI Strategy 2026–2030 names it as
+ * one of five flagship initiatives, a public campaign "to make AI understandable, relevant and
+ * trusted through practical demonstrations" (p.43). This platform is NOT that campaign and
+ * holds no endorsement from it — it is the internal counterpart, the workspace where officials
+ * put the same technology to work on their own department's policies. Every screen that states
+ * the relationship reads the sentences below, so the claim and its boundary cannot drift apart.
+ */
+export const SUPPORTED_INITIATIVE = {
+  /** The campaign, spelled as the Government spells it. */
+  campaign: "Nzwisiso.ai",
+  /** The campaign's own stated purpose, in its own words. */
+  campaignPurpose:
+    "to make AI understandable, relevant and trusted through practical demonstrations",
+  /** The published strategy the campaign belongs to. */
+  strategy: "Zimbabwe National Artificial Intelligence Strategy 2026–2030",
+  /** Who publishes it. */
+  strategyPublisher:
+    "Ministry of Information Communication Technology, Postal and Courier Services",
+  /** Where a reader can check the campaign's own wording. */
+  citation:
+    "Zimbabwe National Artificial Intelligence Strategy 2026–2030, p.43 (flagship initiatives)",
+  /** The relationship, stated as a proposal rather than as a fact about the Ministry. */
+  relationship:
+    `An internal service supporting ${"Nzwisiso.ai"}. The campaign builds public understanding; ` +
+    `this workspace is where officials put the same technology to work on their own department's policies.`,
+  /** The boundary, printed wherever the relationship is printed. */
+  boundary: "Not part of Nzwisiso.ai, and no endorsement from it is held.",
+} as const;
+
+/**
+ * WHO THE SERVICE IS FOR, AND WHERE THE DATA GOES — the two facts an official needs first, in
+ * one place. The address is printed WITHOUT a scheme and is never a link: it does not resolve
+ * yet (checked), and a dead link in front of an official is worse than plain text. The platform
+ * makes no external AI call of any kind, which is what makes the data path statement true.
+ */
+export const SERVICE_POSITION = {
+  /** Who may use it. */
+  audience: "For use by Government of Zimbabwe officials.",
+  /** The address proposed to the Ministry, spelled as proposed. */
+  proposedAddress: "policy.nwisiso.gov",
+  /** Its status, which must be printed beside it wherever it appears. */
+  addressStatus: "proposed — not yet live; subject to assignment by the Ministry (GISP)",
+  /** Where a policy draft goes — nowhere. */
+  dataPath:
+    "No policy text is sent to any external AI service — no Claude, no ChatGPT, no cloud model of any kind. " +
+    "The assessment is produced by a deterministic engine running in the browser, and nothing is uploaded.",
+  /** What the proposal asks for instead. */
+  hosting:
+    "The proposal is that the service be hosted on the Ministry's own infrastructure, so that no data " +
+    "leaves national custody at any point.",
+} as const;
+
 export const BRAND = {
   /** Short product name used in the header bar and document headers. */
   name: NAME,
@@ -174,7 +229,8 @@ export const GOVERNANCE = {
   /** What the platform is for. */
   lens:
     `${NAME} is designed to help government institutions examine proposed policies through ` +
-    "controlled AI-assisted simulation before implementation.",
+    "controlled AI-assisted simulation before implementation — the internal counterpart to the " +
+    "Nzwisiso.ai campaign's practical demonstrations.",
   /** Who decides. This sentence is the point. */
   humanJudgement:
     "The platform does not replace policymakers or determine policy outcomes. It provides an " +

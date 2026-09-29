@@ -1,14 +1,7 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# This is an INTERNAL service. Its footer says "For Internal Use Only", so it must not be
+# offered to search engines: every agent is disallowed, and index.html carries the same
+# instruction in a robots meta tag. `npm run validate` fails the build if a crawler is allowed
+# again while that classification stands.
 
 User-agent: *
-Allow: /
+Disallow: /

@@ -23,6 +23,8 @@
  *     one-page ask — and still carries the pilot framing and the named-source statement
  * 15. The product name carries its configured mark everywhere a reader sees it, and is composed
  *     in one place only
+ * 16. An internal service is not offered to search engines — no crawler is allowed while the
+ *     classification says "For Internal Use Only", and the served page carries the same instruction
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -566,7 +568,16 @@ if (!existsSync(cssPath)) {
   const composeFiles = appFiles.filter((f) => rel(f) !== "src/config/brand.ts");
   const hits = scan(
     composeFiles,
-    [["bare-product-name", configured ? new RegExp(`Nzwisiso(?!\\s?AI${configured})`) : /Nzwisiso(?!\s?AI)/]],
+    [
+      [
+        "bare-product-name",
+        // The Government's own campaign is spelled "Nzwisiso.ai" and must be allowed: naming it
+        // is deliberate, and the platform's own name always carries the configured mark.
+        configured
+          ? new RegExp(`Nzwisiso(?!\\s?AI${configured})(?!\\.ai)`)
+          : /Nzwisiso(?!\s?AI)(?!\.ai)/,
+      ],
+    ],
     // A comment naming the platform is not user-visible copy — including the JSX form,
     // which opens with `{/*` rather than `/*`.
     { ignoreLine: (line) => commentLine(line) || line.trimStart().startsWith("{/*") },
@@ -575,6 +586,49 @@ if (!existsSync(cssPath)) {
   notes.push(
     `INFO  product mark configured in src/config/brand.ts: ${configured ?? "(none)"}`,
   );
+}
+
+// 16 — AN INTERNAL SERVICE IS NOT OFFERED TO SEARCH ENGINES. The footer of every screen says
+//      "For Internal Use Only", and public/robots.txt was inviting Googlebot, Bingbot and the
+//      social crawlers to index the whole platform. Both cannot be true. This reads the
+//      classification out of brand.ts and fails if a crawler is allowed again, or if the served
+//      page drops its own noindex instruction.
+{
+  const brandFile = join(ROOT, "src/config/brand.ts");
+  const brandSource = existsSync(brandFile) ? readFileSync(brandFile, "utf8") : "";
+  const classification = (brandSource.match(/classification:\s*"([^"]+)"/) || [])[1] || "";
+  const internal = /internal/i.test(classification);
+  const problems = [];
+  if (internal) {
+    const robots = join(ROOT, "public/robots.txt");
+    if (!existsSync(robots)) {
+      problems.push("public/robots.txt is missing — an internal service must say so to crawlers");
+    } else {
+      const text = readFileSync(robots, "utf8");
+      const allows = [...text.matchAll(/^\s*Allow:\s*(\S.*)$/gim)].map((m) => m[1].trim());
+      if (allows.length) {
+        problems.push(
+          `public/robots.txt allows ${allows.join(", ")} while brand.ts classifies the service as "${classification}"`,
+        );
+      }
+      if (!/^\s*Disallow:\s*\/\s*$/im.test(text)) {
+        problems.push("public/robots.txt does not disallow all crawlers");
+      }
+    }
+    const htmlPath = join(ROOT, "index.html");
+    const html = existsSync(htmlPath) ? readFileSync(htmlPath, "utf8") : "";
+    if (!/<meta\s+name="robots"[^>]*noindex/i.test(html)) {
+      problems.push(
+        'index.html carries no <meta name="robots" content="noindex…"> — the served page must say it too',
+      );
+    }
+  }
+  check("internal service is not offered to search engines", problems);
+  if (internal) {
+    notes.push(
+      `INFO  classification "${classification}" — crawlers disallowed in robots.txt and index.html`,
+    );
+  }
 }
 
 // summary
