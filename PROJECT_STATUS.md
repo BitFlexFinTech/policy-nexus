@@ -1515,7 +1515,7 @@ measures"** — so an authored number read as an official published figure.
 | # | Batch | What it does | Status |
 |---|---|---|---|
 | **R1** | **The shape and the gates** | `DepartmentIndicator` now carries `basis`, a union — `{ kind: "published", sourceId, publication, asOf }` pointing at the one shared `NAMED_SOURCES` table, or `{ kind: "modelled" }`. The free-text `source` field is **gone**. One derived label (`indicatorBasisLabel`) and one derived count (`countIndicatorsByBasis`) are the only readers, so the KPI strip, the drill-down, the drafted policy and the engine vitals cannot describe the same number differently. | **DONE — verified this session** |
-| **R2–R5** | **The research, in four department clusters** | Each indicator either becomes the real published figure with its publisher, publication and period, or is labelled `Modelled`. **Nothing is invented**: a figure that cannot be confirmed from a named publication stays modelled, exactly as AB-2 left 16 stakeholder shares modelled. | **IN PROGRESS — R2 landed 13 of the 63, and R3 landed a further 8 (21 of 63 published, 42 modelled). R4–R5 remain.** |
+| **R2–R5** | **The research, in four department clusters** | Each indicator either becomes the real published figure with its publisher, publication and period, or is labelled `Modelled`. **Nothing is invented**: a figure that cannot be confirmed from a named publication stays modelled, exactly as AB-2 left 16 stakeholder shares modelled. | **DONE (2026-09-29) — all 63 researched. R2 landed 13, R3 landed 8, R4 landed 3 and R5 landed 0, 24 published / 39 modelled.** |
 | **R6** | Interface refinement for published figures | Trimming what the drill-down and reports print once real figures land. | **NOT STARTED** |
 | **R7** | Docs, deploy, review zip | `PRODUCTION_READINESS.md` states the published/modelled split; the live host is redeployed. | **NOT STARTED** |
 | **R8** | **AB-7** — funding memo, pitch deck, one-page ask | Rewrite `docs/PROPOSAL_PROMPT.md` down from six documents to three. | **NOT STARTED — still last** |
@@ -1543,6 +1543,32 @@ whole of `src/**`; and the drafted policy writes a modelled baseline as modelled
 expected 9 to be less than or equal to 8`; (2) putting "Published department measures" back on the
 engine vitals → **3 gates failed** (the rendered text, the source-text scan and the derived split).
 `sha256` before and after: `5b7a66a4…` (departments.ts) and `2f6922b9…` (EngineStatus.tsx), unchanged.
+
+#### Phase AD R4 and R5 — the last ten departments (2026-09-29, this session)
+
+**R4 — `opc`, `health`, `edu`, `hedu`, `ict`.** Three indicators became published figures, all read from the
+World Bank's own API during the session: `health-staffing` (*Nurse posts filled* → **Nurses and midwives
+(per 1,000 people)**, 3.1, 2022), `edu-transition` (*Secondary transition* → **Primary completion rate**,
+86.0, 2024) and `hedu-research` (*Research outputs registered* → **Scientific and technical journal
+articles**, 519.9, 2023). Each was **re-framed to the published measure**, exactly as R2 and R3 did, rather
+than quietly re-valued. The other ten R4 indicators have no published equivalent and stay `Modelled`.
+
+**R5 — `psc`, `lg`, `mfa`, `env`, `def`.** All **15** stayed `Modelled`: every one is an operational or
+administrative return that no body publishes for Zimbabwe, and where a World Bank series exists on the same
+general subject it measures something materially different from the indicator's own wording (hospital beds
+≠ facility functioning; road length ≠ road condition; total personnel ≠ readiness; health spending ≠
+medicine availability; renewable energy ≠ adaptation planning; tertiary class size ≠ graduation). **Nothing
+was substituted**, because re-pointing one of these figures at an indicator would make its label untrue.
+
+**The published set is now 24 of 63 (39 modelled).** The split is derived (`countIndicatorsByBasis`), so
+the KPI strip, the drill-down and the engine vitals all moved with it. The three new figures are recorded
+in the figure gate in `src/test/indicator-basis.test.tsx`, and PART 7 of
+`docs/PLATFORM_ENRICHMENT_PLAN.md` carries the R4/R5 rows and the 25 newly-recorded no-equivalent reasons.
+**Verified this session:** `npm run validate` (14/14) · `npm run typecheck` · `npm run lint` (0 errors) ·
+`npm test` (**380/380 across 32 files**) · `npm run build` (emits `assets/index-a8LtKHj8.js`). **The new
+gate was proved able to fail** by mutation — changing `hedu-research` to `520.0` fails with
+`hedu/hedu-research value: expected '520.0' to be '519.9'` — and `departments.ts` was restored
+**byte-identical** (`sha256 543081bb…` before and after).
 ### Phase AE — the official Coat of Arms, and the "Digitalize Zimbabwe" pilot case (2026-09-28, requested by the user this session)
 
 **Requested by the user, verbatim:** *"use the attached image for the logo across the platform and the
@@ -1697,7 +1723,9 @@ in a way that survives that rewrite unchanged.
   **`assets/index-BeggQU9V.js`** (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`).
   **Do not describe the deployed site as current until `R7` redeploys it** — and note that it currently
   shows the *earlier* Coat of Arms and carries no favicon set. `npm run validate` prints the difference
-  as an INFO line, so this can never drift in silence.
+  as an INFO line, so this can never drift in silence. *(Since this bullet was written, Phase AD R3 and R4
+  have rebuilt again: the local build now emits `assets/index-a8LtKHj8.js`, and the live host is still
+  unchanged at `assets/index-BeggQU9V.js`.)*
 - **RESOLVED (Phase Z) — the run path is asynchronous, so every capability is now connected.**
   `AssessmentService` returns promises (`buildRun`/`run`/`getRun`/`listRuns`), and `assessmentService`
   is a **dispatcher** that chooses the simulated engine or the live service at the moment of the
@@ -2958,24 +2986,23 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   **Working tree clean.** Baseline `main` is untouched at `7451db0`; `origin/main` is
   still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything is committed, so
   a cold session can start from this file alone.
-- **What to do next, in order:** **R3 is DONE (2026-09-29)** — the fin/zimra/zida/agri/energy/mines
-  cluster was researched against the World Bank's own API and eight figures were written in, taking the
-  published count from 13 to **21 of 63**. **What remains is `R4` and `R5`** — the departments not yet
-  researched to the same standard (`opc`, `health`, `edu`, `hedu`, `ict`, `psc`, `lg`, `mfa`, `env`,
-  `def`, and the measures PART 7 already lists as having no published equivalent), researching each figure
-  from its own publication exactly as R2 and R3 did; then **R7** (docs and **redeploy** — the live host is
-  behind this build right now, which `npm run validate` states as INFO); then **R8 = AB-7**. **Do not
-  re-fetch anything in PART 7 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the 21 published figures and the
-  list of measures with no published series are both recorded there. **Read first:**
+- **What to do next, in order:** **R4 and R5 are DONE (2026-09-29)** — the last ten departments (`opc`,
+  `health`, `edu`, `hedu`, `ict`, `psc`, `lg`, `mfa`, `env`, `def`) were researched against the World Bank's
+  own API and its full indicator catalogue. **R4 wrote in three published figures** (`health-staffing`,
+  `edu-transition`, `hedu-research`) and **R5 wrote in none**, taking the published count to **24 of 63
+  (39 modelled)**; **every one of the 63 is now researched**. **What remains is `R7`** (docs and
+  **redeploy** — the live host is behind this build right now, which `npm run validate` states as INFO),
+  then **R8 = AB-7**. **Do not re-fetch anything in PART 7 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the 24
+  published figures and the 39 recorded no-equivalent reasons are both there. **Read first:**
   `src/config/departments.ts` (the indicator lines), `src/config/reference.ts` (`NAMED_SOURCES` and the
   sourcing statement), `src/test/indicator-basis.test.tsx` (the gates), then the **Phase AD** section below.
 - **THE LIVE SITE IS BEHIND THIS BUILD.** `nzwisiso.bitflex.app` serves `assets/index-BeggQU9V.js`
   (sha256 `c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`), while `npm run build` on
-  the current tree emits `assets/index-DKdnGNmW.js`. **Phase AE changed the artwork and the icons, and AD
-  R3 changed eight indicators, so the deployed site currently shows the old drawing, has no favicon set
-  and carries the pre-R3 figures.** The gap grew first with Phase
-  AD R1, again with Phase AE, and again with R3; **`R7` closes it**, and until then **the live host must
-  not be described
+  the current tree emits `assets/index-a8LtKHj8.js`. **Phase AE changed the artwork and the icons, and AD
+  R2/R3/R4 turned 24 indicators into published figures, so the deployed site currently shows the old
+  drawing, has no favicon set and carries the pre-R4 figures.** The gap grew first with Phase
+  AD R1, again with Phase AE, again with R3 and again with R4; **`R7` closes it**, and until then **the live
+  host must not be described
   as current**. `npm run validate` states the difference as INFO (check 12), so this can never drift in
   silence. *(This bullet previously read "THE LIVE SITE IS NOW THIS BUILD", which stopped being true the
   moment R1 rebuilt the bundle — corrected here.)*
@@ -2985,16 +3012,27 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   AB-5 sweep cover the *retired document statements*, the *deployment claim and its evidence*, and the
   ***Coat of Arms fingerprint with the icon set that belongs to it***).
   (This line said **369/369 across 31 files** until Phase AE, and **379/379** until R3 added its figure
-  gate; the numbers in this file's own Phase AD rows are the check.)
+  gate; **R4's three rows ride inside that same existing test**, so the file and test counts did not move
+  again. The numbers in this file's own Phase AD rows are the check.)
 - **Phase AD R3 is DONE (2026-09-29).** Eight more indicators became published figures, read from the
   World Bank's own API during the session: `fin-deficit`, `fin-revenue`, `fin-investment`, `agri-grain`,
-  `agri-herd`, `agri-input`, `energy-losses` and `zimra-target`. The split is now **21 published / 42
-  modelled**. Five ideas were re-framed to the published measure rather than quietly re-valued, and
+  `agri-herd`, `agri-input`, `energy-losses` and `zimra-target`. The split after R3 was **21 published / 42
+  modelled** (now **24 / 39**, after R4 and R5). Five ideas were re-framed to the published measure rather than quietly re-valued, and
   **nothing was invented**: the measures with no published series stay `Modelled` and are listed in
   **PART 7** of `docs/PLATFORM_ENRICHMENT_PLAN.md`. The new gate in `src/test/indicator-basis.test.tsx`
   pins every published figure (value, publication and period) and was proved able to fail twice by
   mutation, restored byte-identical. Read the **Phase AD R3** row and **PART 7** before touching an
   indicator.
+- **Phase AD R4 and R5 are DONE (2026-09-29).** The last ten departments were researched: **R4** (`opc`,
+  `health`, `edu`, `hedu`, `ict`) wrote in **three** published figures — `health-staffing` (*Nurses and
+  midwives (per 1,000 people)*, 3.1, 2022), `edu-transition` (*Primary completion rate*, 86.0, 2024) and
+  `hedu-research` (*Scientific and technical journal articles*, 519.9, 2023), each **re-framed to the
+  published measure**; **R5** (`psc`, `lg`, `mfa`, `env`, `def`) wrote in **none**, because every one of its
+  15 measures is an operational return no publisher publishes. The split is now **24 published / 39
+  modelled** and **all 63 are researched**. **Nothing was invented**: the 39 modelled ones each carry a
+  recorded reason in **PART 7.4** of `docs/PLATFORM_ENRICHMENT_PLAN.md`. The figure gate in
+  `src/test/indicator-basis.test.tsx` now pins the three new values and was proved able to fail by mutation,
+  restored byte-identical (`sha256 543081bb…`).
 - **Phase AE is DONE (2026-09-28), and it changed no behaviour.** Two things, both verified: **(1)** the
   platform now displays the **official** Coat of Arms — the asset it had been using was a stylised
   drawing — across its three existing placements, with a real favicon set (`favicon.ico` 16/32/48,
@@ -3002,11 +3040,10 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   `docs/PROPOSAL_PROMPT.md` now carries the **"Digitalize Zimbabwe"** pilot case as researched fact,
   with a Part 1 section, a deck slide, the ask, and a hand-over gate. Read the **Phase AE** section
   below for the sources, the six edits, and what could not be confirmed. **This does not change the
-  order of what remains** — R4–R5 (R3 is now done), then R7, then R8.
-- **The order of what remains.** (1) **R4–R5** (R2 and R3 are **DONE**) — research the remaining
-  indicators, department by department, upgrading each one to a published figure or leaving it plainly
-  labelled `Modelled`.
-  (2) **R7** — update the documents and **redeploy** (the live host is behind this build). (3) **R8 =
+  order of what remains** — R7, then R8 (R4–R5 are now done).
+- **The order of what remains.** (1) **R7** — update the documents and **redeploy** (the live host is behind
+  this build); `PRODUCTION_READINESS.md` already states the published/modelled split, so R7 is the deploy and
+  the final document pass. (2) **R8 =
   AB-7**, the final Claude prompt — the funding memo, the pitch deck and the one-page ask — by rewriting
   `docs/PROPOSAL_PROMPT.md` down from the six-document version to three. **AB-7 is the last item, and
   nothing follows it.** The user's decision on the 63 indicator values was taken this session, so that

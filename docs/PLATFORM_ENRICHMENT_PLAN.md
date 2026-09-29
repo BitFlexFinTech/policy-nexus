@@ -215,7 +215,7 @@ publication stays `Modelled`, exactly as AB-2 left 16 stakeholder shares modelle
 `https://api.worldbank.org/v2/country/ZW/indicator/<SERIES>` — so any row can be re-checked with one
 request. The dataset's own `lastupdated` stamp at the time of reading was **2026-07-13**.
 
-### 7.1 The figures confirmed as published — 21 of the 63 indicators
+### 7.1 The figures confirmed as published — 24 of the 63 indicators
 
 | Department / indicator (id) | Figure now shown | World Development Indicators series (code) | Period |
 |---|---|---|---|
@@ -240,6 +240,9 @@ request. The dataset's own `lastupdated` stamp at the time of reading was **2026
 | env / Protected area coverage (`env-parks`) | **28.3** % of land | Terrestrial protected areas (% of total land area) — `ER.LND.PTLD.ZS` | 2025 |
 | env / Forest area (`env-forest`) | **44.7** % of land | Forest area (% of land area) — `AG.LND.FRST.ZS` | 2023 |
 | zimra / Tax revenue (`zimra-target`) | **7.2** % of GDP | Tax revenue (% of GDP) — `GC.TAX.TOTL.GD.ZS` | 2018 |
+| health / Nurses and midwives (`health-staffing`) | **3.1** per 1,000 people | Nurses and midwives (per 1,000 people) — `SH.MED.NUMW.P3` | 2022 |
+| edu / Primary completion rate (`edu-transition`) | **86.0** % of relevant age group | Primary completion rate, total (% of relevant age group) — `SE.PRM.CMPT.ZS` | 2024 |
+| hedu / Scientific journal articles (`hedu-research`) | **519.9** articles | Scientific and technical journal articles — `IP.JRN.ARTC.SC` | 2023 |
 ### 7.2 R2 — the thirteen written in 2026-09-28
 
 Electricity access · protected areas · forest area · mobile subscriptions · fixed broadband ·
@@ -287,8 +290,64 @@ remain `Modelled`. Re-checking them is a new research task, not a re-fetch:
 | energy / Installed capacity (`energy-gen`) | The one candidate series, *Electricity production (kWh)*, is **archived** in the World Bank's API and returns no rows for Zimbabwe |
 | energy / Unserved demand (`energy-supply`) | A load-management operational measure; no publisher publishes it |
 | agri / Irrigated area (`agri-irrigated`) | *Agricultural irrigated land* exists as a series but holds **no Zimbabwe rows** |
+| opc / Policy implementation rate (`opc-impl`) | A whole-of-government delivery measure; no publisher publishes it |
+| opc / Reform milestones met (`opc-milestone`) | The reform programme's own milestone count; no publisher publishes it |
+| opc / Cross-ministry turnaround (`opc-response`) | An administrative service measure; no publisher publishes it |
+| health / Functional primary facilities (`health-facilities`) | *Hospital beds (per 1,000)* (2014) measures hospital capacity, not whether a primary facility is open and staffed |
+| health / Essential medicine availability (`health-stockout`) | A facility stock-out return; *Current health expenditure per capita* measures financing, not availability |
+| edu / Feeding coverage (`edu-feeding`) | A programme-delivery count; no publisher publishes it |
+| hedu / Vocational share of enrolment (`hedu-tvet-share`) | The vocational series is secondary-level, not tertiary, and last reported for 1997 |
+| hedu / Graduation rate (`hedu-graduation`) | No graduation-rate series exists; *Pupil-teacher ratio, tertiary* measures class size |
+| ict / Data cost (`ict-data-cost`) | The ITU price-basket series is archived, and *Fixed broadband subscription* holds no Zimbabwe rows |
+| ict / Services online (`ict-egov`) | An e-government service count; the UN index that measures it is not a series this platform reads |
+| psc / Funded posts filled (`psc-establishment`) | An establishment return; no publisher publishes it |
+| psc / Officers aged over 55 (`psc-age`) | An establishment age profile; no publisher publishes it |
+| psc / Appraisals completed (`psc-appraisal`) | An internal performance-management return; no publisher publishes it |
+| psc / Training days per officer (`psc-training`) | An internal training return; no publisher publishes it |
+| lg / Feeder roads in good condition (`lg-roads`) | *Roads, total network* (latest 2002) measures road length, not feeder-road condition |
+| lg / Devolution absorption (`lg-absorption`) | A budget-execution return; no publisher publishes it |
+| mfa / Diplomatic missions (`mfa-missions`) | A missions list; no series this platform reads publishes it |
+| mfa / Consular document turnaround (`mfa-consular`) | A consular service measure; no publisher publishes it |
+| mfa / Preferential access utilisation (`mfa-trade-util`) | A preference-utilisation return; *Trade (% of GDP)* measures something else |
+| env / Environmental licence turnaround (`env-licences`) | A licensing service measure; no publisher publishes it |
+| env / Adaptation plans in place (`env-climate`) | No series counts adopted local adaptation plans; *Renewable energy consumption* measures mitigation |
+| def / Personnel at readiness (`def-readiness`) | *Armed forces personnel, total* (2020) counts all personnel, not those assessed deployable |
+| def / Veteran benefits processed (`def-veterans`) | A benefits-processing return; no publisher publishes it |
+| def / Civil support response (`def-response`) | A response-time measure; no publisher publishes it |
+| def / Equipment serviceability (`def-equipment`) | An equipment-readiness return; no publisher publishes it |
 
-The remaining modelled indicators are researched in **R4 and R5**.
+**Every one of the 63 indicators is now researched.** 24 are published figures naming their publisher,
+publication and period; the other 39 are labelled `Modelled`, each with the reason recorded in the table
+above (final research: R4 and R5, 2026-09-29).
+
+### 7.5 R4 and R5 — the last ten departments, researched in 2026-09-29
+
+**R4 — `opc`, `health`, `edu`, `hedu`, `ict` (13 indicators).** Three became published figures (rows in
+7.1), each re-framed to the published measure rather than quietly re-valued: "Nurse posts filled" →
+**Nurses and midwives (per 1,000 people)**; "Secondary transition" → **Primary completion rate**;
+"Research outputs registered" → **Scientific and technical journal articles**. The other ten — the whole
+of the Office of the President and Cabinet's set, health's facilities and medicines measures, education's
+feeding measure, higher education's vocational-share and graduation measures, and ICT's data-cost and
+online-services measures — stay `Modelled` (rows in 7.4).
+
+**R5 — `psc`, `lg`, `mfa`, `env`, `def` (15 indicators).** Every one stays `Modelled` (rows in 7.4).
+
+**Why nothing else qualified.** Each remaining measure is an operational or administrative return that no
+body publishes for Zimbabwe. Where a World Bank series exists on the same general subject, it measures
+something **materially different** from the indicator's own wording, so it was not substituted:
+*Hospital beds (per 1,000 people)* (latest 2014) measures hospital capacity, not whether a primary
+facility is open and staffed; *Roads, total network* (latest 2002) measures road length, not the condition
+of the feeder network; *Armed forces personnel, total* (2020) counts all personnel, not those assessed
+deployable; *Current health expenditure per capita* measures financing, not medicine availability;
+*Renewable energy consumption* measures mitigation, not adopted adaptation plans; *Pupil-teacher ratio,
+tertiary* measures class size, not graduation. Re-pointing an indicator at one of these would make its
+label untrue, which is the exact defect Phase AD exists to remove.
+
+**Checked, not assumed.** Every series above was read from the World Bank's own API for Zimbabwe, and the
+full indicator catalogue was searched for terms matching each remaining measure (nurse, physician,
+medicine, hospital, diplomatic, consular, climate, environmental, road, military, vocational, graduation,
+internet and data cost among them). Two series are **archived** and return no data at all
+(`IT.BBD.USEC.CD`, `IT.NET.EDUC.ZS`), and one holds **no Zimbabwe rows** (`AG.LND.IRIG.AG.ZS`).
 
 **Sources for PART 7:** World Bank Open Data — World Development Indicators, read from
 `api.worldbank.org/v2/country/ZW/indicator/<series>` on 2026-09-29.
