@@ -3185,7 +3185,12 @@ version, so it is now several versions behind this working copy. Publishing is o
 you before I run it.
 
 
-- **Branch `feature/unified-platform`.** The commits to know, newest first: **`6dfc4a5`** (the platform
+- **Branch `feature/unified-platform`.** The commits to know, newest first: **`689e5ee`**, **`c890e02`**
+  and **`3b02b9a`** — Batch A's second half (2026-09-30): the shared document strip on the four paperwork
+  screens, the officer's working copy of a drafted policy, and a drafted policy re-run as the next version;
+  then **`00be909`** — Batch A's first half: the engine's starting code out of every document, the Ministry
+  of ICT second, and the owner's approved card sentence — with its records **`5c6ce71`**, **`4d916c9`** and
+  **`a718e3b`**; then **`6dfc4a5`** (the platform
   is named the internal counterpart to the Government's own **Nzwisiso.ai** campaign, with its citation,
   its boundary and the proposed address), **`bbd38e3`** (the product mark is one setting — `TRADEMARK`
   in `src/config/brand.ts` — and the name is composed once, in `WORDMARK`), **`43f015d`** (the drafted
