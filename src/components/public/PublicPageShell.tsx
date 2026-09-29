@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { BRAND, PROMOTER, SOVEREIGNTY_STATEMENT } from "@/config/brand";
+import { BRAND, PROMOTER, SOVEREIGNTY_STATEMENT, WORDMARK } from "@/config/brand";
 import { REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR } from "@/config/reference";
 import { COVERAGE } from "@/lib/coverage";
 import coatOfArms from "@/assets/zimbabwe-coat-of-arms.png";
@@ -41,12 +41,9 @@ export function PublicPageShell({ children }: { children: ReactNode }) {
  * has exactly one home in the codebase.
  */
 function Wordmark() {
-  const [base, ...rest] = BRAND.name.split(" ");
-  const accent = rest.join(" ");
-  if (!accent) return <>{base}</>;
   return (
     <>
-      {base} <span className="text-gold">{accent}</span>
+      {WORDMARK.base} <span className="text-gold">{WORDMARK.suffix}</span>
     </>
   );
 }

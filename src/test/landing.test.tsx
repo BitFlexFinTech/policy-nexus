@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import Landing from "@/pages/Landing";
 import { DEPARTMENT_COUNT, DEPARTMENTS } from "@/config/departments";
 import { STAKEHOLDER_SEGMENTS, REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR, REFERENCE_RATES } from "@/config/reference";
-import { BRAND, ENGINE_EXPLANATION, GOVERNANCE, SOVEREIGNTY_STATEMENT } from "@/config/brand";
+import { BRAND, ENGINE_EXPLANATION, GOVERNANCE, PROCESS_LABEL, SOVEREIGNTY_STATEMENT } from "@/config/brand";
 import {
   KNOWLEDGE_MAP_LINE,
   SIMULATED_AGENT_FIGURE,
@@ -325,7 +325,7 @@ describe("Landing — the pure public landing page", () => {
       // diagram's knowledge-map rows — so an unscoped listitem count would measure
       // both and guard neither.
       const stages = within(
-        screen.getByRole("list", { name: "The Nzwisiso process, stage by stage" }),
+        screen.getByRole("list", { name: `${PROCESS_LABEL}, stage by stage` }),
       ).getAllByRole("listitem");
       expect(stages).toHaveLength(SIMULATION_PIPELINE.length);
       expect(stages).toHaveLength(8);
@@ -425,7 +425,7 @@ describe("Landing — the pure public landing page", () => {
         within(card as HTMLElement).getByText("Thousands of simulated agents."),
       ).toBeInTheDocument();
       expect(card).toHaveTextContent(
-        "Nzwisiso creates a simulated population representing relevant stakeholder perspectives and examines how those agents interact within the policy scenario.",
+        `${BRAND.name} creates a simulated population representing relevant stakeholder perspectives and examines how those agents interact within the policy scenario.`,
       );
     });
   });

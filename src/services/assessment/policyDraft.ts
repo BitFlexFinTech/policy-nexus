@@ -24,6 +24,7 @@ import {
   STAKEHOLDER_SEGMENTS,
 } from "@/config/reference";
 import { createRng } from "@/lib/prng";
+import { ANNEX, CLAUSE } from "./documentStructure";
 import {
   assertCitationsVerified,
   citationsSectionFor,
@@ -37,27 +38,11 @@ import type {
   StakeholderReaction,
 } from "./types";
 
+/** Re-exported so callers and gates read the document's numbering from one place. */
+export { CLAUSE } from "./documentStructure";
+
 /** The one marker used wherever only the department can supply the value. */
 export const BLANK = "[TO BE CONFIRMED BY THE DEPARTMENT]";
-
-/**
- * The clause numbers, in one place, so every cross-reference in the prose is computed
- * rather than typed. A gate in `src/test/policy-document.test.ts` fails the build if a
- * "clause N" reference names a section that does not exist.
- */
-export const CLAUSE = {
-  introduction: 1,
-  situation: 2,
-  vision: 3,
-  legal: 4,
-  measures: 5,
-  implementation: 6,
-  risk: 7,
-  engagement: 8,
-  finance: 9,
-  monitoring: 10,
-  transitional: 11,
-} as const;
 
 /**
  * The abbreviations the platform's own content uses, with their expansions. Only entries
@@ -554,7 +539,7 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
   annexes.push({
     ...registerCitations,
     id: "citations",
-    heading: "Annex C — Instruments relied on",
+    heading: `${ANNEX.instruments} — Instruments relied on`,
   });
 
   annexes.push({

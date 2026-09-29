@@ -22,11 +22,35 @@ const PRINCIPLE = "Understanding before action";
  */
 const INITIATIVE = "Zimbabwe AI Policy Intelligence Initiative";
 
+/**
+ * THE PRODUCT MARK — one setting for the whole platform.
+ *
+ * `TRADEMARK` is the only place the symbol is written. It is "™" today: the mark is NOT yet
+ * registered, and "®" would assert a registration that does not exist — a false legal
+ * statement. When a certificate issues, changing this one character changes every page, every
+ * footer, every generated document and the browser title; nothing else is edited, and the
+ * guard in `scripts/validate.mjs` (which asks only that the name is followed by the
+ * CONFIGURED mark) keeps working without being touched.
+ *
+ * The name is COMPOSED here and nowhere else. "Nzwisiso" alone must never reach a reader: the
+ * Government's own National AI Strategy names a flagship campaign "Nzwisiso.ai", and a bare
+ * mention would read as though this platform were that campaign (see PROJECT_STATUS.md).
+ */
+export const TRADEMARK = "™";
+const NAME_BASE = "Nzwisiso";
+const NAME_SUFFIX = "AI";
+/** The product name, with its mark. */
+export const NAME = `${NAME_BASE} ${NAME_SUFFIX}${TRADEMARK}`;
+/** The wordmark split for the two-colour mastheads, so they cannot disagree with the name. */
+export const WORDMARK = { base: NAME_BASE, suffix: `${NAME_SUFFIX}${TRADEMARK}` } as const;
+/** The process label, used on the landing page and as the pipeline's screen-reader label. */
+export const PROCESS_LABEL = `The ${NAME} process`;
+
 export const BRAND = {
   /** Short product name used in the header bar and document headers. */
-  name: "Nzwisiso AI",
+  name: NAME,
   /** Full product name used on the homepage, the browser title, and reports. */
-  productName: "Nzwisiso AI Policy Dashboard",
+  productName: `${NAME} Policy Dashboard`,
   /** What kind of platform Nzwisiso AI is — the subtitle under the product name. */
   platformLabel: "Policy Intelligence Platform",
   /** The national initiative. The prominent heading on the public landing page. */
@@ -43,9 +67,9 @@ export const BRAND = {
   tagline: `${PRINCIPLE}.`,
   /** The primary supporting statement on the public landing page — the subheading. */
   summary: "Explore potential policy responses before implementation.",
-  /** The longer description: what Nzwisiso AI provides, in the hero and the meta description. */
+  /** The longer description: what the platform provides, in the hero and the meta description. */
   description:
-    "Nzwisiso AI provides government institutions with a controlled AI-assisted environment to " +
+    `${NAME} provides government institutions with a controlled AI-assisted environment to ` +
     "explore potential stakeholder responses, identify areas of risk and examine policy scenarios " +
     "before implementation.",
   /** How the initiative is labelled while it is still a proposal. */
@@ -58,7 +82,7 @@ export const BRAND = {
   ministerialChampion: "Hon. Tatenda A. Mavetera, MP",
   /** The platform credit line. Rendered twice: in the authority line that opens
    *  the page, and under the hero heading. */
-  poweredBy: "Powered by Nzwisiso AI\u00AE",
+  poweredBy: `Powered by ${NAME}`,
   /**
    * Official attribution line, required on the homepage footer. The wording is
    * fixed by the commissioning ministry and must not be softened or reworded.
@@ -103,9 +127,9 @@ export const PROMOTER = {
  * reach the interface — these are the only words the interface may use.
  */
 export const VOCABULARY = {
-  simulationCore: "Nzwisiso simulation core",
-  knowledgeMap: "Nzwisiso knowledge map",
-  agentMemory: "Nzwisiso agent memory",
+  simulationCore: `${NAME} simulation core`,
+  knowledgeMap: `${NAME} knowledge map`,
+  agentMemory: `${NAME} agent memory`,
   agentFeed: "Stakeholder agent feed",
   scenarioEngine: "Scenario engine",
 } as const;
@@ -118,7 +142,7 @@ export const VOCABULARY = {
 export const DISCLAIMER = {
   short: "Prepared for decision support. Not a definitive forecast.",
   long:
-    "This assessment was produced by the Nzwisiso AI Policy Dashboard from the policy text " +
+    `This assessment was produced by the ${BRAND.productName} from the policy text ` +
     "supplied and the department's reference indicators. It describes a simulated " +
     "range of stakeholder responses under stated assumptions. It is prepared for decision " +
     "support and is not a definitive forecast of public opinion, market outcomes, or " +
@@ -149,7 +173,7 @@ export const SOVEREIGNTY_STATEMENT =
 export const GOVERNANCE = {
   /** What the platform is for. */
   lens:
-    "Nzwisiso is designed to help government institutions examine proposed policies through " +
+    `${NAME} is designed to help government institutions examine proposed policies through ` +
     "controlled AI-assisted simulation before implementation.",
   /** Who decides. This sentence is the point. */
   humanJudgement:
@@ -175,7 +199,7 @@ export const ENGINE_EXPLANATION = {
   statement: "One policy draft can generate a much larger analytical environment.",
   /** What the system does with the draft, step by step, in plain language. */
   body:
-    "When a policy is submitted, Nzwisiso moves beyond a single AI response. The system " +
+    `When a policy is submitted, ${NAME} moves beyond a single AI response. The system ` +
     "constructs a structured representation of the policy, identifies relevant entities and " +
     "relationships, creates a simulated population of thousands of interacting agents, and " +
     "examines how different stakeholder perspectives may respond within the scenario.",

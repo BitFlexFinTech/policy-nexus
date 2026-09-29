@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { StatusPill } from "./StatusPill";
 import { Button } from "@/components/ui/button";
 import { findDepartment } from "@/config/departments";
-import { VOCABULARY } from "@/config/brand";
+import { VOCABULARY, WORDMARK } from "@/config/brand";
 import { getReferenceRate } from "@/config/reference";
 import { sessionActions, useSession } from "@/session/useSession";
 import coatOfArms from "@/assets/zimbabwe-coat-of-arms.png";
@@ -33,7 +33,8 @@ export function HeaderBar() {
       <div className="flex items-center gap-3">
         <img src={coatOfArms} alt="Zimbabwe Coat of Arms" className="h-8 w-8 object-contain" />
         <h1 className="text-sm font-semibold tracking-tight text-primary-foreground">
-          Nzwisiso<span className="text-gold"> AI</span>
+          {WORDMARK.base}
+          <span className="text-gold"> {WORDMARK.suffix}</span>
         </h1>
         {department ? (
           <>

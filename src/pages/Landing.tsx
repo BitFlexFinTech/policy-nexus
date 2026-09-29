@@ -4,7 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicPageShell } from "@/components/public/PublicPageShell";
 import { AgentPopulationDiagram, ProcessPipeline, SIMULATION_SCALE } from "@/components/public/SimulationVisuals";
-import { BRAND, DISCLAIMER, ENGINE_EXPLANATION, GOVERNANCE } from "@/config/brand";
+import { BRAND, DISCLAIMER, ENGINE_EXPLANATION, GOVERNANCE, PROCESS_LABEL } from "@/config/brand";
 import { COVERAGE } from "@/lib/coverage";
 
 /**
@@ -31,7 +31,7 @@ const CAPABILITIES: Capability[] = [
     title: "Stakeholder simulation",
     lead: "Thousands of simulated agents.",
     body:
-      "Nzwisiso creates a simulated population representing relevant stakeholder perspectives " +
+      `${BRAND.name} creates a simulated population representing relevant stakeholder perspectives ` +
       "and examines how those agents interact within the policy scenario.",
   },
   {
@@ -259,8 +259,8 @@ export default function Landing() {
         </h2>
         <p className="mt-2 max-w-3xl text-pretty text-sm leading-relaxed text-muted-foreground">
           Government policy can have complex effects across communities, institutions, industries and
-          stakeholders. Nzwisiso provides an additional analytical lens for exploring those potential
-          responses before implementation.
+          stakeholders. {BRAND.name} provides an additional analytical lens for exploring those
+          potential responses before implementation.
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {CAPABILITIES.map((capability) => (
@@ -346,7 +346,7 @@ export default function Landing() {
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10">
           <div>
             <h3 className="text-sm font-semibold tracking-tight text-foreground">
-              The Nzwisiso process
+              {PROCESS_LABEL}
             </h3>
             <p className="mt-1 max-w-xl text-xs leading-relaxed text-muted-foreground">
               Each stage adds depth to the one before it: the draft is understood, mapped, populated,

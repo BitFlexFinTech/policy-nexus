@@ -29,6 +29,7 @@ import {
   type StakeholderSegmentId,
 } from "@/config/reference";
 import type { AssessmentRun, GeneratedDocument, GeneratedSection } from "@/services/assessment/types";
+import { CITATIONS_ANNEX } from "@/services/assessment/documentStructure";
 
 /* ------------------------------------------------------------------------- */
 /* Grounding — the real evidence a draft rests on                              */
@@ -265,5 +266,5 @@ export const provenanceParagraphs = (
   verification: CitationVerification,
 ): string[] => [
   `Provenance: this draft was produced from simulation ${run.reference} on ${REFERENCE_DATE_LABEL}, seeded "${run.seed}", grounded in the ${department.indicators.length} reference indicators of ${department.shortName} and the modelled positions of the ${department.segments.length} groups it models.`,
-  `Citations: ${verification.citations.length} instrument(s) are listed in clause 8. Every one was checked against the platform's cited-instrument table; ${verification.unknown.length + verification.outsideRegister.length + verification.strayChapters.length} could not be verified.`,
+  `Citations: ${verification.citations.length} instrument(s) are listed in ${CITATIONS_ANNEX}. Every one was checked against the platform's cited-instrument table; ${verification.unknown.length + verification.outsideRegister.length + verification.strayChapters.length} could not be verified.`,
 ];

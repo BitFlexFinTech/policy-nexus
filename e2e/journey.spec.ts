@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { Buffer } from "node:buffer";
 import { readFileSync } from "node:fs";
 import { DEPARTMENTS, DEPARTMENT_COUNT, findDepartment } from "../src/config/departments";
+import { BRAND } from "../src/config/brand";
 import { citedInstrumentLabel } from "../src/config/instruments";
 
 /**
@@ -152,7 +153,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Zimbabwe AI Policy Intelligence Initiative" }),
     ).toBeVisible();
-    await expect(page.getByText("Powered by Nzwisiso AI®", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(BRAND.poweredBy, { exact: true }).first()).toBeVisible();
     await expect(page.getByText("Zimbabwe AI Policy Intelligence", { exact: true })).toBeVisible();
     await expect(page.getByText("Policy Intelligence Platform", { exact: true })).toBeVisible();
     // The supporting statement and the description, in the hero.

@@ -44,7 +44,7 @@ concept, a mock-up or a slideware promise — it runs today in an ordinary web b
 network request at all**, and it is the proof of concept for a proposed national capability: the
 **Zimbabwe AI Policy Intelligence Initiative**, championed by the **Minister of Information
 Communication Technology, Postal and Courier Services, Hon. Tatenda A. Mavetera, MP**, and
-delivered on the **Nzwisiso AI** platform. It is reachable today at a demonstration address; moving
+delivered on the **Nzwisiso AI™** platform. It is reachable today at a demonstration address; moving
 it onto Government infrastructure is one of the build items this memo asks to fund. **Do not state
 or imply that it already runs on Government infrastructure or in the Government estate.**
 
@@ -145,7 +145,7 @@ and do not rename it. The spelling the Government uses is **"Digitalize Zimbabwe
 
 - The Government has already decided *that* Zimbabwe will digitalise public administration, and the
   **National AI Strategy (June 2026)** sets the direction. What does not yet exist is a **working,
-  sovereign example that the Ministry itself hosts**. Nzwisiso AI is exactly that, one step short:
+  sovereign example that the Ministry itself hosts**. Nzwisiso AI™ is exactly that, one step short:
   it is not a concept or a mock-up, it runs today in a browser, it makes **no network request at
   all**, and hosting it inside the Ministry is a small, named step — not a rebuild.
 - It answers the AI Strategy's own criteria in one product: applied AI in a public service

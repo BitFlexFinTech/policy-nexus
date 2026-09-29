@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 import { RelationshipGraphCard } from "@/components/relationship/RelationshipGraphCard";
+import { PROCESS_LABEL } from "@/config/brand";
 import { buildPreviewRelationshipGraph, formatAgentCount } from "@/services/assessment/network";
 
 /**
@@ -115,7 +116,7 @@ export const SIMULATION_PIPELINE = [
  */
 export function ProcessPipeline() {
   return (
-    <ol className="mt-5" aria-label="The Nzwisiso process, stage by stage">
+    <ol className="mt-5" aria-label={`${PROCESS_LABEL}, stage by stage`}>
       {SIMULATION_PIPELINE.map((stage, index) => (
         <li key={stage.title} className="relative flex gap-3 pb-4 last:pb-0">
           {/* The rail is decorative — the number and the title carry the meaning. */}

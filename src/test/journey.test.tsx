@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import App from "@/App";
-import { DISCLAIMER } from "@/config/brand";
+import { DISCLAIMER, VOCABULARY } from "@/config/brand";
+import { CITATIONS_ANNEX } from "@/services/assessment/documentStructure";
 import { findDepartment } from "@/config/departments";
 import { clearSession, signInToDepartment } from "@/session/session";
 import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
@@ -189,9 +190,11 @@ describe("journey — run a policy, then read its assessment", () => {
     expect(screen.getByRole("heading", { name: "Provenance" })).toBeInTheDocument();
     expect(screen.getByText("Produced by")).toBeInTheDocument();
     // The provenance row names the producer exactly; the notice above says it in a sentence.
-    expect(screen.getByText("The Nzwisiso simulation core (Mock)")).toBeInTheDocument();
+    expect(screen.getByText(`The ${VOCABULARY.simulationCore} (Mock)`)).toBeInTheDocument();
     expect(
-      screen.getByText(/listed in clause 8 — every one checked against the instrument table/),
+      screen.getByText(
+        new RegExp(`listed in ${CITATIONS_ANNEX} — every one checked against the instrument table`),
+      ),
     ).toBeInTheDocument();
     ["Print", "Save as PDF", "Download Word", "Share"].forEach((label) => {
       expect(screen.getByRole("button", { name: label })).toBeInTheDocument();

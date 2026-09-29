@@ -21,6 +21,8 @@
  *     index.html declares actually exists on disk
  * 14. The Claude prompt asks for exactly three documents — the funding memo, the pitch deck and the
  *     one-page ask — and still carries the pilot framing and the named-source statement
+ * 15. The product name carries its configured mark everywhere a reader sees it, and is composed
+ *     in one place only
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -177,10 +179,30 @@ if (!disclaimerSources.length) {
     // anchor is a line-start two-space indent followed by a word character OR a comment
     // slash, so the capture stops at the field's own comma and can never run into the
     // COMMENT above or below it (both of which mention "description").
+    //
+    // The sentence now opens with the product NAME, which brand.ts COMPOSES from its parts
+    // (so the mark is one setting). This reads those parts out of the same file and resolves
+    // them here, rather than demanding that the served HTML stop matching the source.
     const statement =
       (brandText.match(/\n  description:([\s\S]*?)\n  (?=[\w/])/) || [])[1] || "";
-    const owned = statement.includes('"')
-      ? statement.replace(/[\s"+]/g, "").replace(/,$/, "")
+    const resolvedName = (() => {
+      const mark = (brandText.match(/export const TRADEMARK = "([^"]+)"/) || [])[1];
+      const base = (brandText.match(/const NAME_BASE = "([^"]+)"/) || [])[1];
+      const suffix = (brandText.match(/const NAME_SUFFIX = "([^"]+)"/) || [])[1];
+      return base && suffix && mark ? `${base} ${suffix}${mark}` : null;
+    })();
+    if (statement.includes("${NAME}") && !resolvedName) {
+      drift.push(
+        "src/config/brand.ts builds its description from ${NAME} but does not declare NAME_BASE, NAME_SUFFIX and TRADEMARK, so the served HTML cannot be checked against it",
+      );
+    }
+    const resolvedStatement = resolvedName
+      ? statement.replace(/\$\{NAME\}/g, resolvedName)
+      : statement;
+    // The statement is written with double-quoted strings and template literals mixed, so
+    // both markers have to be stripped before the sentence can be compared.
+    const owned = /["`]/.test(resolvedStatement)
+      ? resolvedStatement.replace(/[\s"`+]/g, "").replace(/,$/, "")
       : "";
     const bare = (value) => value.replace(/\s+/g, "");
 
@@ -521,6 +543,38 @@ if (!existsSync(cssPath)) {
     }
   }
   check("the Claude prompt asks for exactly three documents", problems);
+}
+
+// 15 — THE PRODUCT NAME CARRIES ITS MARK, AND IS COMPOSED IN ONE PLACE. A reader who sees the
+//      platform called "Nzwisiso AI" beside the Government's own "Nzwisiso.ai" campaign cannot
+//      tell whether this is that campaign — so the name must always carry its mark, and the
+//      mark must be the CONFIGURED one. This check reads `TRADEMARK` out of `src/config/brand.ts`
+//      rather than hardcoding a symbol, so the day the mark is registered and the setting changes
+//      to ®, this gate keeps working untouched. The name is composed only in brand.ts (that is
+//      where the parts live); everywhere else no bare "Nzwisiso" may reach a reader. Comment
+//      lines are ignored — a comment naming the platform is not user-visible copy.
+{
+  const brandFile = join(ROOT, "src/config/brand.ts");
+  const brandSource = existsSync(brandFile) ? readFileSync(brandFile, "utf8") : "";
+  const configured = (brandSource.match(/export const TRADEMARK = "([^"]+)"/) || [])[1];
+  const problems = [];
+  if (!configured) {
+    problems.push(
+      "src/config/brand.ts declares no exported TRADEMARK — the product mark must be one readable setting",
+    );
+  }
+  const composeFiles = appFiles.filter((f) => rel(f) !== "src/config/brand.ts");
+  const hits = scan(
+    composeFiles,
+    [["bare-product-name", configured ? new RegExp(`Nzwisiso(?!\\s?AI${configured})`) : /Nzwisiso(?!\s?AI)/]],
+    // A comment naming the platform is not user-visible copy — including the JSX form,
+    // which opens with `{/*` rather than `/*`.
+    { ignoreLine: (line) => commentLine(line) || line.trimStart().startsWith("{/*") },
+  );
+  check("product name carries its configured mark, composed in one place", [...problems, ...hits]);
+  notes.push(
+    `INFO  product mark configured in src/config/brand.ts: ${configured ?? "(none)"}`,
+  );
 }
 
 // summary

@@ -7,6 +7,7 @@ import { RunError, RunNotFound, RunPending } from "@/components/assessment/Asses
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
 import { findDepartment } from "@/config/departments";
 import { renderDocumentText } from "@/services/assessment/documents";
+import { CITATIONS_ANNEX } from "@/services/assessment/documentStructure";
 import { buildDraftingProvenance, verifyDocumentCitations } from "@/services/documents/drafting";
 import { useGeneratedDocument } from "@/services/documents/useGeneratedDocument";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
@@ -84,7 +85,7 @@ export default function PolicyDraft() {
         ],
         [
           "Citations",
-          `${provenance.instrumentsCited} listed in clause 8 — ${
+          `${provenance.instrumentsCited} listed in ${CITATIONS_ANNEX} — ${
             provenance.citationsVerified
               ? "every one checked against the instrument table"
               : "some could not be verified"
