@@ -439,8 +439,10 @@ coverage is the jsdom `workspace.test.tsx` suite, not the browser test)
 - Pushed the **feature branch only**: `GIT_TERMINAL_PROMPT=0 git push -u origin feature/unified-platform`
   → `* [new branch] feature/unified-platform -> feature/unified-platform`, tracking set,
   `PUSH_EXIT=0`. Remote branch HEAD = `bc787d5`.
-- **`origin/main` is unchanged at `7451db0`** — the agent never commits to or pushes `main`.
-  `git branch -vv` confirms local `main` still tracks `origin/main` at the baseline.
+- **`origin/main` was unchanged at `7451db0`** — the agent never commits to or pushes `main`.
+  `git branch -vv` confirmed local `main` then still tracked `origin/main` at the baseline.
+  *(**Superseded by Phase W below**: the user authorized the PR #1 merge, so `main` and `origin/main`
+  are now `b2e2745`.)*
 - GitHub returned the PR link:
   `https://github.com/BitFlexFinTech/policy-nexus/pull/new/feature/unified-platform`.
 - **Review zips:** `nzwisiso-policy-dashboard-review-6.zip` (165 files, 1,114,539 B) for the
@@ -1505,6 +1507,10 @@ because the block it sits in already names itself.
 | 2026-09-29 | **the internal-service promise made mechanical, and a fold regression the browser test caught** | **(1) The platform invited search engines while its footer said "For Internal Use Only".** `public/robots.txt` allowed **Googlebot, Bingbot, Twitterbot and facebookexternalhit** and `User-agent: *` — so an internal Government service was asking to be indexed. Every agent is now **disallowed**, `index.html` carries `<meta name="robots" content="noindex, nofollow" />`, and **validate check 16** (the suite is **17/17** now) reads the classification out of `brand.ts` and fails if a crawler is allowed again or the page drops the instruction. **(2) The audience line on the workspace footer** now reads from `SERVICE_POSITION.audience` instead of an unwritten assumption. **(3) A phone regression, caught by the existing browser test:** the service line added to the hero pushed the primary action to **861px of 844** on a 390px phone. Measured against the previous build (**842px — a 2-pixel margin**), so the page had almost no headroom; the line was moved into the initiative section (which is on the landing page, satisfying the instruction without standing between the reader and the action) and the public shell's phone padding was reduced (`py-10` → `py-8` below `sm`, so the desktop layout is untouched). **The primary action now sits at 834px of 844 — better headroom than the 842 it had before.** **Still open, named rather than half-built:** `/platform-admin` is reachable by anyone who types the address and saves the service configuration; it needs a real guard, and hiding is not protecting |
 | 2026-09-29 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (positioning session, final bytes) | **ALL GREEN**: validate **17/17 (exit 0)** · typecheck **exit 0** · lint **exit 0, 0 errors** · **423/423 across 34 files** · build **✓** |
 | 2026-09-29 | `npx playwright test` (positioning session, final bytes) | **PASS — 11 passed (27.3 s)**, including the phone-fold test at **834px of 844**, with 0 console errors / 0 off-origin requests per test |
+| 2026-09-29 | **truth sweep of `RESUME HERE` — every false current-state statement found and corrected at source** (this session: the user said *"continue where you left off"*; nothing was in progress, so the records were re-read and every claim re-checked against the code and against git) | **Nine defects, all FIXED, none BLOCKED.** **(1)** The "commits to know" bullet named **R8** as the tip although **five newer commits** exist — it now names all five (`6dfc4a5`, `bbd38e3`, `43f015d`, `5bcd014`, `d344bfa`). **(2)** *"NOTHING IS OUTSTANDING … the deploy … finished and verified"* contradicted the redeploy bullet in the same block — rewritten to *"every work item done; one action remains"*. **(3)** The expected-counts bullet said **381/381 across 32 files** — the measured figure is **423/423 across 34 files**; the growth history of that line was extended too. **(4)** *"the live host now serves the Phase S build"* appeared **twice** — the host serves the **R7** build and is **one build behind** the current one, so both were rewritten, and a third copy in *Known-red* was corrected with them. **(5)** *"Phase AB-1 is the last code change"* — false; the five commits above are later. **(6)** *"Phase P is the current state of the landing page"*, and a separate Phase N note asserting a **"Reference date and inputs"** hero panel, both described a page that no longer exists — rewritten from the code (`REFERENCE_DATE` is not referenced in `Landing.tsx`). **(7)** The landing `<h1>` and eyebrow were given as **`BRAND.workspaceLabel`** and **`TEST THE POLICY BEFORE YOU DECIDE`** although **neither string exists in `src/`** (grep: 0 hits) — the real `<h1>` is `BRAND.initiative` and the eyebrow is `BRAND.eyebrow`. **(8)** *"`npm test` 282/282 (22 files) … Playwright 9/9"* → **423/423 across 34 files** and **11/11**; a stale **6/6** and two stale **9/9** lines corrected the same way. **(9)** **`main` and `origin/main`** were described as `7451db0` / `00fae15` with a **BLOCKER** in *Known-red*; both refs are actually **`b2e2745`** (the Phase W merge `c09bfa3` plus its record), the blocker was resolved in Phase W, and *Known-red* holds **no BLOCKER entry** — so the dangling pointer, the wrong SHAs and the claim that `git checkout main` restores the original app were all corrected. **Gate:** every corrected statement is re-checkable by `grep` (the counts by re-running the suite); each stale string was grepped to its expected count before the sweep was reported |
+| 2026-09-29 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (truth-sweep session, final bytes) | **ALL GREEN**: validate **17/17 PASS (exit 0)**, including the deployment-claim check reading this file · typecheck **exit 0** · lint **exit 0, 0 errors** (the same 7 pre-existing `react-refresh` warnings in `src/components/ui/**`) · **423/423 across 34 files** · build **✓** emitting **`assets/index-BgYDS9X7.js`** |
+| 2026-09-29 | `npx playwright test` (truth-sweep session, final bytes) | **PASS — 11 passed (27.0 s)** against the production preview build, with 0 console errors and 0 off-origin requests per test |
+
 
 ### Phase AB-6 — the defect sweep and the simulation-power batches (2026-09-28)
 
@@ -1835,9 +1841,9 @@ the deck, and the opener of the one-page ask.
   was written. Phases AD **R1**, AD **R2**, **AE**, **R3** and **R4** rebuilt the bundle afterwards, so
   `npm run build` emitted a new file each time while the live host still **served**
   **`assets/index-BeggQU9V.js`** (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`). That
-  gap is **closed**: **R7** redeployed on 2026-09-29 and the live host now carries the current build — see
-  the LIVE bullet in **RESUME HERE**. `npm run validate` prints the local build beside the live claim as an
-  INFO line, so a gap can never drift in silence.
+  gap is **closed**: **R7** redeployed on 2026-09-29 and the live host carried the then-current build — see
+  the **DEMO HOST** bullet in **RESUME HERE** for today's true state. `npm run validate` prints the local
+  build beside the live claim as an INFO line, so a gap can never drift in silence.
 - **RESOLVED (Phase Z) — the run path is asynchronous, so every capability is now connected.**
   `AssessmentService` returns promises (`buildRun`/`run`/`getRun`/`listRuns`), and `assessmentService`
   is a **dispatcher** that chooses the simulated engine or the live service at the moment of the
@@ -3087,23 +3093,45 @@ exists once, in the one file every icon size and all three placements are derive
 dependency was added or removed**. No component was rewritten: the three placements keep their existing
 imports and layout boxes, and only the pixels behind them changed. `dist/` was rebuilt.
 
+## Files touched in the truth sweep (2026-09-29, this session)
+
+`PROJECT_STATUS.md` **only** — this was a records session, not a product session. Every edit was inside
+the *RESUME HERE* block, the *Known-red / open items* paragraph that pointed at it, and this file's own
+timeline (the three rows above). **No application source, test, config, script, style or asset changed**;
+`package.json` is untouched, no dependency moved, and the emerald/gold palette, typography, route map and
+determinism rules are unchanged. Because no source changed, the build emits the same bundle as before
+(`assets/index-BgYDS9X7.js`) — the demonstration host is still one build behind until it is redeployed.
+
+The nine corrected statements, and the check that keeps each honest, are listed in the truth-sweep row of
+the timeline above.
+
+
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`.** The commits to know are **`d038947`** (Phase AD **R8** — the
-  prompt asks for three documents, and its four false figures are fixed) and the status commit that
-  carries this line (**R8** — the records). Beneath them: **`96d45fc`** (R7 — the live host is current),
+- **Branch `feature/unified-platform`.** The commits to know, newest first: **`6dfc4a5`** (the platform
+  is named the internal counterpart to the Government's own **Nzwisiso.ai** campaign, with its citation,
+  its boundary and the proposed address), **`bbd38e3`** (the product mark is one setting — `TRADEMARK`
+  in `src/config/brand.ts` — and the name is composed once, in `WORDMARK`), **`43f015d`** (the drafted
+  policy is a real Zimbabwean instrument with numbered provisions, not a summary), **`5bcd014`** (the
+  project promoter appears once, small, in the footer), **`d344bfa`** (the sovereignty sentence states
+  the compute path, not a hosting claim), then **`df70586`** + **`d038947`** (Phase AD **R8** — the
+  prompt asks for three documents, and its four false figures are fixed) and **`96d45fc`** (R7 — the
+  then-current build was redeployed and verified). Beneath them:
   **`d57bf68`** (R6 — a published figure's provenance stated once), **`2013733`** (the R4/R5 status commit),
   **`f50240b`** + **`074eb75`** (R4), **`ccc2dfa`** (the R3 status commit), **`fae8916`** (R3),
   **`beb6e61`** + **`e0184d2`** (its records), **`358b73f`** (Phase AE — the Coat of Arms fingerprint gate),
   **`bde486d`** (R2), **`f4e253f`** (R1 — the indicator basis and its gates). **Run
   `git log --oneline -10 | cat` as the second opinion on state**, and treat any commit that touches only
-  documents as part of the same record. **Working tree clean.** Baseline `main` is untouched at `7451db0`;
-  `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything
-  is committed, so a cold session can start from this file alone.
-- **What to do next: NOTHING IS OUTSTANDING — every work item in the plan is DONE.** The build, the
-  figures, the deploy and the funding prompt are all finished and verified. The next action is not a code
-  task: it is to **use** `docs/PROPOSAL_PROMPT.md` — copy it into Claude and take the funding memo, the
-  deck and the one-page ask to the meeting. **If a future session is asked to change something, the next
+  documents as part of the same record. **Working tree clean.** `main` and `origin/main` are both
+  **`b2e2745`** — the Phase W merge (`c09bfa3`, "Merge pull request #1") plus its record commit; the
+  `origin/main` blocker was **resolved in Phase W**, so there is **no** BLOCKER entry in *Known-red*.
+  Everything is committed, so a cold session can start from this file alone.
+- **What to do next: EVERY WORK ITEM IN THE PLAN IS DONE; ONE ACTION REMAINS.** The build, the figures
+  and the funding prompt are finished and verified by the suite below. **The one action left is the
+  redeploy of `dist/`** (named a few bullets down): the demonstration host serves an older build until it
+  runs. After that the next step is not a code task — it is to **use** `docs/PROPOSAL_PROMPT.md`: copy it
+  into Claude and take the funding memo, the deck and the one-page ask to the meeting. **If a future
+  session is asked to change something, the next
   command to run is** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`,
   then `npx playwright test` — expected **all green: validate 17/17, tests 423/423 across 34 files,
   Playwright 11/11**. **Do not re-fetch anything in PART 7 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
@@ -3124,17 +3152,19 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   sovereignty-copy session, which the platform cannot know from where it runs; **validate checks 1 and 11
   now fail if that claim returns**, in the app or in a document.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test` — expected **all green** (**381/381 tests across 32 files**, **11/11** Playwright,
-  validate **17/17**: the `--destructive` known-red is **retired**, and the six checks added since the
-  AB-5 sweep cover the *retired document statements*, the *deployment claim and its evidence*, the
-  ***Coat of Arms fingerprint with the icon set that belongs to it***, the ***Claude prompt asking
-  for exactly three documents***, the ***product mark — composed in one place, carried everywhere***,
-  and the ***internal-service promise — no crawler is allowed while the footer says
-  "For Internal Use Only"***).
+  then `npx playwright test` — expected **all green**: validate **17/17**, typecheck **exit 0**, lint
+  **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files), tests **423/423 across
+  34 files**, build **✓**, Playwright **11/11**. The `--destructive` known-red is **retired**, and the
+  checks added since the AB-5 sweep cover the *retired document statements*, the *deployment claim and
+  its evidence*, the ***Coat of Arms fingerprint with the icon set that belongs to it***, the
+  ***Claude prompt asking for exactly three documents***, the ***product mark — composed in one place,
+  carried everywhere***, and the ***internal-service promise — no crawler is allowed while the footer
+  says "For Internal Use Only"***.
   (This line said **369/369 across 31 files** until Phase AE, **379/379** until R3 added its figure gate,
-  and **380/380** until R6 added the provenance gate; **R4's three rows ride inside an existing test**, so
-  the file and test counts did not move when R4 landed. The numbers in this file's own Phase AD rows are
-  the check.)
+  **380/380** until R6 added the provenance gate, and **381/381 across 32 files** until the product-mark
+  session, which landed at **423/423 across 34 files**; the positioning session then added the crawler
+  check, making validate **17/17**. **R4's three rows ride inside an existing test**, so the file and
+  test counts did not move when R4 landed. The numbers in this file's own Phase AD rows are the check.)
 - **Phase AD R3 is DONE (2026-09-29).** Eight more indicators became published figures, read from the
   World Bank's own API during the session: `fin-deficit`, `fin-revenue`, `fin-investment`, `agri-grain`,
   `agri-herd`, `agri-input`, `energy-losses` and `zimra-target`. The split after R3 was **21 published / 42
@@ -3282,47 +3312,54 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   `src/components/public/SimulationVisuals.tsx` and `ENGINE_EXPLANATION` in `src/config/brand.ts`;
   the guards live in `src/test/landing.test.tsx` (`What happens behind the assessment`) and
   `e2e/journey.spec.ts` (homepage test + the 390px overflow test).
-- **The live host now serves the Phase S build** — Phases R and S were deployed this session and
-  verified in a real browser against the live origin (2/2 checks, 0 console errors, 0 off-origin
-  requests, SSL token intact). To publish any further change: `npm run build`, then the `.env`-based
-  FTPS `mirror -R dist .` command below.
+- **The live host serves the R7 build** — redeployed and then verified in a real browser against the
+  live origin (0 console errors, 0 off-origin requests, SSL token intact). It is **behind the current
+  build** until it is redeployed; `npm run validate` prints the served name beside the locally built
+  name on every run, so neither name has to be trusted from this file. To publish the current build:
+  `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command below.
 - **Branch:** `feature/unified-platform` · **HEAD: always run `git rev-parse HEAD`** rather than trusting
-  this line; `git log --oneline -6 | cat` is the second opinion on state. The AB-1 sequence is
-  `c5ee2ef` (`feat(phase-ab)` — the graph drawn in pixels) → `b87d0b4` (its record) → `2d5a92f` (the
-  measured stroke widths moved into the code comment), each followed by the `docs(phase-ab)` commits in
-  this file. `tree:` clean. **Phase AB-1 is the last code change.** The two commits before it were
+  this line; `git log --oneline -6 | cat` is the second opinion on state. `tree:` clean. **The latest
+  code changes are the five commits named at the top of this block** (the positioning work, and the four
+  before it). The earlier AB-1 sequence is `c5ee2ef` (`feat(phase-ab)` — the graph drawn in pixels) →
+  `b87d0b4` (its record) → `2d5a92f` (the measured stroke widths moved into the code comment); before it,
   `81e7e21` (`feat(phase-ab)` — the graph colour foundation) and `2094248` (`docs(phase-ab)` — the funding
-  plan). Earlier functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B ·
-  `6b69dfb` Phase C · Phase D = the commit whose message begins `feat(phase-d)` · Phase J =
-  `feat(phase-j)` · Phases E–G = `feat(phase-e)` · Phase H = `test(phase-h)` · Phase M =
-  `feat(phase-m)` · Phase N = `feat(phase-n)` · Phase O = `feat(phase-o)` · Phase P =
-  `feat(phase-p)` · Phase X = `feat(phase-x)` · Phase Y = `feat(phase-y)` · Phase Z =
-  `feat(phase-z)`.
-  `git log --oneline -10 | cat` is the second opinion on state.
-  (This shell's git rejects `--no-pager`; use plain `git log --oneline | cat`.)
-- **Phase P is the current state of the public landing page** (supersedes Phase O, which had built
-  four things the brief later reversed). The page now reads: eyebrow *Understanding before action* →
-  `<h1>` **Zimbabwe AI Policy Intelligence Initiative** → *Powered by Nzwisiso AI®* → subheading
-  **"Explore potential policy responses before implementation."** → the §9 description → **ONE**
-  primary action (**Choose your Department**) → the disclaimer. The hero's right card is **POLICY
-  ASSESSMENT — three steps**, closing on the tagline. Below: **A new capability for policy
-  assessment** (three labelled blocks), the **From policy draft to policy intelligence** governance
-  band, coverage, how-it-works, the deterministic band, the **ministerial positioning panel**
-  (Hon. Tatenda A. Mavetera, MP), and the closing CTA. `BRAND.workspaceLabel` no longer exists;
-  §14's governance sentences live in `GOVERNANCE` in `brand.ts` and are asserted verbatim.
-  A validator (check 10) fails the build if any rendered colour pair drops below its contrast floor,
-  and check 3 blocks `LLM/API` vocabulary in user-facing copy. **Read `### Phase P` (then Phase O)
-  before touching `Landing.tsx`, `brand.ts`, `index.css` or `PublicPageShell.tsx`.**
-- **Nothing is outstanding on the landing page itself.** The live host now serves the Phase S bundle
-  (verified this session). The only open items are the two recorded known-reds (`--destructive`
-  contrast, the hand-maintained `index.html` description).
-- **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always
-  restorable with `git checkout main` or `git checkout baseline-pre-unified-platform`.
-- **The agent has never pushed to `main`, but the recorded "`origin/main` is unchanged at `7451db0`"
-  is now FALSE — corrected this session.** Local `main` is still `7451db0`, but **`origin/main` is
-  `00fae15`**, three commits ahead, carrying a parallel Lovable app — see the **BLOCKER** entry at the
-  top of *Known-red / open items*. The feature branch is pushed through Phase S
-  (`git log --oneline -3 | cat`). Deployment is an FTP upload of `dist/`, not a git push.
+  plan). Earlier functional commits: `a2a5b7c` Phase 0 · `3a22ba2` Phase B · `6b69dfb` Phase C · Phase D =
+  the commit whose message begins `feat(phase-d)` · Phase J = `feat(phase-j)` · Phases E–G =
+  `feat(phase-e)` · Phase H = `test(phase-h)` · Phase M = `feat(phase-m)` · Phase N = `feat(phase-n)` ·
+  Phase O = `feat(phase-o)` · Phase P = `feat(phase-p)` · Phase X = `feat(phase-x)` · Phase Y =
+  `feat(phase-y)` · Phase Z = `feat(phase-z)`.
+- **The current state of the public landing page** is the one the positioning session left on top of
+  Phases M/N/O/P. The page reads: an **authority line** first (`BRAND.proposalLabel`,
+  `BRAND.initiativeDescription`, *Ministerial champion* `BRAND.ministerialChampion`, the custodian
+  ministry and `BRAND.poweredBy`), then the hero — eyebrow *Understanding before action*
+  (`BRAND.eyebrow`) → `<h1>` **Zimbabwe AI Policy Intelligence Initiative** (`BRAND.initiative`) →
+  `BRAND.poweredBy` → subheading **"Explore potential policy responses before implementation."**
+  (`BRAND.summary`) → `BRAND.description` → **ONE** primary action (**Choose your Department** →
+  `/start`) → the disclaimer. The hero's right card is labelled **Policy assessment** and headed
+  **"From policy draft to structured assessment"** — three steps, closing on the tagline. Below: the
+  capabilities band, *behind the assessment*, *how it works*, the deterministic band, coverage, the
+  **"How this supports the Nzwisiso.ai initiative"** section (`SUPPORTED_INITIATIVE` — capability,
+  demonstration, trust, then the citation, the relationship, the proposed address and the boundary),
+  the governance lens (*From policy draft to policy intelligence*), and a closing **"Ready to test a
+  policy draft?"** call to action. **`BRAND.workspaceLabel` no longer exists anywhere in `src/`**
+  (verified by grep this session); §14's governance sentences live in `GOVERNANCE` in `brand.ts` and
+  are asserted verbatim. A validator (check 10) fails the build if any rendered colour pair drops below
+  its contrast floor, check 3 blocks `LLM/API` vocabulary in user-facing copy, and **check 17 fails if
+  the internal service is offered to search engines while the footer says "For Internal Use Only"**.
+  **Read `src/pages/Landing.tsx`, `src/config/brand.ts` and
+  `src/components/public/PublicPageShell.tsx` before touching the landing page.**
+- **Nothing is outstanding on the landing page itself.** The two recorded known-reds (`--destructive`
+  contrast, the hand-maintained `index.html` description) are both **RESOLVED** — see *Known-red / open
+  items*. The one action left for the whole project is the **redeploy** named in this block.
+- **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always restorable
+  with `git checkout baseline-pre-unified-platform`. **Do not read `main` as that baseline:** `main` is
+  now `b2e2745`, the Phase W merge, so `git checkout main` gives the merged platform, not the original.
+- **`main` and `origin/main` are both `b2e2745`** — the Phase W merge commit **`c09bfa3`** ("Merge pull
+  request #1", a **user-authorized** exception to the locked rule, recorded under Phase W) plus its
+  record commit. The old `origin/main` = `00fae15` (Lovable parallel app) divergence is **resolved**, so
+  the **BLOCKER** that used to sit in *Known-red / open items* is gone. The agent has pushed nothing to
+  `main` since; the feature branch carries all later work. Deployment is an FTP upload of `dist/`, not a
+  git push.
 - **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-DRweHRfT.js`,
   `c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`** — the R7 build, verified in a real
   browser against the live origin, with the SSL validation token and `cgi-bin/` confirmed intact afterwards.
@@ -3350,8 +3387,9 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   (`/app/assessments/:id`), **Open full report** (`/app/assessments/:id/report`, the long-form
   narrative record), and **Draft the policy** (`/app/assessments/:id/policy-draft`, the instrument
   itself, editable) → **Open full assessment** (`/app/assessments/:id/full`) → Print / Save as PDF /
-  Download Word / Share. `npx playwright test` → **6/6**, and every test asserts **0 console errors +
-  0 off-origin requests**. The session also survives a genuine page reload (asserted against
+  Download Word / Share. `npx playwright test` → **11/11 today** (it was 6/6 when Phase M wrote this
+  line), and every test asserts **0 console errors + 0 off-origin requests**. The session also survives
+  a genuine page reload (asserted against
   `localStorage["nzwisiso.session.v1"]`). Same inputs always reproduce the same run *and* the same
   two generated documents. **The public entry is now two screens** (Phase M): `/` is a pure landing
   page — official masthead + gold rule, service notice strip, task-led `<h1>`, four capability cards,
@@ -3359,16 +3397,18 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   carrying "A Project by the Ministry of IT" / "For Internal Use Only" — and it holds **no department
   picker**. `/start` is the department chooser. Both render through
   `src/components/public/PublicPageShell.tsx`, so their chrome cannot drift apart.
-  **(Phase N)** the landing hero is a two-column grid: proposition + mechanism + sole primary action on
-  the left, and a bordered **"Reference date and inputs"** panel on the right carrying the reference
-  date, fiscal year and three reference rates read from `src/config/reference.ts` — so a figure is
-  never shown without the frame it was computed in. The brand tagline closes that panel instead of
-  being the `<h1>`. **In the final state the line roles are swapped on the user's instruction**: the
-  prominent `<h1>` is `BRAND.workspaceLabel` (National Policy Simulation Workspace) and the small line
-  above it is `TEST THE POLICY BEFORE YOU DECIDE`. Both render in CAPITALS via the `uppercase` class
-  with positive tracking — the DOM text stays in normal case, so the accessible name, search and
-  copy-paste are unaffected. This is a deliberate instruction that runs against the GDS naming research
-  recorded in Phase N; do not "fix" it back.
+  **(Phases M/N/P, and the positioning session after them)** the landing hero is a two-column grid:
+  proposition + mechanism + sole primary action on the left, and on the right the **"Policy assessment"**
+  card headed **"From policy draft to structured assessment"** — three steps closing on the tagline. The
+  reference **rates are absent** from the landing page (Phase O), and the **"Reference date and inputs"**
+  panel described by Phase N **no longer exists** on this page (verified by grep this session:
+  `REFERENCE_DATE` is not referenced in `Landing.tsx`). The prominent `<h1>` is the **initiative**
+  (`BRAND.initiative`, Zimbabwe AI Policy Intelligence Initiative) and the small line above it is the
+  principle (`BRAND.eyebrow`, *Understanding before action*), both rendered in CAPITALS via the
+  `uppercase` class with positive tracking — the DOM text stays in normal case, so the accessible name,
+  search and copy-paste are unaffected. *(An earlier session briefly placed `TEST THE POLICY BEFORE YOU
+  DECIDE` above a `National Policy Simulation Workspace` heading; neither that string nor
+  `BRAND.workspaceLabel` exists in `src/` now — verified by grep this session.)*
 - **Dev server port:** `npm run dev` serves at **http://localhost:8080/** (`vite.config.ts` sets
   `server.port = 8080`), *not* Vite's default 5173. A stale tab on 5173 shows an old build — this is
   the confirmed root cause of the "I still see the old page" report in Phase M.
@@ -3386,13 +3426,15 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   real `.txt` reading, Phase Y added the capability configuration, the hidden administration screen
   and the click-through fixes, and **Phase Z wired all four capabilities** — the run path now waits,
   drafting and sign-in are connected, and the demo still renders in a single frame.
-  The full suite is green: `npm run validate` **PASS**, `npm run typecheck` exit 0, `npm run lint`
-  0 errors, `npm test` **282/282** (22 files), `npm run build` ✓, `npx playwright test` **9/9**.
-  Phase AA left this green with 9 new guards (agent-population band and replay, the field drawn on
-  the card, the authority line's position by real geometry).
+  The full suite is green (measured this session): `npm run validate` **17/17 PASS**, `npm run typecheck`
+  exit 0, `npm run lint` **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files),
+  `npm test` **423/423 across 34 files**, `npm run build` ✓ (**`assets/index-BgYDS9X7.js`**),
+  `npx playwright test` **11/11**. Phase AA left this green with 9 new guards (agent-population band and
+  replay, the field drawn on the card, the authority line's position by real geometry), and the guards
+  have grown with every session since.
   Remaining work, in priority order:
-  1. **Redeploy `dist/`** to publish Phases X–Z to the live host — `npm run build`, then the FTPS
-     `mirror -R dist .` command below; the live build is still the Phase S bundle.
+  1. **Redeploy `dist/`** to publish the current build to the live host — `npm run build`, then the FTPS
+     `mirror -R dist .` command below; the live host serves the R7 build until then.
   2. **A server** implementing `docs/SERVER_CONTRACT.md`. Nothing on the platform changes when it
      exists: enter its address and key at `/platform-admin`, switch the capability on, and it is in
      use.
@@ -3412,7 +3454,7 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
 - **Exact commands:**
 ```bash
 npm run validate; npm run typecheck; npm run lint; npm test; npm run build
-npx playwright test   # 9/9 — real browser vs vite preview; asserts 0 console errors, 0 off-origin requests
+npx playwright test   # 11/11 — real browser vs vite preview; asserts 0 console errors, 0 off-origin requests
 npm run dev           # serves at http://localhost:8080/  (NOT 5173)
 ```
 
