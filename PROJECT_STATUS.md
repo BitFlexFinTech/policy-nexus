@@ -2976,12 +2976,12 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
 
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`.** The commits to know are **`fae8916`** (Phase AD **R3** — eight
-  more published figures), followed by **`beb6e61`** (the status record) and **`e0184d2`** (a
-  comment-alignment fix in the same test file), then **`358b73f`** (Phase AE — the Coat of Arms fingerprint
-  gate), **`bde486d`** (Phase AD **R2** — 13 real published figures) and **`f4e253f`** (Phase AD **R1** —
-  the indicator basis and its 11 gates), with the status commit that carries this line sitting on top of
-  them. **Run `git log --oneline -8 | cat` as the
+- **Branch `feature/unified-platform`.** The commits to know are **`074eb75`** (Phase AD **R4** — three
+  more published figures) and **`f50240b`** (the R4/R5 document record), sitting on **`ccc2dfa`** (the
+  status commit of the R3 session). Beneath them, the stack the R3 session recorded: **`fae8916`** (R3),
+  **`beb6e61`** + **`e0184d2`** (its records), **`358b73f`** (Phase AE — the Coat of Arms fingerprint gate),
+  **`bde486d`** (R2), **`f4e253f`** (R1 — the indicator basis and its gates), with the status commit that
+  carries this line sitting on top of them all. **Run `git log --oneline -8 | cat` as the
   second opinion on state**, and treat any commit that touches only documents as part of the same record.
   **Working tree clean.** Baseline `main` is untouched at `7451db0`; `origin/main` is
   still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything is committed, so
