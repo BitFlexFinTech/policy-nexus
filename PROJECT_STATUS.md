@@ -2948,37 +2948,52 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
 
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`.** The commits to know are **`bde486d`** (Phase AD **R2** — 13 real
-  published figures) and **`f4e253f`** (Phase AD **R1** — the indicator basis and its 11 gates), then
-  **`8512e9f`** (the status commit that recorded both), then Phase AE: **`8dea07a`** (AE-1 — the official
-  Coat of Arms and the favicon set) and **`09c2ef8`** (AE-2 — the Digitalize Zimbabwe pilot case), with the
-  status commit that carries this line sitting on top of them. **Run `git log --oneline -8 | cat` as the
+- **Branch `feature/unified-platform`.** The commits to know are **`fae8916`** (Phase AD **R3** — eight
+  more published figures, the newest code change), **`358b73f`** (Phase AE — the Coat of Arms fingerprint
+  gate), **`bde486d`** (Phase AD **R2** — 13 real published figures) and **`f4e253f`** (Phase AD **R1** —
+  the indicator basis and its 11 gates), with the status commit that carries this line sitting on top of
+  them. **Run `git log --oneline -8 | cat` as the
   second opinion on state**, and treat any commit that touches only documents as part of the same record.
   **Working tree clean.** Baseline `main` is untouched at `7451db0`; `origin/main` is
   still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything is committed, so
   a cold session can start from this file alone.
-- **What to do next, in order:** **R3** — the next research cluster (finance, revenue, investment and the
-  remaining infrastructure measures: `fin`, `zimra`, `zida`, `agri`, and what R2 left in `energy` and
-  `mines`), researching each figure from its own publication exactly as R2 did with the World Bank; then
-  **R4** and **R5** for whatever is left; then **R7** (docs and **redeploy** — the live host is behind this
-  build right now, which `npm run validate` states as INFO); then **R8 = AB-7**. **Read first:**
+- **What to do next, in order:** **R3 is DONE (2026-09-29)** — the fin/zimra/zida/agri/energy/mines
+  cluster was researched against the World Bank's own API and eight figures were written in, taking the
+  published count from 13 to **21 of 63**. **What remains is `R4` and `R5`** — the departments not yet
+  researched to the same standard (`opc`, `health`, `edu`, `hedu`, `ict`, `psc`, `lg`, `mfa`, `env`,
+  `def`, and the measures PART 7 already lists as having no published equivalent), researching each figure
+  from its own publication exactly as R2 and R3 did; then **R7** (docs and **redeploy** — the live host is
+  behind this build right now, which `npm run validate` states as INFO); then **R8 = AB-7**. **Do not
+  re-fetch anything in PART 7 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the 21 published figures and the
+  list of measures with no published series are both recorded there. **Read first:**
   `src/config/departments.ts` (the indicator lines), `src/config/reference.ts` (`NAMED_SOURCES` and the
   sourcing statement), `src/test/indicator-basis.test.tsx` (the gates), then the **Phase AD** section below.
 - **THE LIVE SITE IS BEHIND THIS BUILD.** `nzwisiso.bitflex.app` serves `assets/index-BeggQU9V.js`
   (sha256 `c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`), while `npm run build` on
-  the current tree emits `assets/index-Cz472pbV.js`. **Phase AE changed the artwork and the icons, so the
-  deployed site currently shows the old drawing and has no favicon set.** The gap grew first with Phase
-  AD R1 and again with Phase AE; **`R7` closes it**, and until then **the live host must not be described
+  the current tree emits `assets/index-DKdnGNmW.js`. **Phase AE changed the artwork and the icons, and AD
+  R3 changed eight indicators, so the deployed site currently shows the old drawing, has no favicon set
+  and carries the pre-R3 figures.** The gap grew first with Phase
+  AD R1, again with Phase AE, and again with R3; **`R7` closes it**, and until then **the live host must
+  not be described
   as current**. `npm run validate` states the difference as INFO (check 12), so this can never drift in
   silence. *(This bullet previously read "THE LIVE SITE IS NOW THIS BUILD", which stopped being true the
   moment R1 rebuilt the bundle — corrected here.)*
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test` — expected **all green** (**379/379 tests across 32 files**, **11/11** Playwright,
+  then `npx playwright test` — expected **all green** (**380/380 tests across 32 files**, **11/11** Playwright,
   validate **14/14**: the `--destructive` known-red is **retired**, and the three checks added since the
   AB-5 sweep cover the *retired document statements*, the *deployment claim and its evidence*, and the
   ***Coat of Arms fingerprint with the icon set that belongs to it***).
-  (This line said **369/369 across 31 files** until Phase AE; that number was stale by the ten gates
-  R1 had added, and the Phase AD R1 row in this same file already recorded the real one.)
+  (This line said **369/369 across 31 files** until Phase AE, and **379/379** until R3 added its figure
+  gate; the numbers in this file's own Phase AD rows are the check.)
+- **Phase AD R3 is DONE (2026-09-29).** Eight more indicators became published figures, read from the
+  World Bank's own API during the session: `fin-deficit`, `fin-revenue`, `fin-investment`, `agri-grain`,
+  `agri-herd`, `agri-input`, `energy-losses` and `zimra-target`. The split is now **21 published / 42
+  modelled**. Five ideas were re-framed to the published measure rather than quietly re-valued, and
+  **nothing was invented**: the measures with no published series stay `Modelled` and are listed in
+  **PART 7** of `docs/PLATFORM_ENRICHMENT_PLAN.md`. The new gate in `src/test/indicator-basis.test.tsx`
+  pins every published figure (value, publication and period) and was proved able to fail twice by
+  mutation, restored byte-identical. Read the **Phase AD R3** row and **PART 7** before touching an
+  indicator.
 - **Phase AE is DONE (2026-09-28), and it changed no behaviour.** Two things, both verified: **(1)** the
   platform now displays the **official** Coat of Arms — the asset it had been using was a stylised
   drawing — across its three existing placements, with a real favicon set (`favicon.ico` 16/32/48,
@@ -2986,9 +3001,10 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   `docs/PROPOSAL_PROMPT.md` now carries the **"Digitalize Zimbabwe"** pilot case as researched fact,
   with a Part 1 section, a deck slide, the ask, and a hand-over gate. Read the **Phase AE** section
   below for the sources, the six edits, and what could not be confirmed. **This does not change the
-  order of what remains** — R3–R5, then R7, then R8.
-- **The order of what remains.** (1) **R3–R5** — research the remaining indicators, department by
-  department, upgrading each one to a published figure or leaving it plainly labelled `Modelled`.
+  order of what remains** — R4–R5 (R3 is now done), then R7, then R8.
+- **The order of what remains.** (1) **R4–R5** (R2 and R3 are **DONE**) — research the remaining
+  indicators, department by department, upgrading each one to a published figure or leaving it plainly
+  labelled `Modelled`.
   (2) **R7** — update the documents and **redeploy** (the live host is behind this build). (3) **R8 =
   AB-7**, the final Claude prompt — the funding memo, the pitch deck and the one-page ask — by rewriting
   `docs/PROPOSAL_PROMPT.md` down from the six-document version to three. **AB-7 is the last item, and
