@@ -1478,6 +1478,13 @@ because the block it sits in already names itself.
 
 
 
+| 2026-09-29 | **the sovereignty sentence corrected at source — in the footer AND inside every generated document** (user instruction) | `SOVEREIGNTY_STATEMENT` (`src/config/brand.ts`) said the simulation was *"…computed locally within national Government infrastructure. No policy text or result leaves national custody."* That is a **hosting** claim — something the platform cannot know from where it runs, and not true of the address the demonstration is served from. It now states the **compute path**, which is true: *"Sovereign data architecture — every simulation is computed locally in your browser. No policy text or result leaves it."* The public footer, the workspace footer and **every generated document** read this one string. **The same claim was also hardcoded inside the generated report** (`src/services/assessment/documents.ts`): it is now **read from the one statement** rather than restated, so a document and the footer can never disagree. **Files touched:** `src/config/brand.ts`, `src/services/assessment/documents.ts`, `scripts/validate.mjs`, `PRODUCTION_READINESS.md`, `PROJECT_STATUS.md`. No colour, layout, route or dependency changed |
+| 2026-09-29 | **the retired hosting claim gated in the app and in the documents, and proved able to fail** | `scripts/validate.mjs`: check 1 (app copy) gains a **`retired-estate-claim`** pattern and check 11 (documents) gains **the retired Government-hosting claim** — so the phrase cannot return either on screen or in a record. Proved by mutation: putting the claim back in **both** `src/config/brand.ts` and `PROJECT_STATUS.md` turned **two** check groups red (*banned user-facing copy* and *retired document statements absent*); both files were then restored **byte-identical** (`src/config/brand.ts` sha256 `6ebc18a3722d41d78c492698b94772de73e7f91657217f9cbadcc3c2a319c352`, `PROJECT_STATUS.md` sha256 `ef1f33154b293064c0c58abffc217a48791c7fddf3fa0b62ba9bb3a67b330063`), and validate returned to green. **The gate then caught a real slip of mine on its first run** — one bullet carried an abbreviated hash instead of the full sha256 — which is corrected in the same pass |
+| 2026-09-29 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (sovereignty-copy session, final bytes) | **ALL GREEN**: validate **15/15 (exit 0)** · typecheck **exit 0** · lint **exit 0, 0 errors** (the same 7 pre-existing `react-refresh` warnings) · **381/381 across 32 files** · build **✓** emitting **`assets/index-Bl2FOMF-.js`** — a NEW bundle name, because source changed — so the demonstration host, which still carries the R7 build `assets/index-DRweHRfT.js` (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), is now **one build behind** until it is redeployed |
+| 2026-09-29 | `npx playwright test` (sovereignty-copy session, final bytes) | **PASS — 11 passed (26.9 s)** against the production preview build, 0 console errors and 0 off-origin requests per test |
+| 2026-09-29 | **defect inventory (sovereignty-copy session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. **(1)** The **retired hosting claim** — the footer and every generated document asserted the simulation ran inside national Government infrastructure; corrected to the compute-path statement, **and the duplicate inside `documents.ts` removed** so there is one source. **(2)** **A stale deployment claim found by the gate**: after the rebuild, three current-state bullets still said the demonstration host served *this* build; all three corrected (the historical log rows were deliberately left as the record of what was true then). **(3)** **A false statement in `PRODUCTION_READINESS.md`** (§ the two deployment paragraphs), corrected the same way. **(4)** My own **abbreviated sha256** in a corrected bullet, caught by check 12 and fixed. **Not a defect, recorded so it is not mistaken for one:** the demonstration host being one build behind is the *honest* state after any source change and is printed by `npm run validate` on every run |
+| 2026-09-29 | **Oreida Pvt Ltd recorded as the project promoter** (user instruction — recorded, not yet written into the proposal) | **Oreida Pvt Ltd** is the **project promoter**, led by **Edmore Zviitwah (Business Lead)** and **Tadii Tendayi (Technical Lead)**. Recorded here because the funding paperwork will name them. **Not recorded as supplier or host:** the user's decision this session is that the platform is hosted on **the Ministry's own data centre / a GISP-managed server**, and a private company supplying or managing Government infrastructure falls under the **Public Procurement and Disposal of Public Assets Act [Chapter 22:23] (Act 5 of 2017)**, regulated by **PRAZ**, which keeps a register of suppliers. The proposal will therefore place Oreida's role beside the procurement route as a `[QUESTION — needs a decision]` (funding prompt, Part 1 section 7) rather than assert an appointment |
+
 ### Phase AB-6 — the defect sweep and the simulation-power batches (2026-09-28)
 
 **Requested by the user, verbatim:** *"why are you rushing to the prompt. are all the bugs and issues
@@ -1646,8 +1653,8 @@ renamed named-source statement produced **3 violations**, and the file was then 
 
 **Verified on the final bytes, this session:** `npm run validate` **15/15 (exit 0)** · `typecheck`
 **exit 0** · `lint` **exit 0, 0 errors** (the same 7 pre-existing `react-refresh` warnings) · `npm test`
-**381/381 across 32 files** · `build` ✓ emitting the same bundle `assets/index-DRweHRfT.js`, so the live
-host is **still current** · `npx playwright test` **11/11**.
+**381/381 across 32 files** · `build` ✓ emitting `assets/index-DRweHRfT.js` (which the demonstration host
+served at that moment; **the bundle has since moved** — see RESUME HERE) · `npx playwright test` **11/11**.
 
 **Files touched this session:** `docs/PROPOSAL_PROMPT.md`, `scripts/validate.mjs` (check 14 + its header
 list), `PROJECT_STATUS.md`. **Not changed:** any application source, the emerald/gold palette, Inter +
@@ -3083,17 +3090,18 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   **Phase AD R8** block above (what changed last), then `docs/PROPOSAL_PROMPT.md`, `scripts/validate.mjs`
   (**check 14**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
-- **LIVE NOW: `nzwisiso.bitflex.app` serves THIS build.** **R7** redeployed `dist/` on 2026-09-29 and the
-  live origin serves `assets/index-DRweHRfT.js`
-  (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`) — the same value the local
-  `npm run build` produces, checked by fetching the live file and hashing it — with the official Coat of
-  Arms, the favicon set and all 24 published figures. A real browser was driven against the live origin this
-  session (title, hero, 16 departments, 0 console errors, 0 off-origin requests). *(This bullet read "THE
-  LIVE SITE IS BEHIND THIS BUILD" until R7 closed the gap; before that it read "THE LIVE SITE IS NOW THIS
-  BUILD", which stopped being true the moment R1 rebuilt the bundle — both corrected.)* **R8 changed no application source, so the bundle name did not move and this is still
-  true on the R8 session's bytes.** To publish any
-  further change: `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command below — **never
-  add `--delete`.**
+- **DEMO HOST: `nzwisiso.bitflex.app` serves `assets/index-DRweHRfT.js`
+  (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`)** — the R7 build, with the official
+  Coat of Arms, the favicon set and all 24 published figures. **The build from the sovereignty-copy session
+  is `assets/index-Bl2FOMF-.js` and has NOT been redeployed**, so the demonstration host is one build behind
+  until the FTPS mirror below is run. `npm run validate` prints the two names side by side on every run, so
+  a stale claim cannot pass unnoticed. To publish any further change: `npm run build`, then the `.env`-based
+  FTPS `mirror -R dist .` command below — **never add `--delete`.**
+- **No page claims Government hosting.** The sovereignty statement (`SOVEREIGNTY_STATEMENT` in
+  `src/config/brand.ts`) states the **compute path** — computed locally in the reader's browser, nothing
+  leaves it — which is true wherever the page is served from. It made a **hosting** claim until the
+  sovereignty-copy session, which the platform cannot know from where it runs; **validate checks 1 and 11
+  now fail if that claim returns**, in the app or in a document.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
   then `npx playwright test` — expected **all green** (**381/381 tests across 32 files**, **11/11** Playwright,
   validate **15/15**: the `--destructive` known-red is **retired**, and the four checks added since the
@@ -3133,9 +3141,11 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   done, so nothing in this plan remains.**
 - **The plan is COMPLETE — no work item remains.** **R8 = AB-7 is DONE (2026-09-29)**: `docs/PROPOSAL_PROMPT.md`
   now asks for **three** documents — the funding memo, the pitch deck and the one-page ask — the four false
-  statements it carried are fixed at source, and **validate check 14** keeps it that way. **R7** kept the
-  live host current, so the live origin serves this build (`assets/index-DRweHRfT.js`, `c601422c…`), and the
-  bundle name did **not** move in R8 because no application source changed. The user's decision on the 63
+  statements it carried are fixed at source, and **validate check 14** keeps it that way. **R7** redeployed
+  the then-current build, and the demonstration host serves `assets/index-DRweHRfT.js`
+  (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`); **the
+  current build is `assets/index-Bl2FOMF-.js`, so the demonstration host is one build behind until it is
+  redeployed again** (the sovereignty-copy change rebuilt the bundle). The user's decision on the 63
   indicator values was taken in the R4/R5 session and **Phase AD** delivered it, so that question is
   **closed**. What remains is not a work item — it is to **use the prompt**: paste it into Claude and take
   the funding memo, the deck and the ask to the meeting.
@@ -3290,13 +3300,14 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   `00fae15`**, three commits ahead, carrying a parallel Lovable app — see the **BLOCKER** entry at the
   top of *Known-red / open items*. The feature branch is pushed through Phase S
   (`git log --oneline -3 | cat`). Deployment is an FTP upload of `dist/`, not a git push.
-- **LIVE NOW: `https://nzwisiso.bitflex.app/` serves THIS build — `assets/index-DRweHRfT.js`,
-  `c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`.** *(This bullet named the **Phase S**
-  build until the R7 additions, which stopped being true once Phases R–AE were published; **R7** redeployed
-  `dist/`, the served file was fetched and hashed, and it is byte-identical to the local build. **R8 changed
-  no application source, so the bundle name did not move.**)* The redeploy was verified in a real browser
-  against the live origin (0 console errors, 0 off-origin requests); the SSL validation token and `cgi-bin/`
-  were confirmed intact afterwards.
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-DRweHRfT.js`,
+  `c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`** — the R7 build, verified in a real
+  browser against the live origin, with the SSL validation token and `cgi-bin/` confirmed intact afterwards.
+  *(This bullet named the **Phase S** build until the R7 additions; **R7** then redeployed `dist/`, the served
+  file was fetched and hashed, and it read "serves THIS build" — true at R8, whose change touched no
+  application source. It stopped being true when the sovereignty-copy fix rebuilt the bundle.)* **The current
+  build is `assets/index-Bl2FOMF-.js`; the demonstration host is one build behind until the mirror below is
+  run.**
   To publish any further change, the credentials are **already saved**:
   ```bash
   npm run build && set -a; . ./.env; set +a

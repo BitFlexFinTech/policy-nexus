@@ -99,10 +99,19 @@ export const DISCLAIMER = {
     "methodology and limitations note in the reference section.",
 } as const;
 
-/** Footer statement on the sovereignty of the compute and data path. */
+/**
+ * The sovereignty statement — the public footer, the workspace footer and every
+ * generated document all read this one string. It states the COMPUTE PATH, which
+ * is true today: the simulation runs inside the reader's own browser, contacts no
+ * external service and uploads nothing. It deliberately makes no claim about which
+ * infrastructure serves the page, because that is a deployment fact the platform
+ * cannot know from where it runs. (It made a hosting claim until 2026-09-29 — that
+ * the simulation ran inside national Government infrastructure — which was not
+ * true of the address the demonstration is served from.)
+ */
 export const SOVEREIGNTY_STATEMENT =
-  "Sovereign data architecture — every simulation is computed locally within the " +
-  "Government of Zimbabwe estate. No policy text or result leaves national custody.";
+  "Sovereign data architecture — every simulation is computed locally in your browser. " +
+  "No policy text or result leaves it.";
 
 /**
  * The governance position. The wording is fixed by the initiative's brief and must

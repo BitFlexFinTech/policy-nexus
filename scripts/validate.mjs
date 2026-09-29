@@ -84,8 +84,14 @@ const scan = (files, patterns, { ignoreLine } = {}) => {
 //    "prototype" is excluded when it is a member expression (`Element.prototype` in
 //    code) — the banned sense is the product-status word in prose, not a JS property.
 const attrLine = (line) => /placeholder\s*[:=]/.test(line) || /placeholder\.svg/.test(line);
+// The retired hosting claim: the interface said the simulation ran "within the
+// Government of Zimbabwe estate". That was a claim about which infrastructure serves
+// the page — something the platform cannot know from where it runs — and it was not
+// true of the address the demonstration is served from. The compute-path fact that IS
+// true lives in `SOVEREIGNTY_STATEMENT`. This gate keeps the old claim from returning.
 check("banned user-facing copy", scan(appFiles, [
   ["banned-copy", /(?<!\.)\b(lorem ipsum|coming soon|reset demo|demo mode|prototype|fake data|placeholder data|demonstration build)\b/i],
+  ["retired-estate-claim", /Government of Zimbabwe estate/i],
 ], { ignoreLine: attrLine }));
 
 // 2 — no claims about real public opinion or certainty
@@ -336,6 +342,7 @@ if (!existsSync(cssPath)) {
     ["a fix described as not made", /flagged not fixed:\s*the scale strip/i],
     ["items described as open after they were fixed", /known and deliberately open/i],
     ["duplication described as unchecked", /can drift from\s*`?brand\.ts`?\s*silently/i],
+    ["the retired Government-hosting claim", /Government of Zimbabwe estate/i],
   ];
   const hits = [];
   for (const file of docs) {

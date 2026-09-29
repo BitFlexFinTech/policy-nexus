@@ -15,7 +15,7 @@
  */
 
 import { indicatorBasisLabel, type Department } from "@/config/departments";
-import { DISCLAIMER, VOCABULARY } from "@/config/brand";
+import { DISCLAIMER, SOVEREIGNTY_STATEMENT, VOCABULARY } from "@/config/brand";
 import { REFERENCE_DATE_LABEL } from "@/config/reference";
 import { createRng } from "@/lib/prng";
 import {
@@ -120,7 +120,9 @@ export const buildLongReport = (run: AssessmentRun, department: Department): Gen
     id: "method",
     heading: "How this result was produced",
     paragraphs: [
-      `The ${VOCABULARY.simulationCore} is computed locally within the Government of Zimbabwe estate. No policy text or result leaves national custody, and no external service is contacted.`,
+      // The sovereignty fact is READ from the one statement, never restated here, so a
+      // generated document and the footer can never disagree about where the work happens.
+      `${SOVEREIGNTY_STATEMENT} No external service is contacted, and no document text is uploaded.`,
       rng.pick(REPORT_METHOD),
       `This run modelled ${run.reactions.length} stakeholder groups, tested the draft against ${run.impacts.length} of ${department.shortName}'s stated priorities, and drew on ${department.indicators.length} reference indicators over a ${run.horizonLabel.toLowerCase()} horizon of ${run.horizonMonths} months.`,
       `The draft's own words were read before anything was modelled; the run screen and the assessment state what that reading found.`,
