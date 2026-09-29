@@ -339,7 +339,7 @@ do not omit it to look authoritative.
 - **What the live site actually is today (re-checked 2026-09-29, after the current build was published).**
   The host `nzwisiso.bitflex.app` serves `assets/index-BgYDS9X7.js`
   (`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`), which is byte-identical to the
-  local build, so **the live site is the finished build** — it carries the authority line, the modelled
+  local build, so **the live site is the build published on 2026-09-29** — it carries the authority line, the modelled
   agent population, the named sources, the official Coat of Arms, the favicon set, the Nzwisiso.ai
   positioning section and all 24 published
   figures. (When this was checked on 2026-09-28 the host served `assets/index-BeggQU9V.js`, which was

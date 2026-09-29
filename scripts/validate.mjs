@@ -3,27 +3,29 @@
  * Nzwisiso static validator — fails loudly on forbidden patterns.
  * Run: npm run validate
  *
- * Checks (each prints PASS/FAIL/SKIP with counts):
+ * Checks, in the order they run (each prints PASS/FAIL/SKIP with counts):
  *  1. Banned user-facing copy (demo / prototype / fake data / coming soon / lorem ipsum)
  *  2. Forbidden predictive phrasing (claims about real public opinion / certainty)
- *  3. Vendor terminology (MiroFish / OASIS / GraphRAG / Zep / Puter / Vultr / Neo4j / ...)
- *  4. Non-determinism (Math.random / Date.now / new Date) in app source
- *  5. Runtime network URLs in app source or index.html
- *  6. 16 departments with the exact stable IDs (once config exists)
- *  7. REFERENCE_DATE pinned to 2026-09-24 (once config exists)
- *  8. Decision-support disclaimer present (once assessment/brand files exist)
- *  9. @media print rules present (once report screens exist)
- * 10. Rendered-pair contrast, MEASURED from the declared tokens in src/index.css
- * 11. Retired statements absent from the documents — false facts that were corrected at
- *     source, so a cold session cannot reintroduce one by copying an old paragraph
- * 12. The deployment claim is stated, agreed across documents, and carries its evidence
- * 13. The Coat of Arms carries a recorded sha256 that matches the file, and every icon size
+ *  3. Vendor terminology (MiroFish / OASIS / GraphRAG / Zep / Puter / Vultr / Neo4j / ...) — no exception
+ *  4. Implementation vocabulary (LLM / API), permitted in exactly one owner-approved sentence
+ *  5. Non-determinism (Math.random / Date.now / new Date) in app source
+ *  6. Runtime network URLs in app source or index.html
+ *  7. 16 departments with the exact stable IDs
+ *  8. REFERENCE_DATE pinned to 2026-09-24
+ *  9. Decision-support disclaimer present
+ * 10. The served HTML description matches the brand description
+ * 11. @media print rules present
+ * 12. Rendered-pair contrast, MEASURED from the declared tokens in src/index.css
+ * 13. Retired statements absent from the documents — false facts corrected at source, so a cold
+ *     session cannot reintroduce one by copying an old paragraph
+ * 14. The deployment claim is stated, agreed across documents, and carries its evidence
+ * 15. The Coat of Arms carries a recorded sha256 that matches the file, and every icon size
  *     index.html declares actually exists on disk
- * 14. The Claude prompt asks for exactly three documents — the funding memo, the pitch deck and the
+ * 16. The Claude prompt asks for exactly three documents — the funding memo, the pitch deck and the
  *     one-page ask — and still carries the pilot framing and the named-source statement
- * 15. The product name carries its configured mark everywhere a reader sees it, and is composed
+ * 17. The product name carries its configured mark everywhere a reader sees it, and is composed
  *     in one place only
- * 16. An internal service is not offered to search engines — no crawler is allowed while the
+ * 18. An internal service is not offered to search engines — no crawler is allowed while the
  *     classification says "For Internal Use Only", and the served page carries the same instruction
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
@@ -33,7 +35,11 @@ import { join, relative } from "node:path";
 const ROOT = process.cwd();
 const failures = [];
 const notes = [];
-const DEPT_IDS = ["opc", "fin", "agri", "health", "edu", "hedu", "ict", "mines", "energy", "psc", "lg", "mfa", "env", "def", "zimra", "zida"];
+// The canonical ids, in the order `src/config/departments.ts` declares them (the Ministry of ICT
+// second, after the Office of the President and Cabinet). Kept here as a plain list because this
+// validator runs as plain Node without TypeScript; check 6 compares membership, and the app's own
+// tests assert the order itself.
+const DEPT_IDS = ["opc", "ict", "fin", "agri", "health", "edu", "hedu", "mines", "energy", "psc", "lg", "mfa", "env", "def", "zimra", "zida"];
 
 const walk = (dir, exts) => {
   const out = [];
@@ -61,6 +67,15 @@ const commentLine = (line) => /^\s*(\/\/|\*|\/\*)/.test(line);
 const srcFiles = [...walk(join(ROOT, "src"), [".ts", ".tsx"]), join(ROOT, "index.html")].filter(existsSync);
 const appFiles = srcFiles.filter((p) => !p.includes("/components/ui/"));
 const uiFiles = srcFiles.filter((p) => p.includes("/components/ui/"));
+/**
+ * Copy a reader can actually see. `src/test/**` is excluded because those files are never bundled
+ * into the application — `dist/` contains only what the entry imports — so a test that must NAME a
+ * banned word in order to assert it is absent previously tripped the check on itself, and the
+ * author had to work around it by not writing the word. That was a false positive at source, not a
+ * real guard: nothing in a test file can reach an officer. The code checks (determinism, runtime
+ * network) still scan every source file, tests included.
+ */
+const copyFiles = appFiles.filter((p) => !p.includes("/test/"));
 
 const check = (name, hits) => {
   if (hits.length) {
@@ -93,24 +108,33 @@ const attrLine = (line) => /placeholder\s*[:=]/.test(line) || /placeholder\.svg/
 // the page — something the platform cannot know from where it runs — and it was not
 // true of the address the demonstration is served from. The compute-path fact that IS
 // true lives in `SOVEREIGNTY_STATEMENT`. This gate keeps the old claim from returning.
-check("banned user-facing copy", scan(appFiles, [
+check("banned user-facing copy", scan(copyFiles, [
   ["banned-copy", /(?<!\.)\b(lorem ipsum|coming soon|reset demo|demo mode|prototype|fake data|placeholder data|demonstration build)\b/i],
   ["retired-estate-claim", /Government of Zimbabwe estate/i],
 ], { ignoreLine: attrLine }));
 
 // 2 — no claims about real public opinion or certainty
-check("forbidden predictive phrasing", scan(appFiles, [
+check("forbidden predictive phrasing", scan(copyFiles, [
   ["predictive-claim", /\b(will definitely|zimbabweans will|citizens oppose|citizens support|the public will|public opinion will)\b/i],
 ]));
 
-// 3 — vendor / implementation terminology must never be user-visible
-check("vendor terminology scrubbed", scan(appFiles, [
+// 3a — vendor names are banned everywhere a reader can see, with no exception at all.
+check("vendor terminology scrubbed", scan(copyFiles, [
   ["vendor-term", /\b(MiroFish|OASIS|GraphRAG|Graphiti|Zep|Puter|puter|Vultr|Neo4j|DeepSeek)\b/],
-  // Implementation vocabulary the initiative's brief forbids in user-facing copy.
-  // Uppercase-only on purpose: `api` is a legitimate local identifier (the stock
-  // carousel primitive uses one), while `API` in prose is the banned sense.
-  ["implementation-term", /\b(LLM|LLMs|API|APIs)\b/],
 ], { ignoreLine: commentLine }));
+
+// 3b — implementation vocabulary. The initiative's brief forbids it in user-facing copy, so it
+// is banned with ONE owner-approved exception: the data-path sentence on the landing page says
+// the platform "leverages the platform's API layer", added at the owner's direct instruction on
+// 2026-09-29. The exception is this exact phrase and nothing else — a second use of the word
+// anywhere in the app still fails this check, which is what keeps the brief's rule meaningful.
+// (Uppercase-only on purpose: `api` is a legitimate local identifier — the stock carousel
+// primitive uses one — while `API` in prose is the banned sense.)
+const APPROVED_API_PHRASE = "leverages the platform's API layer";
+const approvedApiLine = (line) => line.includes(APPROVED_API_PHRASE) || commentLine(line);
+check("implementation vocabulary limited to the approved sentence", scan(copyFiles, [
+  ["implementation-term", /\b(LLM|LLMs|API|APIs)\b/],
+], { ignoreLine: approvedApiLine }));
 
 // 4 — determinism inside app logic (ui/** is stock shadcn; its unused helper is excluded explicitly)
 const determinism = [

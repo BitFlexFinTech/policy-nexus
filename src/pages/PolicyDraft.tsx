@@ -77,7 +77,10 @@ export default function PolicyDraft() {
             : `The configured drafting service — ${provenance.model}`,
         ],
         ["Run reference", provenance.reference],
-        ["Seed", provenance.seed],
+        // The engine's starting code is deliberately NOT shown. It is built from the whole
+        // submitted policy text, so the row displayed an officer's entire draft as one long
+        // machine string underneath the run reference that already identifies the run. The
+        // raw code stays on the internal "exact inputs" record, not on an officer's screen.
         ["Reference date", provenance.referenceDate],
         [
           "Grounded in",

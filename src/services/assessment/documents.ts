@@ -184,7 +184,8 @@ export const buildLongReport = (run: AssessmentRun, department: Department): Gen
       `Source — ${run.source}`,
       `Uploaded files — ${run.fileNames.length > 0 ? run.fileNames.join(", ") : "none"}`,
       `Engine — ${VOCABULARY.simulationCore} (Mock)`,
-      `Seed — ${run.seed}`,
+      // The engine's starting code is deliberately NOT printed: it is built from the whole
+      // submitted policy text, so printing it reprinted that text as one long machine string.
     ],
   };
 

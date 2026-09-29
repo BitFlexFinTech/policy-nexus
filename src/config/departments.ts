@@ -42,12 +42,15 @@ export type DepartmentId =
 /** Canonical, ordered list of department ids. Drives every listing screen. */
 export const DEPARTMENT_IDS: readonly DepartmentId[] = [
   "opc",
+  // The Ministry of ICT stands second, immediately after the Office of the President and
+  // Cabinet, because it is the custodian of this platform. The order here is the ONLY
+  // place the reading order is defined; `DEPARTMENTS` below is derived from it.
+  "ict",
   "fin",
   "agri",
   "health",
   "edu",
   "hedu",
-  "ict",
   "mines",
   "energy",
   "psc",
@@ -189,7 +192,13 @@ export interface Department {
   documents: DepartmentDocument[];
 }
 
-export const DEPARTMENTS: Department[] = [
+/**
+ * The authored department records. Their reading order is NOT taken from their position
+ * here — it comes from `DEPARTMENT_IDS`, and `DEPARTMENTS` below is sorted to match. That
+ * way the data and the order a screen renders cannot drift apart, and moving a department
+ * is a single edit in `DEPARTMENT_IDS`.
+ */
+const DEPARTMENT_DATA: Department[] = [
   {
     id: "opc",
     name: "Office of the President and Cabinet",
@@ -1119,6 +1128,16 @@ export const DEPARTMENTS: Department[] = [
     ],
   },
 ];
+
+/**
+ * The canonical 16 departments, in the order `DEPARTMENT_IDS` defines — the Ministry of
+ * ICT second, after the Office of the President and Cabinet, because it is the custodian
+ * of this platform. Derived rather than hand-ordered, so the order and the data cannot
+ * disagree.
+ */
+export const DEPARTMENTS: Department[] = [...DEPARTMENT_DATA].sort(
+  (a, b) => DEPARTMENT_IDS.indexOf(a.id) - DEPARTMENT_IDS.indexOf(b.id),
+);
 
 /* ------------------------------------------------------------------------- *
  * Look-ups. Components must use these rather than indexing into the array by

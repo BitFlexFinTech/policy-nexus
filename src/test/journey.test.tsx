@@ -196,6 +196,12 @@ describe("journey — run a policy, then read its assessment", () => {
         new RegExp(`listed in ${CITATIONS_ANNEX} — every one checked against the instrument table`),
       ),
     ).toBeInTheDocument();
+    // GATE — the engine's starting code must not appear on an officer's screen either. It is
+    // built from the whole submitted policy text, so the provenance "Seed" row used to print the
+    // officer's entire draft as one long machine string underneath the run reference that
+    // already identifies the run. The raw code stays on the internal "exact inputs" record.
+    expect(screen.queryByText("Seed")).not.toBeInTheDocument();
+    expect(document.body.textContent ?? "").not.toContain(run.seed);
     ["Print", "Save as PDF", "Download Word", "Share"].forEach((label) => {
       expect(screen.getByRole("button", { name: label })).toBeInTheDocument();
     });

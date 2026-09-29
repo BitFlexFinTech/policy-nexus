@@ -96,4 +96,19 @@ describe("assessment engine — determinism and coverage", () => {
     await assessmentService.run(request);
     expect(listRunRequests()).toHaveLength(1);
   });
+
+  /**
+   * GATE — the run feed is shown on screen, so it must never print the engine's starting
+   * code, which contains the whole submitted policy text. The line used to read
+   * "Seed <the entire draft>. Assessment complete", which put an officer's own draft into
+   * the visible feed as one long machine string. This guard fails if that returns.
+   */
+  it("never prints the engine's starting code in the visible run feed", async () => {
+    const run = await assessmentService.buildRun(requestFor("env"));
+    expect(run.seed.length).toBeGreaterThan(20);
+    for (const round of run.rounds) {
+      expect(round.message).not.toContain(run.seed);
+      expect(round.message).not.toMatch(/seed\s*[:—]/i);
+    }
+  });
 });

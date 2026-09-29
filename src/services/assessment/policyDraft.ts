@@ -554,7 +554,11 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
       `Source of the policy text: ${run.source}${run.fileNames.length > 0 ? ` · files: ${listOf(run.fileNames)}` : ""}`,
       `Policy text submitted: ${run.policyText.length} characters`,
       `Horizon: ${run.horizonLabel} (${run.horizonMonths} months)`,
-      `Seed: ${run.seed} — the same seed always yields the same result`,
+      // The engine's starting code is deliberately NOT printed here. It is built from the
+      // whole submitted policy text, so printing it reprinted the officer's own draft as a
+      // single long machine string in the middle of the annexes. The run reference and the
+      // inputs listed around it already identify the run, and the guarantee that identical
+      // inputs yield an identical result is enforced by the test suite, not by prose.
       `Groups modelled: ${run.reactions.length} · priorities tested: ${run.impacts.length} · risks raised: ${run.risks.length} · steps recommended: ${run.recommendations.length}`,
       ...run.leverNotes.map((note) => `Assumption: ${note}`),
     ],

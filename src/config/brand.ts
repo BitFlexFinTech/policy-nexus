@@ -91,10 +91,20 @@ export const SERVICE_POSITION = {
   proposedAddress: "policy.nwisiso.gov",
   /** Its status, which must be printed beside it wherever it appears. */
   addressStatus: "proposed — not yet live; subject to assignment by the Ministry (GISP)",
-  /** Where a policy draft goes — nowhere. */
+  /**
+   * Where a policy draft goes — nowhere.
+   *
+   * The "leverages the platform's API layer" clause is the owner's own wording, given
+   * directly on 2026-09-29, and it is true: the deterministic engine sits behind an
+   * API-shaped seam (`AssessmentService`, and the `drafting` capability's endpoint), which is
+   * exactly what makes the local engine and a Ministry-hosted service interchangeable without
+   * touching a screen. It is the ONE place in officer-facing copy where the word "API" is
+   * permitted; `npm run validate` fails if it appears anywhere else.
+   */
   dataPath:
     "No policy text is sent to any external AI service — no Claude, no ChatGPT, no cloud model of any kind. " +
-    "The assessment is produced by a deterministic engine running in the browser, and nothing is uploaded.",
+    "The assessment is produced by a deterministic engine running in the browser and " +
+    "leverages the platform's API layer, and nothing is uploaded.",
   /** What the proposal asks for instead. */
   hosting:
     "The proposal is that the service be hosted on the Ministry's own infrastructure, so that no data " +

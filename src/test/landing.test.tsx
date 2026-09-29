@@ -20,6 +20,23 @@ const renderLanding = () =>
   );
 
 /**
+ * GATE — the word "API" is permitted in exactly ONE place in officer-facing copy: the
+ * data-path sentence on the landing page, added at the owner's direct instruction on
+ * 2026-09-29 ("and leverages the platform's API layer"). Everywhere else the brief's
+ * plain-language rule stands, and `npm run validate` enforces it across the whole app.
+ * This asserts the page shows the sentence, and that every mention of the word on the page
+ * belongs to it — so a second, unexplained "API" anywhere on the page fails here.
+ */
+describe("Landing — the approved API sentence is the only place the word appears", () => {
+  it("renders the approved sentence once and keeps every API mention inside it", () => {
+    renderLanding();
+    const text = document.body.textContent ?? "";
+    expect(text).toContain("leverages the platform's API layer");
+    expect(text.match(/\bAPI\b/g) ?? []).toHaveLength(1);
+  });
+});
+
+/**
  * The public landing page. Its defining property is that it is a LANDING page:
  * it introduces the platform and hands off to the chooser, and it must NOT carry
  * the department picker — that is asserted below as a real, failable guard.

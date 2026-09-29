@@ -594,7 +594,10 @@ const buildRounds = (
       index: index + 1,
       actor: "System",
       tone: "system",
-      message: `Seed ${context.seed}. Assessment complete — no external request was made.`,
+      // The engine's starting code is deliberately NOT printed here: it is built from the whole
+      // submitted policy text, and this line is shown in the run feed. The run reference and the
+      // recorded inputs already identify the run.
+      message: `Assessment complete — no external request was made. Run ${context.reference} is recorded with the inputs that fix this result.`,
     },
   );
 

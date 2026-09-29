@@ -58,6 +58,17 @@ describe("department config (src/config/departments.ts)", () => {
     expect(DEPARTMENTS.map((d) => d.id)).toEqual([...DEPARTMENT_IDS]);
   });
 
+  /**
+   * GATE — the Ministry of ICT is the custodian of this platform, so it is listed second,
+   * immediately after the Office of the President and Cabinet, on every screen that reads the
+   * canonical order. The order itself lives in `DEPARTMENT_IDS` and `DEPARTMENTS` is derived
+   * from it, so this can only change if that one list is edited.
+   */
+  it("lists the Ministry of ICT second, after the Office of the President and Cabinet", () => {
+    expect([...DEPARTMENT_IDS].slice(0, 2)).toEqual(["opc", "ict"]);
+    expect(DEPARTMENTS.slice(0, 2).map((d) => d.id)).toEqual(["opc", "ict"]);
+  });
+
   it("uses only the canonical ids from DEPARTMENT_IDS", () => {
     for (const d of DEPARTMENTS) expect([...DEPARTMENT_IDS]).toContain(d.id);
   });

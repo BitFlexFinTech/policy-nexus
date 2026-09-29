@@ -53,7 +53,11 @@ describe("generated documents — the long-form report", () => {
     run.recommendations.forEach((item) => expect(text).toContain(item.label));
     expect(text).toContain(run.policyText);
     expect(text).toContain(DISCLAIMER.long);
-    expect(text).toContain(run.seed);
+    // The report states the reproducibility guarantee and names the inputs — but it must NOT
+    // print the engine's starting code, which is built from the whole submitted draft. This
+    // assertion used to require the code to be present, which is the opposite of correct.
+    expect(text).toContain(`Horizon — ${run.horizonLabel}`);
+    expect(text).not.toContain(run.seed);
   });
 
   it("gives every section a heading and at least one paragraph", async () => {
@@ -155,5 +159,32 @@ describe("generated documents — the drafted policy", () => {
       "note",
     ].forEach((id) => expect(ids).toContain(id));
     expect(renderDocumentText(draft).length).toBeGreaterThan(20000);
+  });
+});
+
+/**
+ * GATE — the engine's starting code must never appear in a generated document.
+ *
+ * That code is built from the whole submitted policy text (department :: the entire draft ::
+ * preset :: horizon :: assumptions). It was printed once in Annex D of the drafted policy and
+ * once in the report's run-inputs list, which reprinted an officer's own draft as a single long
+ * machine string inside a document that could be handed to a Minister. This guard fails if it
+ * ever comes back, for every department rather than one sample.
+ */
+describe("generated documents — the engine's starting code is never printed", () => {
+  it("prints neither the seed nor a seed label, for any department", async () => {
+    for (const department of DEPARTMENTS) {
+      const run = await runFor(department.id);
+      // Without this the assertions below could pass on a run that has no seed at all.
+      expect(run.seed.length).toBeGreaterThan(20);
+      const report = renderDocumentText(buildLongReport(run, department));
+      const draft = renderDocumentText(buildPolicyDraft(run, department));
+      for (const text of [report, draft]) {
+        expect(text).not.toContain(run.seed);
+        // The label form (\"Seed:\" / \"Seed —\") is what the documents printed; the bare word
+        // \"seed\" is legitimate English in an agriculture draft, so it is not what is checked.
+        expect(text).not.toMatch(/seed\s*[:—]/i);
+      }
+    }
   });
 });

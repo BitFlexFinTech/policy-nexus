@@ -1511,6 +1511,11 @@ because the block it sits in already names itself.
 | 2026-09-29 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (truth-sweep session, final bytes) | **ALL GREEN**: validate **17/17 PASS (exit 0)**, including the deployment-claim check reading this file · typecheck **exit 0** · lint **exit 0, 0 errors** (the same 7 pre-existing `react-refresh` warnings in `src/components/ui/**`) · **423/423 across 34 files** · build **✓** emitting **`assets/index-BgYDS9X7.js`** |
 | 2026-09-29 | `npx playwright test` (truth-sweep session, final bytes) | **PASS — 11 passed (27.0 s)** against the production preview build, with 0 console errors and 0 off-origin requests per test |
 | 2026-09-29 | **the current build PUBLISHED, then verified on the live origin in a real browser** (truth-sweep session, on the user's instruction *"publish it now, then open the live address in a real browser"*) | `npm run build` → `dist/` referencing **`assets/index-BgYDS9X7.js`**. Published with `lftp` over explicit FTPS, `mirror -R --only-newer` into the document root, **never `--delete`** → **exit 0**, `Total: 2 directories, 13 files`, **New: 2 files**. The credentials were read from `.env` into the shell environment only; **no credential value was printed, echoed or passed as a command argument**. **Verified, four ways, not assumed:** (1) `curl -s -o /dev/null -w '%{http_code}' https://nzwisiso.bitflex.app/` → **200**; (2) the served page's own script tag reads **`assets/index-BgYDS9X7.js`**, the same name the local build emits; (3) fetching that file (**200**, 672,414 bytes) and hashing it gives **`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`**, **byte-identical** to the local `dist/assets/index-BgYDS9X7.js`; (4) a temporary Playwright spec (written for this check, then **deleted**, tree clean) drove the **live origin** in real Chromium: title **`Nzwisiso AI™ Policy Dashboard — Government of Zimbabwe`**, `<h1>` **ZIMBABWE AI POLICY INTELLIGENCE INITIATIVE**, eyebrow **UNDERSTANDING BEFORE ACTION**, script src `/assets/index-BgYDS9X7.js`, primary action *Choose your Department*, the **Nzwisiso.ai** section present, the proposed address **`policy.nwisiso.gov`** printed, the promoter credit present, the chooser at **`/start`** rendering **16** department cards, and **0 console errors, 0 page errors, 0 off-origin requests, 0 failed requests**. The SSL validation token file `.well-known/pki-validation/01a0d6ee-8023-7203-9abc-a37b9060f00d.txt` returns **200** afterwards (no `--delete`), and `cgi-bin/` was left untouched. Screenshots of the live landing page and the live chooser were inspected and match the working copy. The deployment statements in this file and in `PRODUCTION_READINESS.md` were repointed to the published bundle in the same pass, so the records and the live host agree |
+| 2026-09-29 | **BATCH A, first half — the engine's starting code out of every document, ICT second, and the owner's card sentence** (this session, on the user's instruction *"start Batch A now"*) | **(1) Item 4 (the owner's strict rule).** The string the owner kept seeing — `Seed: env::…` — was the engine's starting code, built as `department :: the ENTIRE submitted policy text :: preset :: horizon :: assumptions`. Because it contains the whole draft, every place that printed it reprinted the officer's own policy as one long machine string. It was printed in **FOUR** places, not the two the owner had seen: Annex D of the drafted policy, the long report's run-inputs list, the drafted-policy screen's **Provenance panel** row, the draft's closing **Provenance paragraph**, and the **final line of the visible simulation feed**. All five are removed; the raw code now appears only on the internal "exact inputs" record of the Full Assessment screen, next to the run reference that already identifies the run. **(2) Item 2.** The Ministry of ICT is now **second**, after the Office of the President and Cabinet, because it is the custodian of this platform. The order is now **derived**: `DEPARTMENT_IDS` is the single place it is defined and `DEPARTMENTS` is sorted to match, so the data and the reading order can no longer drift (they were two independent lists until this session). **(3) Item 8.** The data-path card now reads *"…and leverages the platform's API layer…"* — the owner's own words, given directly. The word `API` is permitted in **that one sentence only**: validate check 3 was split into **3a** (vendor names, no exception) and **3b** (implementation vocabulary with the one approved phrase), and the exception is provable — a probe file containing a second `API` turned the check red and was deleted again. **(4) Three defects found while doing the above, all fixed at source.** (a) Two tests **pinned the defect**: `documents.test.ts` required the report to CONTAIN the seed, and `drafting.test.ts` required the provenance note to contain it — both now assert the opposite and the reference instead. (b) The validator's **own header comment was stale**: it listed 16 checks in the wrong order and omitted the served-HTML-description check; rewritten to the real 18 in the order they run. (c) The copy checks scanned **`src/test/**`**, which can never reach a user, so a test that had to name a banned word in order to assert its absence failed the build — the earlier author had worked around it rather than fixing it. A `copyFiles` list now excludes test files from the copy checks while the code checks (determinism, network) still scan everything. **(5) Gates, each proved able to fail.** New: no generated document and no run-feed line may contain the seed or a seed label (all 16 departments); the drafted-policy screen must show no `Seed` row; the approved sentence renders once and `API` appears nowhere else on the page; `DEPARTMENT_IDS` and `DEPARTMENTS` both start `["opc", "ict"]`. Each was proved by mutation — the seed restored to both generators turned **two** gates red, and a probe file containing `API` turned the vocabulary check red — then restored **byte-identical** (`policyDraft.ts` sha256 `02819fbb4772a140e5079844746b7a501f5df682e0437ecbbff9403fe73ecacd`, `scenario.ts` sha256 `39cb10ee5df4ae21bb66639856207cbb3b757ab7d83230c0ab44778099a7eebe`) with validate green again |
+| 2026-09-29 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (Batch A first half, final bytes) | **ALL GREEN**: validate **18/18 PASS (exit 0)** — the count rose from 17 because check 3 was split into 3a and 3b — · typecheck **exit 0** · lint **exit 0, 0 errors** (the same 7 pre-existing `react-refresh` warnings in `src/components/ui/**`) · **427/427 across 34 files** (was 423; four new gates) · build **✓** emitting **`assets/index-BrYtdYWT.js`**, so the demonstration host is **one build behind** until it is redeployed |
+| 2026-09-29 | `npx playwright test` (Batch A first half, final bytes) | **PASS — 11 passed (29.6 s)** against the production preview build, 0 console errors and 0 off-origin requests per test |
+| 2026-09-29 | **what Batch A still owes** (recorded so it cannot be mistaken for done) | Still NOT STARTED: the **shared top navigation strip** on the four document screens (item 5), the **"Re-run simulation"** action with version labels (item 6 of the owner's list), the **working draft that survives leaving the screen** (item 7), and the **drafting stage** (item 6). Batch A's first half above is DONE; the rest is not |
+
 
 
 
@@ -3101,9 +3106,10 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
 the *RESUME HERE* block, the *Known-red / open items* paragraph that pointed at it, and this file's own
 timeline (the three rows above). **No application source, test, config, script, style or asset changed**;
 `package.json` is untouched, no dependency moved, and the emerald/gold palette, typography, route map and
-determinism rules are unchanged. The build emits the same bundle as before (`assets/index-BgYDS9X7.js`);
-that build was **published at the end of this session**, so the demonstration host is current. The only
-tracked file this session touched is this one (`dist/` is gitignored).
+determinism rules are unchanged. The build emitted the same bundle as before (`assets/index-BgYDS9X7.js`),
+and that build was **published at the end of this session** — true when written; a later session changed
+source, so the host is now one build behind. The only tracked file this session touched is this one
+(`dist/` is gitignored).
 
 The nine corrected statements, and the check that keeps each honest, are listed in the truth-sweep row of
 the timeline above.
@@ -3112,19 +3118,22 @@ the timeline above.
 ## RESUME HERE
 
 **PLAIN SUMMARY (OWNER-FACING).**
-Everything the platform is supposed to do is finished and working. I re-checked it just now: every
-automatic check passes, all 423 tests pass, the code compiles into the files a browser runs, and the 11
-tests that click through the whole journey in a real browser pass with no errors.
-Today I changed **no product code at all** — only this notes file. It had nine untrue sentences about the
-present state, and all nine are now corrected: it listed the wrong "latest changes", gave two different
-test counts, said the public web address was already showing the newest version (it is not), described a
-landing page that no longer exists, and named two pieces of on-screen text that are not in the code
-anywhere (checked). A fresh copy of the whole project for review is saved in
-`Review Zip/nzwisiso-policy-dashboard-review-28.zip`.
-**Nothing is outstanding.** The public demonstration web address (`https://nzwisiso.bitflex.app/`) now
-shows this newest copy: I published it and then opened it in a real browser to check, and it shows the
-Nzwisiso.ai section, the promoter line, the corrected sovereignty sentence and the new drafted policy,
-with no errors at all.
+The platform is finished and working, and the first half of the fix list you approved is done and
+checked. Every automatic check passes — 18 of them now — all 427 tests pass, the code compiles into the
+files a browser runs, and the 11 tests that click through the whole journey in a real browser pass with
+no errors.
+**The machine code is out of your documents.** The string you kept seeing, `Seed: env::…`, is gone from
+the drafted policy, from the long report, from the drafted-policy screen's provenance panel and from the
+line the simulation feed ends on. It was the engine's starting code, and because it is built from your
+whole submitted policy it was reprinting your entire draft as one long line. It is kept only on the
+internal "exact inputs" record. Three checks now fail if it ever returns.
+**The Ministry of ICT is now second**, immediately after the Office of the President and Cabinet, on every
+screen — it is the custodian of this platform.
+**The card wording is yours:** "…and leverages the platform's API layer…". The word "API" is allowed in
+that one sentence only, and a check fails if it appears anywhere else.
+**One thing is not done: the newest version is not on the public address yet.** The address shows the
+version published earlier today, so it is one version behind this working copy. Publishing is one
+command, and I will ask you before I run it.
 
 
 - **Branch `feature/unified-platform`.** The commits to know, newest first: **`6dfc4a5`** (the platform
@@ -3152,7 +3161,7 @@ with no errors at all.
   memo, the deck and the one-page ask to the meeting. **If a future session is asked to change something,
   the next
   command to run is** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`,
-  then `npx playwright test` — expected **all green: validate 17/17, tests 423/423 across 34 files,
+  then `npx playwright test` — expected **all green: validate 18/18, tests 427/427 across 34 files,
   Playwright 11/11**. **Do not re-fetch anything in PART 7 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
   24 published figures and the 39 recorded no-equivalent reasons are both there. **Read first:** the
   **Phase AD R8** block above (what changed last), then `docs/PROPOSAL_PROMPT.md`, `scripts/validate.mjs`
@@ -3173,7 +3182,7 @@ with no errors at all.
   sovereignty-copy session, which the platform cannot know from where it runs; **validate checks 1 and 11
   now fail if that claim returns**, in the app or in a document.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test` — expected **all green**: validate **17/17**, typecheck **exit 0**, lint
+  then `npx playwright test` — expected **all green**: validate **18/18**, typecheck **exit 0**, lint
   **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files), tests **423/423 across
   34 files**, build **✓**, Playwright **11/11**. The `--destructive` known-red is **retired**, and the
   checks added since the AB-5 sweep cover the *retired document statements*, the *deployment claim and
@@ -3183,8 +3192,9 @@ with no errors at all.
   says "For Internal Use Only"***.
   (This line said **369/369 across 31 files** until Phase AE, **379/379** until R3 added its figure gate,
   **380/380** until R6 added the provenance gate, and **381/381 across 32 files** until the product-mark
-  session, which landed at **423/423 across 34 files**; the positioning session then added the crawler
-  check, making validate **17/17**. **R4's three rows ride inside an existing test**, so the file and
+  session, which landed at **423/423 across 34 files**; the positioning session added the crawler check and
+  **Batch A's first half** split the vocabulary check in two, making validate **18/18** and the suite
+  **427/427**. **R4's three rows ride inside an existing test**, so the file and
   test counts did not move when R4 landed. The numbers in this file's own Phase AD rows are the check.)
 - **Phase AD R3 is DONE (2026-09-29).** Eight more indicators became published figures, read from the
   World Bank's own API during the session: `fin-deficit`, `fin-revenue`, `fin-investment`, `agri-grain`,
@@ -3218,8 +3228,10 @@ with no errors at all.
   pitch deck and the one-page ask — the four false statements it carried are fixed at source, and
   **validate check 14** keeps it that way. **R7** redeployed the then-current build; the sovereignty,
   promoter, drafted-policy, product-mark and positioning work then rebuilt the bundle, and the
-  **truth-sweep session published the current build** (`assets/index-BgYDS9X7.js`), so the demonstration
-  host is **current** as of 2026-09-29. The user's decision on the 63
+  **truth-sweep session published the current build** (`assets/index-BgYDS9X7.js`). **Batch A then changed
+  source** — the engine's starting code removed from every document, the department order and the card
+  sentence — so the locally built file is now `assets/index-BrYtdYWT.js` and the demonstration host is
+  **one build behind** until it is redeployed. The user's decision on the 63
   indicator values was taken in the R4/R5 session and **Phase AD** delivered it, so that question is
   **closed**. What remains is not a work item — it is to **use the prompt**: paste it into Claude and take
   the funding memo, the deck and the ask to the meeting.
@@ -3333,11 +3345,12 @@ with no errors at all.
   `src/components/public/SimulationVisuals.tsx` and `ENGINE_EXPLANATION` in `src/config/brand.ts`;
   the guards live in `src/test/landing.test.tsx` (`What happens behind the assessment`) and
   `e2e/journey.spec.ts` (homepage test + the 390px overflow test).
-- **The live host serves the build in this working copy.** It was redeployed on 2026-09-29 (FTPS reverse
+- **The live host serves the build published on 2026-09-29.** It was redeployed that day (FTPS reverse
   mirror, **no `--delete`**: 13 files, 2 new, exit 0) and then verified in a real browser against the live
-  origin — the current bundle, the 16 departments, 0 console errors, 0 page errors, 0 off-origin requests,
-  and the SSL validation token file still returning 200. `npm run validate` prints the served name beside
-  the locally built name on every run, so neither name has to be trusted from this file. To publish any
+  origin — the 16 departments, 0 console errors, 0 page errors, 0 off-origin requests, and the SSL
+  validation token file still returning 200. **A later session changed source**, so the host is one build
+  behind the working copy until it is redeployed; `npm run validate` prints the served name beside the
+  locally built name on every run, so neither name has to be trusted from this file. To publish any
   further change: `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command below.
 - **Branch:** `feature/unified-platform` · **HEAD: always run `git rev-parse HEAD`** rather than trusting
   this line; `git log --oneline -6 | cat` is the second opinion on state. `tree:` clean. **The latest
@@ -3366,7 +3379,8 @@ with no errors at all.
   policy draft?"** call to action. **`BRAND.workspaceLabel` no longer exists anywhere in `src/`**
   (verified by grep this session); §14's governance sentences live in `GOVERNANCE` in `brand.ts` and
   are asserted verbatim. A validator (check 10) fails the build if any rendered colour pair drops below
-  its contrast floor, check 3 blocks `LLM/API` vocabulary in user-facing copy, and **check 17 fails if
+  its contrast floor, **check 3** blocks vendor names with no exception and `LLM`/`API` vocabulary
+  outside the one owner-approved sentence, and **check 18 fails if
   the internal service is offered to search engines while the footer says "For Internal Use Only"**.
   **Read `src/pages/Landing.tsx`, `src/config/brand.ts` and
   `src/components/public/PublicPageShell.tsx` before touching the landing page.**
@@ -3388,9 +3402,10 @@ with no errors at all.
   *Understanding before action*, the 16 department cards, 0 console errors, 0 page errors, 0 off-origin
   requests), with the SSL validation token and `cgi-bin/` confirmed intact afterwards.
   *(This bullet named the **Phase S** build until the R7 additions; **R7** then redeployed `dist/`, and the
-  served file hashed identical to the local build. Later work rebuilt the bundle twice, so the host fell
-  behind — `assets/index-DRweHRfT.js` (R7) → `assets/index-Bl2FOMF-.js` → `assets/index-BgYDS9X7.js` —
-  until the truth-sweep session published the current one.)*
+  served file hashed identical to the local build. Later work rebuilt the bundle, so the host fell behind
+  until the truth-sweep session published `assets/index-BgYDS9X7.js`; **Batch A then changed source again**
+  and the locally built file is now `assets/index-BrYtdYWT.js`, so the host is one build behind until it is
+  redeployed. The served name and the built name are printed together by `npm run validate` on every run.)*
   To publish any further change, the credentials are **already saved**:
   ```bash
   npm run build && set -a; . ./.env; set +a
@@ -3449,9 +3464,9 @@ with no errors at all.
   real `.txt` reading, Phase Y added the capability configuration, the hidden administration screen
   and the click-through fixes, and **Phase Z wired all four capabilities** — the run path now waits,
   drafting and sign-in are connected, and the demo still renders in a single frame.
-  The full suite is green (measured this session): `npm run validate` **17/17 PASS**, `npm run typecheck`
+  The full suite is green (measured this session): `npm run validate` **18/18 PASS**, `npm run typecheck`
   exit 0, `npm run lint` **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files),
-  `npm test` **423/423 across 34 files**, `npm run build` ✓ (**`assets/index-BgYDS9X7.js`**),
+  `npm test` **427/427 across 34 files**, `npm run build` ✓ (**`assets/index-BrYtdYWT.js`**),
   `npx playwright test` **11/11**. Phase AA left this green with 9 new guards (agent-population band and
   replay, the field drawn on the card, the authority line's position by real geometry), and the guards
   have grown with every session since.

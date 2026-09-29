@@ -226,7 +226,10 @@ describe("AB-4 — provenance", () => {
     provenanceParagraphs(run, department, verification).forEach((paragraph) => {
       expect(note.paragraphs).toContain(paragraph);
     });
-    expect(note.paragraphs.join(" ")).toContain(run.seed);
+    // The note names the run it came from; it must not print the engine's starting code, which
+    // contains the whole submitted draft.
+    expect(note.paragraphs.join(" ")).toContain(run.reference);
+    expect(note.paragraphs.join(" ")).not.toContain(run.seed);
     expect(note.paragraphs.join(" ")).toContain("check");
   });
 });
