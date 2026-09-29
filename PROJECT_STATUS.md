@@ -1467,6 +1467,13 @@ because the block it sits in already names itself.
 | 2026-09-29 | **R7 — `dist/` redeployed over FTPS, and the live host verified** (Phase AD) | `lftp` reverse mirror of `dist/` into the document root, **no `--delete`**: **13 files** (5 new, 8 modified), **1,256,637 bytes**, exit **0**. `curl https://nzwisiso.bitflex.app/` now references `assets/index-DRweHRfT.js`; hashing the fetched file gives **`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`**, identical to the local `dist/assets/index-DRweHRfT.js`. `.well-known/pki-validation/01a0d6ee-8023-7203-9abc-a37b9060f00d.txt` and `cgi-bin/` confirmed present afterwards (no `--delete` was used) |
 | 2026-09-29 | **the live origin driven in a real browser (R7)** | **PASS** — title *Nzwisiso AI Policy Dashboard — Government of Zimbabwe* · `<h1>` *ZIMBABWE AI POLICY INTELLIGENCE INITIATIVE* · landing department-picker groups **0** · chooser department buttons **16** · workspace signed in **true** · *Entry: one-click (Mock)* visible · **0 console errors, 0 page errors, 0 off-origin requests** |
 | 2026-09-29 | **defect inventory (Phase AD R6/R7 session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. **(1) The R-ladder and RESUME HERE disagreed**: the ladder carried **R6 = NOT STARTED** while RESUME HERE said what remained was *"R7, then R8"*, silently skipping R6 — a cold session could not tell which was true. Resolved by **doing R6** and marking it DONE with its gate, so both now agree and nothing was skipped. **(2)** The published indicators printed their publisher **twice** (note + source line); trimmed and gated. **(3) `PRODUCTION_READINESS.md` §6c still described the live host as behind** after this session's redeploy — corrected to the deployed state with the new hash. **Not a defect but stated honestly:** the orphaned old bundle `assets/index-BeggQU9V.js` remains on the host (the mirror ran without `--delete`, deliberately, so the SSL token and `cgi-bin/` are never touched); it is unreferenced and harmless. **Re-verified rather than assumed:** the counts `npm run validate` prints (24 published / 39 modelled) and the 63-indicator total were checked this session, not carried over from memory |
+| 2026-09-29 | **R8 = AB-7 delivered — the prompt asks for three documents** (Phase AD, the last item in the plan) | `docs/PROPOSAL_PROMPT.md` rewritten from the superseded six-document pack down to **three**: the funding memo (2 pages), the pitch deck (10–12 slides) and the one-page ask, with the legal and procurement positions folded into the memo as **one paragraph each** and a required **named-source statement** replacing the sources register. **Four false statements in the document were fixed at source:** `16 modelled stakeholder groups` → **36** (20 standing on a published share, 16 labelled `Modelled`, counted from `STAKEHOLDER_SEGMENTS`); `63 published reference indicators` → **63 indicators: 24 published figures and 39 `Modelled`**; `49 reference documents` → the **register and its citations are held, not the document files**; and **`runs today, inside the Government estate`** (three places) → it runs **in the browser with no network request**, and the estate claim is now explicitly forbidden. The pilot material (**Digitalize Zimbabwe**, the no-endorsement boundary) survived the rewrite: it is memo section 5, a deck slide, and the opener of the ask. No colour, layout, route, source file or dependency changed |
+| 2026-09-29 | **validate check 14 added — `the Claude prompt asks for exactly three documents`** (Phase AD R8) | `scripts/validate.mjs`: requires the three deliverables **with their lengths** (`the funding memo (2 pages)`, `the pitch deck (10–12 slides)`, `the one-page ask`), requires the deliverable parts to number **1, 2 and 3 and stop** (read from lines beginning `**Part <n> —`), forbids the withdrawn `produce all five/six` instruction, any **Part 4 or later**, and the old `five/six deliverables` heading, and requires the `named-source statement`, the **no endorsement** rail and the programme's own spelling `Digitalize Zimbabwe`. The header's check list was brought to 14 |
+| 2026-09-29 | **the check-14 gate proved able to fail, and restored byte-identical** (Phase AD R8) | Appending `**Part 4 — The procurement route (decision paper, with options).**` and renaming `named-source statement` → `sources note` produced **`FAIL  the Claude prompt asks for exactly three documents — 3 violation(s)`**: *the prompt no longer states the named-source statement* · *the prompt's deliverables are Part 1, 2, 3, 4 — the agreed pack is exactly Part 1, 2 and 3…* · *a fourth deliverable part: "…\*\*Part 4 —…"*. `docs/PROPOSAL_PROMPT.md` was restored from a `/tmp` copy with `shasum -a 256` **identical** before and after: `e2d3937851157a0bba9ce7b554e4ff530f37ce4c4555b7c6fae7f9cae32fa589` |
+| 2026-09-29 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (Phase AD R8, final bytes) | **ALL GREEN — exit 0 at every step**: validate **15/15 checks PASS** (the 14 before plus check 14) · typecheck **exit 0** · lint **0 errors** (the same 7 pre-existing `react-refresh` warnings, all inside `src/components/ui/**`) · **381/381 across 32 files** · build **✓**, emitting `assets/index-DRweHRfT.js` — **the same file the live host already serves**, because R8 changed no application source |
+| 2026-09-29 | `npx playwright test` (Phase AD R8, final bytes) | **PASS — 11 passed (26.5 s)** against the production preview build, 0 console errors and 0 off-origin requests per test |
+| 2026-09-29 | **defect inventory (Phase AD R8 session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. Six defects, all in the documents rather than the product: **(1)** `16 modelled stakeholder groups` — the platform holds **36**; **(2)** `63 published reference indicators … each with a named source` — only **24** are published and **39** are `Modelled`; **(3)** `49 reference documents` written as though the files were held, when the platform holds the **register and its citations**; **(4)** **`it runs today, inside the Government estate`** — three occurrences, including *"sovereign example inside the Government estate"*, when the live demonstration is served from `nzwisiso.bitflex.app` and runs in the browser; **(5)** the prompt's own closing note still said it awaited the **AB-7** rewrite, and **six further places in this file** still described AB-7 as not started or R8 as *the only item left* (the Phase AD ladder row and the Phase AB item table, the Phase AE *"deliberately not done"* note, the two *"order of what remains"* bullets, the *"next action is AB-7 … is superseded"* bullet, and the *"until R2–R5 land"* sentence) — all corrected to the delivered state; **(6)** two further stale numbers in this file: the expected validate count (**14/14** → **15/15**, with the four checks added since the AB-5 sweep now named) and a **"serves the Phase S build"** deployment line left over from Phase S, which would have told a cold reader the live host was many phases behind. **Gate:** validate **check 14**, proved to fail by mutation (3 violations) and restored byte-identical |
+
 
 
 
@@ -1507,9 +1514,9 @@ authored scenario content, not figures read from a named publication, so they mu
 sourced official figures. **The user decided this session** (*"Replace all 63 with real published
 figures — research them department by department first, then build AB-7."*), so the item is no longer
 blocked: **Phase AD** below records it, **R1 is done**, and the research runs as **R2–R5, all before
-AB-7**. Until R2–R5 land, every indicator is labelled `Modelled` — which is true, because the numbers in
-the platform *are* still the modelled ones until a published figure replaces each one. What is no longer
-true, and no longer happens anywhere, is calling them published.
+AB-7**. **R2–R5 have since landed** (R2 landed 13 figures, R3 8, R4 3, R5 0), so the platform now shows
+**24 published** figures and **39 labelled `Modelled`**. What is no longer true, and no longer happens
+anywhere, is calling any of them published on a basis that does not exist.
 
 
 ### Phase AD — the 63 department indicator figures (2026-09-28, requested by the user this session)
@@ -1526,7 +1533,7 @@ measures"** — so an authored number read as an official published figure.
 | **R2–R5** | **The research, in four department clusters** | Each indicator either becomes the real published figure with its publisher, publication and period, or is labelled `Modelled`. **Nothing is invented**: a figure that cannot be confirmed from a named publication stays modelled, exactly as AB-2 left 16 stakeholder shares modelled. | **DONE (2026-09-29) — all 63 researched. R2 landed 13, R3 landed 8, R4 landed 3 and R5 landed 0, 24 published / 39 modelled.** |
 | **R6** | Interface refinement for published figures | Trimming what the drill-down and reports print once real figures land. | **DONE (2026-09-29)** — the 24 published notes repeated their publisher while the drill-down's source line already prints it (publisher + publication + period, derived); the note now carries meaning only, and a new gate fails if provenance returns to a note. |
 | **R7** | Docs, deploy, review zip | `PRODUCTION_READINESS.md` states the published/modelled split; the live host is redeployed. | **DONE (2026-09-29)** — the live host serves `assets/index-DRweHRfT.js` (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), byte-identical to the local build, verified in a real browser. |
-| **R8** | **AB-7** — funding memo, pitch deck, one-page ask | Rewrite `docs/PROPOSAL_PROMPT.md` down from six documents to three. | **NOT STARTED — the last item** |
+| **R8** | **AB-7** — funding memo, pitch deck, one-page ask | Rewrite `docs/PROPOSAL_PROMPT.md` down from six documents to three. | **DONE (2026-09-29) — verified this session.** The prompt now asks for **three** documents: the funding memo (2 pages), the pitch deck (10–12 slides) and the one-page ask, with the legal and procurement positions folded into the memo as one paragraph each and a named-source statement replacing the sources register. **Four false statements found in the document and fixed at source**: 36 stakeholder groups (not 16); 63 indicators of which 24 are published and 39 `Modelled` (not "63 published"); the **register** is held, not the document files; and it does **not** run "inside the Government estate". Gate: validate **check 14**, proved able to fail by mutation. |
 
 **R1 found and fixed six further false claims that were live on screen** (the defect was not only in the
 KPI strip): `EngineStatus` "Published department measures" → the derived split; `FullAssessment` "the
@@ -1608,6 +1615,44 @@ Mock entry into `/app` — with **0 console errors, 0 page errors, 0 off-origin 
 **Not changed, deliberately:** the emerald/gold palette, Inter + JetBrains Mono, `src/components/ui/**`,
 the route map, the determinism rules, `LICENSE` / `NOTICE`, and `package.json` — **no dependency was
 added or removed**.
+
+#### R8 — AB-7: the prompt asks for three documents, and the pack's false figures are gone
+
+**DONE (2026-09-29), verified this session.** `docs/PROPOSAL_PROMPT.md` was rewritten down from the
+superseded six-document version to **three**: **the funding memo (2 pages)**, **the pitch deck
+(10–12 slides)** and **the one-page ask**. What was dropped became smaller, not lost: the legal and
+procurement positions are now **one paragraph each inside the memo**, and the sources register is
+replaced by a required **named-source statement**. The rewrite found **four false statements inside the
+document** and fixed each at source rather than copying it forward:
+
+1. **"16 modelled stakeholder groups"** — the platform holds **36** (`STAKEHOLDER_SEGMENTS`): 20 stand on
+   a published share and 16 are labelled `Modelled`. The bullet now names all 36 and states that split.
+2. **"63 published reference indicators … each with a named source"** — only **24 are published figures**;
+   **39 are `Modelled`** (Phase AD). Corrected to the split, keeping the "coverage, not outcomes" warning.
+3. **"49 reference documents"** — the platform holds the **register and its citations** (each entry citing
+   a real verified instrument), **not the document files**. That distinction is now written where it
+   cannot be lost.
+4. **"it runs today, inside the Government estate"** — said in **three** places. The live demonstration is
+   served from `nzwisiso.bitflex.app` and runs entirely in the browser with **no network request**; the
+   prompt now says that, and **forbids** the estate claim, so a pasted draft cannot repeat it.
+
+**Gate added, and proved able to fail.** `scripts/validate.mjs` **check 14** (*the Claude prompt asks for
+exactly three documents*) requires the three deliverables with their lengths, requires the parts to
+number **1, 2 and 3 and stop**, forbids the withdrawn "produce all five/six" instruction and any
+**Part 4+**, and holds the two things the rewrite must never drop — the **no-endorsement** pilot framing
+and the programme's own spelling, **"Digitalize Zimbabwe"**. Proved by mutation: a Part 4 line plus a
+renamed named-source statement produced **3 violations**, and the file was then restored
+**byte-identical** (`sha256 e2d39378…` before and after). **Committed as `d038947`.**
+
+**Verified on the final bytes, this session:** `npm run validate` **15/15 (exit 0)** · `typecheck`
+**exit 0** · `lint` **exit 0, 0 errors** (the same 7 pre-existing `react-refresh` warnings) · `npm test`
+**381/381 across 32 files** · `build` ✓ emitting the same bundle `assets/index-DRweHRfT.js`, so the live
+host is **still current** · `npx playwright test` **11/11**.
+
+**Files touched this session:** `docs/PROPOSAL_PROMPT.md`, `scripts/validate.mjs` (check 14 + its header
+list), `PROJECT_STATUS.md`. **Not changed:** any application source, the emerald/gold palette, Inter +
+JetBrains Mono, `src/components/ui/**`, the route map, `LICENSE` / `NOTICE`, and `package.json` — **no
+dependency was added or removed.**
 
 ### Phase AE — the official Coat of Arms, and the "Digitalize Zimbabwe" pilot case (2026-09-28, requested by the user this session)
 
@@ -1691,9 +1736,10 @@ office or pilot-intake process), and an honest **method note** recording that th
 invoked but **`firecrawl` is not installed on this machine**, so direct HTTP requests to the publications
 and the Google News index were used instead.
 
-**Deliberately not done:** the **AB-7** restructure of `docs/PROPOSAL_PROMPT.md` from five documents to
-three is **still outstanding and still last** — see the R8 row in Phase AD. The pilot material was added
-in a way that survives that rewrite unchanged.
+**AB-7 has since been delivered (2026-09-29) — see the R8 block in Phase AD.** The restructure of
+`docs/PROPOSAL_PROMPT.md` from the heavier pack down to **three documents** is DONE, and the pilot
+material added here survived it unchanged: it is now Part 1 section 5 of the funding memo, a slide in
+the deck, and the opener of the one-page ask.
 
 ## Known-red / open items
 
@@ -2379,8 +2425,9 @@ already working**, plus **three short documents** — and **no bureaucracy**.
 **The final deliverable is LAST.** When the build is finished and verified, the session says — in these
 words — *"Now the build is complete. Here is the prompt to copy and paste into Claude."* That prompt
 produces the **funding memo (2 pages), the pitch deck (10–12 slides) and the one-page ask**, nothing heavier.
-**`docs/PROPOSAL_PROMPT.md` (written in Phase AA) describes the older six-document version and is
-SUPERSEDED by this decision** — it must be rewritten down to three documents at the end, not used as-is.
+**`docs/PROPOSAL_PROMPT.md` described the older six-document version and was
+SUPERSEDED by this decision** — it was rewritten down to three documents in **R8 (2026-09-29)**, and
+validate **check 14** now fails if the prompt drifts back.
 
 #### Work items, in the agreed order
 
@@ -2392,7 +2439,7 @@ SUPERSEDED by this decision** — it must be rewritten down to three documents a
 | **AB-4** | **AI "Draft the policy"** — department prompt library, grounding, citation verification, provenance | **DONE (2026-09-28).** All four parts are built and gated: a **department prompt library** derived from each department's own configuration (never hand-written, so it cannot drift), the **grounding** handed to the local generator and to a configured service alike, **citation verification** that refuses any draft naming an instrument the register does not hold, and a **provenance record** in the draft's closing note and on the screen. The drafted policy gains clause **8. Citations**. The remote seam now carries the prompt and grounding. **10 new gates in `src/test/drafting.test.ts`**, plus a provenance render assertion added to the journey test and a grounding assertion added to the remote-client test — see the AB-4 rows in the verification log; three code mutations were proved to fail before restore. **No colour, font, layout, route or dependency changed.** |
 | **AB-5** | **"Real data, and where it comes from"** — a short named-source statement on the platform, and the reference-rate reconciliation | **DONE (2026-09-28).** Both halves are in. **The rates are reconciled to named sources:** `REFERENCE_RATES` now holds the **published figures** — ZiG **26.85** per USD and the bank policy rate **30.00%** (both Reserve Bank of Zimbabwe, period **September 2026**) and inflation **0.25%** (ZIMSTAT, period **August 2026**) — and each rate names its publisher (`sourceId` → the new `NAMED_SOURCES`) and the period it is for (`asOf`), both of which the reference screen prints under every rate. The three values the platform used to show (13.56 ZiG, 19.5%, 8.4%) matched **no published figure**, and 8.4% contradicted ZIMSTAT's own release; all three were replaced. **The named-source statement is its own item:** `NAMED_SOURCE_STATEMENT` (three clauses, each a rule the platform actually follows) with the `NAMED_SOURCES` list, rendered as a **Named sources** section on the reference screen. **Five new gates** in `src/test/reference-sources.test.tsx`; two mutations proved they fail before the byte-identical restore. The share-and-source half was already delivered by **E-4**. **One honest caveat, unchanged:** the exchange rate is stated against its **month** (September 2026), not a specific day, because the RBZ figure that could be verified was published for 28 September 2026 — four days after the workspace reference date — and no source supports a 24 September value. See *PART 6* of `docs/PLATFORM_ENRICHMENT_PLAN.md` |
 | **AB-6** | **Retrieve the missing official figures** — ZIMSTAT employment-by-sector, the 2022 urban/rural split, the 2022 age structure, and the **NDS pillars** (NDS1 and any NDS2) | **DONE — every item retrieved and recorded this session (2026-09-28).** See *AB-6 — retrieved in this session* below for the figures, the named sources, and the one honest remaining limit (the 21-industry QLFS break-up exists only as chart images). |
-| **AB-7** | **The final Claude prompt** — memo + deck + ask. **Must be last.** | NOT STARTED |
+| **AB-7** | **The final Claude prompt** — memo + deck + ask. **Must be last.** | **DONE (2026-09-29) — delivered as R8: three documents, gated by validate check 14. It was the last item in the plan, and the plan is now complete** |
 
 #### AB-6 — evidence already gathered, so a cold session does NOT re-do it
 
@@ -3014,26 +3061,28 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
 
 ## RESUME HERE
 
-- **Branch `feature/unified-platform`.** The commits to know are **`d57bf68`** (Phase AD **R6** — a
-  published figure's provenance stated once) and the status commit that carries this line (**R7** — the
-  documents and the redeploy). Beneath them: **`2013733`** (the R4/R5 status commit), **`f50240b`** +
-  **`074eb75`** (R4), **`ccc2dfa`** (the R3 status commit), **`fae8916`** (R3), **`beb6e61`** + **`e0184d2`**
-  (its records), **`358b73f`** (Phase AE — the Coat of Arms fingerprint gate), **`bde486d`** (R2),
-  **`f4e253f`** (R1 — the indicator basis and its gates). **Run `git log --oneline -10 | cat` as the
-  second opinion on state**, and treat any commit that touches only documents as part of the same record.
-  **Working tree clean.** Baseline `main` is untouched at `7451db0`; `origin/main` is still `00fae15`
-  (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything is committed, so a cold session
-  can start from this file alone.
-- **What to do next, in order:** **R6 and R7 are DONE (2026-09-29).** R6 trimmed the duplicated publisher
-  from the 24 published indicators' notes and gated it; R7 published the build — the live host now serves
-  `assets/index-DRweHRfT.js` (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), checked
-  by fetching the live file and hashing it, and driven in a real browser this session. **The only work item left is `R8 = AB-7`** — the funding memo, the pitch deck
-  and the one-page ask, by rewriting `docs/PROPOSAL_PROMPT.md` down from the six-document version to three.
-  **AB-7 is last, and nothing follows it.** **Do not re-fetch anything in PART 7 of
-  `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the 24 published figures and the 39 recorded no-equivalent reasons
-  are both there. **Read first:** `docs/PROPOSAL_PROMPT.md` (what it holds now), then
-  `src/config/departments.ts` (the indicator lines), `src/config/reference.ts` (`NAMED_SOURCES` and the
-  sourcing statement), `src/test/indicator-basis.test.tsx` (the gates), then the **Phase AD** section below.
+- **Branch `feature/unified-platform`.** The commits to know are **`d038947`** (Phase AD **R8** — the
+  prompt asks for three documents, and its four false figures are fixed) and the status commit that
+  carries this line (**R8** — the records). Beneath them: **`96d45fc`** (R7 — the live host is current),
+  **`d57bf68`** (R6 — a published figure's provenance stated once), **`2013733`** (the R4/R5 status commit),
+  **`f50240b`** + **`074eb75`** (R4), **`ccc2dfa`** (the R3 status commit), **`fae8916`** (R3),
+  **`beb6e61`** + **`e0184d2`** (its records), **`358b73f`** (Phase AE — the Coat of Arms fingerprint gate),
+  **`bde486d`** (R2), **`f4e253f`** (R1 — the indicator basis and its gates). **Run
+  `git log --oneline -10 | cat` as the second opinion on state**, and treat any commit that touches only
+  documents as part of the same record. **Working tree clean.** Baseline `main` is untouched at `7451db0`;
+  `origin/main` is still `00fae15` (the parallel Lovable app) — see the BLOCKER in *Known-red*. Everything
+  is committed, so a cold session can start from this file alone.
+- **What to do next: NOTHING IS OUTSTANDING — every work item in the plan is DONE.** The build, the
+  figures, the deploy and the funding prompt are all finished and verified. The next action is not a code
+  task: it is to **use** `docs/PROPOSAL_PROMPT.md` — copy it into Claude and take the funding memo, the
+  deck and the one-page ask to the meeting. **If a future session is asked to change something, the next
+  command to run is** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`,
+  then `npx playwright test` — expected **all green: validate 15/15, tests 381/381 across 32 files,
+  Playwright 11/11**. **Do not re-fetch anything in PART 7 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
+  24 published figures and the 39 recorded no-equivalent reasons are both there. **Read first:** the
+  **Phase AD R8** block above (what changed last), then `docs/PROPOSAL_PROMPT.md`, `scripts/validate.mjs`
+  (**check 14**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
+  (`NAMED_SOURCES` and the sourcing statement).
 - **LIVE NOW: `nzwisiso.bitflex.app` serves THIS build.** **R7** redeployed `dist/` on 2026-09-29 and the
   live origin serves `assets/index-DRweHRfT.js`
   (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`) — the same value the local
@@ -3041,14 +3090,16 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   Arms, the favicon set and all 24 published figures. A real browser was driven against the live origin this
   session (title, hero, 16 departments, 0 console errors, 0 off-origin requests). *(This bullet read "THE
   LIVE SITE IS BEHIND THIS BUILD" until R7 closed the gap; before that it read "THE LIVE SITE IS NOW THIS
-  BUILD", which stopped being true the moment R1 rebuilt the bundle — both corrected.)* To publish any
+  BUILD", which stopped being true the moment R1 rebuilt the bundle — both corrected.)* **R8 changed no application source, so the bundle name did not move and this is still
+  true on the R8 session's bytes.** To publish any
   further change: `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command below — **never
   add `--delete`.**
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
   then `npx playwright test` — expected **all green** (**381/381 tests across 32 files**, **11/11** Playwright,
-  validate **14/14**: the `--destructive` known-red is **retired**, and the three checks added since the
-  AB-5 sweep cover the *retired document statements*, the *deployment claim and its evidence*, and the
-  ***Coat of Arms fingerprint with the icon set that belongs to it***).
+  validate **15/15**: the `--destructive` known-red is **retired**, and the four checks added since the
+  AB-5 sweep cover the *retired document statements*, the *deployment claim and its evidence*, the
+  ***Coat of Arms fingerprint with the icon set that belongs to it***, and the ***Claude prompt asking
+  for exactly three documents***).
   (This line said **369/369 across 31 files** until Phase AE, **379/379** until R3 added its figure gate,
   and **380/380** until R6 added the provenance gate; **R4's three rows ride inside an existing test**, so
   the file and test counts did not move when R4 landed. The numbers in this file's own Phase AD rows are
@@ -3078,20 +3129,23 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   `favicon-32.png`, `favicon-192.png`, `apple-touch-icon.png`) declared in `index.html`; **(2)**
   `docs/PROPOSAL_PROMPT.md` now carries the **"Digitalize Zimbabwe"** pilot case as researched fact,
   with a Part 1 section, a deck slide, the ask, and a hand-over gate. Read the **Phase AE** section
-  below for the sources, the six edits, and what could not be confirmed. **This does not change the
-  order of what remains** — R6 and R7 are now done, so only R8 (AB-7) remains.
-- **The order of what remains.** **R7 is DONE (2026-09-29)** — the documents are updated and the live host
-  now serves this build (`assets/index-DRweHRfT.js`, `c601422c…`). **The only item left is R8 = AB-7**, the
-  final Claude prompt — the funding memo, the pitch deck and the one-page ask — by rewriting
-  `docs/PROPOSAL_PROMPT.md` down from the six-document version to three. **AB-7 is the last item, and
-  nothing follows it.** The user's decision on the 63 indicator values was taken in the R4/R5 session, so
-  that question is **closed** and is recorded in **Phase AD**.
+  below for the sources, the six edits, and what could not be confirmed. **R6, R7 and R8 are all now
+  done, so nothing in this plan remains.**
+- **The plan is COMPLETE — no work item remains.** **R8 = AB-7 is DONE (2026-09-29)**: `docs/PROPOSAL_PROMPT.md`
+  now asks for **three** documents — the funding memo, the pitch deck and the one-page ask — the four false
+  statements it carried are fixed at source, and **validate check 14** keeps it that way. **R7** kept the
+  live host current, so the live origin serves this build (`assets/index-DRweHRfT.js`, `c601422c…`), and the
+  bundle name did **not** move in R8 because no application source changed. The user's decision on the 63
+  indicator values was taken in the R4/R5 session and **Phase AD** delivered it, so that question is
+  **closed**. What remains is not a work item — it is to **use the prompt**: paste it into Claude and take
+  the funding memo, the deck and the ask to the meeting.
 - **Phase AB is the agreed funding plan and the CURRENT WORK — read the Phase AB section in this file
   FIRST (it is below, in the phase list).** It holds: the goal in the user's words (*"we just want to get
   this platform funded … this is just a tool that will help each department research and draft policies"*),
   the **seven work items in the agreed order** (AB-1 graph → AB-2 groups + real ZIMSTAT weights → AB-3 real
   reference documents → AB-4 AI "Draft the policy" → AB-5 the named-source statement + rate reconciliation →
-  AB-6 the missing official figures → **AB-7 the final Claude prompt, which MUST be last**), the items
+  AB-6 the missing official figures → **AB-7 the final Claude prompt, which was last** — **all seven are now
+  delivered**), the items
   **deliberately dropped** (no legal instrument, no procurement paper, no governance framework, no cost
   model — do not resurrect them), the graph diagnosis with the exact current stroke values, the agreed
   graph-only colour exemption, and the **official Zimbabwean figures already gathered** so they are never
@@ -3126,9 +3180,9 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   re-researched. **The engine now reads the policy, weights the figures by what each group stands for,
   derives its risks, reads a real Word file, takes scenario assumptions, and compares two drafts — and all
   of it is LIVE (Batches A–H).** See *Phase AB-6* below for the batch-by-batch record and the mutation
-  proofs. **The next action is AB-7 — the final Claude prompt, which MUST be last** (the funding
-  memo, the pitch deck and the one-page ask; `docs/PROPOSAL_PROMPT.md` is superseded and must be rewritten
-  down to three documents). **The one item the AB-5 defect inventory recorded as BLOCKED is now CLOSED:**
+  proofs. **AB-7 is DONE (2026-09-29)** — `docs/PROPOSAL_PROMPT.md` is now the **three-document** prompt
+  (the funding memo, the pitch deck and the one-page ask) and is gated by validate **check 14**, so this
+  was the **last work item in the plan**. **The one item the AB-5 defect inventory recorded as BLOCKED is now CLOSED:**
   the 63 department indicator values are no longer presented as sourced official figures — **Phase AD
   (R1–R5)** gave every one of the 63 a basis, so **24 are published figures** each naming its publisher, its
   publication and its period, and **39 are explicitly `Modelled`**; the decision was taken and the question
@@ -3236,9 +3290,13 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   `00fae15`**, three commits ahead, carrying a parallel Lovable app — see the **BLOCKER** entry at the
   top of *Known-red / open items*. The feature branch is pushed through Phase S
   (`git log --oneline -3 | cat`). Deployment is an FTP upload of `dist/`, not a git push.
-- **LIVE NOW: `https://nzwisiso.bitflex.app/` serves the Phase S build** — Phases R and S deployed
-  and verified in a real browser against the live origin this session (2/2 checks, 0 console errors,
-  0 off-origin requests); the SSL validation token and `cgi-bin/` were confirmed intact afterwards.
+- **LIVE NOW: `https://nzwisiso.bitflex.app/` serves THIS build — `assets/index-DRweHRfT.js`,
+  `c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`.** *(This bullet named the **Phase S**
+  build until the R7 additions, which stopped being true once Phases R–AE were published; **R7** redeployed
+  `dist/`, the served file was fetched and hashed, and it is byte-identical to the local build. **R8 changed
+  no application source, so the bundle name did not move.**)* The redeploy was verified in a real browser
+  against the live origin (0 console errors, 0 off-origin requests); the SSL validation token and `cgi-bin/`
+  were confirmed intact afterwards.
   To publish any further change, the credentials are **already saved**:
   ```bash
   npm run build && set -a; . ./.env; set +a
