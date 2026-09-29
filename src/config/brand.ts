@@ -72,6 +72,33 @@ export const BRAND = {
 } as const;
 
 /**
+ * The project promoter — the company bringing this initiative forward. It is rendered
+ * as ONE small line in both footers (the public shell and the workspace), derived from
+ * the parts below, so the credit is never retyped in a page and the parts cannot drift.
+ *
+ * Wording rule: Oreida Pvt Ltd is the PROMOTER. It is not a government body, it does
+ * not own the platform, and it holds no appointment to supply or operate it — the words
+ * "supplier", "operator" or "appointed by Government" must never be used for it here.
+ * Whether a private company supplies or manages Government infrastructure is a
+ * procurement matter (Public Procurement and Disposal of Public Assets Act
+ * [Chapter 22:23]), which is recorded in PROJECT_STATUS.md and is not this line's job.
+ */
+const PROMOTER_NAME = "Oreida Pvt Ltd";
+const PROMOTER_BUSINESS_LEAD = "Edmore Zviitwah";
+const PROMOTER_TECHNICAL_LEAD = "Tadii Tendayi";
+
+export const PROMOTER = {
+  name: PROMOTER_NAME,
+  role: "Project promoter",
+  businessLead: PROMOTER_BUSINESS_LEAD,
+  technicalLead: PROMOTER_TECHNICAL_LEAD,
+  /** The one line both footers render. */
+  line:
+    `Project promoter: ${PROMOTER_NAME} · ${PROMOTER_BUSINESS_LEAD} (Business Lead) · ` +
+    `${PROMOTER_TECHNICAL_LEAD} (Technical Lead)`,
+} as const;
+
+/**
  * User-visible engine vocabulary. Vendor and implementation names must never
  * reach the interface — these are the only words the interface may use.
  */

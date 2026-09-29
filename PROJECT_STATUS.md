@@ -1485,6 +1485,8 @@ because the block it sits in already names itself.
 | 2026-09-29 | **defect inventory (sovereignty-copy session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. **(1)** The **retired hosting claim** — the footer and every generated document asserted the simulation ran inside national Government infrastructure; corrected to the compute-path statement, **and the duplicate inside `documents.ts` removed** so there is one source. **(2)** **A stale deployment claim found by the gate**: after the rebuild, three current-state bullets still said the demonstration host served *this* build; all three corrected (the historical log rows were deliberately left as the record of what was true then). **(3)** **A false statement in `PRODUCTION_READINESS.md`** (§ the two deployment paragraphs), corrected the same way. **(4)** My own **abbreviated sha256** in a corrected bullet, caught by check 12 and fixed. **Not a defect, recorded so it is not mistaken for one:** the demonstration host being one build behind is the *honest* state after any source change and is printed by `npm run validate` on every run |
 | 2026-09-29 | **Oreida Pvt Ltd recorded as the project promoter** (user instruction — recorded, not yet written into the proposal) | **Oreida Pvt Ltd** is the **project promoter**, led by **Edmore Zviitwah (Business Lead)** and **Tadii Tendayi (Technical Lead)**. Recorded here because the funding paperwork will name them. **Not recorded as supplier or host:** the user's decision this session is that the platform is hosted on **the Ministry's own data centre / a GISP-managed server**, and a private company supplying or managing Government infrastructure falls under the **Public Procurement and Disposal of Public Assets Act [Chapter 22:23] (Act 5 of 2017)**, regulated by **PRAZ**, which keeps a register of suppliers. The proposal will therefore place Oreida's role beside the procurement route as a `[QUESTION — needs a decision]` (funding prompt, Part 1 section 7) rather than assert an appointment |
 
+| 2026-09-29 | **the project promoter credit added to both footers, small** (user instruction) | **Oreida Pvt Ltd — Project promoter**, with **Edmore Zviitwah (Business Lead)** and **Tadii Tendayi (Technical Lead)**, is now shown on the site: one small line (`text-[9px]`) in the **public footer** and in the **workspace footer**, placed beneath the Ministry's own attribution and never larger than it, so the Ministry line stays dominant. Written **once** — `PROMOTER.line` in `src/config/brand.ts`, derived from its parts — and read by both footers, so the name is never retyped into a page. **Wording rule recorded in the code and the gate:** Oreida is the *promoter*; not a government body, not the owner, holding no appointment to supply or operate the platform (the procurement point is recorded separately, above). **Gates, both proved able to fail and then restored byte-identical:** (1) the credit must be in the public footer and **not larger than the attribution** — mutating it to `text-[12px]` failed with *expected 12 to be less than or equal to 11*; (2) the company name must exist in **one place only** — pasting `"Oreida Pvt Ltd"` into `Landing.tsx` failed with *expected [ 'src/pages/Landing.tsx' ] to deeply equal []*. Both files restored byte-identical (`src/components/public/PublicPageShell.tsx` sha256 `a3d34cad2e4f9435d6a74dafb29b7ef254072d8b1a5b8ff6b7bdf2217030fee1`, `src/pages/Landing.tsx` sha256 `58ca86f271e7263bc8940b0338d141a95d0dcc9aa742f219c77285cfcb6b451c`). New test file **`src/test/promoter.test.tsx`** (3 guards). **The contrast gate caught my first attempt**: `text-primary-foreground/60` measured below the AA floor in both footers (`/75` is the floor) — raised to `/75`, which is the accessibility fix rather than a workaround. **Also in this pass:** the deployment bullets were changed to read the current build name from `npm run validate`'s own output instead of restating it, so they cannot go stale on the next source change |
+
 ### Phase AB-6 — the defect sweep and the simulation-power batches (2026-09-28)
 
 **Requested by the user, verbatim:** *"why are you rushing to the prompt. are all the bugs and issues
@@ -3092,11 +3094,11 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   (`NAMED_SOURCES` and the sourcing statement).
 - **DEMO HOST: `nzwisiso.bitflex.app` serves `assets/index-DRweHRfT.js`
   (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`)** — the R7 build, with the official
-  Coat of Arms, the favicon set and all 24 published figures. **The build from the sovereignty-copy session
-  is `assets/index-Bl2FOMF-.js` and has NOT been redeployed**, so the demonstration host is one build behind
-  until the FTPS mirror below is run. `npm run validate` prints the two names side by side on every run, so
-  a stale claim cannot pass unnoticed. To publish any further change: `npm run build`, then the `.env`-based
-  FTPS `mirror -R dist .` command below — **never add `--delete`.**
+  Coat of Arms, the favicon set and all 24 published figures. **The latest build is NEWER than the bundle the
+  host serves and has NOT been redeployed.** `npm run validate` prints the served name and the locally built
+  name side by side on every run, so the current name is read from the machine output rather than restated
+  here — a claim in this file cannot go stale. To publish it: `npm run build`, then the `.env`-based FTPS
+  `mirror -R dist .` command below — **never add `--delete`.**
 - **No page claims Government hosting.** The sovereignty statement (`SOVEREIGNTY_STATEMENT` in
   `src/config/brand.ts`) states the **compute path** — computed locally in the reader's browser, nothing
   leaves it — which is true wherever the page is served from. It made a **hosting** claim until the
@@ -3305,9 +3307,9 @@ imports and layout boxes, and only the pixels behind them changed. `dist/` was r
   browser against the live origin, with the SSL validation token and `cgi-bin/` confirmed intact afterwards.
   *(This bullet named the **Phase S** build until the R7 additions; **R7** then redeployed `dist/`, the served
   file was fetched and hashed, and it read "serves THIS build" — true at R8, whose change touched no
-  application source. It stopped being true when the sovereignty-copy fix rebuilt the bundle.)* **The current
-  build is `assets/index-Bl2FOMF-.js`; the demonstration host is one build behind until the mirror below is
-  run.**
+  application source. It stopped being true once a change rebuilt the bundle.)* **The latest build has not
+  been redeployed; `npm run validate` prints the served name and the local build name on every run, so the
+  current name is never restated here, where it could go stale.**
   To publish any further change, the credentials are **already saved**:
   ```bash
   npm run build && set -a; . ./.env; set +a

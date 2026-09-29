@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { BRAND, SOVEREIGNTY_STATEMENT } from "@/config/brand";
+import { BRAND, PROMOTER, SOVEREIGNTY_STATEMENT } from "@/config/brand";
 import { REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR } from "@/config/reference";
 import { COVERAGE } from "@/lib/coverage";
 import coatOfArms from "@/assets/zimbabwe-coat-of-arms.png";
@@ -206,6 +206,9 @@ function OfficialFooter() {
             <p className="text-[11px] font-medium tracking-tight">{BRAND.attribution}</p>
             <p className="mt-0.5 text-[9px] uppercase tracking-[0.18em] text-primary-foreground/75">
               {BRAND.classification}
+            </p>
+            <p className="mt-1 text-[9px] leading-relaxed text-primary-foreground/75">
+              {PROMOTER.line}
             </p>
           </div>
           <p className="text-[10px] text-primary-foreground/75">

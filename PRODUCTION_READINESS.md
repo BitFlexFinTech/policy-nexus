@@ -96,13 +96,13 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-09-29, after the sovereignty-copy fix): the demonstration host serves the PREVIOUS
-  build.** `nzwisiso.bitflex.app` serves `assets/index-DRweHRfT.js`
+- **Status today (2026-09-29, after the sovereignty and promoter changes): the demonstration host serves an
+  older build than the working copy.** `nzwisiso.bitflex.app` serves `assets/index-DRweHRfT.js`
   (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`) — fetched and hashed when **R7**
   redeployed it — carrying the official Coat of Arms, the favicon set and all 24 published figures. **The
-  build from the sovereignty-copy session is `assets/index-Bl2FOMF-.js` and has NOT been redeployed**, so the
-  demonstration host is one build behind until the FTPS mirror below is run. `npm run validate` prints both
-  names side by side on every run, so this cannot go stale in silence.
+  latest build has NOT been redeployed.** `npm run validate` prints the served name and the locally built name
+  side by side on every run, so the current name is read from the machine output and not restated here, where
+  it could go stale.
 
 ## 6d. Verified in a real browser (Phase K — report + drafted policy)
 - `npx playwright test` → **5/5**: the 4 Phase H journeys plus one that opens **Open full report**
@@ -281,7 +281,7 @@ on the Phase S bundle) is superseded:** the live host was redeployed on 2026-09-
 (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`) — the same file the local build
 produced that day — and it was redeployed again in **R7** (2026-09-29), so the demonstration host serves
 `assets/index-DRweHRfT.js` (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), which is
-**the previous build now** — the current build (`assets/index-Bl2FOMF-.js`) has not been redeployed.
+**an older build than the working copy** — the latest build has not been redeployed.
 
 ## 7. Disabled by default (deliberate)
 
