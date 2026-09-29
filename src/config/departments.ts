@@ -90,7 +90,12 @@ export interface DepartmentIndicator {
   /** 0–100 position of the bar; presentation only, derived from the indicator. */
   score: number;
   tone: IndicatorTone;
-  /** One line of plain-language meaning, shown when the card is opened. */
+  /**
+   * One line of plain-language meaning, shown when the card is opened. It carries no
+   * provenance: for a published figure the publisher, the publication and the period
+   * come from `indicatorBasisLabel(basis)`, so they are stated once on the source line
+   * and cannot be repeated here in different words (Phase AD R6).
+   */
   note: string;
   /** Where the indicator comes from — a named publication, or plainly modelled. */
   basis: IndicatorBasis;
@@ -258,10 +263,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "fin-invest", label: "Investment promotion", note: "Improve the pipeline of bankable domestic and foreign projects." },
     ],
     indicators: [
-      { id: "fin-deficit", label: "Fiscal deficit", value: "3.6", unit: "% of GDP", score: 4, tone: "warning", note: "General government net borrowing, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", asOf: "2018" } },
-      { id: "fin-revenue", label: "Tax revenue", value: "7.2", unit: "% of GDP", score: 7, tone: "warning", note: "Tax revenue as a share of GDP, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Tax revenue (% of GDP)", asOf: "2018" } },
+      { id: "fin-deficit", label: "Fiscal deficit", value: "3.6", unit: "% of GDP", score: 4, tone: "warning", note: "General government net borrowing.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", asOf: "2018" } },
+      { id: "fin-revenue", label: "Tax revenue", value: "7.2", unit: "% of GDP", score: 7, tone: "warning", note: "Tax revenue as a share of GDP.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Tax revenue (% of GDP)", asOf: "2018" } },
       { id: "fin-taxbase", label: "Registered taxpayer growth", value: "+6.8", unit: "% YoY", score: 68, tone: "primary", note: "Growth in the active taxpayer register year on year.", basis: { kind: "modelled" } },
-      { id: "fin-investment", label: "Foreign direct investment, net inflows", value: "USD 465M", score: 62, tone: "gold", note: "Net inflows of foreign direct investment, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Foreign direct investment, net inflows (BoP, current US$)", asOf: "2024" } },
+      { id: "fin-investment", label: "Foreign direct investment, net inflows", value: "USD 465M", score: 62, tone: "gold", note: "Net inflows of foreign direct investment.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Foreign direct investment, net inflows (BoP, current US$)", asOf: "2024" } },
     ],
     segments: ["exporters", "formal-business", "financial-sector", "civil-servants", "informal-traders", "diaspora", "manufacturers", "pensioners"],
     policyTemplates: [
@@ -317,10 +322,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "agri-market", label: "Smallholder market access", note: "Link communal producers to structured buyers and contracts." },
     ],
     indicators: [
-      { id: "agri-grain", label: "Food production index", value: "121.7", unit: "index (2014–2016 = 100)", score: 89, tone: "success", note: "Food production relative to the 2014–2016 average, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Food production index (2014-2016 = 100)", asOf: "2022" } },
+      { id: "agri-grain", label: "Food production index", value: "121.7", unit: "index (2014–2016 = 100)", score: 89, tone: "success", note: "Food production relative to the 2014–2016 average.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Food production index (2014-2016 = 100)", asOf: "2022" } },
       { id: "agri-irrigated", label: "Irrigated area", value: "203k", unit: "ha", score: 66, tone: "primary", note: "Area under functioning irrigation, all schemes.", basis: { kind: "modelled" } },
-      { id: "agri-herd", label: "Livestock production index", value: "119.6", unit: "index (2014–2016 = 100)", score: 62, tone: "gold", note: "Livestock production relative to the 2014–2016 average, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Livestock production index (2014-2016 = 100)", asOf: "2022" } },
-      { id: "agri-input", label: "Fertiliser consumption", value: "26.2", unit: "kg per hectare", score: 26, tone: "warning", note: "Fertiliser applied per hectare of arable land, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Fertilizer consumption (kilograms per hectare of arable land)", asOf: "2023" } },
+      { id: "agri-herd", label: "Livestock production index", value: "119.6", unit: "index (2014–2016 = 100)", score: 62, tone: "gold", note: "Livestock production relative to the 2014–2016 average.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Livestock production index (2014-2016 = 100)", asOf: "2022" } },
+      { id: "agri-input", label: "Fertiliser consumption", value: "26.2", unit: "kg per hectare", score: 26, tone: "warning", note: "Fertiliser applied per hectare of arable land.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Fertilizer consumption (kilograms per hectare of arable land)", asOf: "2023" } },
     ],
     segments: ["smallholder-farmers", "rural-households", "informal-traders", "exporters", "women-led-enterprises", "development-partners", "cooperatives", "informal-workers"],
     policyTemplates: [
@@ -377,8 +382,8 @@ export const DEPARTMENTS: Department[] = [
     indicators: [
       { id: "health-facilities", label: "Functional primary facilities", value: "94", unit: "%", score: 94, tone: "success", note: "Facilities open and staffed on the reporting day.", basis: { kind: "modelled" } },
       { id: "health-stockout", label: "Essential medicine availability", value: "72", unit: "%", score: 72, tone: "warning", note: "Tracer medicines available at the point of care.", basis: { kind: "modelled" } },
-      { id: "health-staffing", label: "Nurses and midwives", value: "3.1", unit: "per 1,000 people", score: 31, tone: "warning", note: "Nursing and midwifery personnel per 1,000 people, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Nurses and midwives (per 1,000 people)", asOf: "2022" } },
-      { id: "health-immune", label: "Child immunisation coverage", value: "90", unit: "%", score: 90, tone: "gold", note: "Children aged 12–23 months immunised against measles, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Immunisation, measles (% of children aged 12–23 months)", asOf: "2024" } },
+      { id: "health-staffing", label: "Nurses and midwives", value: "3.1", unit: "per 1,000 people", score: 31, tone: "warning", note: "Nursing and midwifery personnel per 1,000 people.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Nurses and midwives (per 1,000 people)", asOf: "2022" } },
+      { id: "health-immune", label: "Child immunisation coverage", value: "90", unit: "%", score: 90, tone: "gold", note: "Children aged 12–23 months immunised against measles.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Immunisation, measles (% of children aged 12–23 months)", asOf: "2024" } },
     ],
     segments: ["health-workers", "urban-households", "rural-households", "civil-servants", "development-partners", "women-led-enterprises", "persons-with-disabilities", "women"],
     policyTemplates: [
@@ -433,9 +438,9 @@ export const DEPARTMENTS: Department[] = [
       { id: "edu-retention", label: "Learner retention", note: "Reduce dropout at the primary-to-secondary transition." },
     ],
     indicators: [
-      { id: "edu-enrolment", label: "Primary enrolment", value: "94.1", unit: "% net", score: 94, tone: "success", note: "Children of primary school age enrolled in primary education, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: School enrolment, primary (% net)", asOf: "2013" } },
-      { id: "edu-ratio", label: "Learner-teacher ratio", value: "36.4:1", score: 62, tone: "warning", note: "Primary pupils for every teacher, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Pupil-teacher ratio, primary", asOf: "2013" } },
-      { id: "edu-transition", label: "Primary completion rate", value: "86.0", unit: "% of relevant age group", score: 86, tone: "primary", note: "Children completing the last grade of primary education, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Primary completion rate, total (% of relevant age group)", asOf: "2024" } },
+      { id: "edu-enrolment", label: "Primary enrolment", value: "94.1", unit: "% net", score: 94, tone: "success", note: "Children of primary school age enrolled in primary education.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: School enrolment, primary (% net)", asOf: "2013" } },
+      { id: "edu-ratio", label: "Learner-teacher ratio", value: "36.4:1", score: 62, tone: "warning", note: "Primary pupils for every teacher.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Pupil-teacher ratio, primary", asOf: "2013" } },
+      { id: "edu-transition", label: "Primary completion rate", value: "86.0", unit: "% of relevant age group", score: 86, tone: "primary", note: "Children completing the last grade of primary education.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Primary completion rate, total (% of relevant age group)", asOf: "2024" } },
       { id: "edu-feeding", label: "Feeding coverage", value: "1.6M", unit: "learners", score: 70, tone: "gold", note: "Learners receiving a daily meal under the programme.", basis: { kind: "modelled" } },
     ],
     segments: ["educators", "rural-households", "urban-households", "youth", "development-partners", "women-led-enterprises", "faith-groups", "persons-with-disabilities"],
@@ -491,10 +496,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "hedu-industry", label: "University-industry linkage", note: "Embed workplace attachment in every programme." },
     ],
     indicators: [
-      { id: "hedu-enrolment", label: "Tertiary enrolment", value: "7.7", unit: "% gross", score: 8, tone: "warning", note: "Tertiary enrolment as a share of the population of tertiary age, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: School enrolment, tertiary (% gross)", asOf: "2024" } },
+      { id: "hedu-enrolment", label: "Tertiary enrolment", value: "7.7", unit: "% gross", score: 8, tone: "warning", note: "Tertiary enrolment as a share of the population of tertiary age.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: School enrolment, tertiary (% gross)", asOf: "2024" } },
       { id: "hedu-tvet-share", label: "Vocational share of enrolment", value: "34", unit: "%", score: 54, tone: "warning", note: "Share of tertiary students in vocational rather than academic programmes.", basis: { kind: "modelled" } },
       { id: "hedu-graduation", label: "Graduation rate", value: "78", unit: "%", score: 78, tone: "success", note: "Registered students completing their programme within the standard duration.", basis: { kind: "modelled" } },
-      { id: "hedu-research", label: "Scientific journal articles", value: "519.9", unit: "articles", score: 52, tone: "gold", note: "Scientific and technical journal articles published in the year, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Scientific and technical journal articles", asOf: "2023" } },
+      { id: "hedu-research", label: "Scientific journal articles", value: "519.9", unit: "articles", score: 52, tone: "gold", note: "Scientific and technical journal articles published in the year.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Scientific and technical journal articles", asOf: "2023" } },
     ],
     segments: ["youth", "educators", "formal-business", "diaspora", "development-partners", "researchers", "employer-federations"],
     policyTemplates: [
@@ -549,8 +554,8 @@ export const DEPARTMENTS: Department[] = [
       { id: "ict-inclusion", label: "Digital financial inclusion", note: "Reduce the cost of digital transactions for low-income users." },
     ],
     indicators: [
-      { id: "ict-coverage", label: "Mobile subscriptions", value: "94.2", unit: "per 100 people", score: 94, tone: "success", note: "Active mobile cellular subscriptions per 100 people, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Mobile cellular subscriptions (per 100 people)", asOf: "2024" } },
-      { id: "ict-broadband", label: "Fixed broadband subscriptions", value: "1.9", unit: "per 100 people", score: 2, tone: "warning", note: "Fixed broadband subscriptions per 100 people, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Fixed broadband subscriptions (per 100 people)", asOf: "2024" } },
+      { id: "ict-coverage", label: "Mobile subscriptions", value: "94.2", unit: "per 100 people", score: 94, tone: "success", note: "Active mobile cellular subscriptions per 100 people.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Mobile cellular subscriptions (per 100 people)", asOf: "2024" } },
+      { id: "ict-broadband", label: "Fixed broadband subscriptions", value: "1.9", unit: "per 100 people", score: 2, tone: "warning", note: "Fixed broadband subscriptions per 100 people.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Fixed broadband subscriptions (per 100 people)", asOf: "2024" } },
       { id: "ict-data-cost", label: "Data cost", value: "4.1", unit: "% of GNI", score: 58, tone: "warning", note: "Entry-level mobile data basket as a share of average income.", basis: { kind: "modelled" } },
       { id: "ict-egov", label: "Services online", value: "38 of 120", score: 32, tone: "gold", note: "High-volume public services available end to end online.", basis: { kind: "modelled" } },
     ],
@@ -607,7 +612,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "mines-safety", label: "Mine health and safety", note: "Reduce accidents through inspection and reporting." },
     ],
     indicators: [
-      { id: "mines-share", label: "Ores and metals share of exports", value: "33.8", unit: "% of merchandise exports", score: 34, tone: "gold", note: "Ores and metals as a share of merchandise export value, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Ores and metals exports (% of merchandise exports)", asOf: "2024" } },
+      { id: "mines-share", label: "Ores and metals share of exports", value: "33.8", unit: "% of merchandise exports", score: 34, tone: "gold", note: "Ores and metals as a share of merchandise export value.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Ores and metals exports (% of merchandise exports)", asOf: "2024" } },
       { id: "mines-beneficiation", label: "Domestically processed output", value: "27", unit: "%", score: 27, tone: "warning", note: "Share of extracted mineral value processed before export.", basis: { kind: "modelled" } },
       { id: "mines-licences", label: "Licence turnaround", value: "48", unit: "days", score: 42, tone: "primary", note: "Average time from complete application to decision.", basis: { kind: "modelled" } },
       { id: "mines-incidents", label: "Reportable incidents", value: "31", unit: "per year", score: 62, tone: "success", note: "Reportable accidents recorded across inspected operations.", basis: { kind: "modelled" } },
@@ -665,10 +670,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "energy-ipp", label: "Independent power producer framework", note: "Make private generation projects bankable and faster to close." },
     ],
     indicators: [
-      { id: "energy-access", label: "Electricity access", value: "62", unit: "% of population", score: 62, tone: "warning", note: "People with access to electricity, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Access to electricity (% of population)", asOf: "2024" } },
+      { id: "energy-access", label: "Electricity access", value: "62", unit: "% of population", score: 62, tone: "warning", note: "People with access to electricity.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Access to electricity (% of population)", asOf: "2024" } },
       { id: "energy-gen", label: "Installed capacity", value: "2.5", unit: "GW", score: 68, tone: "primary", note: "Installed generation capacity connected to the national grid.", basis: { kind: "modelled" } },
       { id: "energy-supply", label: "Unserved demand", value: "410", unit: "MW", score: 48, tone: "gold", note: "Average shortfall met through load management.", basis: { kind: "modelled" } },
-      { id: "energy-losses", label: "Transmission and distribution losses", value: "23.0", unit: "%", score: 23, tone: "warning", note: "Energy lost between generation and billing, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Electric power transmission and distribution losses (% of output)", asOf: "2023" } },
+      { id: "energy-losses", label: "Transmission and distribution losses", value: "23.0", unit: "%", score: 23, tone: "warning", note: "Energy lost between generation and billing.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Electric power transmission and distribution losses (% of output)", asOf: "2023" } },
     ],
     segments: ["formal-business", "urban-households", "rural-households", "mining-operators", "informal-traders", "energy-water-utilities", "transport-operators"],
     policyTemplates: [
@@ -781,8 +786,8 @@ export const DEPARTMENTS: Department[] = [
       { id: "lg-devolution", label: "Devolution funds administration", note: "Improve absorption and accountability of devolution funds." },
     ],
     indicators: [
-      { id: "lg-water", label: "Basic drinking water access", value: "67.2", unit: "% of population", score: 67, tone: "warning", note: "People using at least basic drinking water services, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: People using at least basic drinking water services (% of population)", asOf: "2024" } },
-      { id: "lg-sanitation", label: "Basic sanitation access", value: "34.6", unit: "% of population", score: 35, tone: "warning", note: "People using at least basic sanitation services, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: People using at least basic sanitation services (% of population)", asOf: "2024" } },
+      { id: "lg-water", label: "Basic drinking water access", value: "67.2", unit: "% of population", score: 67, tone: "warning", note: "People using at least basic drinking water services.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: People using at least basic drinking water services (% of population)", asOf: "2024" } },
+      { id: "lg-sanitation", label: "Basic sanitation access", value: "34.6", unit: "% of population", score: 35, tone: "warning", note: "People using at least basic sanitation services.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: People using at least basic sanitation services (% of population)", asOf: "2024" } },
       { id: "lg-roads", label: "Feeder roads in good condition", value: "48", unit: "%", score: 48, tone: "gold", note: "Assessed feeder road length in fair or better condition.", basis: { kind: "modelled" } },
       { id: "lg-absorption", label: "Devolution absorption", value: "71", unit: "%", score: 71, tone: "success", note: "Allocated devolution funds spent within the financial year.", basis: { kind: "modelled" } },
     ],
@@ -842,7 +847,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "mfa-missions", label: "Diplomatic missions", value: "46", score: 74, tone: "primary", note: "Missions and consulates in operation.", basis: { kind: "modelled" } },
       { id: "mfa-consular", label: "Consular document turnaround", value: "21", unit: "days", score: 46, tone: "warning", note: "Average time to issue a passport or consular document abroad.", basis: { kind: "modelled" } },
       { id: "mfa-trade-util", label: "Preferential access utilisation", value: "58", unit: "%", score: 58, tone: "gold", note: "Exports eligible for preferential terms that actually claim them.", basis: { kind: "modelled" } },
-      { id: "mfa-remittance", label: "Recorded remittances", value: "USD 3.51B", score: 70, tone: "success", note: "Personal remittances received, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Personal remittances received (current US$)", asOf: "2024" } },
+      { id: "mfa-remittance", label: "Recorded remittances", value: "USD 3.51B", score: 70, tone: "success", note: "Personal remittances received.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Personal remittances received (current US$)", asOf: "2024" } },
     ],
     segments: ["exporters", "diaspora", "development-partners", "formal-business", "financial-sector", "tourism-operators", "cross-border-traders", "media"],
     policyTemplates: [
@@ -897,8 +902,8 @@ export const DEPARTMENTS: Department[] = [
       { id: "env-waste", label: "Waste and pollution management", note: "Improve collection and reduce illegal disposal." },
     ],
     indicators: [
-      { id: "env-parks", label: "Protected area coverage", value: "28.3", unit: "% of land", score: 28, tone: "success", note: "Terrestrial land under statutory protection, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Terrestrial protected areas (% of total land area)", asOf: "2025" } },
-      { id: "env-forest", label: "Forest area", value: "44.7", unit: "% of land", score: 45, tone: "success", note: "Land under forest cover, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Forest area (% of land area)", asOf: "2023" } },
+      { id: "env-parks", label: "Protected area coverage", value: "28.3", unit: "% of land", score: 28, tone: "success", note: "Terrestrial land under statutory protection.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Terrestrial protected areas (% of total land area)", asOf: "2025" } },
+      { id: "env-forest", label: "Forest area", value: "44.7", unit: "% of land", score: 45, tone: "success", note: "Land under forest cover.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Forest area (% of land area)", asOf: "2023" } },
       { id: "env-licences", label: "Environmental licence turnaround", value: "62", unit: "days", score: 38, tone: "gold", note: "Average time from complete application to decision.", basis: { kind: "modelled" } },
       { id: "env-climate", label: "Adaptation plans in place", value: "31 of 92", score: 34, tone: "primary", note: "Local authorities with an adopted climate adaptation plan.", basis: { kind: "modelled" } },
     ],
@@ -1013,7 +1018,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "zimra-digital", label: "Digital customs modernisation", note: "Move declarations and payments to a single electronic channel." },
     ],
     indicators: [
-      { id: "zimra-target", label: "Tax revenue", value: "7.2", unit: "% of GDP", score: 7, tone: "warning", note: "Tax revenue as a share of GDP, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Tax revenue (% of GDP)", asOf: "2018" } },
+      { id: "zimra-target", label: "Tax revenue", value: "7.2", unit: "% of GDP", score: 7, tone: "warning", note: "Tax revenue as a share of GDP.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Tax revenue (% of GDP)", asOf: "2018" } },
       { id: "zimra-clearance", label: "Border clearance time", value: "26", unit: "hrs", score: 56, tone: "warning", note: "Average time from declaration to release for compliant consignments.", basis: { kind: "modelled" } },
       { id: "zimra-filing", label: "On-time filing rate", value: "69", unit: "%", score: 69, tone: "primary", note: "Registered taxpayers filing by the due date.", basis: { kind: "modelled" } },
       { id: "zimra-audit", label: "Audit yield per case", value: "USD 18k", score: 62, tone: "gold", note: "Average additional assessment raised per completed audit.", basis: { kind: "modelled" } },

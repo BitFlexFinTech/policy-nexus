@@ -259,4 +259,31 @@ describe("department indicators — published with a named source, or plainly mo
     const published = EVERY.filter(({ indicator }) => indicator.basis.kind === "published");
     expect(published, "the published set is fully recorded").toHaveLength(RECORDED.length);
   });
+
+  /**
+   * Phase AD R6 — the drill-down already prints the publisher, the publication and the
+   * period on the source line, so a note that repeated them printed the same fact twice
+   * in two different wordings, which can drift apart. The note now carries meaning only,
+   * and this gate fails if a note starts naming a publisher or its provenance again.
+   */
+  it("keeps a figure's provenance in its source line, not repeated in the note", () => {
+    const publisherMarkers = NAMED_SOURCES.map((source) =>
+      source.name
+        .replace(/\s*\(.*\)/, "")
+        .split(" ")
+        .slice(0, 2)
+        .join(" ")
+        .toLowerCase(),
+    );
+    EVERY.forEach(({ department, indicator }) => {
+      const where = `${department.id}/${indicator.id}`;
+      const note = indicator.note.toLowerCase();
+      publisherMarkers.forEach((marker) => {
+        expect(note, `${where} does not name ${marker} in the note`).not.toContain(marker);
+      });
+      expect(note, `${where} states no provenance in the note`).not.toMatch(
+        /as reported to|reported to the|published by|according to|source:/,
+      );
+    });
+  });
 });
