@@ -206,4 +206,52 @@ describe("department indicators — published with a named source, or plainly mo
         );
       });
   });
+/**
+   * Phase AD R3 — the figures researched and written in, recorded here so a later edit
+   * cannot silently change a published number or quietly turn one back into a modelled
+   * one. Every row is what the publication itself reported, read from the World Bank's
+   * own API during the session. The check fails if a value, a publication or a period
+   * drifts, and it fails if the platform's published set grows without being recorded.
+   */
+  it("holds every published figure, with the value and period it was read from", () => {
+    const RECORDED: ReadonlyArray<[string, string, string, string]> = [
+      ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
+      ["fin/fin-revenue", "7.2", "World Development Indicators: Tax revenue (% of GDP)", "2018"],
+      ["fin/fin-investment", "USD 465M", "World Development Indicators: Foreign direct investment, net inflows (BoP, current US$)", "2024"],
+      ["agri/agri-grain", "121.7", "World Development Indicators: Food production index (2014-2016 = 100)", "2022"],
+      ["agri/agri-herd", "119.6", "World Development Indicators: Livestock production index (2014-2016 = 100)", "2022"],
+      ["agri/agri-input", "26.2", "World Development Indicators: Fertilizer consumption (kilograms per hectare of arable land)", "2023"],
+      ["health/health-immune", "90", "World Development Indicators: Immunisation, measles (% of children aged 12–23 months)", "2024"],
+      ["edu/edu-enrolment", "94.1", "World Development Indicators: School enrolment, primary (% net)", "2013"],
+      ["edu/edu-ratio", "36.4:1", "World Development Indicators: Pupil-teacher ratio, primary", "2013"],
+      ["hedu/hedu-enrolment", "7.7", "World Development Indicators: School enrolment, tertiary (% gross)", "2024"],
+      ["ict/ict-coverage", "94.2", "World Development Indicators: Mobile cellular subscriptions (per 100 people)", "2024"],
+      ["ict/ict-broadband", "1.9", "World Development Indicators: Fixed broadband subscriptions (per 100 people)", "2024"],
+      ["mines/mines-share", "33.8", "World Development Indicators: Ores and metals exports (% of merchandise exports)", "2024"],
+      ["energy/energy-access", "62", "World Development Indicators: Access to electricity (% of population)", "2024"],
+      ["energy/energy-losses", "23.0", "World Development Indicators: Electric power transmission and distribution losses (% of output)", "2023"],
+      ["lg/lg-water", "67.2", "World Development Indicators: People using at least basic drinking water services (% of population)", "2024"],
+      ["lg/lg-sanitation", "34.6", "World Development Indicators: People using at least basic sanitation services (% of population)", "2024"],
+      ["mfa/mfa-remittance", "USD 3.51B", "World Development Indicators: Personal remittances received (current US$)", "2024"],
+      ["env/env-parks", "28.3", "World Development Indicators: Terrestrial protected areas (% of total land area)", "2025"],
+      ["env/env-forest", "44.7", "World Development Indicators: Forest area (% of land area)", "2023"],
+      ["zimra/zimra-target", "7.2", "World Development Indicators: Tax revenue (% of GDP)", "2018"],
+    ];
+
+    RECORDED.forEach(([where, value, publication, asOf]) => {
+      const [departmentId, indicatorId] = where.split("/");
+      const indicator = findDepartment(departmentId)!.indicators.find((entry) => entry.id === indicatorId)!;
+      expect(indicator, `${where} exists`).toBeTruthy();
+      expect(indicator.value, `${where} value`).toBe(value);
+      expect(indicator.basis.kind, `${where} is published`).toBe("published");
+      if (indicator.basis.kind !== "published") return;
+      expect(indicator.basis.sourceId, `${where} source`).toBe("worldbank");
+      expect(indicator.basis.publication, `${where} publication`).toBe(publication);
+      expect(indicator.basis.asOf, `${where} period`).toBe(asOf);
+    });
+
+    // The recorded list is the whole published set: an unrecorded conversion fails here.
+    const published = EVERY.filter(({ indicator }) => indicator.basis.kind === "published");
+    expect(published, "the published set is fully recorded").toHaveLength(RECORDED.length);
+  });
 });

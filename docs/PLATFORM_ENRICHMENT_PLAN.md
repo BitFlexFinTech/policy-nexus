@@ -201,3 +201,94 @@ replaces all three with published figures and names the body that publishes each
 (`rbz.co.zw`) and the Monetary Policy Committee statement of 15 June 2026 · ZIMSTAT (`zimstat.co.zw`) ·
 the RBZ/ZIMSTAT series as compiled by Trading Economics, used only as the retrieval path and the
 cross-check above.
+---
+
+## PART 7 — The department indicators, researched one by one (Phase AD R2–R5)
+
+**R2 written 2026-09-28; R3 written 2026-09-29.** Recorded here so no later session re-fetches a figure
+or re-discovers which ones have no published equivalent. The rule is the platform's own sourcing rule: an
+indicator either names the body that publishes it, the publication it is taken from and the period, or it
+is shown as `Modelled`. **Nothing is invented** — a figure that cannot be confirmed from a named
+publication stays `Modelled`, exactly as AB-2 left 16 stakeholder shares modelled.
+
+**Where every figure below was read:** the World Bank's own Open Data API —
+`https://api.worldbank.org/v2/country/ZW/indicator/<SERIES>` — so any row can be re-checked with one
+request. The dataset's own `lastupdated` stamp at the time of reading was **2026-07-13**.
+
+### 7.1 The figures confirmed as published — 21 of the 63 indicators
+
+| Department / indicator (id) | Figure now shown | World Development Indicators series (code) | Period |
+|---|---|---|---|
+| fin / Fiscal deficit (`fin-deficit`) | **3.6** % of GDP (net borrowing) | Net lending (+) / net borrowing (−) (% of GDP) — `GC.NLD.TOTL.GD.ZS` | 2018 |
+| fin / Tax revenue (`fin-revenue`) | **7.2** % of GDP | Tax revenue (% of GDP) — `GC.TAX.TOTL.GD.ZS` | 2018 |
+| fin / Foreign direct investment, net inflows (`fin-investment`) | **USD 465M** | Foreign direct investment, net inflows (BoP, current US$) — `BX.KLT.DINV.CD.WD` | 2024 |
+| agri / Food production index (`agri-grain`) | **121.7** (2014–2016 = 100) | Food production index (2014-2016 = 100) — `AG.PRD.FOOD.XD` | 2022 |
+| agri / Livestock production index (`agri-herd`) | **119.6** (2014–2016 = 100) | Livestock production index (2014-2016 = 100) — `AG.PRD.LVSK.XD` | 2022 |
+| agri / Fertiliser consumption (`agri-input`) | **26.2** kg per hectare | Fertilizer consumption (kilograms per hectare of arable land) — `AG.CON.FERT.ZS` | 2023 |
+| health / Child immunisation coverage (`health-immune`) | **90** % | Immunisation, measles (% of children aged 12–23 months) — `SH.IMM.MEAS` | 2024 |
+| edu / Primary enrolment (`edu-enrolment`) | **94.1** % net | School enrolment, primary (% net) — `SE.PRM.NENR` | 2013 |
+| edu / Learner-teacher ratio (`edu-ratio`) | **36.4:1** | Pupil-teacher ratio, primary — `SE.PRM.ENRL.TC.ZS` | 2013 |
+| hedu / Tertiary enrolment (`hedu-enrolment`) | **7.7** % gross | School enrolment, tertiary (% gross) — `SE.TER.ENRR` | 2024 |
+| ict / Mobile subscriptions (`ict-coverage`) | **94.2** per 100 people | Mobile cellular subscriptions (per 100 people) — `IT.CEL.SETS.P2` | 2024 |
+| ict / Fixed broadband subscriptions (`ict-broadband`) | **1.9** per 100 people | Fixed broadband subscriptions (per 100 people) — `IT.NET.BBND.P2` | 2024 |
+| mines / Ores and metals share of exports (`mines-share`) | **33.8** % of merchandise exports | Ores and metals exports (% of merchandise exports) — `TX.VAL.MMTL.ZS.UN` | 2024 |
+| energy / Electricity access (`energy-access`) | **62** % of population | Access to electricity (% of population) — `EG.ELC.ACCS.ZS` | 2024 |
+| energy / Transmission and distribution losses (`energy-losses`) | **23.0** % of output | Electric power transmission and distribution losses (% of output) — `EG.ELC.LOSS.ZS` | 2023 |
+| lg / Basic drinking water access (`lg-water`) | **67.2** % of population | People using at least basic drinking water services (% of population) — `SH.H2O.BASW.ZS` | 2024 |
+| lg / Basic sanitation access (`lg-sanitation`) | **34.6** % of population | People using at least basic sanitation services (% of population) — `SH.STA.BASS.ZS` | 2024 |
+| mfa / Recorded remittances (`mfa-remittance`) | **USD 3.51B** | Personal remittances, received (current US$) — `BX.TRF.PWKR.CD.DT` | 2024 |
+| env / Protected area coverage (`env-parks`) | **28.3** % of land | Terrestrial protected areas (% of total land area) — `ER.LND.PTLD.ZS` | 2025 |
+| env / Forest area (`env-forest`) | **44.7** % of land | Forest area (% of land area) — `AG.LND.FRST.ZS` | 2023 |
+| zimra / Tax revenue (`zimra-target`) | **7.2** % of GDP | Tax revenue (% of GDP) — `GC.TAX.TOTL.GD.ZS` | 2018 |
+### 7.2 R2 — the thirteen written in 2026-09-28
+
+Electricity access · protected areas · forest area · mobile subscriptions · fixed broadband ·
+primary net enrolment · pupil–teacher ratio · measles immunisation · basic drinking water ·
+basic sanitation · ores and metals exports · personal remittances · tertiary enrolment.
+
+**Six of the thirteen were re-framed to the published measure** rather than quietly re-valued, because
+the published series measures something different from the earlier wording: "Population mobile coverage"
+→ **Mobile subscriptions**, "Broadband penetration" → **Fixed broadband subscriptions**, "Urban water
+availability" → **Basic drinking water access**, "Sewerage coverage" → **Basic sanitation access**,
+"Forest cover change" (no published figure for the *change*) → **Forest area**, "Mining share of exports"
+→ **Ores and metals share of exports**. **Two figures are old and the app says so:** primary enrolment
+and the pupil–teacher ratio are the **2013** values, because no later Zimbabwean figure exists in that
+series.
+
+### 7.3 R3 — the eight written in 2026-09-29 (this cluster: fin, zimra, zida, agri, energy, mines)
+
+Eight indicators became published figures, all read from the World Bank's own API during the session:
+`fin-deficit`, `fin-revenue`, `fin-investment`, `agri-grain`, `agri-herd`, `agri-input`,
+`energy-losses` and `zimra-target` (rows in 7.1). **Three ideas were re-framed to the published
+measure** rather than quietly re-valued, because the published series measures something different from
+the earlier wording: "Revenue performance" and "Revenue against target" → **Tax revenue**; "Approved
+investment value" → **Foreign direct investment, net inflows**; "National cattle herd" → **Livestock
+production index**; "Input support delivery" → **Fertiliser consumption**; "Distribution losses" →
+**Transmission and distribution losses**.
+
+### 7.4 No published equivalent — these stay labelled `Modelled` (not guessed)
+
+Researched and confirmed to have **no** matching series in the World Bank's own API for Zimbabwe, so they
+remain `Modelled`. Re-checking them is a new research task, not a re-fetch:
+
+| Department / indicator | Why there is no published figure |
+|---|---|
+| fin / Registered taxpayer growth (`fin-taxbase`) | A national taxpayer-register count is published in no series the platform can name |
+| zimra / Border clearance time (`zimra-clearance`) | An operational customs measure; no publisher publishes it |
+| zimra / On-time filing rate (`zimra-filing`) | An operational revenue-authority measure; no publisher publishes it |
+| zimra / Audit yield per case (`zimra-audit`) | An operational revenue-authority measure; no publisher publishes it |
+| zida / Licences issued (`zida-licences`) | ZIDA's own operational count; no publisher publishes it |
+| zida / Licence turnaround (`zida-turnaround`) | ZIDA's own operational measure; no publisher publishes it |
+| zida / Zone occupancy (`zida-zones`) | An SEZ operational return; no publisher publishes it |
+| zida / Investor retention (`zida-retention`) | ZIDA's own operational measure; no publisher publishes it |
+| mines / Domestically processed output (`mines-beneficiation`) | No beneficiation series exists; *mineral rents (% of GDP, 2021)* measures something else |
+| mines / Licence turnaround (`mines-licences`) | A mining-cadastre operational measure; no publisher publishes it |
+| mines / Reportable incidents (`mines-incidents`) | A mine-safety operational count; no publisher publishes it |
+| energy / Installed capacity (`energy-gen`) | The one candidate series, *Electricity production (kWh)*, is **archived** in the World Bank's API and returns no rows for Zimbabwe |
+| energy / Unserved demand (`energy-supply`) | A load-management operational measure; no publisher publishes it |
+| agri / Irrigated area (`agri-irrigated`) | *Agricultural irrigated land* exists as a series but holds **no Zimbabwe rows** |
+
+The remaining modelled indicators are researched in **R4 and R5**.
+
+**Sources for PART 7:** World Bank Open Data — World Development Indicators, read from
+`api.worldbank.org/v2/country/ZW/indicator/<series>` on 2026-09-29.

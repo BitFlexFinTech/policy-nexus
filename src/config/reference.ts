@@ -53,7 +53,7 @@ export const NAMED_SOURCES = [
     id: "worldbank",
     name: "World Bank Open Data",
     figures:
-      "Country figures compiled from national statistical agencies and international bodies — electricity access, protected areas, forest area, internet and mobile use, school enrolment, immunisation, water and sanitation, commodity exports and remittances",
+      "Country figures compiled from national statistical agencies and international bodies — electricity access and transmission and distribution losses, protected areas, forest area, internet and mobile use, school enrolment, immunisation, water and sanitation, commodity exports, remittances, government finances, investment inflows, food and livestock production and fertiliser use",
     publication:
       "World Development Indicators — each series compiled from national sources and, where the series requires it, from WHO/UNICEF, ITU, UNESCO or UN Comtrade, as the series metadata states",
   },

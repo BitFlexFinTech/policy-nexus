@@ -258,10 +258,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "fin-invest", label: "Investment promotion", note: "Improve the pipeline of bankable domestic and foreign projects." },
     ],
     indicators: [
-      { id: "fin-deficit", label: "Fiscal deficit", value: "4.2", unit: "% of GDP", score: 58, tone: "warning", note: "Projected deficit against the annual fiscal framework.", basis: { kind: "modelled" } },
-      { id: "fin-revenue", label: "Revenue performance", value: "94", unit: "%", score: 94, tone: "success", note: "Revenue collected against the annual target for the period to date.", basis: { kind: "modelled" } },
+      { id: "fin-deficit", label: "Fiscal deficit", value: "3.6", unit: "% of GDP", score: 4, tone: "warning", note: "General government net borrowing, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", asOf: "2018" } },
+      { id: "fin-revenue", label: "Tax revenue", value: "7.2", unit: "% of GDP", score: 7, tone: "warning", note: "Tax revenue as a share of GDP, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Tax revenue (% of GDP)", asOf: "2018" } },
       { id: "fin-taxbase", label: "Registered taxpayer growth", value: "+6.8", unit: "% YoY", score: 68, tone: "primary", note: "Growth in the active taxpayer register year on year.", basis: { kind: "modelled" } },
-      { id: "fin-investment", label: "Approved investment value", value: "USD 1.9B", score: 62, tone: "gold", note: "Value of investment licences approved in the period.", basis: { kind: "modelled" } },
+      { id: "fin-investment", label: "Foreign direct investment, net inflows", value: "USD 465M", score: 62, tone: "gold", note: "Net inflows of foreign direct investment, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Foreign direct investment, net inflows (BoP, current US$)", asOf: "2024" } },
     ],
     segments: ["exporters", "formal-business", "financial-sector", "civil-servants", "informal-traders", "diaspora", "manufacturers", "pensioners"],
     policyTemplates: [
@@ -317,10 +317,10 @@ export const DEPARTMENTS: Department[] = [
       { id: "agri-market", label: "Smallholder market access", note: "Link communal producers to structured buyers and contracts." },
     ],
     indicators: [
-      { id: "agri-grain", label: "Staple grain self-sufficiency", value: "89", unit: "%", score: 89, tone: "success", note: "Domestic staple grain availability against estimated national requirement.", basis: { kind: "modelled" } },
+      { id: "agri-grain", label: "Food production index", value: "121.7", unit: "index (2014–2016 = 100)", score: 89, tone: "success", note: "Food production relative to the 2014–2016 average, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Food production index (2014-2016 = 100)", asOf: "2022" } },
       { id: "agri-irrigated", label: "Irrigated area", value: "203k", unit: "ha", score: 66, tone: "primary", note: "Area under functioning irrigation, all schemes.", basis: { kind: "modelled" } },
-      { id: "agri-herd", label: "National cattle herd", value: "5.4M", score: 62, tone: "gold", note: "Estimated national herd after the annual veterinary survey.", basis: { kind: "modelled" } },
-      { id: "agri-input", label: "Input support delivery", value: "76", unit: "%", score: 76, tone: "warning", note: "Share of enrolled households receiving inputs before planting.", basis: { kind: "modelled" } },
+      { id: "agri-herd", label: "Livestock production index", value: "119.6", unit: "index (2014–2016 = 100)", score: 62, tone: "gold", note: "Livestock production relative to the 2014–2016 average, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Livestock production index (2014-2016 = 100)", asOf: "2022" } },
+      { id: "agri-input", label: "Fertiliser consumption", value: "26.2", unit: "kg per hectare", score: 26, tone: "warning", note: "Fertiliser applied per hectare of arable land, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Fertilizer consumption (kilograms per hectare of arable land)", asOf: "2023" } },
     ],
     segments: ["smallholder-farmers", "rural-households", "informal-traders", "exporters", "women-led-enterprises", "development-partners", "cooperatives", "informal-workers"],
     policyTemplates: [
@@ -668,7 +668,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "energy-access", label: "Electricity access", value: "62", unit: "% of population", score: 62, tone: "warning", note: "People with access to electricity, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Access to electricity (% of population)", asOf: "2024" } },
       { id: "energy-gen", label: "Installed capacity", value: "2.5", unit: "GW", score: 68, tone: "primary", note: "Installed generation capacity connected to the national grid.", basis: { kind: "modelled" } },
       { id: "energy-supply", label: "Unserved demand", value: "410", unit: "MW", score: 48, tone: "gold", note: "Average shortfall met through load management.", basis: { kind: "modelled" } },
-      { id: "energy-losses", label: "Distribution losses", value: "12.6", unit: "%", score: 60, tone: "success", note: "Energy lost between transmission and billing.", basis: { kind: "modelled" } },
+      { id: "energy-losses", label: "Transmission and distribution losses", value: "23.0", unit: "%", score: 23, tone: "warning", note: "Energy lost between generation and billing, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Electric power transmission and distribution losses (% of output)", asOf: "2023" } },
     ],
     segments: ["formal-business", "urban-households", "rural-households", "mining-operators", "informal-traders", "energy-water-utilities", "transport-operators"],
     policyTemplates: [
@@ -1013,7 +1013,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "zimra-digital", label: "Digital customs modernisation", note: "Move declarations and payments to a single electronic channel." },
     ],
     indicators: [
-      { id: "zimra-target", label: "Revenue against target", value: "94", unit: "%", score: 94, tone: "success", note: "Collections against the annual revenue target to date.", basis: { kind: "modelled" } },
+      { id: "zimra-target", label: "Tax revenue", value: "7.2", unit: "% of GDP", score: 7, tone: "warning", note: "Tax revenue as a share of GDP, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Tax revenue (% of GDP)", asOf: "2018" } },
       { id: "zimra-clearance", label: "Border clearance time", value: "26", unit: "hrs", score: 56, tone: "warning", note: "Average time from declaration to release for compliant consignments.", basis: { kind: "modelled" } },
       { id: "zimra-filing", label: "On-time filing rate", value: "69", unit: "%", score: 69, tone: "primary", note: "Registered taxpayers filing by the due date.", basis: { kind: "modelled" } },
       { id: "zimra-audit", label: "Audit yield per case", value: "USD 18k", score: 62, tone: "gold", note: "Average additional assessment raised per completed audit.", basis: { kind: "modelled" } },
