@@ -831,6 +831,18 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     // A policy is read by its matrices, so the M&E matrix is a real table on the page.
     await expect(page.getByText("Table 6 — Monitoring and evaluation matrix", { exact: true })).toBeVisible();
 
+    // Batch A item 5 — the four paperwork screens share one strip, in a real browser too,
+    // and the screen the reader is on is the one marked as current.
+    const strip = page.getByRole("navigation", { name: "Documents in this run" });
+    await expect(strip).toBeVisible();
+    await expect(strip.getByRole("link", { name: "Executive summary" })).toBeVisible();
+    await expect(strip.getByRole("link", { name: "Full assessment" })).toBeVisible();
+    await expect(strip.getByRole("link", { name: "Full report" })).toBeVisible();
+    await expect(strip.getByRole("link", { name: "Drafted policy" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+
     await page.getByRole("button", { name: "Edit draft wording" }).click();
     const box = page.getByLabel("Drafted policy text");
     await expect(box).toBeVisible();
