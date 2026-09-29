@@ -50,6 +50,8 @@ client is registered.
 | Department content (16 departments) | Authored deterministic config: `src/config/departments.ts` — **built in Phase B**, verified by importing the module: 16 departments, 64 priorities, 63 indicators, 48 policy templates, 49 documents. **Since Phase AD each indicator carries a `basis`:** either a published figure that names its publisher, its publication and the period (a key into the one `NAMED_SOURCES` table), or plainly `Modelled`. **13 published / 50 modelled after R2, 21 / 42 after R3, and 24 published / 39 modelled after R4 and R5 (2026-09-29)** — and every modelled one is labelled, never dressed as an official figure | CMS / ministry content service | Config loader |
 | Brand identity, disclaimer, engine vocabulary | `src/config/brand.ts` — **built in Phase B** | Stays (identity and disclaimer are permanent) | `src/config/brand.ts` |
 | Simulation history / policy register | **Phase E/F:** `/app/policies` and `/app/simulations` list the department's prepared drafts, and the register and the workspace history table list **real recorded runs** for that department (reference, result, and a link to the assessment). `src/services/assessment/runStore.ts` persists the run *requests* in `localStorage["nzwisiso.runs.v1"]`; results are recomputed from them, so a stored run can never drift from its inputs. | Database of real runs | `AssessmentService.listRuns()` — already the call site |
+| Versions of a department's policy | **REAL — Batch A (2026-09-30).** A run may be re-run from the drafted policy (`revisionOf` on the request), and its version number is **derived** by walking that chain (`src/services/assessment/revision.ts`), never stored beside the run. The identifier of a first run is unchanged by this: the lineage segment is appended to the seed only for a re-run, and `src/test/policy-revision.test.tsx` pins a first run's seed and id to the values the pre-Batch-A composition produced. | Database of policy versions, shared across officers | `src/services/assessment/revision.ts` + `runStore.ts` |
+| The officer's working copy of a drafted policy | **REAL local storage — Batch A (2026-09-30).** `src/services/documents/draftStore.ts` keeps the officer's own wording in `localStorage["nzwisiso.policy-drafts.v1"]`, keyed by the run it belongs to. Only the officer's text is stored — the generated draft is recomputed from the run — and a browser that refuses persistent storage says so on the screen instead of losing the words silently. Nothing is sent anywhere. | Shared drafts held with the run on the server, so a drafting team sees one text | `src/services/documents/draftStore.ts` (the store) + `usePolicyDraft.ts` (the screen) |
 | `REFERENCE_DATE = "2026-09-24"` | Fixed reference date for all dates shown — **built in Phase B** | Real clock | `src/config/reference.ts` |
 | Reference rates (ZiG, policy rate, inflation) | **Reconciled to named sources in AB-5.** `REFERENCE_RATES` holds the **published figures** and each one now names the body that publishes it (`sourceId` → `NAMED_SOURCES`: Reserve Bank of Zimbabwe for the ZiG rate and the bank policy rate; ZIMSTAT for inflation) and the **period the figure is for** (`asOf`). The reference screen prints the publisher, what the figure is and its period under every rate, and states the platform's sourcing rule. AB-5 replaced three stale placeholders that matched no published figure (13.56 ZiG, 19.5%, 8.4% — the last contradicted ZIMSTAT's own release). | Live data feed | `src/config/reference.ts` |
 | Stakeholder segments | **36** canonical segments in `STAKEHOLDER_SEGMENTS` (20 with a published share and a named source, 16 explicitly `Modelled`); departments may reference these ids only | CMS / segmentation service | `src/config/reference.ts` |
@@ -96,12 +98,14 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-09-29, after the truth-sweep publish and then Batch A's source changes): the
-  demonstration host is one build behind the working copy.** `nzwisiso.bitflex.app` serves
+- **Status today (2026-09-30, after Batch A's second half): the demonstration host is behind the working
+  copy.** `nzwisiso.bitflex.app` serves
   `assets/index-BgYDS9X7.js` (`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`) — fetched
   and hashed, and driven in a real browser against the live origin (the initiative `<h1>`, *Understanding
   before action*, the 16 department cards, 0 console errors, 0 page errors, 0 off-origin requests). Batch A
-  then changed source, so the locally built file is `assets/index-BrYtdYWT.js`. `npm run validate` prints
+  then changed source twice — its first half, then items 5, 6 and 7 — so the locally built file is now
+  `assets/index-DIYOve5d.js`, and the published bundle says nothing about the shared document strip, the
+  kept working copy or policy versions. `npm run validate` prints
   the served name and the locally built name side by side on every run, so any gap shows up in the machine
   output rather than in prose.
 

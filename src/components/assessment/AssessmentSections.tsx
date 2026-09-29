@@ -5,6 +5,7 @@ import { REFERENCE_DATE_LABEL } from "@/config/reference";
 import { VOCABULARY } from "@/config/brand";
 import { DIRECTION_TONE, SEVERITY_TONE, SENTIMENT_TONE } from "./tone";
 import type { AssessmentRun } from "@/services/assessment/types";
+import { revisionNumber, revisionParentReference } from "@/services/assessment/revision";
 
 export function AssessmentHeader({ run, title }: { run: AssessmentRun; title: string }) {
   return (
@@ -270,6 +271,14 @@ export function InputRecord({ run }: { run: AssessmentRun }) {
         <Row label="Reference date" value={REFERENCE_DATE_LABEL} />
         <Row label="Horizon" value={run.horizonLabel} />
         <Row label="Source" value={run.source} />
+        <Row label="Version" value={String(revisionNumber(run.id))} />
+        {run.revisionOf && (
+          <Row
+            label="Re-run from"
+            value={revisionParentReference(run.id) ?? run.revisionOf}
+            mono
+          />
+        )}
         <Row label="Seed" value={run.seed} mono />
         <Row label="Engine" value={`${VOCABULARY.simulationCore} (Mock)`} />
         <Row

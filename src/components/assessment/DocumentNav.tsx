@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { RevisionBadge } from "./RevisionBadge";
 import { DOCUMENT_VIEWS } from "./documentViews";
 
 /**
@@ -47,6 +48,9 @@ export function DocumentNav({ runId }: { runId: string }) {
           {view.label}
         </NavLink>
       ))}
+      {/* The version of the policy these documents belong to, derived from the run's own
+          lineage. A first run shows nothing. */}
+      <RevisionBadge runId={runId} className="ml-auto shrink-0" />
     </nav>
   );
 }

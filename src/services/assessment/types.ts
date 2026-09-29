@@ -15,8 +15,12 @@ import type { DepartmentId } from "@/config/departments";
 import type { StakeholderSegmentId, TimeHorizonId } from "@/config/reference";
 import type { ScenarioLevers } from "./levers";
 
-/** How the policy text reached the engine. */
-export type AssessmentSource = "paste" | "preset" | "upload";
+/**
+ * How the policy text reached the engine. `draft` is the drafted policy itself: the
+ * officer took the instrument the platform produced back through the simulation, which
+ * is what makes the run a later version of the one it came from.
+ */
+export type AssessmentSource = "paste" | "preset" | "upload" | "draft";
 
 /**
  * The inputs of a run. This is what gets persisted between visits; the result is
@@ -45,6 +49,13 @@ export interface AssessmentRequest {
    * fills in the neutral setting.
    */
   levers?: ScenarioLevers;
+  /**
+   * The run this one was re-run from, when the officer took the drafted policy back
+   * through the simulation. A first run has none. The version number is DERIVED from
+   * this chain (`revisionNumber` in `./revision`) and never stored a second time, so a
+   * run and the version it is shown as cannot drift apart.
+   */
+  revisionOf?: string;
 }
 
 export interface SimulationRound {
@@ -130,6 +141,10 @@ export interface AssessmentRun {
   levers: ScenarioLevers;
   /** One plain-language line per assumption, for the screen and every export. */
   leverNotes: string[];
+  /**
+   * The run this one was re-run from, copied from the request. Absent on a first run.
+   */
+  revisionOf?: string;
   status: "complete";
   confidence: number;
   summary: string;

@@ -745,6 +745,7 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
     policyTitle,
     policyText: request.policyText,
     source: request.source,
+    revisionOf: request.revisionOf,
     fileNames: request.fileNames ?? [],
     createdAt: REFERENCE_DATE,
     seed,

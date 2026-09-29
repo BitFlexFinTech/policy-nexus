@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useCallback, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DocumentActions } from "@/components/assessment/DocumentActions";
 import { DocumentNav } from "@/components/assessment/DocumentNav";
@@ -7,8 +7,10 @@ import { GeneratedDocumentView } from "@/components/assessment/GeneratedDocument
 import { RunError, RunNotFound, RunPending } from "@/components/assessment/AssessmentSections";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
 import { findDepartment } from "@/config/departments";
+import { assessmentService } from "@/services/assessment/AssessmentService";
 import { renderDocumentText } from "@/services/assessment/documents";
 import { CITATIONS_ANNEX } from "@/services/assessment/documentStructure";
+import { revisionNumber, revisionRequestFromRun } from "@/services/assessment/revision";
 import { buildDraftingProvenance, verifyDocumentCitations } from "@/services/documents/drafting";
 import { useGeneratedDocument } from "@/services/documents/useGeneratedDocument";
 import { usePolicyDraft } from "@/services/documents/usePolicyDraft";
@@ -20,9 +22,12 @@ import { useRun } from "@/services/assessment/useAssessmentRuns";
  * measures; the modelled risks, reactions and recommendations become the
  * engagement, mitigation and monitoring provisions.
  *
- * The draft is editable in place. Unedited it is fully deterministic (the same
- * run always yields the same text); editing is local state only, and whatever is
- * in the box is exactly what Print / Save as PDF / Download Word / Share export.
+ * The draft is editable in place, and the officer's wording is kept in this browser,
+ * keyed by the run, so it survives leaving the screen. Unedited it is fully
+ * deterministic (the same run always yields the same text). Whatever is in the box —
+ * the officer's wording or the generated text — is exactly what Print / Save as PDF /
+ * Download Word / Share export, and exactly what the simulation is run on when the
+ * officer takes the draft back through it (see `revisionRequestFromRun`).
  *
  * AB-4: the screen also states the draft's provenance — who produced it, from what
  * inputs, and whether every citation it lists was checked against the platform's
@@ -63,6 +68,36 @@ export default function PolicyDraft() {
   const draft = usePolicyDraft(run?.id ?? "", generatedText);
   const [editing, setEditing] = useState(false);
 
+  // The drafting stage: the drafted policy is run again as the department's next version.
+  const navigate = useNavigate();
+  const [isRunning, setIsRunning] = useState(false);
+  const [revisionError, setRevisionError] = useState<string | null>(null);
+
+  const runRevision = useCallback(async () => {
+    if (!run) return;
+    const request = revisionRequestFromRun(run.id, draft.text);
+    if (!request) {
+      setRevisionError(
+        "This run is no longer in this browser's register, so it cannot be re-run from here.",
+      );
+      return;
+    }
+    setIsRunning(true);
+    setRevisionError(null);
+    try {
+      // The seam answers in the same breath while the platform is simulated; a live
+      // service takes as long as it takes, and a failure is reported rather than hidden.
+      const next = await assessmentService.run(request);
+      navigate(`/app/simulations/${encodeURIComponent(next.id)}`);
+    } catch (error) {
+      setRevisionError(
+        error instanceof Error ? error.message : "The assessment service could not be reached.",
+      );
+    } finally {
+      setIsRunning(false);
+    }
+  }, [run, draft.text, navigate]);
+
   if (runPending) return <RunPending heading="Drafted policy" />;
   if (runError) return <RunError heading="Drafted policy" message={runError} />;
   if (!run || !department) return <RunNotFound heading="Drafted policy" />;
@@ -72,6 +107,7 @@ export default function PolicyDraft() {
 
   const isEdited = draft.isEdited;
   const text = draft.text;
+  const version = revisionNumber(run.id);
 
   const provenanceRows: ReadonlyArray<[string, string]> = provenance
     ? [
@@ -193,8 +229,32 @@ export default function PolicyDraft() {
         <GeneratedDocumentView document={generated} />
       )}
 
-      {/* The other three documents of this run are reached from the strip at the top of
-          this screen, so this row no longer repeats them. */}
+      {/* The drafting stage. The instrument the platform drafted becomes the policy the
+          simulation is run on, and the run that comes out is recorded as the next version
+          of this one, so the register reads as a chain of drafts rather than unrelated
+          runs. The wording in the box — the officer's own, or the generated text — is what
+          is run, exactly as it is what the export buttons above produce. */}
+      <div className="flex flex-wrap items-center gap-3" data-print="hide">
+        <Button
+          size="sm"
+          className="h-7 text-xs"
+          disabled={isRunning}
+          onClick={() => {
+            void runRevision();
+          }}
+        >
+          {isRunning ? "Running the simulation…" : "Run the simulation on this wording"}
+        </Button>
+        <span className="text-[10px] text-muted-foreground">
+          This is version {version} of the department's policy. Running this wording records
+          version {version + 1}.
+        </span>
+      </div>
+      {revisionError && (
+        <p className="text-[10px] leading-relaxed text-destructive" data-print="hide">
+          The run did not complete: {revisionError}
+        </p>
+      )}
     </div>
   );
 }

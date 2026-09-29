@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { EngineStatus } from "@/components/EngineStatus";
 import { RelationshipGraphCard } from "@/components/relationship/RelationshipGraphCard";
+import { RevisionBadge } from "@/components/assessment/RevisionBadge";
 import { RunError, RunPending } from "@/components/assessment/AssessmentSections";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -99,8 +100,10 @@ export default function SimulationRun() {
     <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
       <header className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-sm font-semibold tracking-tight text-foreground">
+          <h2 className="flex flex-wrap items-center gap-2 text-sm font-semibold tracking-tight text-foreground">
             {VOCABULARY.simulationCore} — {run.reference}
+            {/* Which version of the department's policy this run is. A first run shows none. */}
+            <RevisionBadge runId={run.id} />
           </h2>
           <p className="text-xs text-muted-foreground">
             {run.departmentName} · {run.policyTitle} · horizon {run.horizonLabel} · source {run.source}

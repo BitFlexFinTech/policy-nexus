@@ -855,6 +855,22 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await page.getByRole("button", { name: "Edit draft wording" }).click();
     await expect(page.getByLabel("Drafted policy text")).toHaveValue(/Draft policy —/);
 
+    // Batch A item 6 — the drafting stage: the drafted policy is taken back through the
+    // simulation as the department's next version, and the version is labelled wherever
+    // the run is named.
+    await expect(page.getByText(/This is version 1 of the department's policy/)).toBeVisible();
+    await page
+      .getByLabel("Drafted policy text")
+      .fill("The officer's own wording for version two.");
+    await page.getByRole("button", { name: "Run the simulation on this wording" }).click();
+    await expect(page).toHaveURL(/\/app\/simulations\//);
+    await expect(page.getByText("Version 2", { exact: true })).toBeVisible();
+
+    // The register now holds two versions of this department's policy, the second labelled.
+    await page.getByRole("link", { name: "Simulation Register" }).click();
+    await expect(page.getByText(/\b2 runs\b/)).toBeVisible();
+    await expect(page.getByText("Version 2", { exact: true })).toHaveCount(1);
+
     expectCleanRuntime();
   });
 });

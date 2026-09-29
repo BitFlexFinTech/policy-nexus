@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { findDepartment } from "@/config/departments";
 import { VOCABULARY } from "@/config/brand";
+import { RevisionBadge } from "@/components/assessment/RevisionBadge";
 import { REFERENCE_DATE_LABEL, getTimeHorizon } from "@/config/reference";
 import { useSession } from "@/session/useSession";
 import { useAssessmentRuns } from "@/services/assessment/useAssessmentRuns";
@@ -33,6 +34,13 @@ export default function Simulations() {
             ? `Completed runs for this department are listed first; each opens to its executive summary. The ${VOCABULARY.simulationCore} is deterministic, so re-running identical inputs reproduces the same result.`
             : `No simulation has been run for this department yet. Each row below is a policy draft prepared for the ${VOCABULARY.simulationCore}; results appear in this register once a draft is run.`}
         </p>
+        {runs.length > 0 && (
+          <p className="mt-1 max-w-3xl text-xs text-muted-foreground">
+            Each run is one version of the department's policy. A draft taken back through the{" "}
+            {VOCABULARY.simulationCore} is recorded as the next version, labelled beside its
+            reference.
+          </p>
+        )}
         {runs.length >= 2 && (
           <p className="mt-2">
             <Link
@@ -66,7 +74,10 @@ export default function Simulations() {
             <tbody>
               {runs.map((run) => (
                 <tr key={run.id} className="border-b transition-colors duration-100 last:border-0 hover:bg-muted/30">
-                  <td className="px-3 py-1.5 font-mono font-medium text-primary">{run.reference}</td>
+                  <td className="whitespace-nowrap px-3 py-1.5 font-mono font-medium text-primary">
+                    {run.reference}
+                    <RevisionBadge runId={run.id} className="ml-2 align-middle font-sans" />
+                  </td>
                   <td className="max-w-xs truncate px-3 py-1.5 text-foreground">{run.policyTitle}</td>
                   <td className="whitespace-nowrap px-3 py-1.5 text-muted-foreground">{run.horizonLabel}</td>
                   <td className="px-3 py-1.5 text-right font-mono text-foreground">{run.reactions.length}</td>

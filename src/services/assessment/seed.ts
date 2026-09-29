@@ -24,7 +24,15 @@ export const leverSeed = (levers?: Partial<ScenarioLevers>): string => {
   );
 };
 
-/** The exact string the engine is seeded from. Logged with every run. */
+/**
+ * The exact string the engine is seeded from. Logged with every run.
+ *
+ * The lineage segment is appended ONLY when the run descends from another one, so a
+ * first run's seed — and therefore its identifier and its result — is byte-identical
+ * to what every record made before revisions existed already produced. A re-run is
+ * distinguished by the run it came from, which is a real input: version 2 of a policy
+ * is a different object from version 1 even when a diff of the two texts is empty.
+ */
 export const seedForRequest = (request: AssessmentRequest): string =>
   [
     request.departmentId,
@@ -32,6 +40,7 @@ export const seedForRequest = (request: AssessmentRequest): string =>
     request.templateId ?? "custom",
     request.timeHorizon ?? "medium",
     leverSeed(request.levers),
+    ...(request.revisionOf ? [`revision-of:${request.revisionOf}`] : []),
   ].join("::");
 
 /** Short hex of the seed, used in identifiers. */

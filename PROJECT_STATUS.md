@@ -1514,9 +1514,11 @@ because the block it sits in already names itself.
 | 2026-09-29 | **BATCH A, first half — the engine's starting code out of every document, ICT second, and the owner's card sentence** (this session, on the user's instruction *"start Batch A now"*) | **(1) Item 4 (the owner's strict rule).** The string the owner kept seeing — `Seed: env::…` — was the engine's starting code, built as `department :: the ENTIRE submitted policy text :: preset :: horizon :: assumptions`. Because it contains the whole draft, every place that printed it reprinted the officer's own policy as one long machine string. It was printed in **FOUR** places, not the two the owner had seen: Annex D of the drafted policy, the long report's run-inputs list, the drafted-policy screen's **Provenance panel** row, the draft's closing **Provenance paragraph**, and the **final line of the visible simulation feed**. All five are removed; the raw code now appears only on the internal "exact inputs" record of the Full Assessment screen, next to the run reference that already identifies the run. **(2) Item 2.** The Ministry of ICT is now **second**, after the Office of the President and Cabinet, because it is the custodian of this platform. The order is now **derived**: `DEPARTMENT_IDS` is the single place it is defined and `DEPARTMENTS` is sorted to match, so the data and the reading order can no longer drift (they were two independent lists until this session). **(3) Item 8.** The data-path card now reads *"…and leverages the platform's API layer…"* — the owner's own words, given directly. The word `API` is permitted in **that one sentence only**: validate check 3 was split into **3a** (vendor names, no exception) and **3b** (implementation vocabulary with the one approved phrase), and the exception is provable — a probe file containing a second `API` turned the check red and was deleted again. **(4) Three defects found while doing the above, all fixed at source.** (a) Two tests **pinned the defect**: `documents.test.ts` required the report to CONTAIN the seed, and `drafting.test.ts` required the provenance note to contain it — both now assert the opposite and the reference instead. (b) The validator's **own header comment was stale**: it listed 16 checks in the wrong order and omitted the served-HTML-description check; rewritten to the real 18 in the order they run. (c) The copy checks scanned **`src/test/**`**, which can never reach a user, so a test that had to name a banned word in order to assert its absence failed the build — the earlier author had worked around it rather than fixing it. A `copyFiles` list now excludes test files from the copy checks while the code checks (determinism, network) still scan everything. **(5) Gates, each proved able to fail.** New: no generated document and no run-feed line may contain the seed or a seed label (all 16 departments); the drafted-policy screen must show no `Seed` row; the approved sentence renders once and `API` appears nowhere else on the page; `DEPARTMENT_IDS` and `DEPARTMENTS` both start `["opc", "ict"]`. Each was proved by mutation — the seed restored to both generators turned **two** gates red, and a probe file containing `API` turned the vocabulary check red — then restored **byte-identical** (`policyDraft.ts` sha256 `02819fbb4772a140e5079844746b7a501f5df682e0437ecbbff9403fe73ecacd`, `scenario.ts` sha256 `39cb10ee5df4ae21bb66639856207cbb3b757ab7d83230c0ab44778099a7eebe`) with validate green again |
 | 2026-09-29 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (Batch A first half, final bytes) | **ALL GREEN**: validate **18/18 PASS (exit 0)** — the count rose from 17 because check 3 was split into 3a and 3b — · typecheck **exit 0** · lint **exit 0, 0 errors** (the same 7 pre-existing `react-refresh` warnings in `src/components/ui/**`) · **427/427 across 34 files** (was 423; four new gates) · build **✓** emitting **`assets/index-BrYtdYWT.js`**, so the demonstration host is **one build behind** until it is redeployed |
 | 2026-09-29 | `npx playwright test` (Batch A first half, final bytes) | **PASS — 11 passed (29.6 s)** against the production preview build, 0 console errors and 0 off-origin requests per test |
-| 2026-09-29 | **what Batch A still owes** (recorded so it cannot be mistaken for done) | Still NOT STARTED: the **"Re-run simulation"** action with version labels (item 6 of the owner's list) and the **drafting stage** (item 6). **Items 5 and 7 are DONE in the second half below; Batch A's first half is DONE; the rest is not** |
+| 2026-09-29 | **what Batch A still owes** (recorded so it cannot be mistaken for done) | **BATCH A IS NOW COMPLETE (2026-09-30):** items 2, 4, 5, 6, 7 and 8 are DONE and gated — item 6's "drafting stage" was read as the re-run loop it names (a drafted policy taken back through the simulation as the next version). The owner's original list is **not recorded anywhere in this repository**, only its individual items; if a future session is told there was an eighth or ninth item, that list must be **asked for**, not guessed. **The one thing still outstanding is the redeploy:** the published address carries `assets/index-BgYDS9X7.js` (its hash and the fetch that proved it are in the DEMO HOST bullet below) while this working copy builds `assets/index-DIYOve5d.js` |
 | 2026-09-30 | **BATCH A, second half — item 5: ONE shared navigation strip on the four document screens** (this session, continuing *"start Batch A now"*) | The four screens that make up a run's paperwork — Executive summary, Full assessment, Full report, Drafted policy — each carried their **own** set of links to the other three, written out four times and kept in step by hand. There is now **one** definition, `DOCUMENT_VIEWS` in `src/components/assessment/documentViews.ts` (kept in its own file because a component file that also exports data breaks fast refresh — that was a real warning before the split), rendered by the one strip `src/components/assessment/DocumentNav.tsx`. All four screens render it directly under their header; the current screen is marked with `aria-current="page"`, so the marker is announced rather than carried by colour alone. The duplicated rows were **consolidated, not added to**: each screen now carries only its own next step (Executive summary → *Open full assessment*; Full assessment → *Simulation register*, the one destination outside the run's paperwork; Full report → *Draft the policy*), and the Drafted policy screen's three repeated links are gone. **Gate:** `src/test/journey.test.tsx` → *"carries the one shared document strip on all four screens of a run"* visits all four screens, derives its expected count from `DOCUMENT_VIEWS`, asserts every destination is present, asserts exactly the current one carries `aria-current="page"`, and asserts each destination appears **once** per screen (so a duplicated row cannot come back). **Proved able to fail:** removing `<DocumentNav />` from `FullAssessment.tsx` turned the gate red, then it was restored **byte-identical** (`FullAssessment.tsx` sha256 `516708f36e7993e90a9d1959a906c9aeb6d56bf88dee2551f1ebfa1f9a1c7fd7`) with the gate green again. Suite on these bytes: validate **18/18**, typecheck **0**, lint **0 errors, 7 warnings** (the baseline 7, unchanged), tests **428/428 across 34 files** (up one — the new gate), build **✓** |
 | 2026-09-30 | **BATCH A, second half — item 7: the officer's wording survives leaving the screen** (this session) | The drafted policy is a starting text the officer edits — and those edits lived only in the screen's own state, so opening the full report, or reloading the page, silently threw them away: *Edit draft wording* was a promise the platform did not keep. The working copy is now kept **in this browser, keyed by the run**: `src/services/documents/draftStore.ts` (the store, on the shared browser adapter, whose memory fallback is reported plainly) and `src/services/documents/usePolicyDraft.ts` (the screen's read and write). Only the officer's own text is stored — the generated draft is still recomputed from the run, so the two cannot drift; **blank text means "no working copy"**, so clearing the box brings the generated instrument back rather than exporting an empty one. The screen states where the wording is kept, and states plainly when the browser refused to keep data between visits. **Gates:** `src/test/policy-draft-persistence.test.tsx` (3 tests — carried across leaving and re-entering the screen; keyed per run, so two runs never share wording; a blank box is not a working copy and a write has exactly one key) **plus a real-browser proof** in `e2e/journey.spec.ts`: the officer edits, the page is **reloaded**, and the wording is still there; after *Reset to generated* a reload shows the generated draft again. **Proved able to fail:** returning early from `saveDraftText` turned **all three** gates red, then the file was restored **byte-identical** (`draftStore.ts` sha256 `6b062317b885edeb3d8c7edf4b8bad391f3a2d6601c9f3961d0922dca89a7b0c`) with the gates green again. Suite on these bytes: validate **18/18**, typecheck **0**, lint **0 errors, 7 warnings** (the baseline, unchanged), tests **431/431 across 35 files**, build **✓**, Playwright **11/11**. **Trap recorded:** the first Playwright run failed against a **stale `dist/`** because the shell chain `validate && typecheck && lint && test && build` had stopped at a lint error, so the build never ran — **always confirm the build ran before running Playwright** |
+| 2026-09-30 | **BATCH A, second half — item 6: the drafting stage, and versions of a department's policy** (this session) | The drafted policy can now be taken **back through the simulation**: the run that comes out is the department's **next version** of that policy, numbered and labelled everywhere the run is named. `revisionOf` on the request records where a run came from; the version number is **derived** by walking that chain (`src/services/assessment/revision.ts` — bounded and cycle-safe), never stored beside the run, so a label cannot disagree with the register. The request is built by `revisionRequestFromRun`: the wording in the box becomes the policy (the officer's own text, or the generated instrument), the horizon and assumptions carry over, and uploaded file names do not — the next version's input is the drafted policy itself, and the lineage names where it came from. Three defects found and **fixed at source** while doing it: (a) the drafted-policy screen's own comment still said *"editing is local state only"*, false since item 7 landed; (b) `AssessmentSections` would have listed no version at all on the internal record, so the record now carries a **Version** row and a **Re-run from** row (parent reference, or the parent's raw id when that run is no longer recorded); (c) the first version of the hook made `raw` an "unnecessary dependency" in `useMemo` — a real signal that the memo was not deriving from the snapshot — fixed by adding `draftTextIn(raw, runId)` so the value genuinely comes from the string the screen subscribed to. **Gates:** `src/test/policy-revision.test.tsx` (6 tests — 1→2→3 numbering; the request carries wording/horizon/assumptions and drops file names; the same wording reproduces the same version while never replacing the run it came from; a **pinned** first-run seed and id; a corrupted chain stops instead of hanging; and the screen test that runs the officer's wording, then finds **Version 2** on the new run's documents and beside its register row). A single mutation — dropping `revisionOf` from the built request — turned **4 of the 6** red, then `revision.ts` was restored **byte-identical** (sha256 `2bd74caf868c2677b024d9177fa484eaeacfa4430f4ab1f74892f71ae0e2979f`). The pinned first-run identity was checked **outside the app** as well: the 5-part seed and its hash were recomputed in plain Node from the composition in the previous revision of `seed.ts`, giving the same `fin-07d7371e`. **Real browser:** `e2e/journey.spec.ts` now edits the draft, runs that wording, sees **Version 2**, and finds the register holding **2 runs** with one version label. Suite on these bytes: validate **18/18**, typecheck **0**, lint **0 errors, 7 warnings** (baseline), tests **437/437 across 36 files**, build **✓** emitting **`assets/index-DIYOve5d.js`**, Playwright **11/11** |
+| 2026-09-30 | **defect inventory (Batch A, second half — every defect found, and its disposition)** | Five **FIXED at source**, one **BLOCKED**. (1) The drafted-policy screen's own comment said *"editing is local state only"* — false the moment item 7 landed; corrected. (2) The new strip file introduced a lint warning (a component file that also exports data breaks fast refresh, taking lint from the recorded 7 to 8); fixed by moving the destination list into `documentViews.ts`, so lint is back to the baseline 7 in stock shadcn/ui files. (3) The first `usePolicyDraft` made `raw` an *unnecessary dependency* of `useMemo` — a real signal that the memo was not deriving from the value it subscribed to; fixed by adding `draftTextIn(raw, runId)` so the wording is read from the snapshot itself. (4) Three stale statements in the records — `PRODUCTION_READINESS.md` and `PROJECT_STATUS.md` both still called the published bundle the working copy, the RESUME HERE said *nothing is outstanding*, and the expected test counts were 427/428/431 behind — all corrected, with the built bundle named. (5) The Playwright run was made once against a **stale `dist/`** because the validation chain stops at the first non-zero step; recorded as a trap in the log and in RESUME HERE rather than left unexplained. **BLOCKED:** the owner's **original fix list is not recorded anywhere in the repository** — only its individual items (2, 4, 5, 6, 7, 8), and item 6 as two phrases. Missing input: the owner's own list. Next action: **ask for it**; until then no further item is added or guessed. |
 
 
 
@@ -3116,26 +3118,71 @@ source, so the host is now one build behind. The only tracked file this session 
 The nine corrected statements, and the check that keeps each honest, are listed in the truth-sweep row of
 the timeline above.
 
+## Files touched in Batch A, second half (2026-09-30, this session)
+
+**Item 5 — one shared navigation strip on the four document screens**
+| Change | File | Status |
+|---|---|---|
+| The destinations, defined once | `src/components/assessment/documentViews.ts` (new) | DONE |
+| The strip itself (all four screens render it; current screen marked with `aria-current`) | `src/components/assessment/DocumentNav.tsx` (new) | DONE |
+| Duplicated per-screen link rows consolidated away | `src/pages/Assessment.tsx`, `AssessmentReport.tsx`, `FullAssessment.tsx`, `PolicyDraft.tsx` | DONE |
+| The gate | `src/test/journey.test.tsx` (new test, derives its count from `DOCUMENT_VIEWS`) | DONE |
+
+**Item 7 — the officer's working copy of a drafted policy**
+| Change | File | Status |
+|---|---|---|
+| The store (`localStorage["nzwisiso.policy-drafts.v1"]`, keyed by run) | `src/services/documents/draftStore.ts` (new) | DONE |
+| The screen's read/write, subscribed so two tabs agree | `src/services/documents/usePolicyDraft.ts` (new) | DONE |
+| The screen states where the wording is kept, and says so when the browser refuses | `src/pages/PolicyDraft.tsx` | DONE |
+| Gates: leaving and re-entering, per-run keys, blank ≠ working copy | `src/test/policy-draft-persistence.test.tsx` (new) | DONE |
+| Real-browser gate: edit → reload → wording still there → reset → reload → generated draft | `e2e/journey.spec.ts` | DONE |
+
+**Item 6 — the drafting stage, and versions of a department's policy**
+| Change | File | Status |
+|---|---|---|
+| `revisionOf` on the request; `draft` as a policy source; `revisionOf` on the run | `src/services/assessment/types.ts` | DONE |
+| The lineage segment, appended only for a re-run (a first run's id is untouched) | `src/services/assessment/seed.ts` | DONE |
+| The run carries its lineage | `src/services/assessment/scenario.ts` | DONE |
+| Version derivation (bounded, cycle-safe), parent reference, and the next-version request | `src/services/assessment/revision.ts` (new) | DONE |
+| The version label, one definition | `src/components/assessment/RevisionBadge.tsx` (new) | DONE |
+| Where the label appears: the run strip, the run screen, the register row | `DocumentNav.tsx`, `SimulationRun.tsx`, `Simulations.tsx` | DONE |
+| The run's internal record gains **Version** and **Re-run from** | `src/components/assessment/AssessmentSections.tsx` | DONE |
+| The action: run this wording as the next version | `src/pages/PolicyDraft.tsx` | DONE |
+| Gates (6), including the pinned first-run seed and id | `src/test/policy-revision.test.tsx` (new) | DONE |
+| Real-browser gate: edit → run the wording → **Version 2** → register holds 2 runs | `e2e/journey.spec.ts` | DONE |
+
+**Records corrected in the same session (false statements, fixed at source):** the drafted-policy screen's
+comment claiming *"editing is local state only"*; `PRODUCTION_READINESS.md` and `PROJECT_STATUS.md` claiming
+the published build was still the working copy (the working copy now builds `assets/index-DIYOve5d.js`);
+and the RESUME HERE counts.
+
+
 
 ## RESUME HERE
 
 **PLAIN SUMMARY (OWNER-FACING).**
-The platform is finished and working, and the first half of the fix list you approved is done and
-checked. Every automatic check passes — 18 of them now — all 427 tests pass, the code compiles into the
-files a browser runs, and the 11 tests that click through the whole journey in a real browser pass with
-no errors.
+The first half of your fix list was already done; **the rest of it is done now too**. The platform passes
+every automatic check — 18 of them — all 437 tests pass, the code compiles into the files a browser runs,
+and the 11 tests that click through the whole journey in a real browser pass with no errors.
 **The machine code is out of your documents.** The string you kept seeing, `Seed: env::…`, is gone from
 the drafted policy, from the long report, from the drafted-policy screen's provenance panel and from the
-line the simulation feed ends on. It was the engine's starting code, and because it is built from your
-whole submitted policy it was reprinting your entire draft as one long line. It is kept only on the
-internal "exact inputs" record. Three checks now fail if it ever returns.
+line the simulation feed ends on. It is kept only on the internal "exact inputs" record.
 **The Ministry of ICT is now second**, immediately after the Office of the President and Cabinet, on every
 screen — it is the custodian of this platform.
-**The card wording is yours:** "…and leverages the platform's API layer…". The word "API" is allowed in
-that one sentence only, and a check fails if it appears anywhere else.
-**One thing is not done: the newest version is not on the public address yet.** The address shows the
-version published earlier today, so it is one version behind this working copy. Publishing is one
-command, and I will ask you before I run it.
+**The card wording is yours:** "…and leverages the platform's API layer…". That word is allowed in that one
+sentence only, and a check fails if it appears anywhere else.
+**The four paperwork screens now share one navigation strip** — Executive summary, Full assessment, Full
+report, Drafted policy — so you can move between them from the top instead of hunting for links at the
+bottom, and the screen you are on is marked.
+**Your edits to a drafted policy are no longer thrown away.** Write your wording, open another screen or
+reload the page, and it is still there. The screen says where the wording is kept, and says so plainly if
+your browser refuses to keep it.
+**The drafted policy can now be run again as the next version.** From the drafted-policy screen, one
+button runs your wording through the simulation; the run that comes back is labelled **Version 2** wherever
+it is named, and the register shows both versions side by side. A first run stays unlabelled.
+**One thing is not done: the newest version is not on the public address yet.** The address shows an older
+version, so it is now several versions behind this working copy. Publishing is one command, and I will ask
+you before I run it.
 
 
 - **Branch `feature/unified-platform`.** The commits to know, newest first: **`6dfc4a5`** (the platform
@@ -3156,28 +3203,37 @@ command, and I will ask you before I run it.
   **`b2e2745`** — the Phase W merge (`c09bfa3`, "Merge pull request #1") plus its record commit; the
   `origin/main` blocker was **resolved in Phase W**, so there is **no** BLOCKER entry in *Known-red*.
   Everything is committed, so a cold session can start from this file alone.
-- **What to do next: NOTHING IS OUTSTANDING — every work item in the plan is DONE, including the
-  redeploy.** The build, the figures, the funding prompt **and the publication** are finished and
-  verified by the suite below and by the live-origin check recorded in this block. The next step is not
-  a code task — it is to **use** `docs/PROPOSAL_PROMPT.md`: copy it into Claude and take the funding
+- **What to do next: the fix list you approved is COMPLETE (Batch A, items 2, 4, 5, 6, 7 and 8 —
+  finished 2026-09-30).** The build, the figures, the funding prompt and the three documents are done;
+  **the only outstanding action is PUBLISHING** — the demonstration address carries the
+  2026-09-29 build while this working copy builds `assets/index-DIYOve5d.js`, and publishing changes the
+  public address, so it waits for the owner's word. The next step after that is not a code task — it is to
+  **use** `docs/PROPOSAL_PROMPT.md`: copy it into Claude and take the funding
   memo, the deck and the one-page ask to the meeting. **If a future session is asked to change something,
   the next
   command to run is** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`,
-  then `npx playwright test` — expected **all green: validate 18/18, tests 427/427 across 34 files,
-  Playwright 11/11**. **Do not re-fetch anything in PART 7 of `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
+  then `npx playwright test` — expected **all green: validate 18/18, tests 437/437 across 36 files,
+  Playwright 11/11** (and **check that the build actually ran before Playwright** — a chain stops at the
+  first non-zero step, and Playwright then tests a stale `dist/`). **Do not re-fetch anything in PART 7 of
+  `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
   24 published figures and the 39 recorded no-equivalent reasons are both there. **Read first:** the
-  **Phase AD R8** block above (what changed last), then `docs/PROPOSAL_PROMPT.md`, `scripts/validate.mjs`
+  **Batch A second-half rows** in the verification log (what changed last), then `docs/PROPOSAL_PROMPT.md`,
+  `scripts/validate.mjs`
   (**check 14**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
 - **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-BgYDS9X7.js`
-  (`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`)** — the build in this working
-  copy, published 2026-09-29 and **verified, not assumed**: the served page's own script tag names that
+  (`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`)** — the build that was in this
+  working copy on 2026-09-29, published that day and **verified, not assumed**: the served page's own script tag names that
   file, the fetched file hashes **identical** to the local build, and a real browser driven against the
   live origin printed the initiative `<h1>`, the *Understanding before action* eyebrow, the **16**
   department cards and **0** console errors, **0** page errors, **0** off-origin requests and **0**
   failed requests. `npm run validate` prints the served name beside the locally built name on every run,
   so a gap can never drift in silence. To publish any further change: `npm run build`, then the
   `.env`-based FTPS `mirror -R dist .` command below — **never add `--delete`.**
+  **Since that publish the working copy has moved on — Batch A's first half and then items 5, 6 and 7 of
+  its second half — so it now builds `assets/index-DIYOve5d.js` (2026-09-30) and THE HOST IS BEHIND until
+  it is republished.** Publishing is one command and is **not** done: it changes the public address, so it
+  waits for the owner's word.
 - **No page claims Government hosting.** The sovereignty statement (`SOVEREIGNTY_STATEMENT` in
   `src/config/brand.ts`) states the **compute path** — computed locally in the reader's browser, nothing
   leaves it — which is true wherever the page is served from. It made a **hosting** claim until the
@@ -3185,8 +3241,10 @@ command, and I will ask you before I run it.
   now fail if that claim returns**, in the app or in a document.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
   then `npx playwright test` — expected **all green**: validate **18/18**, typecheck **exit 0**, lint
-  **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files), tests **423/423 across
-  34 files**, build **✓**, Playwright **11/11**. The `--destructive` known-red is **retired**, and the
+  **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files), tests **437/437 across
+  36 files**, build **✓**, Playwright **11/11** — **but run the build as its own step or check its output**,
+  because `&&` stops at the first non-zero step and the browser tests then silently run against a stale
+  `dist/` (that happened this session). The `--destructive` known-red is **retired**, and the
   checks added since the AB-5 sweep cover the *retired document statements*, the *deployment claim and
   its evidence*, the ***Coat of Arms fingerprint with the icon set that belongs to it***, the
   ***Claude prompt asking for exactly three documents***, the ***product mark — composed in one place,
@@ -3196,8 +3254,10 @@ command, and I will ask you before I run it.
   **380/380** until R6 added the provenance gate, and **381/381 across 32 files** until the product-mark
   session, which landed at **423/423 across 34 files**; the positioning session added the crawler check and
   **Batch A's first half** split the vocabulary check in two, making validate **18/18** and the suite
-  **427/427**. **R4's three rows ride inside an existing test**, so the file and
-  test counts did not move when R4 landed. The numbers in this file's own Phase AD rows are the check.)
+  **427/427**; **Batch A's second half** added the shared document strip gate (**428/428**), the working
+  copy of a drafted policy (**431/431 across 35 files**) and versions of a policy (**437/437 across
+  36 files**, the count this line now states). **R4's three rows ride inside an existing test**, so the file
+  and test counts did not move when R4 landed. The numbers in this file's own Phase AD rows are the check.)
 - **Phase AD R3 is DONE (2026-09-29).** Eight more indicators became published figures, read from the
   World Bank's own API during the session: `fin-deficit`, `fin-revenue`, `fin-investment`, `agri-grain`,
   `agri-herd`, `agri-input`, `energy-losses` and `zimra-target`. The split after R3 was **21 published / 42
@@ -3466,9 +3526,10 @@ command, and I will ask you before I run it.
   real `.txt` reading, Phase Y added the capability configuration, the hidden administration screen
   and the click-through fixes, and **Phase Z wired all four capabilities** — the run path now waits,
   drafting and sign-in are connected, and the demo still renders in a single frame.
-  The full suite is green (measured this session): `npm run validate` **18/18 PASS**, `npm run typecheck`
+  The full suite is green (measured this session, 2026-09-30, after Batch A's second half):
+  `npm run validate` **18/18 PASS**, `npm run typecheck`
   exit 0, `npm run lint` **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files),
-  `npm test` **427/427 across 34 files**, `npm run build` ✓ (**`assets/index-BrYtdYWT.js`**),
+  `npm test` **437/437 across 36 files**, `npm run build` ✓ (**`assets/index-DIYOve5d.js`**),
   `npx playwright test` **11/11**. Phase AA left this green with 9 new guards (agent-population band and
   replay, the field drawn on the card, the authority line's position by real geometry), and the guards
   have grown with every session since.
