@@ -127,5 +127,42 @@
   body {
     background: #fff !important;
   }
+
+  /* A policy is read by its matrices, so the tables must survive the printer. */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+  }
+
+  th,
+  td {
+    border: 1px solid #999 !important;
+    padding: 2pt 3pt !important;
+    vertical-align: top;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+
+  /* The cover and the contents each begin their own page, as a printed instrument does. */
+  [data-doc-section="cover"],
+  [data-doc-section="contents"] {
+    break-after: page;
+  }
+
+  /* A numbered clause starts a fresh page only where it would otherwise be orphaned. */
+  [data-doc-section] {
+    break-inside: auto;
+  }
+
+  h4 {
+    break-after: avoid;
+  }
 }
 

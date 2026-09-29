@@ -201,8 +201,16 @@ describe("department indicators — published with a named source, or plainly mo
       .filter((indicator) => indicator.basis.kind === "modelled")
       .forEach((indicator) => {
         const unit = indicator.unit ? ` ${indicator.unit}` : "";
-        expect(text, `${indicator.id} baseline is written as modelled`).toContain(
-          `${indicator.label} — baseline ${indicator.value}${unit} (${MODELLED_INDICATOR_LABEL})`,
+        // The baseline now sits in the monitoring matrix rather than in a sentence, so the
+        // check follows it there: the row carrying this indicator must carry its baseline
+        // AND the modelled label, on the same line. A modelled figure presented as a
+        // published one still fails here.
+        const row = text
+          .split("\n")
+          .find((line) => line.includes(indicator.label) && line.includes(`| ${indicator.value}${unit} |`));
+        expect(row, `${indicator.id} has a monitoring row with its baseline`).toBeTruthy();
+        expect(row, `${indicator.id} baseline is written as modelled`).toContain(
+          MODELLED_INDICATOR_LABEL,
         );
       });
   });

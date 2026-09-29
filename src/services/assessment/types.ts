@@ -158,6 +158,18 @@ export interface GeneratedSection {
   bullets?: string[];
   /** How the optional list is rendered. Defaults to bullets. */
   listStyle?: "bullets" | "clauses";
+  /**
+   * Optional table rendered under the list — the Government matrices a policy is read
+   * by (implementation, monitoring and evaluation, stakeholder analysis). Every row must
+   * carry exactly one cell per column; a gate in `src/test/policy-document.test.ts`
+   * fails the build if a row is short, so a malformed matrix cannot reach a reader.
+   */
+  table?: {
+    /** The table's own caption, e.g. "Table 2 — Modelled position of each group". */
+    caption: string;
+    columns: string[];
+    rows: string[][];
+  };
 }
 
 /**

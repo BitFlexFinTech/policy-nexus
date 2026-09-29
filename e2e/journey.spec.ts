@@ -824,8 +824,11 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     // The drafted policy, including in-place editing.
     await page.getByRole("link", { name: "Draft the policy" }).click();
     await expect(page.getByRole("heading", { name: "Drafted policy", exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Preamble", exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "3. Policy measures", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Republic of Zimbabwe", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Table of contents", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "5. Policy measures", exact: true })).toBeVisible();
+    // A policy is read by its matrices, so the M&E matrix is a real table on the page.
+    await expect(page.getByText("Table 6 — Monitoring and evaluation matrix", { exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: "Edit draft wording" }).click();
     const box = page.getByLabel("Drafted policy text");

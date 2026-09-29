@@ -96,7 +96,7 @@ describe("the simulated platform renders without waiting", () => {
     renderAt(`/app/assessments/${encodeURIComponent(run.id)}/policy-draft`);
 
     expect(screen.getByRole("heading", { name: "Drafted policy" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Preamble" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Republic of Zimbabwe" })).toBeInTheDocument();
     expect(screen.queryByText(/Asking the configured service/)).toBeNull();
   });
 

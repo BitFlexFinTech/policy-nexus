@@ -137,17 +137,23 @@ describe("generated documents — the drafted policy", () => {
       department,
     );
     const ids = draft.sections.map((section) => section.id);
+    // The backbone of the instrument. The full Zimbabwean structure — every part in order,
+    // the length floor, the contents, the acronym list and the matrices — is gated in
+    // src/test/policy-document.test.ts.
     [
-      "preamble",
-      "objective",
-      "scope",
+      "cover",
+      "contents",
+      "foreword",
+      "executive-summary",
+      "situation-analysis",
       "measures",
-      "mitigation",
-      "engagement",
-      "transitional",
+      "legal",
+      "implementation",
       "monitoring",
+      "citations",
+      "annex-e",
       "note",
     ].forEach((id) => expect(ids).toContain(id));
-    expect(renderDocumentText(draft).length).toBeGreaterThan(1500);
+    expect(renderDocumentText(draft).length).toBeGreaterThan(20000);
   });
 });

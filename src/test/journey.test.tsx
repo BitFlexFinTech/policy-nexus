@@ -169,11 +169,20 @@ describe("journey — run a policy, then read its assessment", () => {
     renderAt(`/app/assessments/${encodeURIComponent(run.id)}/policy-draft`);
 
     expect(screen.getByRole("heading", { name: "Drafted policy" })).toBeInTheDocument();
-    ["Preamble", "1. Objective", "2. Scope and application", "3. Policy measures"].forEach((heading) => {
+    [
+      "Republic of Zimbabwe",
+      "Table of contents",
+      "4. Legal and institutional framework",
+      "5. Policy measures",
+      "10. Monitoring, evaluation and review",
+    ].forEach((heading) => {
       expect(screen.getByRole("heading", { name: heading })).toBeInTheDocument();
     });
-    // AB-4: the draft states the instruments it rests on, and where it came from.
-    expect(screen.getByRole("heading", { name: "8. Citations" })).toBeInTheDocument();
+    // AB-4: the draft states the instruments it rests on, and where it came from. The
+    // citations clause is Annex C now that the document follows the Zimbabwean order.
+    expect(
+      screen.getByRole("heading", { name: "Annex C — Instruments relied on" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/Public Finance Management Act \[Chapter 22:19\]/),
     ).toBeInTheDocument();

@@ -20,20 +20,44 @@ import { citedInstrumentLabel } from "./instruments";
 import { getStakeholderSegment, MODELLED_SHARE_LABEL, REFERENCE_DATE_LABEL } from "./reference";
 
 /**
- * The sections every drafted policy must carry, in order. `services/assessment/documents.ts`
+ * The sections every drafted policy must carry, in order. `services/assessment/policyDraft.ts`
  * produces exactly these headings, and a test holds the two together — so this list is a
- * promise the local generator keeps and a model would be asked to keep.
+ * promise the local generator keeps and a configured drafting service would be asked to keep.
+ *
+ * The order is the Zimbabwean one, taken from the published instruments themselves: front
+ * matter (cover, contents, foreword, acknowledgements, acronyms, executive summary), then
+ * numbered clauses (introduction, situation analysis, vision and objectives, legal framework,
+ * measures, implementation, risk, engagement, finance, monitoring, transitional), then the
+ * annexes and the closing note. The National ICT Policy 2015, the National Health Strategy
+ * 2021–2025 and the National AI Strategy 2026–2030 all follow this shape.
  */
 export const POLICY_DRAFT_STRUCTURE: readonly string[] = [
-  "Preamble",
-  "1. Objective",
-  "2. Scope and application",
-  "3. Policy measures",
-  "4. Risk mitigation",
-  "5. Stakeholder engagement",
-  "6. Transitional provisions",
-  "7. Monitoring, evaluation and review",
-  "8. Citations",
+  "Republic of Zimbabwe",
+  "Table of contents",
+  "Foreword",
+  "Acknowledgements",
+  "Abbreviations and acronyms",
+  "Executive summary",
+  "1. Introduction and background",
+  "2. Situation analysis",
+  "2.2 Modelled stakeholder position",
+  "2.3 Stated priorities the policy is directed at",
+  "3. Vision, mission, objectives and guiding principles",
+  "3.2 Guiding principles applied in preparing this draft",
+  "4. Legal and institutional framework",
+  "5. Policy measures",
+  "5.2 Measures arising from the examination",
+  "6. Implementation framework",
+  "7. Risk management",
+  "8. Stakeholder engagement and communication",
+  "9. Financial implications",
+  "10. Monitoring, evaluation and review",
+  "11. Transitional provisions",
+  "Annex A — Implementation matrix for the steps the examination recommended",
+  "Annex B — Stakeholder analysis",
+  "Annex C — Instruments relied on",
+  "Annex D — Run inputs and reproducibility",
+  "Annex E — Method and limitations",
   "Note on this draft",
 ];
 

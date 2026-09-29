@@ -17,7 +17,7 @@ export function GeneratedDocumentView({ document: doc }: { document: GeneratedDo
 
       <div className="space-y-5 p-4">
         {doc.sections.map((section) => (
-          <section key={section.id} className="space-y-2">
+          <section key={section.id} data-doc-section={section.id} className="space-y-2">
             <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {section.heading}
             </h4>
@@ -39,6 +39,47 @@ export function GeneratedDocumentView({ document: doc }: { document: GeneratedDo
                   </li>
                 ))}
               </ul>
+            )}
+
+            {section.table && (
+              <figure className="space-y-1">
+                <figcaption className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                  {section.table.caption}
+                </figcaption>
+                {/* A policy is read by its matrices, so the table is a real table with a
+                    header row and scoped column headers — not styled divs. */}
+                <div className="overflow-x-auto rounded-md border">
+                  <table className="w-full border-collapse text-left text-[11px]">
+                    <thead>
+                      <tr className="bg-muted/50">
+                        {section.table.columns.map((column) => (
+                          <th
+                            key={column}
+                            scope="col"
+                            className="border-b px-2 py-1 font-semibold text-foreground"
+                          >
+                            {column}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {section.table.rows.map((row, rowIndex) => (
+                        <tr key={rowIndex} className="align-top">
+                          {row.map((cell, cellIndex) => (
+                            <td
+                              key={cellIndex}
+                              className="border-b border-dashed px-2 py-1 leading-relaxed text-foreground"
+                            >
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </figure>
             )}
           </section>
         ))}

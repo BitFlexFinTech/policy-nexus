@@ -14,16 +14,10 @@
  * may later replace behind these same signatures (see PRODUCTION_READINESS.md).
  */
 
-import { indicatorBasisLabel, type Department } from "@/config/departments";
+import { type Department } from "@/config/departments";
 import { DISCLAIMER, SOVEREIGNTY_STATEMENT, VOCABULARY } from "@/config/brand";
 import { REFERENCE_DATE_LABEL } from "@/config/reference";
 import { createRng } from "@/lib/prng";
-import {
-  assertCitationsVerified,
-  citationsSectionFor,
-  provenanceParagraphs,
-  verifyDocumentCitations,
-} from "@/services/documents/drafting";
 import type {
   AssessmentRun,
   GeneratedDocument,
@@ -226,203 +220,14 @@ export const buildLongReport = (run: AssessmentRun, department: Department): Gen
 /* The drafted policy                                                          */
 /* ------------------------------------------------------------------------- */
 
-const REVIEW_TRIGGERS: readonly string[] = [
-  "the monitored indicators move outside the range the department stated for them",
-  "the end of the current planning horizon is reached",
-  "the department records compliance-cost concerns it cannot resolve within the existing procedure",
-];
-
 /**
- * The policy itself, drafted from the run: the submitted text becomes the
- * operative measures, and the simulation's findings become the engagement,
- * mitigation and monitoring provisions. Deterministic, and a text an official can
- * edit before it is circulated.
+ * The policy itself, drafted from the run. Its generator lives in its own module
+ * (`./policyDraft.ts`) because a Zimbabwean policy is a structured instrument — front
+ * matter, numbered clauses and annexes, and the matrices a policy is read by — and mixing
+ * it with the report generator made both harder to read. It is re-exported here so every
+ * existing caller and test keeps importing `buildPolicyDraft` from this module.
  */
-export const buildPolicyDraft = (run: AssessmentRun, department: Department): GeneratedDocument => {
-  const rng = createRng(`${run.seed}::policy-draft`);
-
-  const clauses = sentencesOf(run.policyText);
-  const receptive = run.reactions
-    .filter((reaction) => reaction.sentiment === "supportive")
-    .map((reaction) => reaction.label);
-  const conditional = run.reactions
-    .filter((reaction) => reaction.sentiment === "mixed")
-    .map((reaction) => reaction.label);
-  const reluctant = run.reactions
-    .filter((reaction) => reaction.sentiment === "resistant")
-    .map((reaction) => reaction.label);
-
-  const preamble: GeneratedSection = {
-    id: "preamble",
-    heading: "Preamble",
-    paragraphs: [
-      `WHEREAS ${department.name} is constituted with the following mandate: ${department.mandate}`,
-      `AND WHEREAS a simulation of the draft policy "${run.policyTitle}" (${run.reference}) was completed on ${REFERENCE_DATE_LABEL} over a ${run.horizonLabel.toLowerCase()} horizon, modelling the response of ${run.reactions.length} stakeholder groups and testing the draft against ${run.impacts.length} stated priorities;`,
-      `NOW THEREFORE the following measures are proposed for adoption by ${department.shortName}. This draft answers the pressures the simulation identified; it is not yet an adopted instrument.`,
-    ],
-  };
-
-  const objective: GeneratedSection = {
-    id: "objective",
-    heading: "1. Objective",
-    paragraphs: [
-      `The objective of this policy is to carry the draft "${run.policyTitle}" into effect while addressing the pressures the simulation identified, over a ${run.horizonLabel.toLowerCase()} horizon.`,
-      `The policy is directed at the following stated priorities of ${department.shortName}, and its effect on each is to be reported against them:`,
-    ],
-    bullets: department.priorities.map((priority) => `${priority.label} — ${priority.note}`),
-    listStyle: "clauses",
-  };
-
-  const scope: GeneratedSection = {
-    id: "scope",
-    heading: "2. Scope and application",
-    paragraphs: [
-      `This policy applies to ${department.name} and to the offices and agencies through which it implements policy. The groups the simulation modelled are the groups this policy is expected to reach.`,
-      `${listOf(receptive)} are modelled as receptive and can begin under phase one. ${listOf(conditional)} are modelled as conditional and require the engagement measures in clause 5 before obligations bite. ${listOf(reluctant)} are modelled as resistant and require the transitional and mitigation measures in clauses 4 and 6.`,
-    ],
-    bullets: run.reactions.map(
-      (reaction) =>
-        `${reaction.label} — modelled ${SENTIMENT_WORD[reaction.sentiment]} (support index ${reaction.supportIndex}/100)`,
-    ),
-    listStyle: "clauses",
-  };
-
-  const measures: GeneratedSection = {
-    id: "measures",
-    heading: "3. Policy measures",
-    paragraphs: [
-      `The measures below give effect to the draft. Measures 1 to ${Math.max(clauses.length, 1)} restate the substance of the submitted policy as operative provisions, so that the text the department simulated is the text the department adopts.`,
-    ],
-    bullets:
-      clauses.length > 0
-        ? clauses
-        : [
-            `The department shall carry out the measures described in the uploaded document(s): ${listOf(run.fileNames)}.`,
-          ],
-    listStyle: "clauses",
-  };
-
-  const mitigation: GeneratedSection = {
-    id: "mitigation",
-    heading: "4. Risk mitigation",
-    paragraphs: [
-      `Each risk the simulation identified is met with a specific provision, so that the policy does not depend on the risk not materialising.`,
-    ],
-    bullets: run.risks.map((risk, index) => {
-      const response =
-        run.recommendations.length > 0
-          ? run.recommendations[index % run.recommendations.length]
-          : undefined;
-      return response
-        ? `${risk.label} (modelled severity ${risk.severity}) — ${response.label}. ${response.note}`
-        : `${risk.label} (modelled severity ${risk.severity}) — the department shall record and address this risk before obligations commence.`;
-    }),
-    listStyle: "clauses",
-  };
-
-  const engagement: GeneratedSection = {
-    id: "engagement",
-    heading: "5. Stakeholder engagement",
-    paragraphs: [
-      `The simulation models ${conditional.length} groups as conditional and ${reluctant.length} as resistant, and treats late communication as a source of that resistance. Engagement is therefore a provision of this policy rather than an accompanying activity.`,
-    ],
-    bullets: [
-      `The department shall publish this policy, and the implementation schedule referred to in clause 7, before any measure in clause 3 takes effect.`,
-      conditional.length > 0
-        ? `The department shall hold a documented engagement round with ${listOf(conditional)} to settle the implementation detail those groups are waiting on, and shall publish its response.`
-        : `The department shall record, for each group, the implementation detail it is waiting on, and shall publish its response.`,
-      reluctant.length > 0
-        ? `The department shall meet ${listOf(reluctant)} before obligations commence and record the compliance-cost concerns raised, together with the department's response.`
-        : `The department shall record compliance-cost concerns raised by any affected group and publish its response.`,
-      `Every engagement round shall be minuted and the minutes retained for the review in clause 7.`,
-    ],
-    listStyle: "clauses",
-  };
-
-  const transitional: GeneratedSection = {
-    id: "transitional",
-    heading: "6. Transitional provisions",
-    paragraphs: [
-      `Obligations that begin before the supporting systems exist are the clearest risk the simulation identified. This policy therefore starts in phases rather than on a single date.`,
-      `Phase one begins with ${
-        receptive.length > 0
-          ? listOf(receptive)
-          : "the groups the department's own offices serve directly"
-      }. Phase two extends to ${
-        conditional.length > 0 ? listOf(conditional) : "the remaining affected groups"
-      } once the engagement in clause 5 is complete. Phase three extends to ${
-        reluctant.length > 0 ? listOf(reluctant) : "any group still carrying an unresolved cost"
-      } after the transition window, which shall not be shorter than two budget cycles.`,
-    ],
-  };
-
-  const monitoring: GeneratedSection = {
-    id: "monitoring",
-    heading: "7. Monitoring, evaluation and review",
-    paragraphs: [
-      `The policy is monitored against the department's own reference indicators, so that progress is read from one set of figures rather than several.`,
-      `The policy shall be reviewed when ${rng.pick(
-        REVIEW_TRIGGERS,
-      )}. The review shall report the actual position against the modelled position using the indicators below, and shall be published.`,
-    ],
-    bullets: department.indicators.map(
-      (indicator) =>
-        `${indicator.label} — baseline ${indicator.value}${indicator.unit ? ` ${indicator.unit}` : ""} (${indicatorBasisLabel(indicator.basis)})`,
-    ),
-    listStyle: "clauses",
-  };
-
-  const citations = citationsSectionFor(department);
-
-  const note = (paragraphs: string[]): GeneratedSection => ({
-    id: "note",
-    heading: "Note on this draft",
-    paragraphs,
-  });
-
-  const noteBase: string[] = [
-    `This is a drafted instrument produced from simulation ${run.reference}. It is a starting text for the responsible officer to edit; it is not an adopted policy and not legal drafting advice.`,
-    DISCLAIMER.long,
-  ];
-
-  const core: GeneratedSection[] = [
-    preamble,
-    objective,
-    scope,
-    measures,
-    mitigation,
-    engagement,
-    transitional,
-    monitoring,
-    citations,
-  ];
-
-  const identity = {
-    kind: "policy-draft" as const,
-    title: `Draft policy — ${run.policyTitle}`,
-    subtitle: `${department.name} · derived from ${run.reference} · reference date ${REFERENCE_DATE_LABEL}`,
-    fileStem: `${run.reference}-policy-draft`,
-  };
-
-  // The provenance sentence states how many citations were verified, so it is written
-  // from the check of the document's own citations clause. The closing note carries no
-  // citation of its own, which is why the note may be written after the check below.
-  const verification = verifyDocumentCitations(
-    { ...identity, sections: [...core, note(noteBase)] },
-    department,
-  );
-
-  const document: GeneratedDocument = {
-    ...identity,
-    sections: [...core, note([...noteBase, ...provenanceParagraphs(run, department, verification)])],
-  };
-
-  // Fail-closed: a draft that names an instrument outside the department's register, or a
-  // chapter no known citation carries, is not returned at all.
-  assertCitationsVerified(document, department);
-
-  return document;
-};
+export { buildPolicyDraft } from "./policyDraft";
 
 /* ------------------------------------------------------------------------- */
 /* Plain-text rendering — ONE definition, shared by export and by tests        */
@@ -444,6 +249,15 @@ export const renderDocumentText = (doc: GeneratedDocument): string =>
       ...(section.bullets ?? []).map((bullet, index) =>
         section.listStyle === "clauses" ? `${index + 1}. ${bullet}` : `- ${bullet}`,
       ),
+      // A table is rendered as pipe-separated rows, so the plain-text export, the
+      // Word export and the clipboard all carry the same matrix the screen shows.
+      ...(section.table
+        ? [
+            section.table.caption,
+            `| ${section.table.columns.join(" | ")} |`,
+            ...section.table.rows.map((row) => `| ${row.join(" | ")} |`),
+          ]
+        : []),
       "",
     ]),
   ].join("\n");

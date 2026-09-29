@@ -85,7 +85,7 @@ Also required by the same client:
       "departmentId": "fin",
       "instructions": "…the department's own prompt…",
       "citations": [ "Banking Act [Chapter 24:20]", "…" ],
-      "structure": [ "Preamble", "1. Objective", "…", "8. Citations", "Note on this draft" ]
+      "structure": [ "Republic of Zimbabwe", "Table of contents", "Foreword", "…", "11. Transitional provisions", "Annex C — Instruments relied on", "Note on this draft" ]
     }
   }
 }
@@ -96,6 +96,15 @@ Also required by the same client:
 handed to the local generator and to this service alike — so swapping the two cannot change
 what a draft is allowed to rest on. `prompt.citations` is the closed list a draft may cite;
 `prompt.structure` is the section list it must produce.
+
+**The structure now follows the Zimbabwean reading order** (front matter · eleven numbered
+clauses · five annexes · closing note — see `POLICY_DRAFT_STRUCTURE` in
+`src/config/draftingPrompts.ts`), and a service must return **every** part: the local generator
+produces 5,770–6,491 words per department, and a document that is thinner than that is not the
+instrument this platform promises. A service that returns a shorter document is not refused —
+the platform renders what it is given — but the length and structure gates in
+`src/test/policy-document.test.ts` hold the *local* generator to it, so a regression there
+fails the build.
 
 Expected: **200** with a complete `GeneratedDocument`
 (`src/services/assessment/types.ts`): `kind`, `title`, `subtitle`, `fileStem`, and a
