@@ -237,6 +237,10 @@ describe("department indicators — published with a named source, or plainly mo
       ["env/env-parks", "28.3", "World Development Indicators: Terrestrial protected areas (% of total land area)", "2025"],
       ["env/env-forest", "44.7", "World Development Indicators: Forest area (% of land area)", "2023"],
       ["zimra/zimra-target", "7.2", "World Development Indicators: Tax revenue (% of GDP)", "2018"],
+      // Phase AD R4 (2026-09-29) — the first three of the remaining departments' figures.
+      ["health/health-staffing", "3.1", "World Development Indicators: Nurses and midwives (per 1,000 people)", "2022"],
+      ["edu/edu-transition", "86.0", "World Development Indicators: Primary completion rate, total (% of relevant age group)", "2024"],
+      ["hedu/hedu-research", "519.9", "World Development Indicators: Scientific and technical journal articles", "2023"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {

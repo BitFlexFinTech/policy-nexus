@@ -377,7 +377,7 @@ export const DEPARTMENTS: Department[] = [
     indicators: [
       { id: "health-facilities", label: "Functional primary facilities", value: "94", unit: "%", score: 94, tone: "success", note: "Facilities open and staffed on the reporting day.", basis: { kind: "modelled" } },
       { id: "health-stockout", label: "Essential medicine availability", value: "72", unit: "%", score: 72, tone: "warning", note: "Tracer medicines available at the point of care.", basis: { kind: "modelled" } },
-      { id: "health-staffing", label: "Nurse posts filled", value: "81", unit: "%", score: 81, tone: "primary", note: "Funded nursing posts with an officer in place.", basis: { kind: "modelled" } },
+      { id: "health-staffing", label: "Nurses and midwives", value: "3.1", unit: "per 1,000 people", score: 31, tone: "warning", note: "Nursing and midwifery personnel per 1,000 people, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Nurses and midwives (per 1,000 people)", asOf: "2022" } },
       { id: "health-immune", label: "Child immunisation coverage", value: "90", unit: "%", score: 90, tone: "gold", note: "Children aged 12–23 months immunised against measles, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Immunisation, measles (% of children aged 12–23 months)", asOf: "2024" } },
     ],
     segments: ["health-workers", "urban-households", "rural-households", "civil-servants", "development-partners", "women-led-enterprises", "persons-with-disabilities", "women"],
@@ -435,7 +435,7 @@ export const DEPARTMENTS: Department[] = [
     indicators: [
       { id: "edu-enrolment", label: "Primary enrolment", value: "94.1", unit: "% net", score: 94, tone: "success", note: "Children of primary school age enrolled in primary education, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: School enrolment, primary (% net)", asOf: "2013" } },
       { id: "edu-ratio", label: "Learner-teacher ratio", value: "36.4:1", score: 62, tone: "warning", note: "Primary pupils for every teacher, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Pupil-teacher ratio, primary", asOf: "2013" } },
-      { id: "edu-transition", label: "Secondary transition", value: "82", unit: "%", score: 82, tone: "primary", note: "Grade 7 completers progressing to form one.", basis: { kind: "modelled" } },
+      { id: "edu-transition", label: "Primary completion rate", value: "86.0", unit: "% of relevant age group", score: 86, tone: "primary", note: "Children completing the last grade of primary education, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Primary completion rate, total (% of relevant age group)", asOf: "2024" } },
       { id: "edu-feeding", label: "Feeding coverage", value: "1.6M", unit: "learners", score: 70, tone: "gold", note: "Learners receiving a daily meal under the programme.", basis: { kind: "modelled" } },
     ],
     segments: ["educators", "rural-households", "urban-households", "youth", "development-partners", "women-led-enterprises", "faith-groups", "persons-with-disabilities"],
@@ -494,7 +494,7 @@ export const DEPARTMENTS: Department[] = [
       { id: "hedu-enrolment", label: "Tertiary enrolment", value: "7.7", unit: "% gross", score: 8, tone: "warning", note: "Tertiary enrolment as a share of the population of tertiary age, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: School enrolment, tertiary (% gross)", asOf: "2024" } },
       { id: "hedu-tvet-share", label: "Vocational share of enrolment", value: "34", unit: "%", score: 54, tone: "warning", note: "Share of tertiary students in vocational rather than academic programmes.", basis: { kind: "modelled" } },
       { id: "hedu-graduation", label: "Graduation rate", value: "78", unit: "%", score: 78, tone: "success", note: "Registered students completing their programme within the standard duration.", basis: { kind: "modelled" } },
-      { id: "hedu-research", label: "Research outputs registered", value: "212", score: 66, tone: "gold", note: "Publications and intellectual property registrations in the year.", basis: { kind: "modelled" } },
+      { id: "hedu-research", label: "Scientific journal articles", value: "519.9", unit: "articles", score: 52, tone: "gold", note: "Scientific and technical journal articles published in the year, as reported to the World Bank.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Scientific and technical journal articles", asOf: "2023" } },
     ],
     segments: ["youth", "educators", "formal-business", "diaspora", "development-partners", "researchers", "employer-federations"],
     policyTemplates: [
