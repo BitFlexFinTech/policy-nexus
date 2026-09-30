@@ -65,6 +65,33 @@ export interface AssessmentRequest {
    * other's work. See `src/config/officer.ts`.
    */
   preparedBy?: OfficerIdentity;
+  /**
+   * The department's own documents, read into this run (owner's item 3). Optional, so every
+   * stored run and every caller written before this existed keeps working; when present a
+   * short digest of them joins the seed, so the same draft with more departmental material
+   * is a genuinely different run.
+   */
+  documents?: DepartmentDocumentInput[];
+}
+
+/**
+ * One departmental document supplied to a run: its name, and whatever text was really read
+ * from it. `text` is empty when the file could only be recorded by name (a PDF in this
+ * build), so a run can state honestly how much departmental material it actually read
+ * (owner's item 3).
+ */
+export interface DepartmentDocumentInput {
+  id: string;
+  name: string;
+  text: string;
+}
+
+/** What a run recorded about one departmental document it was given. */
+export interface RunDocumentRecord {
+  id: string;
+  name: string;
+  /** Characters of real text read from this document. 0 when it could only be recorded. */
+  characters: number;
 }
 
 export interface SimulationRound {
@@ -156,6 +183,8 @@ export interface AssessmentRun {
   revisionOf?: string;
   /** Who prepared the policy, copied from the request. Absent when none was recorded. */
   preparedBy?: OfficerIdentity;
+  /** The departmental documents this run was given, and what was really read from each. */
+  documents?: RunDocumentRecord[];
   status: "complete";
   confidence: number;
   summary: string;

@@ -24,6 +24,7 @@ import {
 } from "@/services/extraction/extractPolicyText";
 import { useSession } from "@/session/useSession";
 import { getSession } from "@/session/session";
+import { departmentDocumentInputs } from "@/services/documents/departmentDocuments";
 
 /**
  * Policy ingestion for the signed-in department. Presets come from the
@@ -116,6 +117,9 @@ export function PolicyInput() {
       // and the record states plainly that the name is self-declared today. Read from the
       // session at the moment of the run, so the freshest name is the one recorded.
       preparedBy: getSession()?.officer,
+      // Owner's item 3 — the department's own documents are read into the run, so the
+      // modelled position rests on departmental material as well as on the submitted draft.
+      documents: departmentDocumentInputs(department.id),
     };
     // The seam always hands back a promise. While the platform is simulated it is
     // already resolved, so the officer waits for nothing — the run opens in the

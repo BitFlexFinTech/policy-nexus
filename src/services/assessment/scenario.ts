@@ -689,6 +689,19 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
   ).length;
   const weightedGap = Math.abs(support - supportEqual);
 
+  /**
+   * The department's own documents, when it supplied any (owner's item 3). Only text that was
+   * really read is counted: a file recorded by name contributes nothing to the examination,
+   * and the run says so rather than implying it was read.
+   */
+  const readDocuments = (request.documents ?? []).filter(
+    (document) => document.text.trim().length > 0,
+  );
+  const documentCharacters = readDocuments.reduce(
+    (total, document) => total + document.text.length,
+    0,
+  );
+
   const summary =
     `Modelled over ${horizonLabel.toLowerCase()} (${horizonMonths} months), the draft "${policyTitle}" draws a population-weighted support index of ` +
     `${support}/100 across ${reactions.length} stakeholder groups (${supportEqual}/100 if every group is counted equally), ` +
@@ -697,6 +710,9 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
     `and name ${addressed} of the ${reactions.length} modelled groups; its own reach is ${reading.breadth}/100. ` +
     `Confidence in the modelled range is ${confidence}% and modelled volatility is ${volatility}/100. ` +
     `${risks.length} ${risks.length === 1 ? "risk is" : "risks are"} raised, the first being ${risks[0].label.toLowerCase()}. ` +
+    (readDocuments.length
+      ? `The examination also read ${readDocuments.length} of the department's own ${readDocuments.length === 1 ? "document" : "documents"} (${documentCharacters} characters), so the modelled position rests on departmental material as well as the submitted draft. `
+      : "") +
     `These are simulated stakeholder responses under stated assumptions, prepared for decision support — not a forecast of public opinion.`;
 
   const metrics: AssessmentMetric[] = [
@@ -724,6 +740,17 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
       value: `${volatility} / 100`,
       note: "Spread of the modelled responses — higher means the outcome is more sensitive to implementation detail.",
     },
+    // Only when the department supplied documents that were really read (owner's item 3).
+    ...(readDocuments.length
+      ? [
+          {
+            id: "metric-documents",
+            label: "Departmental documents read",
+            value: String(readDocuments.length),
+            note: `${documentCharacters} characters of the department's own material were read alongside the submitted draft, so the modelled position rests on more than the draft alone.`,
+          },
+        ]
+      : []),
     {
       // BATCH A — the replacement for the old "stakeholder coverage" card. Coverage is
       // still stated (every group is modelled), and the draft's own reach is added, so
@@ -747,6 +774,16 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
     source: request.source,
     revisionOf: request.revisionOf,
     preparedBy: request.preparedBy,
+    // The departmental documents the run was given, with what was really read from each.
+    // Absent when none were supplied, so runs made before this existed are unchanged.
+    documents:
+      request.documents && request.documents.length > 0
+        ? request.documents.map((document) => ({
+            id: document.id,
+            name: document.name,
+            characters: document.text.trim().length,
+          }))
+        : undefined,
     fileNames: request.fileNames ?? [],
     createdAt: REFERENCE_DATE,
     seed,

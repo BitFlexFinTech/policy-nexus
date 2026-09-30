@@ -936,4 +936,41 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
 
     expectCleanRuntime();
   });
+
+  test("a department's own documents are read into its runs (item 3)", async ({ page }) => {
+    await page.goto("/");
+    await enterWorkspace(page);
+
+    // The department adds one of its own documents.
+    await page.getByRole("link", { name: "Documents" }).click();
+    await expect(page.getByRole("heading", { name: "Document Library" })).toBeVisible();
+    await page.setInputFiles('input[type="file"]', {
+      name: "finance-notes.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from(
+        "The department's own notes on tax bands and duty, added as material for the examination.",
+      ),
+    });
+    await expect(page.getByText("finance-notes.txt", { exact: true })).toBeVisible();
+    await expect(page.getByText(/characters will be read into every run/)).toBeVisible();
+
+    // A run made afterwards reads it, and both the run and the assessment say so.
+    await page.getByRole("link", { name: "Overview" }).click();
+    await page
+      .getByPlaceholder(/Draft the policy text/)
+      .fill("A draft run, used to check that the department's own documents are read.");
+    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
+      timeout: 30_000,
+    });
+    await page.getByRole("link", { name: "Open executive summary" }).click();
+    await expect(page.getByText("Departmental documents read")).toBeVisible();
+    await expect(page.getByText(/1 of the department's own document/)).toBeVisible();
+
+    // And the run's own record states what was supplied and what was read.
+    await page.getByRole("link", { name: "Full assessment", exact: true }).click();
+    await expect(page.getByText("1 supplied · 1 read")).toBeVisible();
+
+    expectCleanRuntime();
+  });
 });

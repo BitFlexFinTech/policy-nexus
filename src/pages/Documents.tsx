@@ -9,6 +9,7 @@ import { citedInstrumentLabel } from "@/config/instruments";
 import { formatReferenceDate } from "@/config/reference";
 import { useSession } from "@/session/useSession";
 import { RecordedDocumentDialog } from "@/components/documents/RecordedDocumentDialog";
+import { DepartmentDocumentsPanel } from "@/components/documents/DepartmentDocumentsPanel";
 
 /**
  * Document Library — the full department document register, with each document's
@@ -77,6 +78,9 @@ export default function Documents() {
           if (!open) setSelected(null);
         }}
       />
+
+      {/* Owner's item 3 — the department's own documents, read into every run it makes. */}
+      <DepartmentDocumentsPanel department={department} />
     </div>
   );
 }

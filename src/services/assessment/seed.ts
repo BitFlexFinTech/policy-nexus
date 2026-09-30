@@ -11,7 +11,27 @@
 import { hashString, normaliseSeedText, toSeedHex } from "@/lib/prng";
 import { officerDisplayName } from "@/config/officer";
 import { resolveLevers, type ScenarioLevers } from "./levers";
-import type { AssessmentRequest } from "./types";
+import type { AssessmentRequest, DepartmentDocumentInput } from "./types";
+
+/**
+ * A short, stable fingerprint of the departmental documents a run was given.
+ *
+ * The documents themselves are far too large to put in the seed — and the seed is displayed
+ * and stored — so the seed carries this digest instead: it changes the moment any document's
+ * text changes, and it never contains the text. Sorted, so the order documents were added in
+ * cannot change the result.
+ */
+const documentDigest = (documents?: DepartmentDocumentInput[]): string => {
+  if (!documents || documents.length === 0) return "";
+  return [...documents]
+    // Only documents with real text are part of the examination. A file recorded by name
+    // (a PDF in this build) contributes nothing, so it must not change the run either —
+    // the platform reads nothing and the seed says nothing.
+    .filter((document) => document.text.trim().length > 0)
+    .map((document) => `${document.id}:${document.text.length}:${toSeedHex(hashString(document.text))}`)
+    .sort()
+    .join("|");
+};
 
 /**
  * The assumptions, flattened into one string in a fixed order. Part of the seed, so
@@ -47,6 +67,7 @@ export const seedForRequest = (request: AssessmentRequest): string =>
           `prepared-by:${officerDisplayName(request.preparedBy)}|${request.preparedBy.position}|${request.preparedBy.source}`,
         ]
       : []),
+    ...(documentDigest(request.documents) ? [`documents:${documentDigest(request.documents)}`] : []),
   ].join("::");
 
 /** Short hex of the seed, used in identifiers. */

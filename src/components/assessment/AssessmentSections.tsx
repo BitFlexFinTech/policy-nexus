@@ -294,6 +294,15 @@ export function InputRecord({ run }: { run: AssessmentRun }) {
           label="Uploaded files"
           value={run.fileNames.length ? run.fileNames.join(", ") : "None"}
         />
+        {/* Owner's item 3 — what the department's own documents contributed to this run. */}
+        <Row
+          label="Departmental documents"
+          value={
+            run.documents && run.documents.length > 0
+              ? `${run.documents.length} supplied · ${run.documents.filter((document) => document.characters > 0).length} read`
+              : "None added for this department"
+          }
+        />
       </dl>
       <div className="mt-3">
         <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
