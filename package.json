@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc -b --pretty false",
     "validate": "node scripts/validate.mjs",
+    "sync:check": "node scripts/sync-check.mjs",
     "e2e": "playwright test"
   },
   "dependencies": {

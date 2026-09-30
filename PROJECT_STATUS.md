@@ -37,6 +37,16 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
   consolidated index confirms one** (`chapter: null` otherwise), the kind and the source. Departments point
   at it by `id`; the citation text shown anywhere is **derived** (`citedInstrumentLabel`) and is never
   stored a second time, so a title and its chapter cannot drift apart.
+- **SYNC IS A STRICT RULE (the owner, 2026-09-30): the local files, GitHub, and the public website
+  must always carry the same thing, and nobody may merely SAY they are in sync.** One command proves
+  it: **`npm run sync:check`** (`scripts/sync-check.mjs`). It fails unless (1) the working tree is
+  clean, (2) this copy and `origin/feature/unified-platform` are the same commit, (3) the app built
+  from THIS code is byte-for-byte the file the website serves — compared by fingerprint, not by
+  name — and (4) this copy is on the agreed branch. Run it after every deploy and before every
+  hand-off, and paste its real output as the evidence.
+- **A deploy is not finished until `npm run sync:check` says IN SYNC.** Uploading with `lftp mirror -R
+  --only-newer` (never `--delete`), then verifying the served file's sha256 against the local build,
+  is the whole procedure; the check is what makes "finished" mean something.
 - Determinism: no `Math.random()`, no `Date.now()`, no `new Date()` for content.
   `REFERENCE_DATE = "2026-09-24"`. Same department + same policy ⇒ identical result.
 - Scenario mode only: no backend, no DB, no AI APIs, no CDN scripts at runtime.
@@ -3437,11 +3447,12 @@ site itself.
   sovereignty-copy session, which the platform cannot know from where it runs; **validate checks 1 and 11
   now fail if that claim returns**, in the app or in a document.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test` — expected **all green**: validate **18/18**, typecheck **exit 0**, lint
-  **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files), tests **457/457 across
-  40 files**, build **✓**, Playwright **14/14** — **but run the build as its own step or check its output**,
+  then `npx playwright test`, and finally **`npm run sync:check`** — expected **all green**: validate **18/18**,
+  typecheck **exit 0**, lint **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files),
+  tests **470/470 across 43 files**, build **✓**, Playwright **16/16**, and the sync check reporting
+  **IN SYNC** (local files · GitHub · the website). **But run the build as its own step or check its output**,
   because `&&` stops at the first non-zero step and the browser tests then silently run against a stale
-  `dist/` (that happened this session). The `--destructive` known-red is **retired**, and the
+  `dist/` (that happened in an earlier session). The `--destructive` known-red is **retired**, and the
   checks added since the AB-5 sweep cover the *retired document statements*, the *deployment claim and
   its evidence*, the ***Coat of Arms fingerprint with the icon set that belongs to it***, the
   ***Claude prompt asking for exactly three documents***, the ***product mark — composed in one place,
