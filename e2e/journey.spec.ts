@@ -99,6 +99,24 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await expect(page).toHaveURL(/\/app$/);
   };
 
+  /**
+   * The same entry, with the officer's own name and post recorded (item 1). The fields sit
+   * on the chooser and are filled BEFORE the department is entered, which is the case the
+   * paper trail has to survive.
+   */
+  const enterWorkspaceWithPreparer = async (page: Page) => {
+    await openChooser(page);
+    await page.getByLabel("First name").fill("Tendai");
+    await page.getByLabel("Surname").fill("Moyo");
+    await page.getByLabel("Position").fill("Director, Policy Development");
+    await departmentGroup(page)
+      .getByRole("button", { name: new RegExp(escapeRegex(DEPARTMENT.shortName)) })
+      .first()
+      .click();
+    await page.getByRole("button", { name: `Enter ${DEPARTMENT.shortName}` }).click();
+    await expect(page).toHaveURL(/\/app$/);
+  };
+
   test("the landing page hands off to the chooser, which lists all 16 departments", async ({ page }) => {
     await page.goto("/");
 
@@ -882,6 +900,39 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await page.getByRole("link", { name: "Simulation Register" }).click();
     await expect(page.getByText(/\b2 runs\b/)).toBeVisible();
     await expect(page.getByText("Version 2", { exact: true })).toHaveCount(1);
+
+    expectCleanRuntime();
+  });
+
+  test("the drafted policy names the officer who prepared it (item 1 — the paper trail)", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await enterWorkspaceWithPreparer(page);
+
+    await page
+      .getByPlaceholder(/Draft the policy text/)
+      .fill("A draft used to check that the paper trail reaches the drafted policy.");
+    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
+      timeout: 30_000,
+    });
+    await page.getByRole("link", { name: "Draft the policy" }).click();
+    await expect(page.getByRole("heading", { name: "Drafted policy", exact: true })).toBeVisible();
+
+    // The instrument itself names the preparer, the panel shows the same person and post,
+    // and the screen says plainly where the name came from.
+    await expect(
+      page.getByText(/Prepared by: Tendai Moyo, Director, Policy Development/),
+    ).toBeVisible();
+    await expect(page.getByText("Tendai Moyo — Director, Policy Development").first()).toBeVisible();
+    await expect(page.getByText(/Names in this build are self-declared at entry/)).toBeVisible();
+
+    // The run's own record carries the same name, so the trail is on the record as well.
+    await page.getByRole("link", { name: "Full assessment" }).click();
+    await expect(page.getByRole("heading", { name: "Full Assessment" })).toBeVisible();
+    await expect(page.getByText("Tendai Moyo — Director, Policy Development").first()).toBeVisible();
+    await expect(page.getByText("Self-declared at entry (sign-in not enabled)")).toBeVisible();
 
     expectCleanRuntime();
   });

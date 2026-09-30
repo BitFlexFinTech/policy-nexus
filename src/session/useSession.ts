@@ -1,8 +1,10 @@
 import { useSyncExternalStore } from "react";
 import {
+  clearOfficer,
   clearSession,
   getSessionServerSnapshot,
   getSessionSnapshot,
+  setOfficer,
   signInToDepartment,
   signInWithSso,
   subscribeToSession,
@@ -24,4 +26,6 @@ export const sessionActions = {
   signInToDepartment,
   signInWithSso,
   clearSession,
+  setOfficer,
+  clearOfficer,
 };

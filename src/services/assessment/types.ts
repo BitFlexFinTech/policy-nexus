@@ -12,6 +12,7 @@
  */
 
 import type { DepartmentId } from "@/config/departments";
+import type { OfficerIdentity } from "@/config/officer";
 import type { StakeholderSegmentId, TimeHorizonId } from "@/config/reference";
 import type { ScenarioLevers } from "./levers";
 
@@ -56,6 +57,14 @@ export interface AssessmentRequest {
    * run and the version it is shown as cannot drift apart.
    */
   revisionOf?: string;
+  /**
+   * Who prepared the policy, recorded so the run carries a paper trail to the person
+   * responsible for it. Optional, so every stored run and every caller written before this
+   * existed keeps working; when present it is part of the seed, so two officers running
+   * the same text produce two recorded runs rather than one row that quietly replaces the
+   * other's work. See `src/config/officer.ts`.
+   */
+  preparedBy?: OfficerIdentity;
 }
 
 export interface SimulationRound {
@@ -145,6 +154,8 @@ export interface AssessmentRun {
    * The run this one was re-run from, copied from the request. Absent on a first run.
    */
   revisionOf?: string;
+  /** Who prepared the policy, copied from the request. Absent when none was recorded. */
+  preparedBy?: OfficerIdentity;
   status: "complete";
   confidence: number;
   summary: string;

@@ -18,6 +18,7 @@
 
 import { indicatorBasisLabel, type Department } from "@/config/departments";
 import { BRAND, DISCLAIMER, SOVEREIGNTY_STATEMENT, VOCABULARY } from "@/config/brand";
+import { officerDisplayName } from "@/config/officer";
 import {
   MODELLED_SHARE_LABEL,
   REFERENCE_DATE_LABEL,
@@ -37,6 +38,33 @@ import type {
   GeneratedSection,
   StakeholderReaction,
 } from "./types";
+
+/**
+ * Who the drafted policy names as its preparer: the officer recorded on the run, with their
+ * post, or the department when none was recorded. Composed here so the foreword, the
+ * "Prepared by" section and every export name the same preparer the same way (item 1).
+ */
+const preparerLine = (run: AssessmentRun, department: Department): string => {
+  const officer = run.preparedBy;
+  if (!officer) return department.shortName;
+  const name = officerDisplayName(officer) || department.shortName;
+  return [name, officer.position, department.shortName].map((part) => part.trim()).filter(Boolean).join(", ");
+};
+
+/**
+ * The paper-trail line the instrument itself carries: who prepared it, and how honestly that
+ * name was established. Kept to one line because a Government document's title block is fixed
+ * by the mandated structure; the full sentence about self-declaration appears on the screen
+ * and on the run's own record.
+ */
+const preparerDisclosure = (run: AssessmentRun, department: Department): string => {
+  const officer = run.preparedBy;
+  if (!officer) return `${department.shortName} (no individual preparer recorded)`;
+  const name = officerDisplayName(officer) || "unnamed officer";
+  const post = officer.position.trim() ? `, ${officer.position.trim()}` : "";
+  const how = officer.source === "sign-in" ? "from Government sign-in" : "self-declared at entry";
+  return `${name}${post}, ${department.shortName} (${how})`;
+};
 
 /** Re-exported so callers and gates read the document's numbering from one place. */
 export { CLAUSE } from "./documentStructure";
@@ -124,6 +152,9 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
       `DRAFT POLICY — ${run.policyTitle}`,
       `${BRAND.initiative} · prepared on ${BRAND.productName}`,
       `Run reference ${run.reference} · reference date ${REFERENCE_DATE_LABEL} · horizon ${run.horizonLabel} (${run.horizonMonths} months)`,
+      // Item 1 — the paper trail, on the instrument itself. One line, inside the block that
+      // already identifies the run, so the document's mandated structure is unchanged.
+      `Prepared by: ${preparerDisclosure(run, department)}`,
       "DRAFT FOR REVIEW — this is not an adopted instrument. It is prepared for decision support: the platform informs, and a human decides.",
       `Marking: ${BRAND.classification}`,
     ],
@@ -135,7 +166,7 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
     id: "foreword",
     heading: "Foreword",
     paragraphs: [
-      `This policy concerns "${run.policyTitle}", prepared by ${department.shortName}. Its measures were examined by controlled simulation before adoption, and the findings of that examination are recorded in the clauses and annexes that follow.`,
+      `This policy concerns "${run.policyTitle}", prepared by ${preparerLine(run, department)}. Its measures were examined by controlled simulation before adoption, and the findings of that examination are recorded in the clauses and annexes that follow.`,
       `The examination modelled the response of ${run.reactions.length} stakeholder groups over a ${run.horizonLabel.toLowerCase()} horizon and tested the draft against ${run.impacts.length} of the department's stated priorities. Where it showed a pressure the draft did not answer, this policy carries a provision for it.`,
       "The instrument remains a draft until it is adopted through the department's own approval process. Nothing in it decides a question that belongs to a person: it sets out what the department intends to do, and what the department will publish so that its effect can be seen.",
       `Foreword to be signed by the Honourable Minister responsible for ${department.name}: ${BLANK}, with the date of signature.`,

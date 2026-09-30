@@ -5,6 +5,7 @@ import { REFERENCE_DATE_LABEL } from "@/config/reference";
 import { VOCABULARY } from "@/config/brand";
 import { DIRECTION_TONE, SEVERITY_TONE, SENTIMENT_TONE } from "./tone";
 import type { AssessmentRun } from "@/services/assessment/types";
+import { officerRecordLine } from "@/config/officer";
 import { revisionNumber, revisionParentReference } from "@/services/assessment/revision";
 
 export function AssessmentHeader({ run, title }: { run: AssessmentRun; title: string }) {
@@ -272,6 +273,14 @@ export function InputRecord({ run }: { run: AssessmentRun }) {
         <Row label="Horizon" value={run.horizonLabel} />
         <Row label="Source" value={run.source} />
         <Row label="Version" value={String(revisionNumber(run.id))} />
+        {/* Item 1 — the paper trail, on the run's own record. */}
+        <Row
+          label="Prepared by"
+          value={officerRecordLine(run.preparedBy) ?? "Not recorded"}
+        />
+        {run.preparedBy?.source === "self-declared" && (
+          <Row label="Name source" value="Self-declared at entry (sign-in not enabled)" />
+        )}
         {run.revisionOf && (
           <Row
             label="Re-run from"

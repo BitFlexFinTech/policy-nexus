@@ -9,6 +9,7 @@
  */
 
 import { hashString, normaliseSeedText, toSeedHex } from "@/lib/prng";
+import { officerDisplayName } from "@/config/officer";
 import { resolveLevers, type ScenarioLevers } from "./levers";
 import type { AssessmentRequest } from "./types";
 
@@ -41,6 +42,11 @@ export const seedForRequest = (request: AssessmentRequest): string =>
     request.timeHorizon ?? "medium",
     leverSeed(request.levers),
     ...(request.revisionOf ? [`revision-of:${request.revisionOf}`] : []),
+    ...(request.preparedBy
+      ? [
+          `prepared-by:${officerDisplayName(request.preparedBy)}|${request.preparedBy.position}|${request.preparedBy.source}`,
+        ]
+      : []),
   ].join("::");
 
 /** Short hex of the seed, used in identifiers. */

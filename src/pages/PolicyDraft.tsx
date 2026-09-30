@@ -6,6 +6,7 @@ import { DocumentNav } from "@/components/assessment/DocumentNav";
 import { GeneratedDocumentView } from "@/components/assessment/GeneratedDocumentView";
 import { RunError, RunNotFound, RunPending } from "@/components/assessment/AssessmentSections";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
+import { OFFICER_SELF_DECLARED_NOTE, officerRecordLine } from "@/config/officer";
 import { findDepartment } from "@/config/departments";
 import { assessmentService } from "@/services/assessment/AssessmentService";
 import { renderDocumentText } from "@/services/assessment/documents";
@@ -118,6 +119,14 @@ export default function PolicyDraft() {
             : `The configured drafting service — ${provenance.model}`,
         ],
         ["Run reference", provenance.reference],
+        // Item 1 — the paper trail. The person the record names as the preparer, exactly as
+        // the run records them, so a reviewer can see who this draft is attributed to.
+        [
+          "Prepared by",
+          run.preparedBy
+            ? officerRecordLine(run.preparedBy) ?? department.name
+            : `Not recorded — attributed to ${department.name}`,
+        ],
         // The engine's starting code is deliberately NOT shown. It is built from the whole
         // submitted policy text, so the row displayed an officer's entire draft as one long
         // machine string underneath the run reference that already identifies the run. The
@@ -179,6 +188,13 @@ export default function PolicyDraft() {
             ))}
           </dl>
         </section>
+      )}
+
+      {/* Item 1 — honesty about the paper trail. A recorded name is stated for what it is. */}
+      {run.preparedBy?.source === "self-declared" && (
+        <p className="text-[10px] leading-relaxed text-muted-foreground">
+          {OFFICER_SELF_DECLARED_NOTE}
+        </p>
       )}
 
       <DocumentActions
