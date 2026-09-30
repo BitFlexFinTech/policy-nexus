@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DocumentActions } from "@/components/assessment/DocumentActions";
 import { DocumentNav } from "@/components/assessment/DocumentNav";
+import { draftingPathFor } from "@/components/assessment/draftingStageConfig";
 import { GeneratedDocumentView } from "@/components/assessment/GeneratedDocumentView";
 import { RunError, RunNotFound, RunPending } from "@/components/assessment/AssessmentSections";
 import { DISCLAIMER } from "@/config/brand";
@@ -66,9 +67,7 @@ export default function AssessmentReport() {
         {/* The other documents of this run live in the strip above; this row carries the
             one step that follows a report — drafting the instrument itself. */}
         <Button asChild size="sm" className="h-7 text-xs">
-          <Link to={`/app/assessments/${encodeURIComponent(run.id)}/policy-draft`}>
-            Draft the policy
-          </Link>
+          <Link to={draftingPathFor(run.id)}>Draft the policy</Link>
         </Button>
       </div>
     </div>

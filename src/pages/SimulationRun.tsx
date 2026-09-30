@@ -4,6 +4,7 @@ import { EngineStatus } from "@/components/EngineStatus";
 import { RelationshipGraphCard } from "@/components/relationship/RelationshipGraphCard";
 import { RevisionBadge } from "@/components/assessment/RevisionBadge";
 import { ReRunSimulationLink } from "@/components/assessment/ReRunSimulationLink";
+import { draftingPathFor } from "@/components/assessment/draftingStageConfig";
 import { RunError, RunPending } from "@/components/assessment/AssessmentSections";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -238,9 +239,7 @@ export default function SimulationRun() {
               </Link>
             </Button>
             <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-              <Link to={`/app/assessments/${encodeURIComponent(run.id)}/policy-draft`}>
-                Draft the policy
-              </Link>
+              <Link to={draftingPathFor(run.id)}>Draft the policy</Link>
             </Button>
             <Button asChild size="sm" variant="outline" className="h-7 text-xs">
               <Link to="/app/simulations">Simulation register</Link>

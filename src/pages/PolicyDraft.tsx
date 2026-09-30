@@ -1,6 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { DraftingStage } from "@/components/assessment/DraftingStage";
+import { DRAFTING_QUERY_PARAM, prefersReducedMotion } from "@/components/assessment/draftingStageConfig";
 import { DocumentActions } from "@/components/assessment/DocumentActions";
 import { DocumentNav } from "@/components/assessment/DocumentNav";
 import { GeneratedDocumentView } from "@/components/assessment/GeneratedDocumentView";
@@ -99,6 +101,22 @@ export default function PolicyDraft() {
     }
   }, [run, draft.text, navigate]);
 
+  // Item 6 — the drafting stage. It plays when the officer ARRIVES from "Draft the policy"
+  // (the address carries `?drafting=1`), not on every visit or reload, so returning to the
+  // document later is instant. The parameter is removed once read, so a reload does not
+  // replay the stage. A reader who asked their system for reduced motion never sees it.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [stageFinished, setStageFinished] = useState(false);
+  // Captured ONCE. The parameter is removed from the address on mount (below), so reading it
+  // again on a later render would report "no stage" and the stage would vanish mid-play.
+  const [stageRequested] = useState(() => searchParams.get(DRAFTING_QUERY_PARAM) === "1");
+  useEffect(() => {
+    if (searchParams.has(DRAFTING_QUERY_PARAM)) setSearchParams({}, { replace: true });
+  }, [searchParams, setSearchParams]);
+  const finishStage = useCallback(() => setStageFinished(true), []);
+  const showingStage =
+    stageRequested && !stageFinished && !prefersReducedMotion() && Boolean(generated);
+
   if (runPending) return <RunPending heading="Drafted policy" />;
   if (runError) return <RunError heading="Drafted policy" message={runError} />;
   if (!run || !department) return <RunNotFound heading="Drafted policy" />;
@@ -163,6 +181,13 @@ export default function PolicyDraft() {
 
       <DocumentNav runId={run.id} />
 
+      {/* Item 6 — the drafting stage: when the officer arrived from "Draft the policy" the
+          document is composed in front of them instead of already being finished. Every
+          other way of reaching this screen (the strip, a reload, a bookmark) skips it. */}
+      {showingStage ? (
+        <DraftingStage run={run} onDone={finishStage} />
+      ) : (
+      <>
       <div className="rounded-lg border border-warning/40 bg-warning/5 p-3 text-xs leading-relaxed text-foreground">
         {DISCLAIMER.short} This document is a starting text for the responsible officer to edit — it is
         not an adopted instrument.{" "}
@@ -270,6 +295,8 @@ export default function PolicyDraft() {
         <p className="text-[10px] leading-relaxed text-destructive" data-print="hide">
           The run did not complete: {revisionError}
         </p>
+      )}
+      </>
       )}
     </div>
   );

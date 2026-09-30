@@ -843,6 +843,15 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
 
     // The drafted policy, including in-place editing.
     await page.getByRole("link", { name: "Draft the policy" }).click();
+
+    // Owner's item 6 — the drafting stage. Arriving from "Draft the policy" shows the
+    // instrument being composed from THIS run (its own reaction, risk and recommendation
+    // counts), instead of the policy already being there. It is skippable.
+    const drafting = page.getByRole("region", { name: "Drafting the policy" });
+    await expect(drafting).toBeVisible();
+    await expect(drafting.getByRole("button", { name: "Show the policy now" })).toBeVisible();
+    await page.getByRole("button", { name: "Show the policy now" }).click();
+
     await expect(page.getByRole("heading", { name: "Drafted policy", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Republic of Zimbabwe", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Table of contents", exact: true })).toBeVisible();
@@ -929,6 +938,8 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     });
     await page.getByRole("link", { name: "Draft the policy" }).click();
     await expect(page.getByRole("heading", { name: "Drafted policy", exact: true })).toBeVisible();
+    // The drafting stage plays first (item 6); skip it to read the document.
+    await page.getByRole("button", { name: "Show the policy now" }).click();
 
     // The instrument itself names the preparer, the panel shows the same person and post,
     // and the screen says plainly where the name came from.
