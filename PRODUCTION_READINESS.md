@@ -100,17 +100,17 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-09-30, after Batch D — the host and the working copy are IN STEP).**
+- **Status today (2026-09-30, after Batch E — the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-D0IGL0ss.js` (`d810bf82bc679a717aa82b40bbb459d9dee324190bfce2ccba79ad659a99ce88`) — fetched
+  `assets/index-01cszBHW.js` (`0e698f14d6244e5c3afc277361204f95b22c77c23556468e419a31d0c8551536`) — fetched
   and hashed against the local `dist/` build (identical), and driven in a real browser against the live
-  origin (the initiative `<h1>`, *Understanding before action*, **all 16** department buttons, 0 console
-  errors, 0 page errors, 0 off-origin requests). The upload was `lftp mirror -R --only-newer` over explicit
-  FTPS, **never `--delete`** — 13 files, 1,314,347 bytes, 0 removed — and the SSL validation token
+  origin, which read the department dashboard as **"Stakeholder groups modelled 16 — This department's set
+  · 36 nationally"** and the Reference screen as **"Stakeholder groups modelled nationally (36)"**, with 0
+  console errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
+  explicit FTPS, **never `--delete`** — 13 files, 1,317,228 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. The published
-  bundle now carries the owner's items 6 and 7: *Re-run simulation*, *Drafting the policy*, *Show the
-  policy now*, *kept in this browser for this department* and *Loaded the inputs of*, and **no** MiroFish /
-  OASIS / Puter. `npm run validate` prints
+  bundle carries the owner's items 1–11, including every department modelling **16** stakeholder groups.
+  `npm run validate` prints
   the served name and the locally built name side by side on every run, so any gap shows up in the machine
   output rather than in prose.
 
