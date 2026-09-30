@@ -995,6 +995,33 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     expectCleanRuntime();
   });
 
+  test("the policy input remembers what was typed and set (item 7)", async ({ page }) => {
+    await page.goto("/");
+    await enterWorkspace(page);
+
+    const wording = "A draft the officer has not finished yet.";
+    await page.getByPlaceholder(/Draft the policy text/).fill(wording);
+    await page.getByRole("button", { name: "Needs a new appropriation" }).click();
+
+    // Leave the input for the register, then come back the way an officer would.
+    await page.getByRole("link", { name: "Simulation Register", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Simulation Register" })).toBeVisible();
+    await page.getByRole("link", { name: "Overview" }).click();
+
+    await expect(page.getByPlaceholder(/Draft the policy text/)).toHaveValue(wording);
+    await expect(page.getByRole("button", { name: "Needs a new appropriation" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(page.getByText(/kept in this browser for this department/)).toBeVisible();
+
+    // A full reload is a genuine re-run of the app — the draft must still be there.
+    await page.reload();
+    await expect(page.getByPlaceholder(/Draft the policy text/)).toHaveValue(wording);
+
+    expectCleanRuntime();
+  });
+
   test("the admin screen edits the landing page's wording (item 9)", async ({ page }) => {
     // The public page shows the wording it ships with.
     await page.goto("/");

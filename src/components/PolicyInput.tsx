@@ -27,6 +27,11 @@ import {
 import { useSession } from "@/session/useSession";
 import { getSession } from "@/session/session";
 import { departmentDocumentInputs } from "@/services/documents/departmentDocuments";
+import {
+  getPolicyInput,
+  isPolicyInputStorePersistent,
+  savePolicyInput,
+} from "@/services/documents/policyInputStore";
 
 /**
  * Policy ingestion for the signed-in department. Presets come from the
@@ -39,9 +44,18 @@ export function PolicyInput() {
   const department = findDepartment(session?.departmentId);
   const navigate = useNavigate();
 
-  const [draft, setDraft] = useState("");
-  const [templateId, setTemplateId] = useState<string | undefined>(undefined);
-  const [uploadedFiles, setUploadedFiles] = useState<ExtractedPolicyFile[]>([]);
+  // Item 7 — the officer's working draft is kept in this browser, keyed by department, so
+  // leaving the screen (for the register, a run, or anything else) and coming back no longer
+  // throws away what they typed, what they uploaded and the assumptions they set. The stored
+  // record is read ONCE, here, to seed the screen; everything after that is written back by
+  // the effect below. See `src/services/documents/policyInputStore.ts`.
+  const restored = getPolicyInput(department?.id);
+
+  const [draft, setDraft] = useState(() => restored?.text ?? "");
+  const [templateId, setTemplateId] = useState<string | undefined>(() => restored?.templateId);
+  const [uploadedFiles, setUploadedFiles] = useState<ExtractedPolicyFile[]>(
+    () => restored?.files ?? [],
+  );
   const [readProgress, setReadProgress] = useState(0);
   const [isReading, setIsReading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -49,7 +63,7 @@ export function PolicyInput() {
   const [runError, setRunError] = useState<string | null>(null);
   // BATCH E — the assumptions the officer sets for this run. Neutral by default, so
   // the screen renders exactly as it did before until a lever is touched.
-  const [levers, setLevers] = useState<ScenarioLevers>(DEFAULT_LEVERS);
+  const [levers, setLevers] = useState<ScenarioLevers>(() => restored?.levers ?? DEFAULT_LEVERS);
   const [searchParams, setSearchParams] = useSearchParams();
   // Item 6 — the run whose inputs were loaded by "Re-run simulation", so the screen can
   // say where the text came from instead of appearing to have invented it.
@@ -134,6 +148,22 @@ export function PolicyInput() {
     setLoadedFrom({ runId: inputs.runId, reference: peekRun(inputs.runId)?.reference });
     setRunError(null);
   }, [searchParams, department, setSearchParams]);
+
+  /**
+   * Item 7 — write the officer's working state back to this browser whenever it changes, so
+   * leaving the screen and returning finds it exactly as it was left. The store refuses an
+   * untouched screen, so simply opening the workspace leaves no record behind.
+   */
+  useEffect(() => {
+    if (!department) return;
+    savePolicyInput({
+      departmentId: department.id,
+      text: draft,
+      templateId,
+      levers,
+      files: uploadedFiles,
+    });
+  }, [department, draft, templateId, levers, uploadedFiles]);
 
   const handleRunSimulation = useCallback(async () => {
     if (!department) return;
@@ -230,7 +260,7 @@ export function PolicyInput() {
   const presets = department.policyTemplates;
 
   return (
-    <div className="flex h-full flex-col border-r bg-card">
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto border-r bg-card">
       <div className="flex items-center justify-between border-b px-4 py-2.5">
         <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Policy Ingestion Hub</span>
         <Button
@@ -265,6 +295,14 @@ export function PolicyInput() {
         </p>
       )}
 
+      {/* Item 7 — say plainly that the officer's work survives leaving this screen, and be
+          honest when the browser refused to keep anything. */}
+      <p className="border-b px-3 py-1.5 text-[10px] leading-relaxed text-muted-foreground">
+        {isPolicyInputStorePersistent()
+          ? "Your draft, your uploaded documents and your assumptions are kept in this browser for this department — they are still here when you come back to this screen."
+          : "This browser refused to keep data between visits, so your draft lasts only until this page is closed."}
+      </p>
+
       {/* Presets */}
       <div className="space-y-1 border-b px-3 py-2">
         <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -287,8 +325,10 @@ export function PolicyInput() {
         </div>
       </div>
 
-      {/* Text area */}
-      <div className="min-h-0 flex-1 p-3">
+      {/* Text area. It keeps a usable minimum height, and the column above scrolls rather
+          than letting the boxes below (the upload zone and the assumptions) be covered by
+          the history table on a short viewport. */}
+      <div className="min-h-[140px] flex-1 p-3">
         <textarea
           value={draft}
           onChange={(e) => {
