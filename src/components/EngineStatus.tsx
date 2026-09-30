@@ -1,6 +1,7 @@
 import { StatusPill } from "./StatusPill";
 import { countIndicatorsByBasis, findDepartment } from "@/config/departments";
 import { VOCABULARY } from "@/config/brand";
+import { STAKEHOLDER_SEGMENTS } from "@/config/reference";
 import { getReferenceRate } from "@/config/reference";
 import { useSession } from "@/session/useSession";
 import { useAssessmentRuns } from "@/services/assessment/useAssessmentRuns";
@@ -59,7 +60,16 @@ export function EngineStatus() {
           value={String(runs.length)}
           sub="Simulations recorded in this browser"
         />
-        <Metric label="Stakeholder segments" value={String(department.segments.length)} sub="Modelled population groups" />
+        {/* Two different quantities must never share one label. The dashboard shows THIS
+            department's modelled set; the Reference screen shows the national list. Before
+            the owner's item 11 they both read "Stakeholder segments", so the dashboard's 8
+            looked like a contradiction of the platform-wide 36 — that is exactly what the
+            owner reported. Each now says which it is. */}
+        <Metric
+          label="Stakeholder groups modelled"
+          value={String(department.segments.length)}
+          sub={`This department's set · ${STAKEHOLDER_SEGMENTS.length} nationally`}
+        />
         <Metric
           label="Reference indicators"
           value={String(department.indicators.length)}

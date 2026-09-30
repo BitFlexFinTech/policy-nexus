@@ -148,7 +148,7 @@ export const createSwarm = (
   const rng = createRng(seed);
   const centreX = options.width / 2;
   const centreY = options.height / 2;
-  const reach = Math.min(options.width, options.height) / 2;
+  const reach = Math.min(options.width, options.height) / 2 - options.padding;
 
   const byKind = new Map<RelationshipNodeKind, typeof graph.nodes>();
   graph.nodes.forEach((node) => {
@@ -327,7 +327,6 @@ export const stepSwarm = (state: SwarmState, dt: number): void => {
     if (node.y < inset) forceY[index] += (inset - node.y) * 0.02;
     if (node.y > bottom) forceY[index] -= (node.y - bottom) * 0.02;
   });
-
   // Integrate. A pinned node is driven by the pointer and holds its position, but
   // it still pushed its neighbours away in the loops above.
   nodes.forEach((node, index) => {
@@ -345,6 +344,35 @@ export const stepSwarm = (state: SwarmState, dt: number): void => {
     }
     node.x += node.vx * dt * 60;
     node.y += node.vy * dt * 60;
+
+    // HARD FRAME CONSTRAINT. The soft wall above is a force, and a force can be
+    // out-pushed: with enough marks in the school, repulsion and the springs held one
+    // outside the frame even at rest, which is exactly what the owner reported ("they
+    // should not go off screen"). Clamping the position after integrating makes "inside
+    // the padded frame" an invariant of the model rather than a hope. It is applied to
+    // pinned marks too, so a mark cannot be dragged out of the picture either.
+    //
+    // The outward velocity is cleared on the axis that was clamped. Without that, a mark
+    // held at the wall would keep pushing outward forever, its speed would never fall
+    // below `restSpeed`, and the whole school could never come to a true rest — which is
+    // the property that makes a mark clickable.
+    const inset = options.padding;
+    const right = options.width - inset;
+    const bottom = options.height - inset;
+    if (node.x < inset) {
+      node.x = inset;
+      if (node.vx < 0) node.vx = 0;
+    } else if (node.x > right) {
+      node.x = right;
+      if (node.vx > 0) node.vx = 0;
+    }
+    if (node.y < inset) {
+      node.y = inset;
+      if (node.vy < 0) node.vy = 0;
+    } else if (node.y > bottom) {
+      node.y = bottom;
+      if (node.vy > 0) node.vy = 0;
+    }
   });
 
   // Rest the whole school once nothing is moving faster than the rest speed. A

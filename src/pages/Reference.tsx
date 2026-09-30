@@ -77,12 +77,14 @@ export default function Reference() {
 
       <section className="rounded-lg border bg-card p-3">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Stakeholder segments modelled ({STAKEHOLDER_SEGMENTS.length})
+          Stakeholder groups modelled nationally ({STAKEHOLDER_SEGMENTS.length})
         </h3>
         <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
-          Each group carries the share of the country it stands for, with the source the figure came
-          from. Where no official figure exists, the share is labelled {MODELLED_SHARE_LABEL} rather
-          than filled with a guess.
+          The national list. Each department models its own set drawn from these — the dashboard shows
+          how many that department uses — so this figure and the dashboard's are different quantities,
+          not two answers to one question. Each group carries the share of the country it stands for,
+          with the source the figure came from. Where no official figure exists, the share is labelled{" "}
+          {MODELLED_SHARE_LABEL} rather than filled with a guess.
         </p>
         <ul className="mt-2 grid gap-1.5 sm:grid-cols-2">
           {STAKEHOLDER_SEGMENTS.map((segment) => (

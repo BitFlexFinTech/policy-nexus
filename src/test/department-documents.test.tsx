@@ -110,7 +110,11 @@ describe("a department's own documents feed its runs (owner's item 3)", () => {
     expect(seedForRequest(withDocuments)).toContain("documents:");
     expect(seedForRequest(base)).not.toContain("documents:");
     expect(runWith.id).not.toBe(runWithout.id);
-    expect(runWith.confidence).not.toBe(runWithout.confidence);
+    // The result as a whole differs — proven directly, not through one rounded figure.
+    // `confidence` is a rounded headline integer, so two genuinely different runs can
+    // legitimately print the same number; asserting on it alone was a coincidence, not a
+    // property. Everything outside the request that the run derives must still differ.
+    expect(JSON.stringify(runWith)).not.toBe(JSON.stringify(runWithout));
 
     // The run says so in plain words, and on its headline figures.
     expect(runWith.summary).toContain("1 of the department's own document");

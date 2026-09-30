@@ -17,29 +17,39 @@ import {
 } from "@/config/instruments";
 
 /**
- * The groups each department models, pinned exactly (Phase AC, batch E-2).
+ * The groups each department models, pinned exactly.
  *
  * This list is the one the run, the assessment and the relationship graph all derive
  * their participant groups from, so a change here changes what a simulation models.
  * Pinning it makes any later change deliberate instead of silent drift.
+ *
+ * RAISED 2026-09-30 — the owner's item 11. The owner reported for the second time that the
+ * relationship graph was still sparse and that a department still showed "Stakeholder
+ * segments 8". The cause: the *platform-wide* canonical list had grown to 36 groups, but each
+ * department still modelled only 6–8 of them, and the run, the graph and the dashboard all
+ * read the department's own list — so nothing the owner looked at had changed. Every
+ * department now models **16** groups, chosen from the 36 national groups for what that
+ * department's policies genuinely affect, keeping the departments distinct (Finance and
+ * Agriculture do not model the same population). The count is raised, not removed: the gate
+ * below still holds it to a range, and this pin still makes any change deliberate.
  */
 const DEPARTMENT_SEGMENTS: Record<string, string[]> = {
-  opc: ["civil-servants", "local-authorities", "development-partners", "formal-business", "youth", "traditional-leaders", "faith-groups", "media"],
-  fin: ["exporters", "formal-business", "financial-sector", "civil-servants", "informal-traders", "diaspora", "manufacturers", "pensioners"],
-  agri: ["smallholder-farmers", "rural-households", "informal-traders", "exporters", "women-led-enterprises", "development-partners", "cooperatives", "informal-workers"],
-  health: ["health-workers", "urban-households", "rural-households", "civil-servants", "development-partners", "women-led-enterprises", "persons-with-disabilities", "women"],
-  edu: ["educators", "rural-households", "urban-households", "youth", "development-partners", "women-led-enterprises", "faith-groups", "persons-with-disabilities"],
-  hedu: ["youth", "educators", "formal-business", "diaspora", "development-partners", "researchers", "employer-federations"],
-  ict: ["urban-households", "rural-households", "financial-sector", "formal-business", "youth", "informal-traders", "ict-operators", "researchers"],
-  mines: ["mining-operators", "rural-households", "exporters", "local-authorities", "formal-business", "artisanal-miners", "conservation-communities"],
-  energy: ["formal-business", "urban-households", "rural-households", "mining-operators", "informal-traders", "energy-water-utilities", "transport-operators"],
-  psc: ["civil-servants", "youth", "women-led-enterprises", "local-authorities", "development-partners", "pensioners", "trade-unions"],
-  lg: ["local-authorities", "urban-households", "rural-households", "informal-traders", "women-led-enterprises", "traditional-leaders", "energy-water-utilities", "transport-operators"],
-  mfa: ["exporters", "diaspora", "development-partners", "formal-business", "financial-sector", "tourism-operators", "cross-border-traders", "media"],
-  env: ["rural-households", "smallholder-farmers", "mining-operators", "development-partners", "local-authorities", "conservation-communities", "tourism-operators", "energy-water-utilities"],
-  def: ["civil-servants", "rural-households", "development-partners", "local-authorities", "war-veterans", "pensioners", "persons-with-disabilities"],
-  zimra: ["formal-business", "informal-traders", "exporters", "financial-sector", "mining-operators", "informal-workers", "cross-border-traders", "manufacturers"],
-  zida: ["formal-business", "exporters", "diaspora", "development-partners", "financial-sector", "manufacturers", "employer-federations", "tourism-operators"],
+  opc: ["civil-servants", "local-authorities", "development-partners", "formal-business", "youth", "traditional-leaders", "faith-groups", "media", "urban-households", "rural-households", "women", "trade-unions", "employer-federations", "persons-with-disabilities", "researchers", "informal-workers"],
+  fin: ["exporters", "formal-business", "financial-sector", "civil-servants", "informal-traders", "diaspora", "manufacturers", "pensioners", "urban-households", "rural-households", "informal-workers", "smallholder-farmers", "mining-operators", "trade-unions", "employer-federations", "women-led-enterprises"],
+  agri: ["smallholder-farmers", "rural-households", "informal-traders", "exporters", "women-led-enterprises", "development-partners", "cooperatives", "informal-workers", "urban-households", "formal-business", "financial-sector", "local-authorities", "traditional-leaders", "transport-operators", "energy-water-utilities", "cross-border-traders"],
+  health: ["health-workers", "urban-households", "rural-households", "civil-servants", "development-partners", "women-led-enterprises", "persons-with-disabilities", "women", "youth", "educators", "faith-groups", "local-authorities", "pensioners", "informal-workers", "traditional-leaders", "media"],
+  edu: ["educators", "rural-households", "urban-households", "youth", "development-partners", "women-led-enterprises", "faith-groups", "persons-with-disabilities", "civil-servants", "local-authorities", "traditional-leaders", "health-workers", "informal-workers", "media", "researchers", "trade-unions"],
+  hedu: ["youth", "educators", "formal-business", "diaspora", "development-partners", "researchers", "employer-federations", "urban-households", "rural-households", "civil-servants", "financial-sector", "manufacturers", "ict-operators", "women-led-enterprises", "media", "trade-unions"],
+  ict: ["urban-households", "rural-households", "financial-sector", "formal-business", "youth", "informal-traders", "ict-operators", "researchers", "civil-servants", "local-authorities", "media", "educators", "persons-with-disabilities", "women-led-enterprises", "energy-water-utilities", "development-partners"],
+  mines: ["mining-operators", "rural-households", "exporters", "local-authorities", "formal-business", "artisanal-miners", "conservation-communities", "urban-households", "civil-servants", "financial-sector", "manufacturers", "transport-operators", "energy-water-utilities", "trade-unions", "women-led-enterprises", "development-partners"],
+  energy: ["formal-business", "urban-households", "rural-households", "mining-operators", "informal-traders", "energy-water-utilities", "transport-operators", "civil-servants", "manufacturers", "smallholder-farmers", "local-authorities", "development-partners", "financial-sector", "women-led-enterprises", "informal-workers", "trade-unions"],
+  psc: ["civil-servants", "youth", "women-led-enterprises", "local-authorities", "development-partners", "pensioners", "trade-unions", "urban-households", "rural-households", "health-workers", "educators", "persons-with-disabilities", "women", "informal-workers", "employer-federations", "researchers"],
+  lg: ["local-authorities", "urban-households", "rural-households", "informal-traders", "women-led-enterprises", "traditional-leaders", "energy-water-utilities", "transport-operators", "civil-servants", "smallholder-farmers", "cooperatives", "faith-groups", "youth", "informal-workers", "development-partners", "persons-with-disabilities"],
+  mfa: ["exporters", "diaspora", "development-partners", "formal-business", "financial-sector", "tourism-operators", "cross-border-traders", "media", "manufacturers", "mining-operators", "employer-federations", "trade-unions", "civil-servants", "urban-households", "informal-traders", "researchers"],
+  env: ["rural-households", "smallholder-farmers", "mining-operators", "development-partners", "local-authorities", "conservation-communities", "tourism-operators", "energy-water-utilities", "urban-households", "artisanal-miners", "cooperatives", "traditional-leaders", "informal-workers", "women-led-enterprises", "manufacturers", "media"],
+  def: ["civil-servants", "rural-households", "development-partners", "local-authorities", "war-veterans", "pensioners", "persons-with-disabilities", "urban-households", "traditional-leaders", "faith-groups", "youth", "health-workers", "women", "media", "trade-unions", "transport-operators"],
+  zimra: ["formal-business", "informal-traders", "exporters", "financial-sector", "mining-operators", "informal-workers", "cross-border-traders", "manufacturers", "urban-households", "rural-households", "smallholder-farmers", "transport-operators", "employer-federations", "trade-unions", "cooperatives", "artisanal-miners"],
+  zida: ["formal-business", "exporters", "diaspora", "development-partners", "financial-sector", "manufacturers", "employer-federations", "tourism-operators", "mining-operators", "women-led-enterprises", "youth", "researchers", "ict-operators", "informal-traders", "transport-operators", "cooperatives"],
 };
 
 /**
@@ -142,10 +152,13 @@ describe("department config (src/config/departments.ts)", () => {
     }
   });
 
-  it("gives every department between 6 and 8 stakeholder groups, with no repeats", () => {
+  it("gives every department between 15 and 18 stakeholder groups, with no repeats", () => {
+    // Raised from 6–8 on 2026-09-30 (the owner's item 11): the relationship graph is drawn
+    // from these groups, and 6–8 of them left it visibly sparse. The gate is kept, so the
+    // count cannot silently fall back, and the range still allows the departments to differ.
     for (const d of DEPARTMENTS) {
-      expect(d.segments.length, `${d.id} models ${d.segments.length} groups`).toBeGreaterThanOrEqual(6);
-      expect(d.segments.length, `${d.id} models ${d.segments.length} groups`).toBeLessThanOrEqual(8);
+      expect(d.segments.length, `${d.id} models ${d.segments.length} groups`).toBeGreaterThanOrEqual(15);
+      expect(d.segments.length, `${d.id} models ${d.segments.length} groups`).toBeLessThanOrEqual(18);
       expect(new Set(d.segments).size, `${d.id} repeats a group`).toBe(d.segments.length);
     }
   });

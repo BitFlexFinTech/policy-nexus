@@ -995,6 +995,33 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     expectCleanRuntime();
   });
 
+  test("the dashboard states this department's own group count, not a stale one (item 11)", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await enterWorkspace(page);
+
+    // The figure the owner reported as stuck at 8, read from the rendered page — the whole
+    // point of item 11 is what the officer actually SEES, so the gate reads the screen and
+    // not the configuration.
+    const body = (await page.locator("body").textContent()) ?? "";
+    const shown = body.match(/Stakeholder groups modelled(\d+)/);
+    expect(shown, "the dashboard no longer states how many groups it models").not.toBeNull();
+    expect(Number(shown![1])).toBeGreaterThanOrEqual(15);
+
+    // The two quantities are labelled apart, so the dashboard's figure can never again read
+    // as a contradiction of the platform-wide list.
+    expect(body).toContain("36 nationally");
+
+    // And the national list is named for what it is.
+    await page.getByRole("link", { name: "Reference" }).click();
+    await expect(
+      page.getByRole("heading", { name: /Stakeholder groups modelled nationally \(36\)/ }),
+    ).toBeVisible();
+
+    expectCleanRuntime();
+  });
+
   test("the policy input remembers what was typed and set (item 7)", async ({ page }) => {
     await page.goto("/");
     await enterWorkspace(page);

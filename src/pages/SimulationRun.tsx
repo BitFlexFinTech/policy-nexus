@@ -32,6 +32,22 @@ import type { SimulationRound } from "@/services/assessment/types";
  */
 export const RUN_ROUND_TICK_MS = 1150;
 
+/**
+ * How many ticks the reveal aims to take, whatever the run's round count.
+ *
+ * A department now models sixteen stakeholder groups (the owner's item 11), and the run
+ * carries several rounds per group, so revealing exactly one round per tick would put a
+ * single run past forty seconds. The content is untouched — the same rounds, in the same
+ * order, from the same seed — and only the PACING changes: the reveal advances several
+ * rounds at a time so every run takes about the same, watchable time. The graph still grows
+ * as the run proceeds; it simply grows in slightly larger steps.
+ */
+export const RUN_REVEAL_TICKS = 18;
+
+/** How many rounds one tick reveals, for a run of this length. At least one. */
+const roundsPerTick = (total: number): number =>
+  Math.max(1, Math.ceil(total / RUN_REVEAL_TICKS));
+
 const toneClassFor = (round: SimulationRound, position: number) =>
   round.tone === "system"
     ? FEED_SYSTEM_TONE
@@ -60,7 +76,7 @@ export default function SimulationRun() {
   useEffect(() => {
     if (total === 0 || revealed >= total) return;
     const timer = window.setTimeout(
-      () => setRevealed((count) => Math.min(count + 1, total)),
+      () => setRevealed((count) => Math.min(count + roundsPerTick(total), total)),
       RUN_ROUND_TICK_MS,
     );
     return () => window.clearTimeout(timer);
