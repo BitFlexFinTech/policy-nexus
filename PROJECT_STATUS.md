@@ -3238,7 +3238,11 @@ server. Making it public for everyone is a separate job (the thing we call "depl
 
 
 
-- **Branch `feature/unified-platform`.** The commits to know, newest first: **`689e5ee`**, **`c890e02`**
+- **Branch `feature/unified-platform`.** The commits to know, newest first: **`7777508`** — **Batch C
+  (2026-09-30, owner's item 9)**: the administration screen edits the landing page's wording, its masthead
+  mark and its tab icon; before it **`3f05331`** (the review-zip folder is never committed), **`9859c2d`** —
+  **Batch B2 (item 3)**: a department's own documents are read into its runs, and **`7cdecd4`** —
+  **Batch B1 (item 1)**: the paper trail, who prepared a policy; then **`689e5ee`**, **`c890e02`**
   and **`3b02b9a`** — Batch A's second half (2026-09-30): the shared document strip on the four paperwork
   screens, the officer's working copy of a drafted policy, and a drafted policy re-run as the next version;
   then **`00be909`** — Batch A's first half: the engine's starting code out of every document, the Ministry
