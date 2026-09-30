@@ -28,6 +28,8 @@ dist
 playwright-report
 test-results
 *.zip
+# The review zip lives inside the project, and is never committed.
+Review Zip/
 *.tsbuildinfo
 
 # Local env
