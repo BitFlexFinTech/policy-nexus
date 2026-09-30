@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { findDepartment } from "@/config/departments";
 import { VOCABULARY } from "@/config/brand";
 import { RevisionBadge } from "@/components/assessment/RevisionBadge";
+import { ReRunSimulationLink } from "@/components/assessment/ReRunSimulationLink";
 import { REFERENCE_DATE_LABEL, getTimeHorizon } from "@/config/reference";
 import { useSession } from "@/session/useSession";
 import { useAssessmentRuns } from "@/services/assessment/useAssessmentRuns";
@@ -83,12 +84,21 @@ export default function Simulations() {
                   <td className="px-3 py-1.5 text-right font-mono text-foreground">{run.reactions.length}</td>
                   <td className="px-3 py-1.5 font-mono text-foreground">{run.confidence}%</td>
                   <td className="px-3 py-1.5">
-                    <Link
-                      to={`/app/assessments/${encodeURIComponent(run.id)}`}
-                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary hover:underline"
-                    >
-                      Complete
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to={`/app/assessments/${encodeURIComponent(run.id)}`}
+                        className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary hover:underline"
+                      >
+                        Complete
+                      </Link>
+                      {/* Item 6 — every completed run row can be taken back to the policy input
+                          with its own inputs loaded. A prepared draft is not yet a run, so it
+                          is not re-run from here. */}
+                      <ReRunSimulationLink
+                        runId={run.id}
+                        className="inline-flex items-center rounded-full border border-primary/40 px-2 py-0.5 text-[10px] font-semibold text-primary hover:bg-primary/10"
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}

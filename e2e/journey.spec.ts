@@ -902,6 +902,15 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await expect(page.getByText(/\b2 runs\b/)).toBeVisible();
     await expect(page.getByText("Version 2", { exact: true })).toHaveCount(1);
 
+    // Owner's item 6 — "Re-run simulation" on a register row takes that run's own inputs
+    // back to the policy input: the wording is already in the box, and the screen says
+    // where it came from. Nothing is retyped and no run is started by the press itself.
+    await page.getByRole("link", { name: "Re-run simulation" }).first().click();
+    await expect(page.getByPlaceholder(/Draft the policy text/)).toHaveValue(
+      "The officer's own wording for version two.",
+    );
+    await expect(page.getByText(/Loaded the inputs of/)).toBeVisible();
+
     expectCleanRuntime();
   });
 

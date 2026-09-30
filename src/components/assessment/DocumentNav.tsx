@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { ReRunSimulationLink } from "./ReRunSimulationLink";
 import { RevisionBadge } from "./RevisionBadge";
 import { DOCUMENT_VIEWS } from "./documentViews";
 
@@ -48,9 +49,17 @@ export function DocumentNav({ runId }: { runId: string }) {
           {view.label}
         </NavLink>
       ))}
-      {/* The version of the policy these documents belong to, derived from the run's own
-          lineage. A first run shows nothing. */}
-      <RevisionBadge runId={runId} className="ml-auto shrink-0" />
+      <span className="ml-auto flex shrink-0 items-center gap-1">
+        {/* The version of the policy these documents belong to, derived from the run's own
+            lineage. A first run shows nothing. */}
+        <RevisionBadge runId={runId} className="shrink-0" />
+        {/* Item 6 — from any of the four documents, take this run's inputs back to the policy
+            input so they can be edited and run again. */}
+        <ReRunSimulationLink
+          runId={runId}
+          className="shrink-0 whitespace-nowrap rounded-md border border-primary/40 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+        />
+      </span>
     </nav>
   );
 }

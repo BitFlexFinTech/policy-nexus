@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { findDepartment } from "@/config/departments";
 import { REFERENCE_FISCAL_YEAR } from "@/config/reference";
-import { assessmentService } from "@/services/assessment/AssessmentService";
+import { assessmentService, peekRun } from "@/services/assessment/AssessmentService";
+import { RERUN_QUERY_PARAM, rerunInputsFrom } from "@/services/assessment/rerun";
 import {
   CAPACITY_LEVERS,
   DEFAULT_LEVERS,
@@ -18,6 +19,7 @@ import {
 } from "@/services/assessment/levers";
 import type { AssessmentRequest, AssessmentSource } from "@/services/assessment/types";
 import {
+  classifyPolicyFile,
   extractPolicyFile,
   isAcceptedPolicyFile,
   type ExtractedPolicyFile,
@@ -49,6 +51,12 @@ export function PolicyInput() {
   // the screen renders exactly as it did before until a lever is touched.
   const [levers, setLevers] = useState<ScenarioLevers>(DEFAULT_LEVERS);
   const [searchParams, setSearchParams] = useSearchParams();
+  // Item 6 — the run whose inputs were loaded by "Re-run simulation", so the screen can
+  // say where the text came from instead of appearing to have invented it.
+  const [loadedFrom, setLoadedFrom] = useState<{ runId: string; reference?: string } | null>(null);
+  // The lineage the loaded run had, so running the same wording again reproduces it rather
+  // than silently becoming a first version of the policy.
+  const [revisionOf, setRevisionOf] = useState<string | undefined>(undefined);
 
   /**
    * Set one lever. The value is checked against the lever's own allowed values, so a
@@ -85,6 +93,48 @@ export function PolicyInput() {
     setSearchParams({}, { replace: true });
   }, [searchParams, department, setSearchParams]);
 
+  /**
+   * Item 6 — "Re-run simulation". The officer pressed the action against a recorded run,
+   * which arrives here as `?rerun=<run id>`. The run's own stored inputs are loaded back
+   * into this screen — its text, its preset, its uploaded file names and its four
+   * assumptions — so they edit and press Run rather than retyping. The parameter is then
+   * removed, exactly as `?draft` is, so the address stays clean and a reload cannot
+   * overwrite the officer's edits.
+   *
+   * A run that is no longer in this browser's register loads nothing: the screen says so
+   * rather than showing empty boxes that would look like a reset.
+   */
+  useEffect(() => {
+    const requestedRun = searchParams.get(RERUN_QUERY_PARAM);
+    if (!requestedRun || !department) return;
+    const inputs = rerunInputsFrom(decodeURIComponent(requestedRun));
+    setSearchParams({}, { replace: true });
+    if (!inputs || inputs.departmentId !== department.id) {
+      setRunError("That run is no longer in this browser's register, so its inputs cannot be loaded.");
+      return;
+    }
+    // An upload run's text was its file names, not typed wording — putting that fallback
+    // string in the box would turn the next run into a paste. The files are carried instead,
+    // so re-running reproduces the same upload run.
+    const isUploadRun = inputs.source === "upload";
+    setDraft(isUploadRun ? "" : inputs.policyText);
+    setTemplateId(inputs.templateId);
+    setLevers(inputs.levers);
+    setRevisionOf(inputs.revisionOf);
+    setUploadedFiles(
+      inputs.fileNames.map((name) => ({
+        name,
+        sizeLabel: "—",
+        kind: classifyPolicyFile(name),
+        extracted: false,
+        text: "",
+        status: "Carried over from the earlier run — not read again.",
+      })),
+    );
+    setLoadedFrom({ runId: inputs.runId, reference: peekRun(inputs.runId)?.reference });
+    setRunError(null);
+  }, [searchParams, department, setSearchParams]);
+
   const handleRunSimulation = useCallback(async () => {
     if (!department) return;
     const fileNames = uploadedFiles.map((file) => file.name);
@@ -112,6 +162,10 @@ export function PolicyInput() {
       // BATCH E — the officer's assumptions travel with the request, so they are part
       // of the stored run and part of its seed.
       levers,
+      // Item 6 — when the officer arrived here from "Re-run simulation" on a run that
+      // descended from an earlier one, that lineage is carried, so running the same
+      // wording again reproduces the same run instead of quietly becoming a first version.
+      revisionOf,
       // Item 1 — the paper trail. The officer named at entry travels with the request, so
       // the stored run, its seed and every document derived from it name the same person,
       // and the record states plainly that the name is self-declared today. Read from the
@@ -137,7 +191,7 @@ export function PolicyInput() {
     } finally {
       setIsRunning(false);
     }
-  }, [department, draft, templateId, uploadedFiles, navigate, levers]);
+  }, [department, draft, templateId, uploadedFiles, navigate, levers, revisionOf]);
 
   /**
    * Read each accepted file through the extraction seam, one at a time, and show
@@ -194,6 +248,20 @@ export function PolicyInput() {
       {runError && (
         <p className="border-b bg-destructive/5 px-3 py-2 text-[10px] leading-relaxed text-destructive">
           The run did not complete: {runError}
+        </p>
+      )}
+
+      {/* Item 6 — say where the loaded inputs came from, so the boxes never look as if the
+          platform invented them. Running them unchanged records the same run; editing the
+          wording records it as the next version of the same policy. */}
+      {loadedFrom && !runError && (
+        <p className="border-b bg-primary/5 px-3 py-2 text-[10px] leading-relaxed text-foreground">
+          Loaded the inputs of{" "}
+          <span className="font-mono font-medium text-primary">
+            {loadedFrom.reference ?? loadedFrom.runId}
+          </span>{" "}
+          — its text, preset, documents and assumptions. Running them unchanged records the same
+          run; edit the wording and it is recorded as the next version of this policy.
         </p>
       )}
 

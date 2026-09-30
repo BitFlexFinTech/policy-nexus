@@ -10,6 +10,7 @@ import { clearRuns, listRunRequests, saveRunRequest } from "@/services/assessmen
 import type { AssessmentRequest } from "@/services/assessment/types";
 import { RUN_ROUND_TICK_MS } from "@/pages/SimulationRun";
 import { DOCUMENT_VIEWS } from "@/components/assessment/documentViews";
+import { RERUN_LABEL, rerunPathFor } from "@/services/assessment/rerun";
 
 const renderAt = (path: string) => {
   window.history.pushState({}, "", path);
@@ -234,8 +235,15 @@ describe("journey — run a policy, then read its assessment", () => {
       renderAt(path);
 
       const strip = screen.getByRole("navigation", { name: "Documents in this run" });
-      // The destinations are defined once and every screen offers all of them.
-      expect(within(strip).getAllByRole("link")).toHaveLength(DOCUMENT_VIEWS.length);
+      // The four destinations are defined once and every screen offers all of them. Since
+      // the owner's item 6 the same strip also carries the ONE "Re-run simulation" action,
+      // which goes back to the policy input rather than to a document — so it is asserted
+      // separately, and the count is the four views plus that one action.
+      expect(within(strip).getAllByRole("link")).toHaveLength(DOCUMENT_VIEWS.length + 1);
+      expect(within(strip).getByRole("link", { name: RERUN_LABEL })).toHaveAttribute(
+        "href",
+        rerunPathFor(run.id),
+      );
       DOCUMENT_VIEWS.forEach((view) => {
         const link = within(strip).getByRole("link", { name: view.label });
         expect(link).toHaveAttribute("href");

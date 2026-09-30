@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { EngineStatus } from "@/components/EngineStatus";
 import { RelationshipGraphCard } from "@/components/relationship/RelationshipGraphCard";
 import { RevisionBadge } from "@/components/assessment/RevisionBadge";
+import { ReRunSimulationLink } from "@/components/assessment/ReRunSimulationLink";
 import { RunError, RunPending } from "@/components/assessment/AssessmentSections";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -243,6 +244,11 @@ export default function SimulationRun() {
             </Button>
             <Button asChild size="sm" variant="outline" className="h-7 text-xs">
               <Link to="/app/simulations">Simulation register</Link>
+            </Button>
+            {/* Item 6 — take this run's own inputs back to the policy input, edit them and
+                run again. Running them unchanged records the same run, not a duplicate. */}
+            <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+              <ReRunSimulationLink runId={run.id} />
             </Button>
           </div>
         </div>
