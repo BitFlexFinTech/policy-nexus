@@ -3,6 +3,8 @@ import { StatusPill } from "./StatusPill";
 import { Button } from "@/components/ui/button";
 import { findDepartment } from "@/config/departments";
 import { VOCABULARY, WORDMARK } from "@/config/brand";
+import { logoSrc } from "@/config/content";
+import { useContent } from "@/config/useContent";
 import { getReferenceRate } from "@/config/reference";
 import { sessionActions, useSession } from "@/session/useSession";
 import coatOfArms from "@/assets/zimbabwe-coat-of-arms.png";
@@ -17,6 +19,7 @@ import coatOfArms from "@/assets/zimbabwe-coat-of-arms.png";
 export function HeaderBar() {
   const session = useSession();
   const navigate = useNavigate();
+  const content = useContent();
   const department = findDepartment(session?.departmentId);
   const zigRate = getReferenceRate("zig-usd");
 
@@ -31,7 +34,7 @@ export function HeaderBar() {
   return (
     <header className="flex items-center justify-between border-b bg-primary px-4 py-2">
       <div className="flex items-center gap-3">
-        <img src={coatOfArms} alt="Zimbabwe Coat of Arms" className="h-8 w-8 object-contain" />
+        <img src={logoSrc(content, coatOfArms)} alt="Zimbabwe Coat of Arms" className="h-8 w-8 object-contain" />
         <h1 className="text-sm font-semibold tracking-tight text-primary-foreground">
           {WORDMARK.base}
           <span className="text-gold"> {WORDMARK.suffix}</span>

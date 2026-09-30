@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CapabilityEditor } from "@/components/admin/CapabilityEditor";
+import { ContentEditor } from "@/components/admin/ContentEditor";
 import { SsoEditor } from "@/components/admin/SsoEditor";
 import { BRAND } from "@/config/brand";
 import {
@@ -67,7 +68,8 @@ export default function PlatformAdmin() {
           </h1>
           <p className="max-w-3xl text-xs text-muted-foreground">
             {BRAND.productName} · {BRAND.entityCustodian}. Capability credentials are entered here
-            and read by the platform's service seams. This page is reached only by typing{" "}
+            and read by the platform's service seams, and the public landing page's wording, mark
+            and tab icon are edited further down. This page is reached only by typing{" "}
             <span className="font-mono text-foreground">{ADMIN_ROUTE}</span>; nothing links to it.
           </p>
         </header>
@@ -98,6 +100,8 @@ export default function PlatformAdmin() {
         ))}
 
         <SsoEditor config={draft} onChange={setDraft} />
+
+        <ContentEditor />
 
         <section className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-3">
           <Button size="sm" className="h-8 text-xs" onClick={save} disabled={!dirty}>

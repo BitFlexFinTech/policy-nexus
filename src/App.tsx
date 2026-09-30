@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -20,10 +21,33 @@ import NotFound from "./pages/NotFound.tsx";
 import PlatformAdmin from "./pages/PlatformAdmin.tsx";
 import AuthCallback from "./pages/AuthCallback.tsx";
 import { ADMIN_ROUTE } from "@/config/platform";
+import { faviconOverride } from "@/config/content";
+import { useContent } from "@/config/useContent";
 import { RequireSession } from "./routes/RequireSession.tsx";
 import { WorkspaceLayout } from "./layouts/WorkspaceLayout.tsx";
 
 const queryClient = new QueryClient();
+
+/**
+ * Applies an uploaded tab icon when an administrator has set one. It rewrites only
+ * the `rel="icon"` links — the iOS tile (`apple-touch-icon`) is deliberately left
+ * alone, because an arbitrary upload has not been prepared to the sizes iOS wants.
+ * With nothing set, the shipped icon set is untouched.
+ */
+function BrandIconOverride() {
+  const content = useContent();
+  const icon = faviconOverride(content);
+
+  useEffect(() => {
+    if (!icon) return;
+    const links = Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]'));
+    const previous = links.map((link) => link.getAttribute("href"));
+    links.forEach((link) => link.setAttribute("href", icon));
+    return () => links.forEach((link, index) => link.setAttribute("href", previous[index] ?? ""));
+  }, [icon]);
+
+  return null;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -31,6 +55,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        {/* Applies an uploaded tab icon, when one is set. */}
+        <BrandIconOverride />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/start" element={<ChooseDepartment />} />

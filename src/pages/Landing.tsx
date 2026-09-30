@@ -6,6 +6,8 @@ import { PublicPageShell } from "@/components/public/PublicPageShell";
 import { AgentPopulationDiagram, ProcessPipeline, SIMULATION_SCALE } from "@/components/public/SimulationVisuals";
 import { BRAND, DISCLAIMER, ENGINE_EXPLANATION, GOVERNANCE, PROCESS_LABEL, SERVICE_POSITION, SUPPORTED_INITIATIVE } from "@/config/brand";
 import { COVERAGE } from "@/lib/coverage";
+import { contentText } from "@/config/content";
+import { useContent } from "@/config/useContent";
 
 /**
  * What the platform does — three capabilities, in the order a user meets them.
@@ -13,33 +15,11 @@ import { COVERAGE } from "@/lib/coverage";
  * paragraph, so a card can name its subject without becoming taller than its
  * neighbours and without adding a second heading to the card.
  */
-type Capability = {
-  icon: LucideIcon;
-  title: string;
-  body: string;
-  lead?: string;
-};
-
-const CAPABILITIES: Capability[] = [
-  {
-    icon: Upload,
-    title: "Policy input",
-    body: "Upload or enter the proposed policy.",
-  },
-  {
-    icon: Users,
-    title: "Stakeholder simulation",
-    lead: "Thousands of simulated agents.",
-    body:
-      `${BRAND.name} creates a simulated population representing relevant stakeholder perspectives ` +
-      "and examines how those agents interact within the policy scenario.",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Policy assessment",
-    body: "Review structured findings, potential risks and areas requiring further consideration.",
-  },
-];
+/**
+ * The three capability cards. Their icon is fixed presentation; their wording is
+ * editable and lives in `src/config/content.ts`, read below through `contentText`.
+ */
+const CAPABILITY_ICONS: LucideIcon[] = [Upload, Users, ClipboardCheck];
 
 /** The three steps of a run, matching the journey in the workspace. */
 /**
@@ -61,21 +41,8 @@ const INITIATIVE_SUPPORT = [
   },
 ];
 
-/** The three steps of a run, matching the journey in the workspace. */
-const STEPS = [
-  {
-    title: "Provide the draft policy",
-    body: "Paste the text, start from a draft the department has already prepared, or upload a PDF, DOCX or TXT file.",
-  },
-  {
-    title: "Run the simulation",
-    body: "The simulation core models every stakeholder group the department defines, over a stated horizon, from a seeded and reproducible process.",
-  },
-  {
-    title: "Read the result and draft the policy",
-    body: "Open the executive summary, the full assessment or the long-form report — then edit the drafted policy and export it.",
-  },
-];
+/** The three "How it works" steps; their wording lives in the content registry. */
+const HOW_STEP_IDS = ["step1", "step2", "step3"] as const;
 
 /**
  * The three steps from a draft to a structured assessment, as the landing page
@@ -84,20 +51,8 @@ const STEPS = [
  * competes with a section name. The full six-step journey is unchanged in the
  * workspace itself.
  */
-const ASSESSMENT_STEPS = [
-  {
-    title: "Add your policy",
-    body: "Upload a document or enter a policy draft.",
-  },
-  {
-    title: "Run simulation",
-    body: "Explore potential responses across simulated stakeholder perspectives.",
-  },
-  {
-    title: "Review assessment",
-    body: "Examine potential concerns, risks and areas for further consideration.",
-  },
-];
+/** The three steps in the assessment card; their wording lives in the content registry. */
+const ASSESSMENT_STEP_IDS = ["step1", "step2", "step3"] as const;
 
 /**
  * The thin gold rule that opens a section — the institutional mark, drawn in the
@@ -116,6 +71,7 @@ function SectionRule() {
  * entry. Would-be entry happens once, through the single primary action below.
  */
 export default function Landing() {
+  const content = useContent();
   return (
     <PublicPageShell>
       {/* The authority line — the first thing on the page, and therefore the first
@@ -235,7 +191,7 @@ export default function Landing() {
           className="rounded-lg border bg-primary-tint p-5"
         >
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-            Policy assessment
+            {contentText(content, "assessment.label")}
           </p>
           {/* A short gold rule — the institutional mark, drawn in the rule token
               rather than the fill gold, which is invisible on a light surface. */}
@@ -244,13 +200,13 @@ export default function Landing() {
             id="landing-assessment-heading"
             className="mt-3 text-base font-semibold tracking-tight text-foreground"
           >
-            From policy draft to structured assessment
+            {contentText(content, "assessment.heading")}
           </h2>
           <ol className="mt-4">
-            {ASSESSMENT_STEPS.map((step, index) => (
-              <li key={step.title} className="relative flex gap-3 pb-4 last:pb-0">
+            {ASSESSMENT_STEP_IDS.map((stepId, index) => (
+              <li key={stepId} className="relative flex gap-3 pb-4 last:pb-0">
                 {/* The rail is decorative — the step number and title carry the meaning. */}
-                {index < ASSESSMENT_STEPS.length - 1 ? (
+                {index < ASSESSMENT_STEP_IDS.length - 1 ? (
                   <span
                     aria-hidden="true"
                     className="absolute bottom-0 left-3 top-7 w-px bg-primary/25"
@@ -261,9 +217,11 @@ export default function Landing() {
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold leading-snug tracking-tight text-foreground">
-                    {step.title}
+                    {contentText(content, `assessment.${stepId}.title`)}
                   </p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{step.body}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                    {contentText(content, `assessment.${stepId}.body`)}
+                  </p>
                 </div>
               </li>
             ))}
@@ -280,33 +238,33 @@ export default function Landing() {
           id="capabilities-heading"
           className="mt-4 text-xl font-semibold tracking-tight text-foreground sm:text-2xl"
         >
-          A new capability for policy assessment
+          {contentText(content, "capabilities.heading")}
         </h2>
         <p className="mt-2 max-w-3xl text-pretty text-sm leading-relaxed text-muted-foreground">
-          Government policy can have complex effects across communities, institutions, industries and
-          stakeholders. {BRAND.name} provides an additional analytical lens for exploring those
-          potential responses before implementation.
+          {contentText(content, "capabilities.intro")}
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {CAPABILITIES.map((capability) => (
-            <article
-              key={capability.title}
-              className="flex h-full flex-col gap-2 rounded-lg border bg-card p-4"
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-md border border-primary/20 bg-primary/5 text-primary">
-                <capability.icon className="h-4 w-4" aria-hidden="true" />
-              </span>
-              <h3 className="text-sm font-semibold uppercase leading-snug tracking-wide text-foreground">
-                {capability.title}
-              </h3>
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                {capability.lead ? (
-                  <span className="font-medium text-foreground">{capability.lead} </span>
-                ) : null}
-                {capability.body}
-              </p>
-            </article>
-          ))}
+          {CAPABILITY_ICONS.map((Icon, index) => {
+            const key = `card${index + 1}`;
+            const lead = contentText(content, `capabilities.${key}.lead`);
+            return (
+              <article
+                key={key}
+                className="flex h-full flex-col gap-2 rounded-lg border bg-card p-4"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-md border border-primary/20 bg-primary/5 text-primary">
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                </span>
+                <h3 className="text-sm font-semibold uppercase leading-snug tracking-wide text-foreground">
+                  {contentText(content, `capabilities.${key}.title`)}
+                </h3>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {lead ? <span className="font-medium text-foreground">{lead} </span> : null}
+                  {contentText(content, `capabilities.${key}.body`)}
+                </p>
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -374,8 +332,7 @@ export default function Landing() {
               {PROCESS_LABEL}
             </h3>
             <p className="mt-1 max-w-xl text-xs leading-relaxed text-muted-foreground">
-              Each stage adds depth to the one before it: the draft is understood, mapped, populated,
-              run and analysed before an assessment is produced for review.
+              {contentText(content, "process.note")}
             </p>
             <ProcessPipeline />
           </div>
@@ -393,18 +350,20 @@ export default function Landing() {
           id="how-heading"
           className="mt-4 text-xl font-semibold tracking-tight text-foreground sm:text-2xl"
         >
-          How it works
+          {contentText(content, "how.heading")}
         </h2>
         <ol className="mt-6 grid gap-4 md:grid-cols-3">
-          {STEPS.map((step, index) => (
-            <li key={step.title} className="rounded-lg border bg-card p-4">
+          {HOW_STEP_IDS.map((stepId, index) => (
+            <li key={stepId} className="rounded-lg border bg-card p-4">
               <span className="font-mono text-xs font-semibold text-primary">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <h3 className="mt-2 text-sm font-semibold leading-snug tracking-tight text-foreground">
-                {step.title}
+                {contentText(content, `how.${stepId}.title`)}
               </h3>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{step.body}</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                {contentText(content, `how.${stepId}.body`)}
+              </p>
             </li>
           ))}
         </ol>
@@ -423,13 +382,10 @@ export default function Landing() {
               id="deterministic-heading"
               className="text-xs font-semibold uppercase tracking-[0.16em] text-primary"
             >
-              Structured and repeatable
+              {contentText(content, "repeatable.heading")}
             </h2>
             <p className="mt-2 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-              The same defined assessment process is applied consistently to each policy scenario,
-              providing a controlled environment for examining potential stakeholder responses.
-              Scenario results are generated locally from the defined policy scenario and reference
-              configuration.
+              {contentText(content, "repeatable.body")}
             </p>
           </div>
         </div>
@@ -443,7 +399,7 @@ export default function Landing() {
           id="coverage-heading"
           className="text-xs font-semibold uppercase tracking-[0.16em] text-primary"
         >
-          Platform coverage
+          {contentText(content, "coverage.heading")}
         </h2>
         <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-5 lg:grid-cols-4">
           <div>
@@ -480,8 +436,7 @@ export default function Landing() {
           </div>
         </dl>
         <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-          Counts are read directly from the department reference configuration, so this page cannot
-          claim more coverage than the platform holds.
+          {contentText(content, "coverage.note")}
         </p>
       </section>
 
@@ -573,11 +528,10 @@ export default function Landing() {
           <div>
             <SectionRule />
             <h2 className="mt-4 text-lg font-semibold tracking-tight text-foreground">
-              Ready to test a policy draft?
+              {contentText(content, "closing.heading")}
             </h2>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              Choose the department you are preparing policy for, and the workspace loads its
-              indicators, prepared drafts and reference documents.
+              {contentText(content, "closing.body")}
             </p>
           </div>
           <Button asChild size="lg" className="h-11 px-5 text-sm">

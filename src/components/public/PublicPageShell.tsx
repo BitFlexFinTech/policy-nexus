@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { BRAND, PROMOTER, SOVEREIGNTY_STATEMENT, WORDMARK } from "@/config/brand";
 import { REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR } from "@/config/reference";
 import { COVERAGE } from "@/lib/coverage";
+import { logoSrc } from "@/config/content";
+import { useContent } from "@/config/useContent";
 import coatOfArms from "@/assets/zimbabwe-coat-of-arms.png";
 
 /**
@@ -15,6 +17,7 @@ import coatOfArms from "@/assets/zimbabwe-coat-of-arms.png";
  */
 export function PublicPageShell({ children }: { children: ReactNode }) {
   const location = useLocation();
+  const content = useContent();
 
   // Section links such as `/#capabilities` must land on the section even when they
   // are followed from the other public screen: a browser only scrolls to a hash on
@@ -27,7 +30,7 @@ export function PublicPageShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <OfficialMasthead />
+      <OfficialMasthead markSrc={logoSrc(content, coatOfArms)} />
       <OfficialNoticeStrip />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">{children}</main>
       <OfficialFooter />
@@ -49,13 +52,13 @@ function Wordmark() {
 }
 
 /** State identity first, service identity second, closed by the national rule. */
-function OfficialMasthead() {
+function OfficialMasthead({ markSrc }: { markSrc: string }) {
   return (
     <header className="bg-primary text-primary-foreground">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
           <img
-            src={coatOfArms}
+            src={markSrc}
             alt="Zimbabwe Coat of Arms"
             className="h-10 w-10 shrink-0 object-contain"
           />

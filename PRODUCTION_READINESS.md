@@ -380,6 +380,29 @@ defaults to simulated; nothing is constructed, fetched or called while a capabil
 
 **Stated in the screen, not hidden from it:** credentials are held in this browser's local
 storage and are readable through developer tools. Production requires a server-side proxy.
+### 9b. Landing page content and brand marks (item 9 — Batch C, 2026-09-30)
+
+The same screen, reached the same way, carries **Landing page content**: the public landing page's
+authored wording, the masthead mark and the browser-tab icon.
+
+| What | Where it is entered | Kept where | Published to other visitors? |
+|---|---|---|---|
+| Landing page wording (authored sections) | `/platform-admin` → *Landing page content* | `localStorage["nzwisiso.content.v1"]` in this browser | **No** — browser-only until a server exists |
+| Masthead mark | `/platform-admin` (image upload → data address) | same store | **No** |
+| Browser-tab icon | `/platform-admin` (image upload → data address) | same store | **No** |
+
+**The go-live note that matters:** a change made here is seen **only in the browser that made it**.
+To change the wording every visitor sees, either (a) edit the default in `src/config/content.ts`
+and redeploy, or (b) add a server that serves the override to everyone. There is no server today, so
+option (a) is the shipping path.
+
+**Not editable from the screen, on purpose:** the brief-fixed sentences (the governance sentence, the
+engine explanation, the sovereignty statement, the service principle), the identity strings (product
+name, entity, tagline — `index.html` must stay equal to `brand.ts`, which `npm run validate` checks),
+and the official Coat of Arms file (validate pins its sha256). The screen shows each of these
+read-only, with the reason.
+
+
 
 **What a key alone cannot do:** PDF/DOCX extraction needs a server; sign-in needs a provider
 registration (issuer, client ID, redirect address) rather than a key; and the assessment and

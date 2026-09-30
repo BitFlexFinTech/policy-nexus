@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import { readFileSync } from "node:fs";
 import { DEPARTMENTS, DEPARTMENT_COUNT, findDepartment } from "../src/config/departments";
 import { BRAND } from "../src/config/brand";
+import { ADMIN_ROUTE } from "../src/config/platform";
 import { citedInstrumentLabel } from "../src/config/instruments";
 
 /**
@@ -970,6 +971,28 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     // And the run's own record states what was supplied and what was read.
     await page.getByRole("link", { name: "Full assessment", exact: true }).click();
     await expect(page.getByText("1 supplied · 1 read")).toBeVisible();
+
+    expectCleanRuntime();
+  });
+
+  test("the admin screen edits the landing page's wording (item 9)", async ({ page }) => {
+    // The public page shows the wording it ships with.
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "How it works" })).toBeVisible();
+
+    // An administrator rewrites one section heading and saves it.
+    await page.goto(ADMIN_ROUTE);
+    await expect(page.getByRole("heading", { name: "Landing page content" })).toBeVisible();
+    await page.locator('[id="content-how.heading"]').fill("How the platform works");
+    await page.getByRole("button", { name: "Save content" }).click();
+    await expect(
+      page.getByText("Saved to this browser. Open the landing page to see it."),
+    ).toBeVisible();
+
+    // The public page now shows the changed wording, and not the old one.
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "How the platform works" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "How it works" })).toHaveCount(0);
 
     expectCleanRuntime();
   });
