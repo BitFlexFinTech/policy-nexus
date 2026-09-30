@@ -100,14 +100,17 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-09-30, after Batch A's second half): the demonstration host is behind the working
-  copy.** `nzwisiso.bitflex.app` serves
-  `assets/index-BgYDS9X7.js` (`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`) — fetched
-  and hashed, and driven in a real browser against the live origin (the initiative `<h1>`, *Understanding
-  before action*, the 16 department cards, 0 console errors, 0 page errors, 0 off-origin requests). Batch A
-  then changed source twice — its first half, then items 5, 6 and 7 — so the locally built file is now
-  `assets/index-DIYOve5d.js`, and the published bundle says nothing about the shared document strip, the
-  kept working copy or policy versions. `npm run validate` prints
+- **Status today (2026-09-30, after Batch D — the host and the working copy are IN STEP).**
+  `nzwisiso.bitflex.app` serves
+  `assets/index-D0IGL0ss.js` (`d810bf82bc679a717aa82b40bbb459d9dee324190bfce2ccba79ad659a99ce88`) — fetched
+  and hashed against the local `dist/` build (identical), and driven in a real browser against the live
+  origin (the initiative `<h1>`, *Understanding before action*, **all 16** department buttons, 0 console
+  errors, 0 page errors, 0 off-origin requests). The upload was `lftp mirror -R --only-newer` over explicit
+  FTPS, **never `--delete`** — 13 files, 1,314,347 bytes, 0 removed — and the SSL validation token
+  (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. The published
+  bundle now carries the owner's items 6 and 7: *Re-run simulation*, *Drafting the policy*, *Show the
+  policy now*, *kept in this browser for this department* and *Loaded the inputs of*, and **no** MiroFish /
+  OASIS / Puter. `npm run validate` prints
   the served name and the locally built name side by side on every run, so any gap shows up in the machine
   output rather than in prose.
 
