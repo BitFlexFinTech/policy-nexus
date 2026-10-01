@@ -84,7 +84,7 @@ from memory.
 | The owner's words | True state |
 |---|---|
 | *"all parts that say Nzwisiso should be written like \"Nzwisiso AI®\" so you need fix that across the platform"* | **NOT DONE — deliberately, and it needs the owner's decision.** The platform shows **`Nzwisiso AI™`**, and `src/config/brand.ts` carries the reason in writing: *"® would assert a registration that does not exist — a false legal claim."* This is a legal statement, not a design choice, so it is **BLOCKED pending the owner's answer** (is the mark registered?). |
-| *"the \"Recommended next steps\" dont seem to have any actionable CTA's. The recommended next steps should draft all the plans and documents for the user to carry out those recommended next steps… the user should have the option to click the action button next to the implement the recommended steps"* | **NOT DONE.** `RecommendationList` (`src/components/assessment/AssessmentSections.tsx`) prints each step's label and note with **nothing to click**. |
+| *"the "Recommended next steps" dont seem to have any actionable CTA's. The recommended next steps should draft all the plans and documents for the user to carry out those recommended next steps… the user should have the option to click the action button next to the implement the recommended steps"* | **DONE — Batch F, 2026-09-30.** The owner chose **all three levels** (A, B and C). **The research that shaped it, done first:** the platform ALREADY drafted what each step asks for — the implementation matrix, the cost categories, the monitoring and evaluation matrix and the stakeholder analysis — inside the drafted policy, where an officer had to hunt for it. So the work was to **reach it, send it, and finish it**, not to invent eight new documents. **(A) Every recommended step now carries a real action** — *Open what answers this →*, which lands the reader on the exact table or clause that answers that step, plus *Download this part (Word)*, which produces that one part as its own `.docx` to send to the finance or planning office. **(B) An Implementation pack** — a fifth document, `buildImplementationPack`, gathering the five working matrices on their own so they can be worked on and circulated without the rest of the instrument. **(C) Fill the blanks once** — a form on the pack records the responsible office, target date, funding source, amount, monitoring target and frequency; typed ONCE, then printed into **both** the drafted policy and the pack. **Architecture, because it mattered here:** the five matrices were extracted from the drafted policy into `src/services/assessment/matrices.ts`, so the policy and the pack are built from **one** source and cannot disagree; and the document-kind list was collapsed from three copies into one (`DOCUMENT_KINDS`). **Proven, not assumed:** all 16 departments' drafted policies were fingerprinted before and after the extraction and are **byte-identical**; the new gates were each shown to fail under a mutation and then restored byte-identical. **The one thing the platform still cannot do, said plainly on the screen:** it cannot know a real office, budget line, date or target, so those stay marked blanks until the department completes them. **Honest limit:** what the officer types is kept in **this browser only** — there is no server, so it does not travel to a colleague's machine. |
 
 **The standing lesson of this section — a rule for every future session.** A summary of a list is not the
 list. When the owner refers to *"the list"*, *"the plan"* or *"what we agreed"*, **read the conversation in
@@ -1577,7 +1577,8 @@ because the block it sits in already names itself.
 | 2026-09-30 | **PUBLISHED (Batch D) — built, uploaded over explicit FTPS, and verified on the live host** | The owner was asked in plain words what publishing changes (*visitors would immediately see a version they had not looked at*) and what happens if nothing is done (*the address keeps showing 29 September*), and answered **"Yes — publish it now"**. `npm run build` → `dist/` referencing **`assets/index-D0IGL0ss.js`**; uploaded with `lftp --env-password` over **explicit FTPS port 21** (`ftp:ssl-force yes`, `ftp:ssl-protect-data yes`), `mirror -R --only-newer`, **never `--delete`** — **13 files, 1,314,347 bytes, 0 removed**, in 215 s. Credentials were read from `.env` inside a **600-permission** temporary script and were never printed and never passed as a shell argument. **Verified live, not assumed:** `https://nzwisiso.bitflex.app/` returns **200**; the served page's script tag names **`assets/index-D0IGL0ss.js`**; the fetched file's sha256 is **`d810bf82bc679a717aa82b40bbb459d9dee324190bfce2ccba79ad659a99ce88`**, **identical** to the local build; the live bundle contains *Re-run simulation*, *Drafting the policy*, *Show the policy now*, *kept in this browser for this department* and *Loaded the inputs of*, and contains **no** MiroFish / OASIS / Puter; a real browser driven against the live origin printed the initiative `<h1>`, the *Understanding before action* eyebrow and **all 16** department buttons with **0 console errors, 0 page errors, 0 off-origin requests**; and a read-only listing afterwards shows `.well-known/pki-validation/01a0d6ee-8023-7203-9abc-a37b9060f00d.txt` (25 Sep) and `cgi-bin/` **untouched**. The host and the working copy are **in step**. |
 | 2026-09-30 | **DEFECT FOUND BY THE OWNER — item 11 was marked DONE while it was not; corrected at source** | The owner reported: *"why are you making fake claims again. the platform is still only showing Stakeholder segments 8."* **They were right.** **Verified by driving a real browser against the LIVE site** (`https://nzwisiso.bitflex.app/`, the published Batch D build): after entering the Finance department, the **Engine Vitals** card reads **"Stakeholder segments8"**; the **Reference** screen reads **"Stakeholder segments modelled (36)"**. Both are computed from real configuration — but they are **two different quantities under nearly the same label**. The graph's stakeholder nodes come from `run.reactions` (`buildRelationshipGraph`, `src/services/assessment/network.ts`), which come from `department.segments` (`src/services/assessment/scenario.ts:365`) — **6 to 8 groups per department**, enforced by `src/test/departments.test.ts` (*"gives every department between 6 and 8 stakeholder groups"*) and pinned per department. The **36** is the platform-wide canonical list (`STAKEHOLDER_SEGMENTS`, `src/config/reference.ts`), used by the Reference screen, the landing coverage figure and `policyReading`. **The earlier `DONE` was written against the 36 and never checked against what a department actually draws**, and the assistant repeated it as *"all eleven are done"* without verifying — the exact failure the owner named. **FIXED at source (the records, this turn):** the item-11 row now reads **NOT DONE** with the evidence; the RESUME HERE tally reads *"1–10 done, 11 NOT done"*; the PLAIN SUMMARY leads with the correction; and this row records it. **NOT YET FIXED (the substance, and it is stated as such):** the per-department group count is still 6–8, so the graph is still sparse. That needs (a) a decision on how many groups each department models and (b) a change to the run-reveal pacing, because rounds scale with groups (`roundsPerGroup` × groups, `scenario.ts:512`) and are revealed one at a time at `RUN_ROUND_TICK_MS = 1150` — 36 groups would take **over a minute** per run. |
 | 2026-09-30 | **BATCH E — item 11 rebuilt: every department's modelled stakeholder set, and the frame made a rule** (this session) | **The owner's chosen remedy:** *"a bigger researched set per department (about 15–18 each), so departments stay different from one another."* **What was built.** Each of the **16** departments now models **16** stakeholder groups, drawn from the **36** national groups (`STAKEHOLDER_SEGMENTS`, `src/config/reference.ts`) for what that department's policies genuinely affect — Finance takes exporters, pensioners and mining operators; Agriculture takes smallholder farmers, cooperatives and cross-border traders; Defence alone takes war veterans. Checked mechanically, not by eye: every department is **16 groups**, **no repeats**, **every group canonical**, **all 36 groups still modelled by at least one department** (no orphans), and the departments remain distinct. **The gate was raised, not removed:** `src/test/departments.test.ts` now requires **15–18** groups per department (it said 6–8) and its per-department pin was updated deliberately, with the reason written above it. **Reveal pacing changed to keep a run watchable:** rounds scale with groups, so `src/pages/SimulationRun.tsx` now reveals `ceil(total / 18)` rounds per tick (`RUN_REVEAL_TICKS = 18`, `RUN_ROUND_TICK_MS = 1150` unchanged) — the **content is untouched**, only the pacing; a run stays about 21 seconds. **Two further defects fixed at source:** (a) `src/lib/graph/swarm.ts` — the frame was a **soft force** only, so with more marks one could settle outside the picture (measured: y = 761.76 against a 750-high frame; −1.41 against a 0 edge). It is now a **hard clamp** after integration, with the outward velocity cleared on the clamped axis — without that second half the school could never come to a true rest, and the rest is what makes a mark clickable. The initial ring radius was also pulled inside by the frame padding. (b) `src/components/EngineStatus.tsx` + `src/pages/Reference.tsx` — the two screens both read *"Stakeholder segments"* with different numbers, which is precisely what made the owner's 8 look like a contradiction; they are now **"Stakeholder groups modelled"** (with *"This department's set · 36 nationally"*) and **"Stakeholder groups modelled nationally (36)"**. **Three engine tests were re-derived rather than relaxed, and the reason is recorded in each:** the risk *count* is no longer the measure of a better draft (a fuller draft adds action sentences, which legitimately raise the absorption risk) so the test now asserts that the bare draft raises `risk-scope`, that the complete draft raises none of the four risks its clauses answer, and that it raises no more risks than the bare one; the weighted-index tolerance is now **derived from the arithmetic** (`others / (1000 × boosted + others) × widest gap`) instead of the flat `2` that only made sense for eight groups; and a coincidence-based `confidence !==` assertion became `JSON.stringify(runWith) !== JSON.stringify(runWithout)`, because a rounded headline figure may legitimately match across two genuinely different runs. **Proved able to fail, then restored byte-identical:** putting one department back to 8 groups turned **2 gates red** while the range gate reported *"opc models 8 groups: expected 8 to be greater than or equal to 15"* (`src/config/departments.ts` sha256 `7543217305a744c70ced9aefeed6bde2ce6e7f840e96c3c9fff1bc367a2d4ccc` before and after); the frame gates were observed red before the clamp and green after. **New browser gate:** `e2e/journey.spec.ts` reads the rendered page, fails if the dashboard figure is below 15, fails if `36 nationally` is missing, and checks the Reference heading. Suite on these bytes: validate **18/18 PASS**, typecheck **0**, lint **0 errors, 7 warnings** (baseline), tests **470/470 across 43 files**, build **✓**, Playwright **16/16**. |
-| 2026-09-30 | **PUBLISHED (Batch E) — the item 11 fix is live, and the live figure was read off the page** | `npm run build` → `dist/` referencing **`assets/index-01cszBHW.js`**; uploaded with `lftp --env-password` over explicit FTPS, `mirror -R --only-newer`, **never `--delete`** — **13 files, 1,317,228 bytes** (1 new, 12 modified). Credentials read from `.env` inside a **600-permission** temporary script, never printed, never passed as a shell argument. **Verified live, and the specific thing the owner reported was re-read from the rendered page:** `https://nzwisiso.bitflex.app/` returns 200, serves `assets/index-01cszBHW.js`, and the fetched file's sha256 is **`0e698f14d6244e5c3afc277361204f95b22c77c23556468e419a31d0c8551536`** — **identical** to the local build. A real browser against the live origin, after entering the Finance department, read the dashboard as **"Stakeholder groups modelled16This department's set · 36 nationally"** and the Reference screen as **"Stakeholder groups modelled nationally (36)"** — so the figure the owner saw as **8** now reads **16**, and the two labels no longer collide. The upload left `.well-known/pki-validation/` and `cgi-bin/` untouched. |
+| 2026-09-30 | **PUBLISHED (Batch E) — the item 11 fix went live, and the live figure was read off the page** | `npm run build` → `dist/` referencing **`assets/index-01cszBHW.js`**; uploaded with `lftp --env-password` over explicit FTPS, `mirror -R --only-newer`, **never `--delete`** — **13 files, 1,317,228 bytes** (1 new, 12 modified). Credentials read from `.env` inside a **600-permission** temporary script, never printed, never passed as a shell argument. **Verified live, and the specific thing the owner reported was re-read from the rendered page:** `https://nzwisiso.bitflex.app/` returned 200 and published **`assets/index-01cszBHW.js`**, whose sha256 was **`0e698f14d6244e5c3afc277361204f95b22c77c23556468e419a31d0c8551536`** — **identical** to the local build. A real browser against the live origin, after entering the Finance department, read the dashboard as **"Stakeholder groups modelled16This department's set · 36 nationally"** and the Reference screen as **"Stakeholder groups modelled nationally (36)"** — so the figure the owner saw as **8** now reads **16**, and the two labels no longer collide. The upload left `.well-known/pki-validation/` and `cgi-bin/` untouched. *(Superseded later the same day by the Batch F build, `assets/index-B1i84oxZ.js`.)* |
+| 2026-09-30 | **BATCH F — the recommended-step actions, the Implementation pack, and one answer that fills every document** (this session) | The owner asked what the actions would do, *"are these actionable things or is it necessary?"*, and to research before changing anything. **The research changed the design.** The platform ALREADY drafts what each step asks for — Table 4 (implementation matrix), Table 5 (cost categories), Table 6 (monitoring and evaluation matrix), Annex A (recommended steps) and Annex B (stakeholder analysis) — inside the drafted policy, with the department's own values marked `[TO BE CONFIRMED BY THE DEPARTMENT]`. So the gap was never "the plans are missing": it was **reach, send and finish**. The owner chose all three levels. **(A) Reach and send.** `src/services/assessment/recommendationActions.ts` maps every recommendation the engine can produce to the section that answers it and what the officer does with it; `RecommendationList` now renders *Open what answers this →* (a deep link to `#<section>`, which the drafted-policy screen scrolls to) and *Download this part (Word)* (that one section as its own `.docx`). `sliceDocumentSection` wraps one section as a document, so the existing renderer and export path carry it — no second renderer, and the download mechanism moved to `src/services/documents/documentExport.ts` so **one** place prepares a Word file. **(B) The Implementation pack.** `buildImplementationPack` composes the five working matrices as a fifth document, routed at `/app/assessments/:id/implementation-pack` and added to the shared strip. **(C) Finish it.** `src/services/documents/implementationStore.ts` keeps the answers per run (office, target date, funding source, amount, monitoring target, frequency); `ImplementationForm` collects them on the pack; they are passed explicitly into the builders, so the **drafted policy** prints them too. **Architecture that protects it:** the five matrices were extracted from `policyDraft.ts` into `src/services/assessment/matrices.ts`, so the policy and the pack are built from ONE source and cannot disagree; "the measures" (`sentencesOf`) and the blank marker moved with them; and the document-kind list, previously written in three files, is now `DOCUMENT_KINDS` in `types.ts`. **Proven, not assumed:** all 16 departments' drafted policies were fingerprinted **before and after** the extraction and are **byte-identical** (`opc:b82af9229d6604c6:35279 … zida:50b03f66bc833547:37573`), so a large refactor demonstrably changed nothing a reader sees. **Gates, each proved able to fail then restored byte-identical:** a destination removed and another pointed at a missing section → **3 red** (`recommendationActions.ts` sha256 `12a149b11dd392dcc6149bdae98de2b03410f9e44ae45e21f8dcdd6597db9491`); the entered answers ignored → **2 red** (`matrices.ts` `672ec85b9ab89b202828520c77eb8408565ef87aafd26437999e4f9f0d3b76fd`). **Two real defects found and fixed while building:** the loading hook's effect was missing `fills` from its dependencies (lint), and the cached-document key did not include the answers — so a changed answer would have shown a **stale document**. Both fixed, with the default answers made ONE frozen object so adding it to the dependencies cannot loop. **Real browser, on the LIVE site:** a simulation, **5** *Open what answers this →* actions, the pack with Table 4, one typed answer printed in **both** the pack and the drafted policy, and a genuine `.docx` download — with **0 console errors, 0 page errors, 0 off-origin requests**. Suite on these bytes: validate **18/18 PASS**, typecheck **0**, lint **0 errors, 7 warnings** (baseline), tests **489/489 across 46 files**, build **✓** emitting **`assets/index-B1i84oxZ.js`**, Playwright **17/17**, and **`npm run sync:check` IN SYNC**. |
 
 
 | 2026-09-30 | **defect inventory (Batch A, second half — every defect found, and its disposition)** | Five **FIXED at source**, one **BLOCKED**. (1) The drafted-policy screen's own comment said *"editing is local state only"* — false the moment item 7 landed; corrected. (2) The new strip file introduced a lint warning (a component file that also exports data breaks fast refresh, taking lint from the recorded 7 to 8); fixed by moving the destination list into `documentViews.ts`, so lint is back to the baseline 7 in stock shadcn/ui files. (3) The first `usePolicyDraft` made `raw` an *unnecessary dependency* of `useMemo` — a real signal that the memo was not deriving from the value it subscribed to; fixed by adding `draftTextIn(raw, runId)` so the wording is read from the snapshot itself. (4) Three stale statements in the records — `PRODUCTION_READINESS.md` and `PROJECT_STATUS.md` both still called the published bundle the working copy, the RESUME HERE said *nothing is outstanding*, and the expected test counts were 427/428/431 behind — all corrected, with the built bundle named. (5) The Playwright run was made once against a **stale `dist/`** because the validation chain stops at the first non-zero step; recorded as a trap in the log and in RESUME HERE rather than left unexplained. **BLOCKED at the time, RESOLVED the same day (2026-09-30):** the owner's **original fix list was not in the repository** — only six of its eleven items. The full list was **recovered from the conversation itself and is recorded verbatim, with the true state of every item, at the top of this file**. Nothing about it has to be guessed again. |
@@ -3307,6 +3308,33 @@ row, the RESUME HERE summary ("five are done…"), the eleven-item tally, the ex
 | A browser gate that reads the rendered dashboard figure and fails below 15, plus the Reference heading | `e2e/journey.spec.ts` | DONE |
 
 
+## Files touched in Batch F (recommended-step actions, the pack, and the answers — 2026-09-30)
+
+| Change | File | Status |
+|---|---|---|
+| One place saying which part of the paperwork answers each recommended step, and what the officer does with it | `src/services/assessment/recommendationActions.ts` (new) | DONE |
+| One place preparing a Word file, shared by the document buttons and the per-step download | `src/services/documents/documentExport.ts` (new) | DONE |
+| One section of a document, wrapped as a document of its own | `src/services/assessment/documents.ts` | DONE |
+| The action beside every recommended step | `src/components/assessment/AssessmentSections.tsx` | DONE |
+| The buttons now use the shared download helper | `src/components/assessment/DocumentActions.tsx` | DONE |
+| The five working matrices, extracted so the policy and the pack share ONE source | `src/services/assessment/matrices.ts` (new) | DONE |
+| The drafted policy now builds its matrices from that shared module, and prints the entered answers | `src/services/assessment/policyDraft.ts` | DONE |
+| The Implementation pack itself | `src/services/assessment/implementationPack.ts` (new) | DONE |
+| The pack's screen | `src/pages/ImplementationPack.tsx` (new) | DONE |
+| The form that completes the working matrices | `src/components/assessment/ImplementationForm.tsx` (new) | DONE |
+| The answers, kept per run in this browser | `src/services/documents/implementationStore.ts` (new) | DONE |
+| The hook that reads and writes them | `src/services/documents/useImplementationFills.ts` (new) | DONE |
+| The document-kind list collapsed from three copies into ONE | `src/services/assessment/types.ts` | DONE |
+| Fills passed through the loading seam, with the cached-document key and the dependencies corrected | `src/services/documents/useGeneratedDocument.ts` | DONE |
+| The remote drafting seam widened to the one kind list, and told the answers too | `src/services/documents/remoteDraftingClient.ts` | DONE |
+| The fifth view in the shared strip | `src/components/assessment/documentViews.ts` | DONE |
+| The new route | `src/App.tsx` | DONE |
+| The drafted policy prints the entered answers | `src/pages/PolicyDraft.tsx` | DONE |
+| Gates: the actions (7), the pack (5), the answers (7) | `src/test/recommendation-actions.test.tsx`, `src/test/implementation-pack.test.ts`, `src/test/implementation-fills.test.tsx` (new) | DONE |
+| The strip gate now covers every screen of a run, not four | `src/test/journey.test.tsx` | DONE |
+| Real-browser proof: the action, the `.docx` download, the pack, and one answer in both documents | `e2e/journey.spec.ts` | DONE |
+
+
 ## RESUME HERE
 
 **PLAIN SUMMARY (OWNER-FACING).**
@@ -3361,12 +3389,33 @@ was taller than the space it had, so its bottom controls (the upload box and the
 buttons) were hidden **behind** the simulation history table and could not be clicked. The panel now
 keeps its own controls and scrolls, so every button in it is reachable.
 
-**Unchanged:** the `®` product mark is still **waiting on your legal answer** (the platform prints `™`,
-and says why, because `®` would claim a registration that does not exist), and the **action buttons
-beside "Recommended next steps"** are still not built. **The public address is now up to date:** I asked
-you whether to publish, you said yes, and it is done — the site everyone sees now carries all eleven
-fixes. I checked the live page with a real browser and it loaded with no errors from anywhere outside the
-site itself.
+**What I built after that — the "Recommended next steps" actions you asked about.** I researched it first,
+and found something that changed the answer: **the platform already drafted the plans those steps ask
+for** — the implementation matrix, the cost categories, the monitoring table and the stakeholder analysis
+— but they were buried inside the drafted policy where an officer had to hunt for them. So I built the
+three things you chose:
+
+- **Every recommended step now has a real action.** *Open what answers this →* takes you straight to the
+  exact table or clause that answers that step. *Download this part (Word)* gives you just that one part
+  as its own Word document, to send to the finance office or to planning — instead of copying a table out
+  of a long instrument by hand.
+- **An Implementation pack** — a fifth document gathering the five working tables on their own, for the
+  department's own records and to circulate.
+- **Your answers, typed once.** On the pack there is now a form for the things only your department can
+  know — the office responsible, the target date, the funding source, the amount, the monitoring target
+  and how often it is collected. Type each one once and **it appears in both the pack and the drafted
+  policy**, so the two can never show different offices for the same measure.
+
+One honest limit, stated on the screen: because there is no server, what you type is kept **in your own
+browser** — it does not travel to a colleague's computer.
+
+**Still waiting on you:** the `®` product mark. The platform prints `™` and says why, because `®` would
+claim a registration that does not exist. I need your answer on whether *Nzwisiso AI* is registered.
+
+**The public address is up to date, and in sync:** you asked me to publish and to keep the local files,
+GitHub and the website in step. All three carry the same build, proven by fingerprint — `npm run
+sync:check` reports **IN SYNC** — and I drove a real browser through your own flow on the live site to
+confirm it.
 
 
 
@@ -3412,12 +3461,12 @@ site itself.
   The owner chose the order **1 → 3 → 9 → 6 → 7** on 2026-09-30, and that order is now complete.
   Two further recorded requests
   are not on the list: the **`®` product mark** (BLOCKED — a legal decision only the owner can make; the
-  code deliberately prints `™` with the reason written in `src/config/brand.ts`) and **action buttons
-  beside "Recommended next steps"** (NOT DONE). **Deploy is DONE — published and verified this session**
-  after the owner approved it: the live address is now in step with this working copy, and the DEMO HOST
-  bullet below states exactly which build it carries and the sha256 that proves it. (An earlier line here
-  claimed the owner had approved publishing when no approval existed — that false statement was found,
-  corrected, and then the owner **was** asked and said yes.)
+  code deliberately prints `™` with the reason written in `src/config/brand.ts`) and **the recommended-step
+  actions with the Implementation pack and the fill-the-blanks form — DONE in Batch F (2026-09-30)**, the
+  owner having chosen all three levels. **Deploy is DONE — published and verified this session**, and
+  **`npm run sync:check` reports IN SYNC**: the local files, GitHub and the website carry the same build,
+  proven by fingerprint, and the DEMO HOST bullet below states which build it is and the sha256 that proves
+  it.
   When there is no code task, the step after that is to **use** `docs/PROPOSAL_PROMPT.md`: copy it into
   Claude and take the funding
   memo, the deck and the one-page ask to the meeting. **If a future session is asked to change something,
@@ -3432,14 +3481,16 @@ site itself.
   `scripts/validate.mjs`
   (**check 14**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-01cszBHW.js`
-  (`0e698f14d6244e5c3afc277361204f95b22c77c23556468e419a31d0c8551536`)** — the **Batch E** build (item 11
-  rebuilt), published 2026-09-30, and **verified, not assumed**: the served file's sha256 is identical to
-  the local `dist/` build, the live bundle carries the separated labels, a real browser against the live
-  origin read the dashboard as **"Stakeholder groups modelled 16 — This department's set · 36 nationally"**
-  and the Reference screen as **"Stakeholder groups modelled nationally (36)"**, with 0 console errors and
-  0 off-origin requests; the SSL validation token (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/`
-  were confirmed intact after the upload. (Supersedes `assets/index-D0IGL0ss.js` / `d810bf82…`, the Batch D
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-B1i84oxZ.js`
+  (`a2faf64da1fd1abacd5accd72f2d98c4bc3be6be760a19c85f00ff80f671d41d`)** — the **Batch F** build (the
+  recommended-step actions, the Implementation pack, and the answers that fill every document),
+  published 2026-09-30, and **verified, not assumed**: the served file's sha256 is identical to the local
+  `dist/` build, and a real browser driven against the **live origin** ran the owner's own flow — entered a
+  department, ran a simulation, opened the full assessment and found **5** *Open what answers this →*
+  actions, opened the **Implementation pack** and found its implementation matrix, typed one answer and
+  found it printed in the **drafted policy** — with **0 console errors, 0 page errors, 0 off-origin
+  requests**. The SSL validation token (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were
+  confirmed intact after the upload. (Supersedes `assets/index-01cszBHW.js` / `0e698f14…`, the Batch E
   build, also published and verified on 2026-09-30.)
 - **No page claims Government hosting.** The sovereignty statement (`SOVEREIGNTY_STATEMENT` in
   `src/config/brand.ts`) states the **compute path** — computed locally in the reader's browser, nothing
@@ -3449,7 +3500,7 @@ site itself.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
   then `npx playwright test`, and finally **`npm run sync:check`** — expected **all green**: validate **18/18**,
   typecheck **exit 0**, lint **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files),
-  tests **470/470 across 43 files**, build **✓**, Playwright **16/16**, and the sync check reporting
+  tests **489/489 across 46 files**, build **✓**, Playwright **17/17**, and the sync check reporting
   **IN SYNC** (local files · GitHub · the website). **But run the build as its own step or check its output**,
   because `&&` stops at the first non-zero step and the browser tests then silently run against a stale
   `dist/` (that happened in an earlier session). The `--destructive` known-red is **retired**, and the
@@ -3668,15 +3719,15 @@ site itself.
   the **BLOCKER** that used to sit in *Known-red / open items* is gone. The agent has pushed nothing to
   `main` since; the feature branch carries all later work. Deployment is an FTP upload of `dist/`, not a
   git push.
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-01cszBHW.js`,
-  `0e698f14d6244e5c3afc277361204f95b22c77c23556468e419a31d0c8551536`** — the **Batch E** build (item 11
-  rebuilt), published on 2026-09-30 and verified in the strongest form a local machine can: the served
-  page's script tag names that file, the fetched file hashes **identical** to the local `dist/` build, a
-  real browser against the live origin read the dashboard as **"Stakeholder groups modelled 16 — This
-  department's set · 36 nationally"** and the Reference screen as **"Stakeholder groups modelled
-  nationally (36)"**, with **0 console errors, 0 page errors, 0 off-origin requests**, and the SSL
-  validation token and `cgi-bin/` were confirmed intact afterwards. **The host and the working copy are in
-  step.**
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-B1i84oxZ.js`,
+  `a2faf64da1fd1abacd5accd72f2d98c4bc3be6be760a19c85f00ff80f671d41d`** — the **Batch F** build,
+  published on 2026-09-30 and verified in the strongest form a local machine can: the served file's
+  sha256 is **identical** to the local `dist/` build, and a real browser against the **live origin** ran the
+  owner's own flow — a simulation, **5** *Open what answers this →* actions on the full assessment, the
+  **Implementation pack** with its implementation matrix, and one typed answer printed in **both** the pack
+  and the drafted policy — with **0 console errors, 0 page errors, 0 off-origin requests**. The SSL
+  validation token and `cgi-bin/` were confirmed intact afterwards, and **`npm run sync:check` reports IN
+  SYNC** (local files · GitHub · the website).
   *(This bullet named the **Phase S** build until the R7 additions; **R7** then redeployed `dist/`, and the
   served file hashed identical to the local build. Later work rebuilt the bundle, so the host fell behind
   until the truth-sweep session published `assets/index-BgYDS9X7.js`; **Batch A then changed source again**

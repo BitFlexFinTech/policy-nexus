@@ -336,13 +336,15 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
-- **What the live site actually is today (re-checked 2026-09-30, after the Batch E build was published).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-01cszBHW.js`
-  (`0e698f14d6244e5c3afc277361204f95b22c77c23556468e419a31d0c8551536`), which is byte-identical to the
+- **What the live site actually is today (re-checked 2026-09-30, after the Batch F build was published).**
+  The host `nzwisiso.bitflex.app` serves `assets/index-B1i84oxZ.js`
+  (`a2faf64da1fd1abacd5accd72f2d98c4bc3be6be760a19c85f00ff80f671d41d`), which is byte-identical to the
   local build, so **the live site is the build published on 2026-09-30** — it carries the authority line, the modelled
   agent population, the named sources, the official Coat of Arms, the favicon set, the Nzwisiso.ai
   positioning section, all 24 published figures, and the owner's items 1–11, including the *Re-run
-  simulation* action, the drafting stage, and every department modelling **16** stakeholder groups. (When
+  simulation* action, the drafting stage, the recommended-step actions that open or send the part of the
+  policy that answers each step, the **Implementation pack**, and every department modelling **16**
+  stakeholder groups. (When
   this was checked on 2026-09-28 the host served
   `assets/index-BeggQU9V.js`, which was
   behind the code; **R7** closed that gap, and later work rebuilt the bundle several times, so the current
