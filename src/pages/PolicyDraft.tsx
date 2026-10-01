@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DraftingStage } from "@/components/assessment/DraftingStage";
 import { DRAFTING_QUERY_PARAM, prefersReducedMotion } from "@/components/assessment/draftingStageConfig";
@@ -116,6 +116,22 @@ export default function PolicyDraft() {
   const finishStage = useCallback(() => setStageFinished(true), []);
   const showingStage =
     stageRequested && !stageFinished && !prefersReducedMotion() && Boolean(generated);
+
+  /**
+   * A recommended step links here with `#<section>` (see `recommendationActions.ts`), so the officer
+   * lands on the exact table that answers the step instead of hunting through the instrument. Every
+   * section is rendered with `data-doc-section`, so the browser's own hash is enough — no new route and
+   * no extra state. The id is checked against a plain pattern first, so a hand-typed address cannot put
+   * a breakable selector into `querySelector`.
+   */
+  const location = useLocation();
+  useEffect(() => {
+    const id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id || !generated) return;
+    if (!/^[a-z0-9-]+$/.test(id)) return;
+    const target = document.querySelector<HTMLElement>(`[data-doc-section="${id}"]`);
+    if (target) target.scrollIntoView({ block: "start" });
+  }, [location.hash, generated]);
 
   if (runPending) return <RunPending heading="Drafted policy" />;
   if (runError) return <RunError heading="Drafted policy" message={runError} />;

@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { findDepartment } from "@/config/departments";
 import { REFERENCE_DATE_LABEL } from "@/config/reference";
 import { VOCABULARY } from "@/config/brand";
+import { buildPolicyDraft, renderDocumentText, sliceDocumentSection } from "@/services/assessment/documents";
+import {
+  policyDraftPartPath,
+  recommendationTarget,
+} from "@/services/assessment/recommendationActions";
+import { downloadAsWord } from "@/services/documents/documentExport";
 import { DIRECTION_TONE, SEVERITY_TONE, SENTIMENT_TONE } from "./tone";
 import type { AssessmentRun } from "@/services/assessment/types";
 import { officerRecordLine } from "@/config/officer";
@@ -233,21 +241,89 @@ export function RiskList({ run }: { run: AssessmentRun }) {
 }
 
 export function RecommendationList({ run }: { run: AssessmentRun }) {
+  const [status, setStatus] = useState<{ id: string; message: string } | null>(null);
+
+  /**
+   * Download the one part of the drafted policy that answers a step, as its own Word document.
+   *
+   * The drafted policy is built on the press — it is a pure function of the run, so this cannot show a
+   * different figure from the assessment the officer is reading, and nothing is stored to keep in step.
+   */
+  const downloadPart = (recommendationId: string, sectionId: string) => {
+    const department = findDepartment(run.departmentId);
+    if (!department) {
+      setStatus({ id: recommendationId, message: "This department's configuration could not be read." });
+      return;
+    }
+    const part = sliceDocumentSection(buildPolicyDraft(run, department), sectionId);
+    if (!part) {
+      setStatus({
+        id: recommendationId,
+        message: "That part is not in this run's drafted policy, so nothing was downloaded.",
+      });
+      return;
+    }
+    setStatus({
+      id: recommendationId,
+      message: downloadAsWord({
+        title: part.title,
+        text: renderDocumentText(part),
+        fileStem: part.fileStem,
+      }),
+    });
+  };
+
   return (
     <Section title={`Recommended next steps (${run.recommendations.length})`}>
-      {run.recommendations.map((recommendation, index) => (
-        <div key={recommendation.id} className="flex items-start gap-2 px-4 py-2">
-          <span className="font-mono text-[10px] text-muted-foreground">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <div>
-            <div className="text-xs font-medium text-foreground">{recommendation.label}</div>
-            <div className="text-[10px] leading-relaxed text-muted-foreground">
-              {recommendation.note}
+      <p className="px-4 pt-2 text-[10px] leading-relaxed text-muted-foreground">
+        Each step below is already worked into the drafted policy. Use the action beside it to open the
+        exact table or clause that answers it, or to download just that part to send on.
+      </p>
+      {run.recommendations.map((recommendation, index) => {
+        const target = recommendationTarget(recommendation.id);
+        return (
+          <div key={recommendation.id} className="border-b border-dashed px-4 py-2 last:border-0">
+            <div className="flex items-start gap-2">
+              <span className="font-mono text-[10px] text-muted-foreground">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div className="min-w-0">
+                <div className="text-xs font-medium text-foreground">{recommendation.label}</div>
+                <div className="text-[10px] leading-relaxed text-muted-foreground">
+                  {recommendation.note}
+                </div>
+
+                {/* The action. A link, because it takes the officer to a place; and a download, because
+                    the whole point is to send that one part on without copying it out by hand. */}
+                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                  <Link
+                    to={policyDraftPartPath(run.id, target.sectionId)}
+                    className="inline-flex items-center gap-1 rounded-md border border-primary/40 px-2 py-0.5 text-[10px] font-semibold text-primary transition-colors hover:bg-primary/10"
+                  >
+                    Open what answers this →
+                  </Link>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 px-2 text-[10px]"
+                    onClick={() => downloadPart(recommendation.id, target.sectionId)}
+                  >
+                    Download this part (Word)
+                  </Button>
+                </div>
+
+                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+                  Answered in <span className="text-foreground">{target.label}</span> — {target.use}
+                </p>
+
+                {status?.id === recommendation.id && (
+                  <p className="mt-1 text-[10px] font-medium text-primary">{status.message}</p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </Section>
   );
 }

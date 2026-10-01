@@ -497,6 +497,21 @@ const buildRecommendations = (
   }));
 };
 
+/**
+ * EVERY recommendation the engine can produce, derived from the two banks above.
+ *
+ * This exists so a destination can be checked against it. A recommendation with no destination would
+ * show the officer a button that leads nowhere, and a destination for a recommendation that no longer
+ * exists would be stale advice — both are caught by `src/test/recommendation-actions.test.ts` in both
+ * directions, so neither can appear silently.
+ */
+export const RECOMMENDATION_IDS: readonly string[] = [
+  ...new Set([
+    ...Object.values(REMEDIES).map((remedy) => remedy.id),
+    ...Object.values(CLAUSE_GAP_REMEDIES).map((remedy) => remedy.id),
+  ]),
+].sort();
+
 const buildRounds = (
   department: Department,
   context: Pick<AssessmentRun, "reference" | "seed" | "policyText" | "horizonLabel">,

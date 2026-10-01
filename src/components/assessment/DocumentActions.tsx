@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BRAND, DISCLAIMER } from "@/config/brand";
 import { REFERENCE_DATE_LABEL } from "@/config/reference";
-import { createDocxBlob } from "@/services/documents/docx";
+import { downloadAsWord, type DocumentExportPayload } from "@/services/documents/documentExport";
 import type { AssessmentRun } from "@/services/assessment/types";
 
 export type DocumentScope = "summary" | "full";
@@ -45,16 +45,10 @@ const fileNameFor = (run: AssessmentRun, scope: DocumentScope) =>
   `${run.reference}-${scope === "full" ? "full-assessment" : "executive-summary"}`;
 
 /**
- * An explicitly supplied export payload. When a generated document (the
- * long-form report or the drafted policy) is exported, this supplies the title,
- * the exact text and the filename — the four actions are otherwise identical, so
- * there is still one place that knows how an assessment document is exported.
+ * Re-exported so every existing caller keeps importing it from here. The shape itself now lives with
+ * the one download mechanism (`src/services/documents/documentExport.ts`).
  */
-export interface DocumentExportPayload {
-  title: string;
-  text: string;
-  fileStem: string;
-}
+export type { DocumentExportPayload };
 
 /**
  * Document actions for an assessment. Print and PDF use the browser's own
@@ -98,20 +92,7 @@ export function DocumentActions({
 
   const handleWord = () => {
     if (!payload) return;
-    try {
-      const blob = createDocxBlob({ title: payload.title, body: payload.text });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `${payload.fileStem}.docx`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      document.body.removeChild(anchor);
-      URL.revokeObjectURL(url);
-      setStatus(`Word document downloaded: ${payload.fileStem}.docx`);
-    } catch {
-      setStatus("The Word download could not be prepared in this browser.");
-    }
+    setStatus(downloadAsWord(payload));
   };
 
   const handleShare = async () => {

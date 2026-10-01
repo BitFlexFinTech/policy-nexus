@@ -263,6 +263,32 @@ export const renderDocumentText = (doc: GeneratedDocument): string =>
     ]),
   ].join("\n");
 
+/**
+ * ONE SECTION of a generated document, as a document of its own.
+ *
+ * The owner's recommended steps often need a single working part sent on its own — the implementation
+ * matrix to the finance office, the monitoring matrix to planning — and until now that meant copying a
+ * table out of a long instrument by hand. This returns the section wrapped as a document, so the
+ * existing rendering and the existing export path carry it unchanged: there is no second renderer.
+ *
+ * `undefined` when the document holds no such section, so a caller must decide what to say rather than
+ * exporting an empty file that looks like a real answer.
+ */
+export const sliceDocumentSection = (
+  doc: GeneratedDocument,
+  sectionId: string,
+): GeneratedDocument | undefined => {
+  const section = doc.sections.find((entry) => entry.id === sectionId);
+  if (!section) return undefined;
+  return {
+    ...doc,
+    title: `${doc.title} — ${section.heading}`,
+    subtitle: `${doc.subtitle} · one part of this document, extracted for circulation`,
+    fileStem: `${doc.fileStem}-${section.id}`,
+    sections: [section],
+  };
+};
+
 
 
 
