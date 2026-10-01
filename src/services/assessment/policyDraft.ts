@@ -27,6 +27,20 @@ import {
 import { createRng } from "@/lib/prng";
 import { ANNEX, CLAUSE } from "./documentStructure";
 import {
+  BLANK,
+  PHASE_ONE_DATE,
+  PHASE_TWO_DATE,
+  SENTIMENT_WORD,
+  costCategoriesTable,
+  implementationMatrixTable,
+  monitoringMatrixTable,
+  recommendedStepsTable,
+  sentencesOf,
+  shareLabel,
+  stakeholderAnalysisTable,
+  type DocumentFills,
+} from "./matrices";
+import {
   assertCitationsVerified,
   citationsSectionFor,
   provenanceParagraphs,
@@ -69,8 +83,8 @@ const preparerDisclosure = (run: AssessmentRun, department: Department): string 
 /** Re-exported so callers and gates read the document's numbering from one place. */
 export { CLAUSE } from "./documentStructure";
 
-/** The one marker used wherever only the department can supply the value. */
-export const BLANK = "[TO BE CONFIRMED BY THE DEPARTMENT]";
+/** Re-exported from the matrix module, which is where it is written. */
+export { BLANK } from "./matrices";
 
 /**
  * The abbreviations the platform's own content uses, with their expansions. Only entries
@@ -95,12 +109,6 @@ export const KNOWN_ABBREVIATIONS: ReadonlyArray<readonly [string, string]> = [
   ["ZWG", "Zimbabwe Gold (national currency unit)"],
 ];
 
-const SENTIMENT_WORD: Record<StakeholderReaction["sentiment"], string> = {
-  supportive: "receptive",
-  mixed: "conditional",
-  resistant: "resistant",
-};
-
 /** "a, b and c"; and a phrase that stays grammatical when the list is empty. */
 const listOf = (labels: readonly string[]): string =>
   labels.length === 0
@@ -109,26 +117,15 @@ const listOf = (labels: readonly string[]): string =>
       ? labels[0]
       : `${labels.slice(0, -1).join(", ")} and ${labels[labels.length - 1]}`;
 
-/** Split submitted policy text into its own sentences. Deterministic. */
-const sentencesOf = (text: string): string[] =>
-  text
-    .replace(/\s+/g, " ")
-    .split(/(?<=[.!?])\s+/)
-    .map((sentence) => sentence.trim())
-    .filter((sentence) => sentence.length > 1);
-
-/** A share as it is printed: "38.6% of the population", or the Modelled label. */
-const shareLabel = (reaction: StakeholderReaction): string => {
-  const segment = STAKEHOLDER_SEGMENTS.find((entry) => entry.id === reaction.segmentId);
-  if (!segment || segment.share === null) return `${MODELLED_SHARE_LABEL} — no published share`;
-  return `${segment.share}% of the ${segment.shareBase}`;
-};
-
 /* ------------------------------------------------------------------------- */
 /* The document                                                                */
 /* ------------------------------------------------------------------------- */
 
-export const buildPolicyDraft = (run: AssessmentRun, department: Department): GeneratedDocument => {
+export const buildPolicyDraft = (
+  run: AssessmentRun,
+  department: Department,
+  fills: DocumentFills = {},
+): GeneratedDocument => {
   // The seed string is unchanged from the first version of this document, so every
   // existing guarantee — and every recorded expectation — still holds.
   const rng = createRng(`${run.seed}::policy-draft`);
@@ -346,9 +343,6 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
 
   /* --- 6. Implementation framework --------------------------------------- */
 
-  const phaseOneDate = `Phase 1 — from ${REFERENCE_DATE_LABEL}`;
-  const phaseTwoDate = `Phase ${CLAUSE.engagement} engagement complete`;
-
   numbered.push({
     id: "implementation",
     heading: `${CLAUSE.implementation}. Implementation framework`,
@@ -357,19 +351,7 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
       `The phasing follows clause ${CLAUSE.transitional}: measures that restate the submitted draft begin with the groups the examination models as receptive, and the measures arising from the examination follow once the engagement at clause ${CLAUSE.engagement} is complete. The dates below are therefore the policy's own phasing; the department sets the calendar dates.`,
       "Where a single office is accountable for a measure, naming it once here is sufficient; where a measure falls to more than one office, the lead office is named first and the supporting offices after it.",
     ],
-    table: {
-      caption: "Table 4 — Implementation matrix: measure, office, date and funding",
-      columns: ["Measure", "Responsible office", "Target date", "Funding source"],
-      rows: [
-        ...submittedMeasures.map((measure) => [measure, BLANK, phaseOneDate, BLANK]),
-        ...run.recommendations.map((recommendation) => [
-          `${recommendation.label} — ${recommendation.note}`,
-          BLANK,
-          phaseTwoDate,
-          BLANK,
-        ]),
-      ],
-    },
+    table: implementationMatrixTable(run, fills),
   });
 
   /* --- 7. Risk management ------------------------------------------------ */
@@ -430,42 +412,7 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
       `Each category follows from a provision of this policy, so the schedule is complete against the measures in clause ${CLAUSE.measures} and the implementation obligations in clause ${CLAUSE.implementation}.`,
       "Recurring costs are those that continue after the policy is in force; one-off costs are those that arise once, in preparing for it.",
     ],
-    table: {
-      caption: "Table 5 — Cost categories created by this policy, for costing by the department",
-      columns: ["Cost item", "Type", "Basis in this policy", "Amount"],
-      rows: [
-        [
-          "Implementation of the measures",
-          "One-off",
-          `The measures in clause ${CLAUSE.measures} and the offices named in clause ${CLAUSE.implementation}`,
-          BLANK,
-        ],
-        [
-          "Engagement rounds and their publication",
-          "One-off",
-          `The engagement obligations in clause ${CLAUSE.engagement}`,
-          BLANK,
-        ],
-        [
-          "Capacity and training for the offices carrying the measures",
-          "One-off",
-          `The implementation obligations in clause ${CLAUSE.implementation}`,
-          BLANK,
-        ],
-        [
-          "Monitoring, reporting and the review",
-          "Recurring",
-          `The monitoring and evaluation matrix in clause ${CLAUSE.monitoring}`,
-          BLANK,
-        ],
-        [
-          "Compliance with the policy by those it affects",
-          "Recurring",
-          `The obligations in clause ${CLAUSE.measures}; the cost to those affected is not modelled and is marked at clause ${CLAUSE.risk}`,
-          BLANK,
-        ],
-      ],
-    },
+    table: costCategoriesTable(fills),
   });
 
   /* --- 10. Monitoring, evaluation and review ----------------------------- */
@@ -478,25 +425,7 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
       `The policy shall be reviewed when ${rng.pick(REVIEW_TRIGGERS)}. The review shall compare the actual position with the position modelled in the examination, report the comparison against the indicators below, and be published.`,
       `The department shall set the target for each indicator and name the office that collects it: ${BLANK}. Where a target is set, the review reports against it; where none is set, the review reports the movement from the baseline.`,
     ],
-    table: {
-      caption: "Table 6 — Monitoring and evaluation matrix",
-      columns: [
-        "Indicator",
-        "Baseline",
-        "Target",
-        "Data source",
-        "Frequency",
-        "Responsible office",
-      ],
-      rows: department.indicators.map((indicator) => [
-        indicator.label,
-        `${indicator.value}${indicator.unit ? ` ${indicator.unit}` : ""}`,
-        BLANK,
-        indicatorBasisLabel(indicator.basis),
-        BLANK,
-        BLANK,
-      ]),
-    },
+    table: monitoringMatrixTable(department, fills),
   });
 
   /* --- 11. Transitional provisions --------------------------------------- */
@@ -531,16 +460,7 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
     paragraphs: [
       `The ${run.recommendations.length} steps recommended by the examination, each with what it requires, who carries it, and when it is due. The office and the calendar date are the department's to state.`,
     ],
-    table: {
-      caption: "Table A1 — Recommended steps, with the requirement each carries",
-      columns: ["Step", "What it requires", "Responsible office", "Target date"],
-      rows: run.recommendations.map((recommendation) => [
-        recommendation.label,
-        recommendation.note,
-        BLANK,
-        phaseTwoDate,
-      ]),
-    },
+    table: recommendedStepsTable(run, fills),
   });
 
   annexes.push({
@@ -549,20 +469,7 @@ export const buildPolicyDraft = (run: AssessmentRun, department: Department): Ge
     paragraphs: [
       "Each modelled group, the published share it stands on where one exists, its modelled position, and the engagement this policy provides for it.",
     ],
-    table: {
-      caption: "Table B1 — Group, share, modelled position and engagement",
-      columns: ["Stakeholder group", "Published share", "Modelled position", "Engagement provided"],
-      rows: run.reactions.map((reaction) => [
-        reaction.label,
-        shareLabel(reaction),
-        SENTIMENT_WORD[reaction.sentiment],
-        reaction.sentiment === "supportive"
-          ? `Briefed under clause ${CLAUSE.engagement} before commencement`
-          : reaction.sentiment === "mixed"
-            ? `Engagement round under clause ${CLAUSE.engagement} before obligations bite`
-            : `Met before obligations commence under clause ${CLAUSE.engagement}`,
-      ]),
-    },
+    table: stakeholderAnalysisTable(run),
   });
 
   // Annex C keeps the citations section's own id, so the platform's citation check reads

@@ -16,6 +16,7 @@ import { CITATIONS_ANNEX } from "@/services/assessment/documentStructure";
 import { revisionNumber, revisionRequestFromRun } from "@/services/assessment/revision";
 import { buildDraftingProvenance, verifyDocumentCitations } from "@/services/documents/drafting";
 import { useGeneratedDocument } from "@/services/documents/useGeneratedDocument";
+import { useImplementationFills } from "@/services/documents/useImplementationFills";
 import { usePolicyDraft } from "@/services/documents/usePolicyDraft";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
 
@@ -42,12 +43,15 @@ export default function PolicyDraft() {
   const { run, pending: runPending, error: runError } = useRun(runId);
 
   const department = useMemo(() => (run ? findDepartment(run.departmentId) : undefined), [run]);
+  // The answers the department has entered for this run's working matrices. Typed once on the
+  // Implementation pack, they appear here too, so the two documents cannot show different offices.
+  const implementation = useImplementationFills(runId ?? "");
   const {
     document: generated,
     pending: documentPending,
     error: documentError,
     source,
-  } = useGeneratedDocument("policy-draft", run, department);
+  } = useGeneratedDocument("policy-draft", run, department, implementation.fills);
   const generatedText = useMemo(
     () => (generated ? renderDocumentText(generated) : ""),
     [generated],

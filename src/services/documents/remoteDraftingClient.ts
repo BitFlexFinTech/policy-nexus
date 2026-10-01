@@ -10,10 +10,18 @@
  */
 
 import { liveService, type CapabilityConfig } from "@/config/platform";
-import type { AssessmentRun, GeneratedDocument, GeneratedSection } from "@/services/assessment/types";
+import {
+  DOCUMENT_KINDS,
+  type AssessmentRun,
+  type DocumentKind,
+  type GeneratedDocument,
+  type GeneratedSection,
+} from "@/services/assessment/types";
 import type { DraftingGrounding } from "./drafting";
+import type { DocumentFills } from "@/services/assessment/matrices";
 
-export type DraftingKind = "report" | "policy-draft";
+/** The kinds of document a drafting service may be asked for — the platform's own list. */
+export type DraftingKind = DocumentKind;
 
 export interface RemoteDraftingRequest {
   kind: DraftingKind;
@@ -27,6 +35,12 @@ export interface RemoteDraftingRequest {
    * the two cannot change what a draft is allowed to rest on.
    */
   grounding: DraftingGrounding;
+  /**
+   * The answers the department has entered for this run's working matrices. A service is given exactly
+   * what the local generator is given, so what an officer typed appears in the draft either way rather
+   * than being silently dropped when a service is switched on.
+   */
+  fills?: DocumentFills;
 }
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
@@ -43,7 +57,7 @@ const isSection = (value: unknown): value is GeneratedSection => {
 /** True only for a document carrying every field the screens render. */
 export const isGeneratedDocument = (value: unknown): value is GeneratedDocument => {
   if (!isObject(value)) return false;
-  if (value.kind !== "report" && value.kind !== "policy-draft") return false;
+  if (!DOCUMENT_KINDS.includes(value.kind as DocumentKind)) return false;
   if (typeof value.title !== "string" || typeof value.subtitle !== "string") return false;
   if (typeof value.fileStem !== "string") return false;
   if (!Array.isArray(value.sections) || value.sections.length === 0) return false;

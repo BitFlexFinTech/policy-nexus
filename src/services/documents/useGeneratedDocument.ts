@@ -3,11 +3,54 @@ import type { Department } from "@/config/departments";
 import { describeCapability } from "@/config/platform";
 import { usePlatformConfig } from "@/config/usePlatformConfig";
 import { buildLongReport, buildPolicyDraft } from "@/services/assessment/documents";
+import { buildImplementationPack } from "@/services/assessment/implementationPack";
+import type { DocumentFills } from "@/services/assessment/matrices";
 import type { AssessmentRun, GeneratedDocument } from "@/services/assessment/types";
 import { buildDraftingGrounding, type DraftingSource } from "./drafting";
 import { remoteDraftingClient } from "./remoteDraftingClient";
 
-export type DocumentKind = "report" | "policy-draft";
+import type { DocumentKind } from "@/services/assessment/types";
+
+/**
+ * The answers when a caller supplies none.
+ *
+ * ONE frozen object, shared, and never a fresh `{}`: this value is a dependency of the effects below, and
+ * a new object on every render would make them re-run forever. That is also why it is written down here
+ * rather than left as a literal in the signature.
+ */
+const NO_FILLS: DocumentFills = Object.freeze({});
+
+/**
+ * A short, stable fingerprint of the answers, so a document is re-asked for when an officer changes one.
+ * Both levels are sorted, so the same answers always produce the same fingerprint whatever order they
+ * were typed in.
+ */
+const fillsKey = (fills: DocumentFills): string =>
+  Object.keys(fills)
+    .sort()
+    .map((rowKey) => {
+      const row = fills[rowKey] ?? {};
+      const fields = Object.keys(row)
+        .sort()
+        .map((field) => `${field}=${String(row[field as keyof typeof row] ?? "")}`)
+        .join(",");
+      return `${rowKey}(${fields})`;
+    })
+    .join(";");
+
+/**
+ * The one place a document kind is turned into a document. Adding a kind means adding a row here, so a
+ * kind can never be requested without a builder behind it. The answers the department has entered are
+ * passed in explicitly, so a document is still a pure function of its inputs.
+ */
+const BUILDERS: Record<
+  DocumentKind,
+  (run: AssessmentRun, department: Department, fills: DocumentFills) => GeneratedDocument
+> = {
+  report: (run, department) => buildLongReport(run, department),
+  "policy-draft": (run, department, fills) => buildPolicyDraft(run, department, fills),
+  "implementation-pack": (run, department, fills) => buildImplementationPack(run, department, fills),
+};
 
 export interface GeneratedDocumentResult {
   document: GeneratedDocument | null;
@@ -38,18 +81,15 @@ export const useGeneratedDocument = (
   kind: DocumentKind,
   run: AssessmentRun | undefined,
   department: Department | undefined,
+  /** The answers the department has entered for this run's working matrices. */
+  fills: DocumentFills = NO_FILLS,
 ): GeneratedDocumentResult => {
   const config = usePlatformConfig();
   const live = describeCapability(config, "drafting").state === "live";
 
   const simulated = useMemo(
-    () =>
-      run && department
-        ? kind === "report"
-          ? buildLongReport(run, department)
-          : buildPolicyDraft(run, department)
-        : null,
-    [kind, run, department],
+    () => (run && department ? BUILDERS[kind](run, department, fills) : null),
+    [kind, run, department, fills],
   );
 
   const grounding = useMemo(
@@ -57,7 +97,9 @@ export const useGeneratedDocument = (
     [run, department],
   );
 
-  const key = run ? `${kind}:${run.id}` : "";
+  // The answers are part of what identifies the document: two different sets of answers are two
+  // different documents, so the cached one must not be reused for the other.
+  const key = run ? `${kind}:${run.id}:${fillsKey(fills)}` : "";
   const [fetched, setFetched] = useState<
     { key: string; document?: GeneratedDocument; error?: string } | null
   >(null);
@@ -76,7 +118,7 @@ export const useGeneratedDocument = (
     }
     let active = true;
     client
-      .generate({ kind, model: "", run, grounding })
+      .generate({ kind, model: "", run, grounding, fills })
       .then((document) => {
         if (active) setFetched({ key, document });
       })
@@ -92,7 +134,7 @@ export const useGeneratedDocument = (
     return () => {
       active = false;
     };
-  }, [live, key, kind, run, grounding]);
+  }, [live, key, kind, run, grounding, fills]);
 
   if (!live) return { document: simulated, pending: false, error: null, source: localSource };
   if (fetched && fetched.key === key) {

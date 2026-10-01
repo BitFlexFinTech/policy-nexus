@@ -16,6 +16,7 @@ import Assessment from "./pages/Assessment.tsx";
 import FullAssessment from "./pages/FullAssessment.tsx";
 import AssessmentReport from "./pages/AssessmentReport.tsx";
 import PolicyDraft from "./pages/PolicyDraft.tsx";
+import ImplementationPack from "./pages/ImplementationPack.tsx";
 import Compare from "./pages/Compare.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import PlatformAdmin from "./pages/PlatformAdmin.tsx";
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="/app/assessments/:id/full" element={<FullAssessment />} />
               <Route path="/app/assessments/:id/report" element={<AssessmentReport />} />
               <Route path="/app/assessments/:id/policy-draft" element={<PolicyDraft />} />
+              <Route path="/app/assessments/:id/implementation-pack" element={<ImplementationPack />} />
               <Route path="/app/compare/:a/:b" element={<Compare />} />
               <Route path="/app/documents" element={<Documents />} />
               <Route path="/app/reference" element={<Reference />} />

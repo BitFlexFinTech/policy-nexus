@@ -13,4 +13,5 @@ export const DOCUMENT_VIEWS: ReadonlyArray<{ segment: string; label: string; end
   { segment: "full", label: "Full assessment" },
   { segment: "report", label: "Full report" },
   { segment: "policy-draft", label: "Drafted policy" },
+  { segment: "implementation-pack", label: "Implementation pack" },
 ];

@@ -231,8 +231,18 @@ export interface GeneratedSection {
  * A document generated from one completed run: the long-form narrative report
  * (`report`) or the drafted policy itself (`policy-draft`).
  */
+/**
+ * EVERY kind of document the platform can generate — ONE list.
+ *
+ * It was written in three places (the document type, the loading hook and the remote drafting client),
+ * which is how a kind ends up accepted in one place and rejected in another. Adding a kind now means
+ * adding it once; the remote client's validation and the seam both read this list.
+ */
+export const DOCUMENT_KINDS = ["report", "policy-draft", "implementation-pack"] as const;
+export type DocumentKind = (typeof DOCUMENT_KINDS)[number];
+
 export interface GeneratedDocument {
-  kind: "report" | "policy-draft";
+  kind: DocumentKind;
   title: string;
   /** One line naming the run this document derives from. */
   subtitle: string;

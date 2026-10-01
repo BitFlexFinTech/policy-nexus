@@ -1022,6 +1022,57 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     expectCleanRuntime();
   });
 
+  test("a recommended step opens its answer, and one answer reaches both documents (items A, B and C)", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await enterWorkspace(page);
+
+    await page
+      .getByPlaceholder(/Draft the policy text/)
+      .fill(
+        "Each bank must register by 31 January. A transition period of twelve months applies before the register opens. The Treasury shall fund the register from the consolidated revenue fund.",
+      );
+    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
+      timeout: 30_000,
+    });
+
+    // A — every recommended step carries a real action, on the officer's screen.
+    await page.getByRole("link", { name: "Open executive summary" }).click();
+    await page.getByRole("link", { name: "Full assessment", exact: true }).click();
+    const openAnswer = page.getByRole("link", { name: "Open what answers this →" });
+    await expect(openAnswer.first()).toBeVisible();
+    expect(await openAnswer.count()).toBeGreaterThan(0);
+
+    // …and the download really produces a Word file.
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("button", { name: "Download this part (Word)" }).first().click(),
+    ]);
+    expect(download.suggestedFilename()).toMatch(/\.docx$/);
+
+    // The action opens the drafted policy at the section that answers the step.
+    await openAnswer.first().click();
+    await expect(page).toHaveURL(/policy-draft#/);
+    await expect(page.getByRole("heading", { name: "Drafted policy", exact: true })).toBeVisible();
+
+    // B — the pack is offered beside the other documents and carries the working matrices.
+    await page.getByRole("link", { name: "Implementation pack", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Implementation pack", exact: true })).toBeVisible();
+    await expect(page.getByText(/Table 4 — Implementation matrix/).first()).toBeVisible();
+
+    // C — type one answer, once.
+    await page.getByPlaceholder("To be confirmed").first().fill("Office of the Accountant-General");
+    await expect(page.getByText("Office of the Accountant-General").first()).toBeVisible();
+
+    // The SAME answer is now printed in the drafted policy.
+    await page.getByRole("link", { name: "Drafted policy", exact: true }).click();
+    await expect(page.getByText("Office of the Accountant-General").first()).toBeVisible();
+
+    expectCleanRuntime();
+  });
+
   test("the policy input remembers what was typed and set (item 7)", async ({ page }) => {
     await page.goto("/");
     await enterWorkspace(page);

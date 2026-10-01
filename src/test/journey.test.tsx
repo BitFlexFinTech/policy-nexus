@@ -218,7 +218,7 @@ describe("journey — run a policy, then read its assessment", () => {
     expect(screen.getByRole("button", { name: "Edit draft wording" })).toBeInTheDocument();
   });
 
-  it("carries the one shared document strip on all four screens of a run", () => {
+  it("carries the one shared document strip on every screen of a run", () => {
     const run = recordRun(requestFor("fin"));
     const screens: ReadonlyArray<{ path: string; current: string }> = [
       { path: `/app/assessments/${encodeURIComponent(run.id)}`, current: "Executive summary" },
@@ -227,6 +227,10 @@ describe("journey — run a policy, then read its assessment", () => {
       {
         path: `/app/assessments/${encodeURIComponent(run.id)}/policy-draft`,
         current: "Drafted policy",
+      },
+      {
+        path: `/app/assessments/${encodeURIComponent(run.id)}/implementation-pack`,
+        current: "Implementation pack",
       },
     ];
 
