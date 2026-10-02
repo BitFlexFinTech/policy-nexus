@@ -657,7 +657,7 @@ if (!existsSync(cssPath)) {
 
 // 17 — NO SUPERSEDED BUNDLE IS PRESENTED AS THE LIVE ONE. Check 12 proves the three record
 //      files AGREE on the live bundle; it cannot see a stale claim worded differently, and that
-//      is how four false statements survived a redeploy. Found on 2026-10-02, after the site had
+//      is how eight stale statements survived a redeploy. Found on 2026-10-02, after the site had
 //      been republished: prose still told the reader the host was one build behind, one line
 //      still presented the Phase S bundle as "Live build (current — 2026-09-26)", and the block
 //      still said "the one action left for the whole project is the redeploy". A dated log row is
