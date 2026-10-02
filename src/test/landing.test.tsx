@@ -251,7 +251,7 @@ describe("Landing — the pure public landing page", () => {
   it("carries the required attribution in the footer, with the classification smaller", () => {
     renderLanding();
     const footer = screen.getByRole("contentinfo");
-    const attribution = within(footer).getByText("A Project by the Ministry of IT");
+    const attribution = within(footer).getByText("A Project by the Ministry of ICT");
     const classification = within(footer).getByText("For Internal Use Only");
 
     const sizeOf = (node: HTMLElement) => {

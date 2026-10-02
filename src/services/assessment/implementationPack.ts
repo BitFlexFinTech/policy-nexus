@@ -12,7 +12,8 @@
  * THREE RULES, the same as the drafted policy's:
  *   1. Nothing is invented. Every table comes from the SAME builder the drafted policy uses, so the two
  *      documents can never disagree about the same policy, and every value only the department can state
- *      is printed as the same marked blank.
+ *      is printed as the same marked blank — which the department completes in the document it exports.
+ *      The platform does not ask for those values on screen (the owner's instruction, 2026-10-02).
  *   2. It is deterministic — the same run always produces the same pack, byte for byte.
  *   3. It carries no figure of its own. Where a reader needs the authority for a figure, it is in the
  *      policy and in the run the pack derives from.
@@ -28,14 +29,12 @@ import {
   monitoringMatrixTable,
   recommendedStepsTable,
   stakeholderAnalysisTable,
-  type DocumentFills,
 } from "./matrices";
 import type { AssessmentRun, GeneratedDocument, GeneratedSection } from "./types";
 
 export const buildImplementationPack = (
   run: AssessmentRun,
   department: Department,
-  fills: DocumentFills = {},
 ): GeneratedDocument => {
   const purpose: GeneratedSection = {
     id: "pack-purpose",
@@ -53,7 +52,7 @@ export const buildImplementationPack = (
     paragraphs: [
       "Each measure the draft already carried, followed by each step the examination recommended. The responsible office, the calendar date and the funding source are the department's to state, and the pack does not invent them.",
     ],
-    table: implementationMatrixTable(run, fills),
+    table: implementationMatrixTable(run),
   };
 
   const costs: GeneratedSection = {
@@ -62,7 +61,7 @@ export const buildImplementationPack = (
     paragraphs: [
       "The categories this policy creates, for the department's costing office. No amount is modelled: the categories follow from the policy's own provisions, and the amount is a decision of the department and the Ministry of Finance.",
     ],
-    table: costCategoriesTable(fills),
+    table: costCategoriesTable(),
   };
 
   const monitoring: GeneratedSection = {
@@ -71,7 +70,7 @@ export const buildImplementationPack = (
     paragraphs: [
       "Each indicator with the baseline and the data source the department already holds, so progress is read from one set of figures rather than several. The target, the review frequency and the office that collects the figure are the department's to set.",
     ],
-    table: monitoringMatrixTable(department, fills),
+    table: monitoringMatrixTable(department),
   };
 
   const steps: GeneratedSection = {
@@ -80,7 +79,7 @@ export const buildImplementationPack = (
     paragraphs: [
       `The ${run.recommendations.length} ${run.recommendations.length === 1 ? "step" : "steps"} the examination recommended, each with the requirement it carries. Each is already worked into the drafted policy; this is the version an office works from.`,
     ],
-    table: recommendedStepsTable(run, fills),
+    table: recommendedStepsTable(run),
   };
 
   const stakeholders: GeneratedSection = {

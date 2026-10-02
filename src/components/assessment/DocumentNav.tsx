@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { BackToOverview } from "./BackToOverview";
 import { ReRunSimulationLink } from "./ReRunSimulationLink";
 import { RevisionBadge } from "./RevisionBadge";
 import { DOCUMENT_VIEWS } from "./documentViews";
@@ -29,6 +30,9 @@ export function DocumentNav({ runId }: { runId: string }) {
       data-print="hide"
       className="flex items-center gap-1 overflow-x-auto rounded-lg border bg-card px-2 py-1.5"
     >
+      {/* The owner's instruction (2026-10-02): one "← Back", always to the Overview. It sits
+          in this strip so every screen of a run carries it, from one definition. */}
+      <BackToOverview />
       <span className="shrink-0 px-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
         This run
       </span>

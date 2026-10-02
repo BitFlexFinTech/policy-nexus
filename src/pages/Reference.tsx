@@ -1,4 +1,4 @@
-import { findDepartment } from "@/config/departments";
+import { findDepartment, indicatorBasisLabel } from "@/config/departments";
 import { BRAND, DISCLAIMER, SOVEREIGNTY_STATEMENT, VOCABULARY } from "@/config/brand";
 import {
   getNamedSource,
@@ -36,6 +36,38 @@ export default function Reference() {
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Department context</h3>
         <p className="mt-1 text-xs font-medium text-foreground">{department.name}</p>
         <p className="mt-1 text-xs text-muted-foreground">{department.mandate}</p>
+      </section>
+
+      {/* The owner's instruction, 2026-10-02: the department's indicators were a card strip
+          at the top of the Overview, and they were removed from there. Every figure now lives
+          here instead — all of them, never a subset — with the same source line the cards
+          printed, so nothing is lost and nothing is re-worded by hand. */}
+      <section className="rounded-lg border bg-card p-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Department indicators ({department.indicators.length})
+        </h3>
+        <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+          This department's reference figures, all of them. Each one either names the body that
+          publishes it, the publication it is taken from and the period it is for, or it is shown as{" "}
+          {MODELLED_SHARE_LABEL} rather than estimated.
+        </p>
+        <ul className="mt-2 space-y-2">
+          {department.indicators.map((indicator) => (
+            <li key={indicator.id} className="border-b border-dashed pb-2 last:border-0 last:pb-0">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <span className="text-xs font-medium text-foreground">{indicator.label}</span>
+                <span className="font-mono text-xs text-foreground">
+                  {indicator.value}
+                  {indicator.unit === "%" ? "%" : indicator.unit ? ` ${indicator.unit}` : ""}
+                </span>
+              </div>
+              <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">{indicator.note}</p>
+              <p className="text-[10px] text-muted-foreground">
+                Source: {indicatorBasisLabel(indicator.basis)}
+              </p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="rounded-lg border bg-card p-3">

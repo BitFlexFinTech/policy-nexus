@@ -38,7 +38,6 @@ import {
   sentencesOf,
   shareLabel,
   stakeholderAnalysisTable,
-  type DocumentFills,
 } from "./matrices";
 import {
   assertCitationsVerified,
@@ -124,7 +123,6 @@ const listOf = (labels: readonly string[]): string =>
 export const buildPolicyDraft = (
   run: AssessmentRun,
   department: Department,
-  fills: DocumentFills = {},
 ): GeneratedDocument => {
   // The seed string is unchanged from the first version of this document, so every
   // existing guarantee — and every recorded expectation — still holds.
@@ -351,7 +349,7 @@ export const buildPolicyDraft = (
       `The phasing follows clause ${CLAUSE.transitional}: measures that restate the submitted draft begin with the groups the examination models as receptive, and the measures arising from the examination follow once the engagement at clause ${CLAUSE.engagement} is complete. The dates below are therefore the policy's own phasing; the department sets the calendar dates.`,
       "Where a single office is accountable for a measure, naming it once here is sufficient; where a measure falls to more than one office, the lead office is named first and the supporting offices after it.",
     ],
-    table: implementationMatrixTable(run, fills),
+    table: implementationMatrixTable(run),
   });
 
   /* --- 7. Risk management ------------------------------------------------ */
@@ -412,7 +410,7 @@ export const buildPolicyDraft = (
       `Each category follows from a provision of this policy, so the schedule is complete against the measures in clause ${CLAUSE.measures} and the implementation obligations in clause ${CLAUSE.implementation}.`,
       "Recurring costs are those that continue after the policy is in force; one-off costs are those that arise once, in preparing for it.",
     ],
-    table: costCategoriesTable(fills),
+    table: costCategoriesTable(),
   });
 
   /* --- 10. Monitoring, evaluation and review ----------------------------- */
@@ -425,7 +423,7 @@ export const buildPolicyDraft = (
       `The policy shall be reviewed when ${rng.pick(REVIEW_TRIGGERS)}. The review shall compare the actual position with the position modelled in the examination, report the comparison against the indicators below, and be published.`,
       `The department shall set the target for each indicator and name the office that collects it: ${BLANK}. Where a target is set, the review reports against it; where none is set, the review reports the movement from the baseline.`,
     ],
-    table: monitoringMatrixTable(department, fills),
+    table: monitoringMatrixTable(department),
   });
 
   /* --- 11. Transitional provisions --------------------------------------- */
@@ -460,7 +458,7 @@ export const buildPolicyDraft = (
     paragraphs: [
       `The ${run.recommendations.length} steps recommended by the examination, each with what it requires, who carries it, and when it is due. The office and the calendar date are the department's to state.`,
     ],
-    table: recommendedStepsTable(run, fills),
+    table: recommendedStepsTable(run),
   });
 
   annexes.push({

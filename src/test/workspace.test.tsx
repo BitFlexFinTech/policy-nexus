@@ -39,18 +39,26 @@ describe("workspace — all 16 departments, department-aware panels", () => {
     signInToDepartment(department.id);
     renderAt("/app");
     expect(screen.getByText(department.abbr)).toBeInTheDocument();
-    // The KPI strip must render every indicator the department declares.
-    department.indicators.forEach((indicator) => {
-      expect(screen.getByText(indicator.label)).toBeInTheDocument();
-    });
   });
 
-  it("opens a KPI card to its meaning and source", () => {
-    signInToDepartment("fin");
-    renderAt("/app");
-    const indicator = findDepartment("fin")!.indicators[0];
-    fireEvent.click(screen.getByRole("button", { name: new RegExp(escapeRegex(indicator.label)) }));
-    expect(screen.getByText(`Source: ${indicatorBasisLabel(indicator.basis)}`)).toBeInTheDocument();
+  /**
+   * The owner's instruction, 2026-10-02: the indicator cards came off the Overview. The
+   * figures moved to the Reference screen, and this gate follows them there — every one the
+   * department declares, never a subset, each with the source line the cards used to print.
+   */
+  it.each(DEPARTMENTS)("states every one of $abbr's indicators on the Reference screen", (department) => {
+    signInToDepartment(department.id);
+    renderAt("/app/reference");
+    department.indicators.forEach((indicator) => {
+      expect(
+        screen.getAllByText(indicator.label).length,
+        `${department.id}/${indicator.id} label`,
+      ).toBeGreaterThan(0);
+      expect(
+        screen.getAllByText(`Source: ${indicatorBasisLabel(indicator.basis)}`).length,
+        `${department.id}/${indicator.id} source line`,
+      ).toBeGreaterThan(0);
+    });
   });
 
   it.each(SECONDARY)("renders %s without throwing", (path, heading) => {

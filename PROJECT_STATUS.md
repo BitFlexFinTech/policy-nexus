@@ -388,9 +388,10 @@ real-browser visual/pixel check yet (Playwright Chromium is not installed; that 
   `DISCLAIMER.long`, `SOVEREIGNTY_STATEMENT`).
 - `src/config/reference.ts`: **added `getTimeHorizon`** so horizon labels have one look-up
   helper instead of two inline `.find()` duplicates (single-source-of-truth rule).
-- **Tests:** new `src/test/workspace.test.tsx` — **29 tests**: every one of the 16 departments
-  renders `/app` and every indicator is present (dataset completeness), a KPI card opens to its
-  source, all four secondary routes smoke-render their heading, the nav has exactly 5 links,
+- **Tests:** new `src/test/workspace.test.tsx`: every one of the 16 departments renders `/app`, and
+  every indicator is present on the Reference screen with its derived source line (dataset
+  completeness — moved there on 2026-10-02, when the Overview's indicator card strip was removed at
+  the owner's instruction), all four secondary routes smoke-render their heading, the nav has exactly 5 links,
   the document screen lists every declared document, the policy register lists every draft, the
   reference screen shows all 16 segments and all 3 rates, and all four secondary routes are
   guarded without a session. Suite is now **62 tests** (was 33).
@@ -680,7 +681,8 @@ with `No department selected` and a disabled *Enter workspace* button.
 
 Requirement: a professional, modern homepage with a **government aesthetic** that **highlights what the
 platform does**, benchmarked against European government platforms, whose footer carries exactly
-**"A Project by the Ministry of IT"**, with **"For Internal Use Only"** beneath it in smaller text.
+**"A Project by the Ministry of ICT"**, with **"For Internal Use Only"** beneath it in smaller text.
+(The original brief wrote "Ministry of IT"; the owner corrected it to **ICT** on 2026-10-02.)
 
 Research done this session against live public-sector design systems (see the sources named in the
 chat): **GOV.UK Design System** (dark masthead + state lockup, thin accent rule, "phase banner" notice
@@ -725,8 +727,8 @@ dependency, no gradients or glassmorphism):
    the `Enter <department>` action).
 9. **Official footer** — four columns (identity · Platform anchors · Reference frame · Administration,
    naming `BRAND.entityCustodian`), the retained sovereignty statement, then the required attribution
-   **"A Project by the Ministry of IT"** with **"For Internal Use Only"** beneath it in smaller
-   letterspaced small caps.
+   **"A Project by the Ministry of ICT"** with **"For Internal Use Only"** beneath it in smaller
+   letterspaced small caps. (Corrected from "Ministry of IT" on 2026-10-02 at the owner's instruction.)
 
 **Byte-for-byte functional contract preserved on `/`** (rules 03 + 06): the department group keeps its
 name `Select a department — 16 available`, exactly 16 real buttons, the `Selected: <full name>` /
@@ -1578,11 +1580,12 @@ because the block it sits in already names itself.
 | 2026-09-30 | **DEFECT FOUND BY THE OWNER — item 11 was marked DONE while it was not; corrected at source** | The owner reported: *"why are you making fake claims again. the platform is still only showing Stakeholder segments 8."* **They were right.** **Verified by driving a real browser against the LIVE site** (`https://nzwisiso.bitflex.app/`, the published Batch D build): after entering the Finance department, the **Engine Vitals** card reads **"Stakeholder segments8"**; the **Reference** screen reads **"Stakeholder segments modelled (36)"**. Both are computed from real configuration — but they are **two different quantities under nearly the same label**. The graph's stakeholder nodes come from `run.reactions` (`buildRelationshipGraph`, `src/services/assessment/network.ts`), which come from `department.segments` (`src/services/assessment/scenario.ts:365`) — **6 to 8 groups per department**, enforced by `src/test/departments.test.ts` (*"gives every department between 6 and 8 stakeholder groups"*) and pinned per department. The **36** is the platform-wide canonical list (`STAKEHOLDER_SEGMENTS`, `src/config/reference.ts`), used by the Reference screen, the landing coverage figure and `policyReading`. **The earlier `DONE` was written against the 36 and never checked against what a department actually draws**, and the assistant repeated it as *"all eleven are done"* without verifying — the exact failure the owner named. **FIXED at source (the records, this turn):** the item-11 row now reads **NOT DONE** with the evidence; the RESUME HERE tally reads *"1–10 done, 11 NOT done"*; the PLAIN SUMMARY leads with the correction; and this row records it. **NOT YET FIXED (the substance, and it is stated as such):** the per-department group count is still 6–8, so the graph is still sparse. That needs (a) a decision on how many groups each department models and (b) a change to the run-reveal pacing, because rounds scale with groups (`roundsPerGroup` × groups, `scenario.ts:512`) and are revealed one at a time at `RUN_ROUND_TICK_MS = 1150` — 36 groups would take **over a minute** per run. |
 | 2026-09-30 | **BATCH E — item 11 rebuilt: every department's modelled stakeholder set, and the frame made a rule** (this session) | **The owner's chosen remedy:** *"a bigger researched set per department (about 15–18 each), so departments stay different from one another."* **What was built.** Each of the **16** departments now models **16** stakeholder groups, drawn from the **36** national groups (`STAKEHOLDER_SEGMENTS`, `src/config/reference.ts`) for what that department's policies genuinely affect — Finance takes exporters, pensioners and mining operators; Agriculture takes smallholder farmers, cooperatives and cross-border traders; Defence alone takes war veterans. Checked mechanically, not by eye: every department is **16 groups**, **no repeats**, **every group canonical**, **all 36 groups still modelled by at least one department** (no orphans), and the departments remain distinct. **The gate was raised, not removed:** `src/test/departments.test.ts` now requires **15–18** groups per department (it said 6–8) and its per-department pin was updated deliberately, with the reason written above it. **Reveal pacing changed to keep a run watchable:** rounds scale with groups, so `src/pages/SimulationRun.tsx` now reveals `ceil(total / 18)` rounds per tick (`RUN_REVEAL_TICKS = 18`, `RUN_ROUND_TICK_MS = 1150` unchanged) — the **content is untouched**, only the pacing; a run stays about 21 seconds. **Two further defects fixed at source:** (a) `src/lib/graph/swarm.ts` — the frame was a **soft force** only, so with more marks one could settle outside the picture (measured: y = 761.76 against a 750-high frame; −1.41 against a 0 edge). It is now a **hard clamp** after integration, with the outward velocity cleared on the clamped axis — without that second half the school could never come to a true rest, and the rest is what makes a mark clickable. The initial ring radius was also pulled inside by the frame padding. (b) `src/components/EngineStatus.tsx` + `src/pages/Reference.tsx` — the two screens both read *"Stakeholder segments"* with different numbers, which is precisely what made the owner's 8 look like a contradiction; they are now **"Stakeholder groups modelled"** (with *"This department's set · 36 nationally"*) and **"Stakeholder groups modelled nationally (36)"**. **Three engine tests were re-derived rather than relaxed, and the reason is recorded in each:** the risk *count* is no longer the measure of a better draft (a fuller draft adds action sentences, which legitimately raise the absorption risk) so the test now asserts that the bare draft raises `risk-scope`, that the complete draft raises none of the four risks its clauses answer, and that it raises no more risks than the bare one; the weighted-index tolerance is now **derived from the arithmetic** (`others / (1000 × boosted + others) × widest gap`) instead of the flat `2` that only made sense for eight groups; and a coincidence-based `confidence !==` assertion became `JSON.stringify(runWith) !== JSON.stringify(runWithout)`, because a rounded headline figure may legitimately match across two genuinely different runs. **Proved able to fail, then restored byte-identical:** putting one department back to 8 groups turned **2 gates red** while the range gate reported *"opc models 8 groups: expected 8 to be greater than or equal to 15"* (`src/config/departments.ts` sha256 `7543217305a744c70ced9aefeed6bde2ce6e7f840e96c3c9fff1bc367a2d4ccc` before and after); the frame gates were observed red before the clamp and green after. **New browser gate:** `e2e/journey.spec.ts` reads the rendered page, fails if the dashboard figure is below 15, fails if `36 nationally` is missing, and checks the Reference heading. Suite on these bytes: validate **18/18 PASS**, typecheck **0**, lint **0 errors, 7 warnings** (baseline), tests **470/470 across 43 files**, build **✓**, Playwright **16/16**. |
 | 2026-09-30 | **PUBLISHED (Batch E) — the item 11 fix went live, and the live figure was read off the page** | `npm run build` → `dist/` referencing **`assets/index-01cszBHW.js`**; uploaded with `lftp --env-password` over explicit FTPS, `mirror -R --only-newer`, **never `--delete`** — **13 files, 1,317,228 bytes** (1 new, 12 modified). Credentials read from `.env` inside a **600-permission** temporary script, never printed, never passed as a shell argument. **Verified live, and the specific thing the owner reported was re-read from the rendered page:** `https://nzwisiso.bitflex.app/` returned 200 and published **`assets/index-01cszBHW.js`**, whose sha256 was **`0e698f14d6244e5c3afc277361204f95b22c77c23556468e419a31d0c8551536`** — **identical** to the local build. A real browser against the live origin, after entering the Finance department, read the dashboard as **"Stakeholder groups modelled16This department's set · 36 nationally"** and the Reference screen as **"Stakeholder groups modelled nationally (36)"** — so the figure the owner saw as **8** now reads **16**, and the two labels no longer collide. The upload left `.well-known/pki-validation/` and `cgi-bin/` untouched. *(Superseded later the same day by the Batch F build, `assets/index-B1i84oxZ.js`.)* |
-| 2026-09-30 | **BATCH F — the recommended-step actions, the Implementation pack, and one answer that fills every document** (this session) | The owner asked what the actions would do, *"are these actionable things or is it necessary?"*, and to research before changing anything. **The research changed the design.** The platform ALREADY drafts what each step asks for — Table 4 (implementation matrix), Table 5 (cost categories), Table 6 (monitoring and evaluation matrix), Annex A (recommended steps) and Annex B (stakeholder analysis) — inside the drafted policy, with the department's own values marked `[TO BE CONFIRMED BY THE DEPARTMENT]`. So the gap was never "the plans are missing": it was **reach, send and finish**. The owner chose all three levels. **(A) Reach and send.** `src/services/assessment/recommendationActions.ts` maps every recommendation the engine can produce to the section that answers it and what the officer does with it; `RecommendationList` now renders *Open what answers this →* (a deep link to `#<section>`, which the drafted-policy screen scrolls to) and *Download this part (Word)* (that one section as its own `.docx`). `sliceDocumentSection` wraps one section as a document, so the existing renderer and export path carry it — no second renderer, and the download mechanism moved to `src/services/documents/documentExport.ts` so **one** place prepares a Word file. **(B) The Implementation pack.** `buildImplementationPack` composes the five working matrices as a fifth document, routed at `/app/assessments/:id/implementation-pack` and added to the shared strip. **(C) Finish it.** `src/services/documents/implementationStore.ts` keeps the answers per run (office, target date, funding source, amount, monitoring target, frequency); `ImplementationForm` collects them on the pack; they are passed explicitly into the builders, so the **drafted policy** prints them too. **Architecture that protects it:** the five matrices were extracted from `policyDraft.ts` into `src/services/assessment/matrices.ts`, so the policy and the pack are built from ONE source and cannot disagree; "the measures" (`sentencesOf`) and the blank marker moved with them; and the document-kind list, previously written in three files, is now `DOCUMENT_KINDS` in `types.ts`. **Proven, not assumed:** all 16 departments' drafted policies were fingerprinted **before and after** the extraction and are **byte-identical** (`opc:b82af9229d6604c6:35279 … zida:50b03f66bc833547:37573`), so a large refactor demonstrably changed nothing a reader sees. **Gates, each proved able to fail then restored byte-identical:** a destination removed and another pointed at a missing section → **3 red** (`recommendationActions.ts` sha256 `12a149b11dd392dcc6149bdae98de2b03410f9e44ae45e21f8dcdd6597db9491`); the entered answers ignored → **2 red** (`matrices.ts` `672ec85b9ab89b202828520c77eb8408565ef87aafd26437999e4f9f0d3b76fd`). **Two real defects found and fixed while building:** the loading hook's effect was missing `fills` from its dependencies (lint), and the cached-document key did not include the answers — so a changed answer would have shown a **stale document**. Both fixed, with the default answers made ONE frozen object so adding it to the dependencies cannot loop. **Real browser, on the LIVE site:** a simulation, **5** *Open what answers this →* actions, the pack with Table 4, one typed answer printed in **both** the pack and the drafted policy, and a genuine `.docx` download — with **0 console errors, 0 page errors, 0 off-origin requests**. Suite on these bytes: validate **18/18 PASS**, typecheck **0**, lint **0 errors, 7 warnings** (baseline), tests **489/489 across 46 files**, build **✓** emitting **`assets/index-B1i84oxZ.js`**, Playwright **17/17**, and **`npm run sync:check` IN SYNC**. |
+| 2026-09-30 | **BATCH F — the recommended-step actions, the Implementation pack, and one answer that fills every document** (this session; **the pack's fill-in form was removed on 2026-10-02 at the owner's instruction — see that row**) | The owner asked what the actions would do, *"are these actionable things or is it necessary?"*, and to research before changing anything. **The research changed the design.** The platform ALREADY drafts what each step asks for — Table 4 (implementation matrix), Table 5 (cost categories), Table 6 (monitoring and evaluation matrix), Annex A (recommended steps) and Annex B (stakeholder analysis) — inside the drafted policy, with the department's own values marked `[TO BE CONFIRMED BY THE DEPARTMENT]`. So the gap was never "the plans are missing": it was **reach, send and finish**. The owner chose all three levels. **(A) Reach and send.** `src/services/assessment/recommendationActions.ts` maps every recommendation the engine can produce to the section that answers it and what the officer does with it; `RecommendationList` now renders *Open what answers this →* (a deep link to `#<section>`, which the drafted-policy screen scrolls to) and *Download this part (Word)* (that one section as its own `.docx`). `sliceDocumentSection` wraps one section as a document, so the existing renderer and export path carry it — no second renderer, and the download mechanism moved to `src/services/documents/documentExport.ts` so **one** place prepares a Word file. **(B) The Implementation pack.** `buildImplementationPack` composes the five working matrices as a fifth document, routed at `/app/assessments/:id/implementation-pack` and added to the shared strip. **(C) Finish it.** `src/services/documents/implementationStore.ts` keeps the answers per run (office, target date, funding source, amount, monitoring target, frequency); `ImplementationForm` collects them on the pack; they are passed explicitly into the builders, so the **drafted policy** prints them too. **Architecture that protects it:** the five matrices were extracted from `policyDraft.ts` into `src/services/assessment/matrices.ts`, so the policy and the pack are built from ONE source and cannot disagree; "the measures" (`sentencesOf`) and the blank marker moved with them; and the document-kind list, previously written in three files, is now `DOCUMENT_KINDS` in `types.ts`. **Proven, not assumed:** all 16 departments' drafted policies were fingerprinted **before and after** the extraction and are **byte-identical** (`opc:b82af9229d6604c6:35279 … zida:50b03f66bc833547:37573`), so a large refactor demonstrably changed nothing a reader sees. **Gates, each proved able to fail then restored byte-identical:** a destination removed and another pointed at a missing section → **3 red** (`recommendationActions.ts` sha256 `12a149b11dd392dcc6149bdae98de2b03410f9e44ae45e21f8dcdd6597db9491`); the entered answers ignored → **2 red** (`matrices.ts` `672ec85b9ab89b202828520c77eb8408565ef87aafd26437999e4f9f0d3b76fd`). **Two real defects found and fixed while building:** the loading hook's effect was missing `fills` from its dependencies (lint), and the cached-document key did not include the answers — so a changed answer would have shown a **stale document**. Both fixed, with the default answers made ONE frozen object so adding it to the dependencies cannot loop. **Real browser, on the LIVE site:** a simulation, **5** *Open what answers this →* actions, the pack with Table 4, one typed answer printed in **both** the pack and the drafted policy, and a genuine `.docx` download — with **0 console errors, 0 page errors, 0 off-origin requests**. Suite on these bytes: validate **18/18 PASS**, typecheck **0**, lint **0 errors, 7 warnings** (baseline), tests **489/489 across 46 files**, build **✓** emitting **`assets/index-B1i84oxZ.js`**, Playwright **17/17**, and **`npm run sync:check` IN SYNC**. |
 | 2026-10-02 | **national policy-drafting expansion — more stakeholder groups and more reference indicators (the owner's request: *"add more stakeholder groups and reference indicators … we don't need them to be real as this is just for demo purposes … we will add the real data for each"* after approval)** | **BUILT:** canonical stakeholder groups **36 → 72** (36 new, all `Modelled`) in `src/config/reference.ts`; every one of the 16 departments now models **24** groups (was 16) in `src/config/departments.ts`; reference indicators **63 → 160** (ten per department, 97 new, all `Modelled`). `src/components/KPICards.tsx` now wraps the strip (`repeat(auto-fit, minmax(150px, 1fr))`) so ten cards read cleanly. **NOTHING already published was changed** — the split is now **24 published / 136 modelled**. **TESTED on these bytes:** `npm run validate` **PASS — all checks green** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **489/489 across 46 files** · build **✓** emitting **`assets/index-CMAlJ9Ac.js`** · Playwright **17/17**. **Count-strings moved with the data (fixed at source):** the `DEPARTMENT_SEGMENTS` pin + the "22–26" range in `src/test/departments.test.ts`; `MODELLED_IDS` in `src/test/stakeholder-weights.test.ts`; `toHaveLength(72)` in `src/test/workspace.test.tsx`; the "72 nationally" text/heading in `e2e/journey.spec.ts`; the "160 indicators" length in `src/test/indicator-basis.test.tsx`. **Three defects found by the gates and fixed at source:** an energy indicator id clash (`energy-access` twice), a PSC id+label clash (`psc-establishment` twice, "Funded posts filled" twice), and a stale comment in `src/lib/graph/palette.ts` ("five to twelve groups" → twenty-four). **DEPLOYED and verified (2026-10-02):** uploaded over explicit FTPS (`lftp mirror -R --only-newer`, **never `--delete`**) — 13 files, 1,358,840 bytes; the live host was left carrying **`assets/index-CMAlJ9Ac.js`** (sha256 **`0a62dbcd26e66ae0b9878d7fb18b2e3af4ec09897f0bb1200bfe13588471564d`**), **byte-identical** to the local build; `.well-known/` and `cgi-bin/` intact; the branch was pushed; **`npm run sync:check` reports IN SYNC**. |
 
 
 | 2026-10-02 | **the sourcing-statement defect (the owner's question: *"what is left to clean up so the demo works flawlessly based on the proposal"*) — one wrong sentence fixed in the platform, and eight stale deployment claims fixed in the records, each with a new gate** | **THE DEFECT:** the reference screen's sourcing sentence said *"Stakeholder shares are ZIMSTAT's published 2022 census figures"*, while **one of the twenty published shares** is the **Public Service Commission's** (*Public Service Sentinel*, Q1 2026 — pensioners administered, 209,360, `src/config/reference.ts`). The screen therefore credited one publisher for shares that came from two — and the same sentence is quoted in the funding memo (Part B §11) and in the one-page ask, so the pack repeated it. **FIXED at source:** `SHARE_PUBLISHERS` (`["ZIMSTAT", "Public Service Commission"]`) added to `src/config/reference.ts` and the sentence rewritten to name both; **gate:** a new test in `src/test/reference-sources.test.tsx` — every published share must name one of those bodies, **every body on the list must really be used by a share** (so the list cannot name a phantom publisher), the sentence must name every body on the list, and the published/modelled split must stay **20 / 52**. **Proved able to fail:** the old sentence restored → `the sourcing rule names Public Service Commission: expected 'Stakeholder shares are ZIMSTAT's pub…' to contain 'Public Service Commission'` → 1 failed / 5 passed; `reference.ts` restored **byte-identical** (`sha256 79cce988e375b381461cec7705bcd83536915623a8fd85a5cfab91b53ca8d916`). **ALSO FIXED (the records, eight false present-tense statements about the live host, found by the new gate itself):** `PROJECT_STATUS.md` §Phase AD R7 prose ("the live origin now serves that exact file"), the Phase AE status-documents prose ("the deployed host is still on … the deployed site is behind until R7"), the truth-sweep prose ("the host is now one build behind"), the RESUME HERE "plan is COMPLETE" bullet, the RESUME HERE "live host serves the build published on 2026-09-29" bullet, the RESUME HERE "the one action left … is the redeploy" bullet, and `PRODUCTION_READINESS.md` §6e prose and §8's **"Live build (current — 2026-09-26): the host serves the Phase S bundle"**. A dated log row keeps its present-tense wording on purpose (it records what was true then) — except the 2026-10-02 deploy row, whose "serves" was put in the past so the deployment-agreement check has one name to agree on. **NEW GATE — validate check 17, "no superseded bundle presented as the live one":** R1 a present-tense `serves … <bundle>` in prose must name the agreed live bundle; R2 prose may not say the live host/site is behind; R3 prose may not say a deploy is still to come; R4 the RESUME HERE block must state the sync check's result — all four only bite when the records agree the host serves the build this working copy produces. **Proved able to fail:** it reported **9 violations** before the fixes and **0** after. **DEPLOYED and verified (2026-10-02):** `npm run build` → **`assets/index-7sZF-fGv.js`**; FTPS reverse mirror (`lftp -R --only-newer`, **never `--delete`**) — 13 files, 1,358,916 bytes; the served file's sha256 (**`26a08ca04c08e65c4f9dbb8d0e8b40491f9a4367a7feb37cabdb04ae211fb1a2`**) is **identical** to the local `dist/` build; the site returns **200**; `.well-known/pki-validation/` token **200** and `cgi-bin/` intact. **TESTED on these bytes:** `npm run validate` **PASS — 19/19** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **490/490 across 46 files** · build **✓** · Playwright **17/17** · `npm run sync:check` **IN SYNC**. **Not touched, by the owner's instruction:** `Minister Submission/**` (the owner has handled the proposal) — noted in the report that this copy still carries the old sentence and no web address. |
+| 2026-10-02 | **the owner's five corrections — the footer wording, the Overview cards, the hand-fill form, the run-page actions, and one Back control (the owner: *"this is unacceptable. remove them now. never ever make a UI/UX decision without approval"*)** | **(1) Footer.** `BRAND.attribution` → **"A Project by the Ministry of ICT"** (was "Ministry of IT"), with the three test assertions (`landing.test.tsx`, `e2e/journey.spec.ts` ×2) and four record lines that repeated it updated. **(2) The Overview cards removed.** `<KPICards />` was the ONLY usage anywhere; `src/components/KPICards.tsx` is **deleted** (references before: 2 — the file and one test list; after: 0). Every indicator now renders on the **Reference** screen in a new *"Department indicators (N)"* section carrying the same derived source line the cards printed (`indicatorBasisLabel`), so no figure is lost and none is re-worded by hand. **The gate moved with the figures:** `src/test/workspace.test.tsx` now requires **every indicator of all 16 departments on `/app/reference`** (label + source line) instead of on `/app`, and `indicator-basis.test.tsx`'s drill-down test became two tests (the engine-vitals split, and every indicator's derived source line on the Reference screen). `.clinerules/03-preserve-existing-ui-and-no-break.md` — which listed the "KPI card strip" as part of the locked visual identity — was corrected in the same change, so no future session can be told to preserve a strip the owner removed. **(3) The hand-fill form removed (deep removal, no dead code).** Deleted: `ImplementationForm.tsx`, `useImplementationFills.ts`, `implementationStore.ts`, `implementation-fills.test.tsx`, and the whole `fills` plumbing through `matrices.ts` (`FillValue`/`DocumentFills`/`FillField`/`fillableRows`/`filled`/the row keys), `implementationPack.ts`, `policyDraft.ts`, `useGeneratedDocument.ts` and `remoteDraftingClient.ts`. The four matrices now print `BLANK` (and the policy's own phasing where a date is its own). **Kept:** the pack itself (now read-only), its chip on the strip, its route, and the *"Open what answers this →"* navigation. The browser test now proves the **opposite** of what it did: the pack carries **0** `To be confirmed` inputs and prints the marked blank. **(4) The run-page actions at top and bottom.** Extracted to ONE component (`RunActions.tsx`) and rendered twice, so the two rows cannot drift; the unit test and the browser test assert **two** of each. **(5) One "← Back" to the Overview.** `BackToOverview.tsx`, used by the shared strip (all five document screens), the run page and the register; the strip test now **requires** it and asserts `href="/app"`, plus a new browser test that clicks it from the run page, the register and a document screen. **A naming defect found and fixed while wiring it:** the control's first accessible name ("Back to the Overview") collided with the nav's "Overview" link — Playwright's strict mode caught it (2 elements) — so the accessible name is the visible word **"Back"**, with the destination in `title`. **TESTED on these bytes:** `npm run validate` **PASS — 19/19** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **500/500 across 45 files** · build **✓** emitting **`assets/index-w2OBNTQe.js`** · Playwright **18/18**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,353,774 bytes; the served file's sha256 **`8ce3e4d7e90e83e4eaa7bba8fb1621ae18e150f5e439b7767fbcbf6d8c227a36`** is **identical** to the local build, the site returns **200**, the SSL token returns **200** and `cgi-bin/` is intact. |
 | 2026-09-30 | **defect inventory (Batch A, second half — every defect found, and its disposition)** | Five **FIXED at source**, one **BLOCKED**. (1) The drafted-policy screen's own comment said *"editing is local state only"* — false the moment item 7 landed; corrected. (2) The new strip file introduced a lint warning (a component file that also exports data breaks fast refresh, taking lint from the recorded 7 to 8); fixed by moving the destination list into `documentViews.ts`, so lint is back to the baseline 7 in stock shadcn/ui files. (3) The first `usePolicyDraft` made `raw` an *unnecessary dependency* of `useMemo` — a real signal that the memo was not deriving from the value it subscribed to; fixed by adding `draftTextIn(raw, runId)` so the wording is read from the snapshot itself. (4) Three stale statements in the records — `PRODUCTION_READINESS.md` and `PROJECT_STATUS.md` both still called the published bundle the working copy, the RESUME HERE said *nothing is outstanding*, and the expected test counts were 427/428/431 behind — all corrected, with the built bundle named. (5) The Playwright run was made once against a **stale `dist/`** because the validation chain stops at the first non-zero step; recorded as a trap in the log and in RESUME HERE rather than left unexplained. **BLOCKED at the time, RESOLVED the same day (2026-09-30):** the owner's **original fix list was not in the repository** — only six of its eleven items. The full list was **recovered from the conversation itself and is recorded verbatim, with the true state of every item, at the top of this file**. Nothing about it has to be guessed again. |
 
 
@@ -3350,7 +3353,7 @@ row, the RESUME HERE summary ("five are done…"), the eleven-item tally, the ex
   published/modelled split stays **20 / 52**.
 - `scripts/validate.mjs` — **check 17, "no superseded bundle presented as the live one"** (R1–R4 above).
 - `PROJECT_STATUS.md` — the eight stale deployment statements, the new 2026-10-02 timeline row, this
-  section, the PLAIN SUMMARY, and the RESUME HERE counts (**19/19**, **490/490**).
+  section, the PLAIN SUMMARY, and the RESUME HERE counts (**19/19**, **500/500**).
 - `PRODUCTION_READINESS.md` — §6c's status block brought to the new bundle and fingerprint, §6e's stale
   prose put in the past, §8's *"Live build (current — 2026-09-26)"* relabelled as deployment history.
 - `docs/PROPOSAL_PROMPT.md` — the live-site paragraph brought to the new bundle and fingerprint, and the
@@ -3360,12 +3363,62 @@ row, the RESUME HERE summary ("five are done…"), the eleven-item tally, the ex
   `src/components/ui/**`, `package.json` (no dependency moved), the palette, the typography and the route
   map.
 
+## Files touched in the owner's-five-corrections session (2026-10-02, this session)
+
+- `src/config/brand.ts` — the footer attribution is now **"A Project by the Ministry of ICT"**, with the
+  correction recorded in the comment. `src/test/landing.test.tsx` and `e2e/journey.spec.ts` assert the new
+  wording; `PROJECT_STATUS.md` (3 lines) and `PRODUCTION_READINESS.md` (1 line) were corrected.
+- `src/pages/Index.tsx` — the indicator card strip is gone (with the reason written in its comment);
+  `src/components/KPICards.tsx` **deleted**; `src/pages/Reference.tsx` gained the
+  **"Department indicators (N)"** section (every figure, its value, its plain-language note and its
+  derived source line).
+- `src/test/workspace.test.tsx` and `src/test/indicator-basis.test.tsx` — the indicator gates moved to the
+  Reference screen; the card drill-down tests were replaced.
+- `.clinerules/03-preserve-existing-ui-and-no-break.md` — the "KPI card strip" entry replaced by the
+  Reference screen's indicator list, with the change recorded.
+- **Deleted (the hand-fill form):** `src/components/assessment/ImplementationForm.tsx`,
+  `src/services/documents/useImplementationFills.ts`,
+  `src/services/documents/implementationStore.ts`, `src/test/implementation-fills.test.tsx`.
+- `src/services/assessment/matrices.ts` — the `fills` machinery removed; the four tables print `BLANK`.
+  `implementationPack.ts`, `policyDraft.ts`, `useGeneratedDocument.ts` and `remoteDraftingClient.ts` — the
+  `fills` parameter removed throughout; `src/pages/ImplementationPack.tsx` and `src/pages/PolicyDraft.tsx`
+  no longer read stored answers.
+- **New:** `src/components/assessment/RunActions.tsx` (the five actions, rendered at the top and the
+  bottom of the run page) and `src/components/assessment/BackToOverview.tsx` (the one "← Back").
+  `src/pages/SimulationRun.tsx` and `src/pages/Simulations.tsx` carry the back control;
+  `src/components/assessment/DocumentNav.tsx` carries it on all five document screens.
+- `e2e/journey.spec.ts` — the two-rows assertion, the "the pack asks for nothing" assertion, the new
+  back-control test, and `.first()` on the action links now that each appears twice on the run page.
+- `PROJECT_STATUS.md` · `PRODUCTION_READINESS.md` · `docs/PROPOSAL_PROMPT.md` — the deployment claim
+  brought to the new bundle and fingerprint, and every claim about the removed form corrected.
+- **Not touched:** `Minister Submission/**` (the owner's), `src/components/ui/**`, `package.json` (no
+  dependency moved), the palette, the typography and the route map.
+
 ## RESUME HERE
 
 **PLAIN SUMMARY (OWNER-FACING).**
 
-**This session (2026-10-02 — one wrong sentence in the platform, and the project's own notes brought
-up to date).** **The demo is ready: every check is green, and the live website carries exactly the build
+**This session (2026-10-02 — your five corrections: all built, tested and live).** In plain words:
+1. **The footer now reads "A Project by the Ministry of ICT"** (it said "Ministry of IT"). It is one line
+   of text, so every public page changed at once.
+2. **The cards are gone from the top of the Overview.** Those were your department's indicator figures.
+   Every one of them — all ten, with the body that publishes each figure and the period it is for — now
+   sits on the **Reference** screen, so nothing was lost and no figure is hidden. The Overview still tells
+   you how many indicators there are, and how many are published figures.
+3. **The hand-fill form is gone.** The platform used to ask an officer to type the responsible office,
+   dates, funding source, targets and amounts into the Implementation pack. It asks for **nothing** now:
+   the pack is generated and read-only, and the cells only your department can decide print as
+   `[TO BE CONFIRMED BY THE DEPARTMENT]`, which the department fills in the copy it exports.
+4. **The run page now shows its five actions at the top as well as at the bottom**, so nobody has to
+   scroll through a long run to open the paperwork.
+5. **Every screen of a run now has one "← Back"**, and it always returns to the Overview.
+**The live address is `https://nzwisiso.bitflex.app/` and it carries exactly this build** — proved by
+fingerprint, not by saying so. One rule I have written down and now follow: **no change to what you see
+without your approval.**
+
+**Earlier summary (2026-10-02 — the sourcing sentence and the deployment notes).**
+
+**The demo is ready: every check is green, and the live website carries exactly the build
 that is on this machine** (proved by fingerprint, not by saying so). Two things were fixed:
 1. **One wrong sentence, in the platform and in the proposal.** The Reference screen said *every*
    stakeholder share came from ZIMSTAT's 2022 census. **Nineteen of the twenty do; one does not** — it
@@ -3446,11 +3499,13 @@ three things you chose:
   as its own Word document, to send to the finance office or to planning — instead of copying a table out
   of a long instrument by hand.
 - **An Implementation pack** — a fifth document gathering the five working tables on their own, for the
-  department's own records and to circulate.
-- **Your answers, typed once.** On the pack there is now a form for the things only your department can
-  know — the office responsible, the target date, the funding source, the amount, the monitoring target
-  and how often it is collected. Type each one once and **it appears in both the pack and the drafted
-  policy**, so the two can never show different offices for the same measure.
+  department's own records and to circulate. It is **generated and read-only**.
+- **Your answers, typed once — REMOVED on 2026-10-02 at the owner's instruction.** The pack used to
+  carry a form for the things only your department can know (the office responsible, the target date,
+  the funding source, the amount, the monitoring target, how often it is collected). The owner ruled
+  that the platform must not ask an officer to hand-fill the matrices: **the form, its stored answers
+  and the plumbing behind them are gone.** Those cells now print the marked blank
+  (`[TO BE CONFIRMED BY THE DEPARTMENT]`) and the department completes them in the copy it exports.
 
 One honest limit, stated on the screen: because there is no server, what you type is kept **in your own
 browser** — it does not travel to a colleague's computer.
@@ -3509,7 +3564,9 @@ confirm it.
   Two further recorded requests
   are not on the list: the **`®` product mark** (BLOCKED — a legal decision only the owner can make; the
   code deliberately prints `™` with the reason written in `src/config/brand.ts`) and **the recommended-step
-  actions with the Implementation pack and the fill-the-blanks form — DONE in Batch F (2026-09-30)**, the
+  actions with the Implementation pack — DONE in Batch F (2026-09-30); the pack's fill-the-blanks form
+  was REMOVED on 2026-10-02 at the owner's instruction (the platform must not ask an officer to
+  hand-fill the matrices)**, the
   owner having chosen all three levels. **Deploy is DONE — published and verified this session**, and
   **`npm run sync:check` reports IN SYNC**: the local files, GitHub and the website carry the same build,
   proven by fingerprint, and the DEMO HOST bullet below states which build it is and the sha256 that proves
@@ -3519,26 +3576,27 @@ confirm it.
   memo, the deck and the one-page ask to the meeting. **If a future session is asked to change something,
   the next
   command to run is** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`,
-  then `npx playwright test` — expected **all green: validate 19/19, tests 490/490 across 46 files,
-  Playwright 17/17** (and **check that the build actually ran before Playwright** — a chain stops at the
+  then `npx playwright test` — expected **all green: validate 19/19, tests 500/500 across 45 files,
+  Playwright 18/18** (and **check that the build actually ran before Playwright** — a chain stops at the
   first non-zero step, and Playwright then tests a stale `dist/`). **Do not re-fetch anything in PART 7 of
   `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
   24 published figures and the 39 recorded no-equivalent reasons are both there. **Read first:** the
-  **sourcing-statement row** at the top of the verification log (2026-10-02 — what changed last), then `docs/PROPOSAL_PROMPT.md`,
+  **owner’s-five-changes row** at the top of the verification log (2026-10-02 — what changed last), then `docs/PROPOSAL_PROMPT.md`,
   `scripts/validate.mjs`
   (**check 14**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-7sZF-fGv.js`
-  (`26a08ca04c08e65c4f9dbb8d0e8b40491f9a4367a7feb37cabdb04ae211fb1a2`)** — the **sourcing-statement fix**
-  on top of the **national policy-drafting** build: **72** canonical stakeholder groups, **24** modelled
-  per department, **160** reference indicators (ten per department), and the reference screen's sourcing
-  sentence now naming **both** publishers the shares stand on (ZIMSTAT and the Public Service Commission),
-  which `src/test/reference-sources.test.tsx` gates. Published 2026-10-02 and **verified, not assumed**:
-  the served file's sha256 is **identical** to the local `dist/` build (`curl` on the served file vs
-  `shasum` on the local build), the site returns **200**, and the SSL validation token
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-w2OBNTQe.js`
+  (`8ce3e4d7e90e83e4eaa7bba8fb1621ae18e150f5e439b7767fbcbf6d8c227a36`)** — the **owner's five changes of
+  2026-10-02** on top of the national policy-drafting build: the footer reads **"A Project by the Ministry
+  of ICT"**; the indicator cards are **gone from the Overview** and every figure (with its named source)
+  now sits on the **Reference** screen; the Implementation pack's **hand-fill form is gone** (the pack is
+  generated and read-only); the run page carries its **five actions at the top and at the bottom**; and
+  every run screen carries **one "← Back" to the Overview**. Published 2026-10-02 and **verified, not
+  assumed**: the served file's sha256 is **identical** to the local `dist/` build (`curl` on the served
+  file vs `shasum` on the local build), the site returns **200**, and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` (25 Sep) were confirmed **intact** afterwards.
-  **`npm run sync:check` reports IN SYNC.** (Supersedes `assets/index-CMAlJ9Ac.js` / `0a62dbcd…`, the
-  2026-10-02 drafting build.)
+  **`npm run sync:check` reports IN SYNC.** (Supersedes `assets/index-7sZF-fGv.js` / `26a08ca0…`, the
+  sourcing-statement build.)
 - **No page claims Government hosting.** The sovereignty statement (`SOVEREIGNTY_STATEMENT` in
   `src/config/brand.ts`) states the **compute path** — computed locally in the reader's browser, nothing
   leaves it — which is true wherever the page is served from. It made a **hosting** claim until the
@@ -3547,7 +3605,7 @@ confirm it.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
   then `npx playwright test`, and finally **`npm run sync:check`** — expected **all green**: validate **19/19**,
   typecheck **exit 0**, lint **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files),
-  tests **490/490 across 46 files**, build **✓**, Playwright **17/17**, and the sync check reporting
+  tests **500/500 across 45 files**, build **✓**, Playwright **18/18**, and the sync check reporting
   **IN SYNC** (local files · GitHub · the website). **But run the build as its own step or check its output**,
   because `&&` stops at the first non-zero step and the browser tests then silently run against a stale
   `dist/` (that happened in an earlier session). The `--destructive` known-red is **retired**, and the
@@ -3768,15 +3826,17 @@ confirm it.
   the **BLOCKER** that used to sit in *Known-red / open items* is gone. The agent has pushed nothing to
   `main` since; the feature branch carries all later work. Deployment is an FTP upload of `dist/`, not a
   git push.
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-7sZF-fGv.js`,
-  `26a08ca04c08e65c4f9dbb8d0e8b40491f9a4367a7feb37cabdb04ae211fb1a2`** — the **national policy-drafting**
-  build with the sourcing-statement fix (2026-10-02), verified in the strongest form a local machine can:
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-w2OBNTQe.js`,
+  `8ce3e4d7e90e83e4eaa7bba8fb1621ae18e150f5e439b7767fbcbf6d8c227a36`** — the national policy-drafting
+  build with the sourcing-statement fix and the owner's five changes of 2026-10-02, verified in the
+  strongest form a local machine can:
   the served file's sha256 is **identical** to the local `dist/` build, and the site returns **200**. The
   SSL validation token and `cgi-bin/` were confirmed intact afterwards, and **`npm run sync:check` reports
   IN SYNC** (local files · GitHub · the website).
   *(This bullet has named each published build in turn — Phase S, the truth-sweep build
   `assets/index-BgYDS9X7.js`, then Batch F `assets/index-B1i84oxZ.js`, then the drafting build
-  `assets/index-CMAlJ9Ac.js`. The served name and the built name
+  `assets/index-CMAlJ9Ac.js`, then the sourcing-statement build `assets/index-7sZF-fGv.js`. The served
+  name and the built name
   are printed together by `npm run validate` on every run, so the host can never be claimed current when it
   is not.)*
   To publish any further change, the credentials are **already saved**:
@@ -3805,7 +3865,7 @@ confirm it.
   two generated documents. **The public entry is now two screens** (Phase M): `/` is a pure landing
   page — official masthead + gold rule, service notice strip, task-led `<h1>`, four capability cards,
   a coverage strip computed from the configuration, three steps, closing CTA, and the official footer
-  carrying "A Project by the Ministry of IT" / "For Internal Use Only" — and it holds **no department
+  carrying "A Project by the Ministry of ICT" / "For Internal Use Only" — and it holds **no department
   picker**. `/start` is the department chooser. Both render through
   `src/components/public/PublicPageShell.tsx`, so their chrome cannot drift apart.
   **(Phases M/N/P, and the positioning session after them)** the landing hero is a two-column grid:

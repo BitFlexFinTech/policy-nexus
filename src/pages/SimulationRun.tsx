@@ -3,8 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { EngineStatus } from "@/components/EngineStatus";
 import { RelationshipGraphCard } from "@/components/relationship/RelationshipGraphCard";
 import { RevisionBadge } from "@/components/assessment/RevisionBadge";
-import { ReRunSimulationLink } from "@/components/assessment/ReRunSimulationLink";
-import { draftingPathFor } from "@/components/assessment/draftingStageConfig";
+import { RunActions } from "@/components/assessment/RunActions";
+import { BackToOverview } from "@/components/assessment/BackToOverview";
 import { RunError, RunPending } from "@/components/assessment/AssessmentSections";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -116,6 +116,8 @@ export default function SimulationRun() {
 
   return (
     <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+      {/* The owner's instruction (2026-10-02): one "← Back", always to the Overview. */}
+      <BackToOverview />
       <header className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h2 className="flex flex-wrap items-center gap-2 text-sm font-semibold tracking-tight text-foreground">
@@ -133,6 +135,11 @@ export default function SimulationRun() {
           value={isComplete ? "Complete" : "Running"}
         />
       </header>
+
+      {/* The owner's instruction (2026-10-02): the SAME five actions as at the bottom of the
+          page, so an officer does not have to scroll a long run to open the paperwork. Both
+          rows render one definition (`RunActions`), so they cannot drift apart. */}
+      {isComplete && <RunActions runId={run.id} />}
 
       <div className="space-y-1 rounded-lg border bg-card p-3">
         <div className="flex items-center justify-between gap-2 text-[10px] uppercase tracking-wide text-muted-foreground">
@@ -243,29 +250,7 @@ export default function SimulationRun() {
             One run produces three documents: the executive summary (short), the full report (long),
             and a drafted policy you can edit before circulating it.
           </p>
-          <div className="flex flex-wrap gap-2">
-            <Button asChild size="sm" className="h-7 text-xs">
-              <Link to={`/app/assessments/${encodeURIComponent(run.id)}`}>
-                Open executive summary
-              </Link>
-            </Button>
-            <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-              <Link to={`/app/assessments/${encodeURIComponent(run.id)}/report`}>
-                Open full report
-              </Link>
-            </Button>
-            <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-              <Link to={draftingPathFor(run.id)}>Draft the policy</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-              <Link to="/app/simulations">Simulation register</Link>
-            </Button>
-            {/* Item 6 — take this run's own inputs back to the policy input, edit them and
-                run again. Running them unchanged records the same run, not a duplicate. */}
-            <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-              <ReRunSimulationLink runId={run.id} />
-            </Button>
-          </div>
+          <RunActions runId={run.id} />
         </div>
       )}
     </div>

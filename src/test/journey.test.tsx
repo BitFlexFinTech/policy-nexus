@@ -95,7 +95,10 @@ describe("journey — run a policy, then read its assessment", () => {
       screen.getByText(`${run.rounds.length} / ${run.rounds.length} rounds`),
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Assessment Complete" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Open executive summary/ })).toBeInTheDocument();
+    // The owner's instruction (2026-10-02): the five actions appear at the TOP of the run page
+    // as well as at the bottom. Two matches is the proof that both rows render.
+    expect(screen.getAllByRole("link", { name: /Open executive summary/ })).toHaveLength(2);
+    expect(screen.getAllByRole("link", { name: "Re-run simulation" })).toHaveLength(2);
   });
 
   it("renders the executive summary with every metric, group, impact and risk", () => {
@@ -239,11 +242,16 @@ describe("journey — run a policy, then read its assessment", () => {
       renderAt(path);
 
       const strip = screen.getByRole("navigation", { name: "Documents in this run" });
-      // The four destinations are defined once and every screen offers all of them. Since
-      // the owner's item 6 the same strip also carries the ONE "Re-run simulation" action,
-      // which goes back to the policy input rather than to a document — so it is asserted
-      // separately, and the count is the four views plus that one action.
-      expect(within(strip).getAllByRole("link")).toHaveLength(DOCUMENT_VIEWS.length + 1);
+      // The destinations are defined once and every screen offers all of them: the document
+      // views, the ONE "Re-run simulation" action (which goes back to the policy input rather
+      // than to a document), and — since the owner's instruction on 2026-10-02 — the ONE
+      // "← Back" control, which always returns to the Overview. A screen that loses the back
+      // control fails here.
+      expect(within(strip).getAllByRole("link")).toHaveLength(DOCUMENT_VIEWS.length + 2);
+      expect(
+        within(strip).getByRole("link", { name: "Back" }),
+        "every screen of a run carries the back control",
+      ).toHaveAttribute("href", "/app");
       expect(within(strip).getByRole("link", { name: RERUN_LABEL })).toHaveAttribute(
         "href",
         rerunPathFor(run.id),
@@ -263,6 +271,15 @@ describe("journey — run a policy, then read its assessment", () => {
       expect(screen.getAllByRole("link", { name: "Drafted policy" })).toHaveLength(1);
       expect(screen.getAllByRole("link", { name: "Full report" })).toHaveLength(1);
     });
+  });
+
+  it("carries the back control on the run page and the register, and it always goes to the Overview", () => {
+    const run = recordRun(requestFor("fin"));
+    renderAt(`/app/simulations/${encodeURIComponent(run.id)}`);
+    expect(screen.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/app");
+    cleanup();
+    renderAt("/app/simulations");
+    expect(screen.getByRole("link", { name: "Back" })).toHaveAttribute("href", "/app");
   });
 
   it("shows the explicit panel for an unknown reference on both new routes", () => {

@@ -3,13 +3,11 @@ import { useParams } from "react-router-dom";
 import { DocumentActions } from "@/components/assessment/DocumentActions";
 import { DocumentNav } from "@/components/assessment/DocumentNav";
 import { GeneratedDocumentView } from "@/components/assessment/GeneratedDocumentView";
-import { ImplementationForm } from "@/components/assessment/ImplementationForm";
 import { RunError, RunNotFound, RunPending } from "@/components/assessment/AssessmentSections";
 import { DISCLAIMER } from "@/config/brand";
 import { findDepartment } from "@/config/departments";
 import { renderDocumentText } from "@/services/assessment/documents";
 import { useGeneratedDocument } from "@/services/documents/useGeneratedDocument";
-import { useImplementationFills } from "@/services/documents/useImplementationFills";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
 
 /**
@@ -27,13 +25,11 @@ export default function ImplementationPack() {
   const runId = params.id ? decodeURIComponent(params.id) : undefined;
   const { run, pending: runPending, error: runError } = useRun(runId);
   const department = useMemo(() => (run ? findDepartment(run.departmentId) : undefined), [run]);
-  // The answers the department has entered, shared with the drafted policy so both print the same ones.
-  const implementation = useImplementationFills(runId ?? "");
   const {
     document: pack,
     pending: packPending,
     error: packError,
-  } = useGeneratedDocument("implementation-pack", run, department, implementation.fills);
+  } = useGeneratedDocument("implementation-pack", run, department);
 
   if (runPending) return <RunPending heading="Implementation pack" />;
   if (runError) return <RunError heading="Implementation pack" message={runError} />;
@@ -66,18 +62,9 @@ export default function ImplementationPack() {
       <p className="max-w-3xl text-[10px] leading-relaxed text-muted-foreground">
         This pack holds the working parts of the policy — the matrices an office carries the policy out
         with — and nothing else. Every table is the same table the drafted policy carries. Where a value
-        is yours to decide, the cell says so in capitals rather than being filled with a guess.
+        is the department's own to decide, the cell is marked rather than filled with a guess: the
+        department completes it in the copy it exports. The platform asks for nothing on this screen.
       </p>
-
-      <ImplementationForm
-        run={run}
-        department={department}
-        fills={implementation.fills}
-        setField={implementation.setField}
-        clear={implementation.clear}
-        answered={implementation.answered}
-        persistent={implementation.persistent}
-      />
 
       <DocumentActions
         document={{ title: pack.title, text: renderDocumentText(pack), fileStem: pack.fileStem }}

@@ -151,8 +151,12 @@ export const BRAND = {
   /**
    * Official attribution line, required on the homepage footer. The wording is
    * fixed by the commissioning ministry and must not be softened or reworded.
+   *
+   * 2026-10-02: the owner corrected this line — the commissioning ministry is the
+   * **Ministry of ICT** (short form), not "Ministry of IT". The full statutory name is
+   * `entityCustodian` above; this line carries the short form the owner asked for.
    */
-  attribution: "A Project by the Ministry of IT",
+  attribution: "A Project by the Ministry of ICT",
   /**
    * Classification marking. Rendered smaller than `attribution` — the two are a
    * pair: the attribution names the owner, the classification states who may see it.

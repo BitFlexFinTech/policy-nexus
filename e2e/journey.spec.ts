@@ -356,7 +356,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
 
     // Required footer strings, at the bottom of the page.
     const footer = page.locator("footer");
-    await expect(footer.getByText("A Project by the Ministry of IT")).toBeVisible();
+    await expect(footer.getByText("A Project by the Ministry of ICT")).toBeVisible();
     await expect(footer.getByText("For Internal Use Only")).toBeVisible();
 
     // "For Internal Use Only" must render in strictly SMALLER text. This reads the
@@ -369,7 +369,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
         return node ? parseFloat(getComputedStyle(node).fontSize) : Number.NaN;
       };
       return {
-        attribution: read("A Project by the Ministry of IT"),
+        attribution: read("A Project by the Ministry of ICT"),
         classification: read("For Internal Use Only"),
       };
     });
@@ -650,7 +650,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
       timeout: 30_000,
     });
 
-    await page.getByRole("link", { name: "Open executive summary" }).click();
+    await page.getByRole("link", { name: "Open executive summary" }).first().click();
     await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
 
     // Interactivity check: a headline metric card opens to its explanation.
@@ -829,20 +829,28 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
       timeout: 30_000,
     });
 
-    // The run screen now offers all three outputs, not just the summary.
-    await expect(page.getByRole("link", { name: "Open executive summary" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Open full report" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Draft the policy" })).toBeVisible();
+    // The run screen now offers all three outputs, not just the summary — and the owner's
+    // instruction (2026-10-02) is that the SAME actions appear at the TOP of the page as well
+    // as at the bottom, so they are reachable without scrolling a long run. A count of two per
+    // action is the proof: one row would fail here.
+    for (const label of [
+      "Open executive summary",
+      "Open full report",
+      "Draft the policy",
+      "Re-run simulation",
+    ]) {
+      await expect(page.getByRole("link", { name: label })).toHaveCount(2);
+    }
 
     // The long-form report (the "long version").
-    await page.getByRole("link", { name: "Open full report" }).click();
+    await page.getByRole("link", { name: "Open full report" }).first().click();
     await expect(page.getByRole("heading", { name: "Full report", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Purpose and scope of this report" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Reproducibility and run inputs" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Limitations" })).toBeVisible();
 
     // The drafted policy, including in-place editing.
-    await page.getByRole("link", { name: "Draft the policy" }).click();
+    await page.getByRole("link", { name: "Draft the policy" }).first().click();
 
     // Owner's item 6 — the drafting stage. Arriving from "Draft the policy" shows the
     // instrument being composed from THIS run (its own reaction, risk and recommendation
@@ -936,7 +944,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
       timeout: 30_000,
     });
-    await page.getByRole("link", { name: "Draft the policy" }).click();
+    await page.getByRole("link", { name: "Draft the policy" }).first().click();
     await expect(page.getByRole("heading", { name: "Drafted policy", exact: true })).toBeVisible();
     // The drafting stage plays first (item 6); skip it to read the document.
     await page.getByRole("button", { name: "Show the policy now" }).click();
@@ -984,7 +992,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
       timeout: 30_000,
     });
-    await page.getByRole("link", { name: "Open executive summary" }).click();
+    await page.getByRole("link", { name: "Open executive summary" }).first().click();
     await expect(page.getByText("Departmental documents read")).toBeVisible();
     await expect(page.getByText(/1 of the department's own document/)).toBeVisible();
 
@@ -1022,7 +1030,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     expectCleanRuntime();
   });
 
-  test("a recommended step opens its answer, and one answer reaches both documents (items A, B and C)", async ({
+  test("a recommended step opens its answer, and the pack asks for nothing (items A, B and C)", async ({
     page,
   }) => {
     await page.goto("/");
@@ -1039,7 +1047,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     });
 
     // A — every recommended step carries a real action, on the officer's screen.
-    await page.getByRole("link", { name: "Open executive summary" }).click();
+    await page.getByRole("link", { name: "Open executive summary" }).first().click();
     await page.getByRole("link", { name: "Full assessment", exact: true }).click();
     const openAnswer = page.getByRole("link", { name: "Open what answers this →" });
     await expect(openAnswer.first()).toBeVisible();
@@ -1062,13 +1070,43 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await expect(page.getByRole("heading", { name: "Implementation pack", exact: true })).toBeVisible();
     await expect(page.getByText(/Table 4 — Implementation matrix/).first()).toBeVisible();
 
-    // C — type one answer, once.
-    await page.getByPlaceholder("To be confirmed").first().fill("Office of the Accountant-General");
-    await expect(page.getByText("Office of the Accountant-General").first()).toBeVisible();
+    // C — the owner's instruction (2026-10-02): the platform asks for NOTHING here. The pack
+    // prints the marked blank for a value only the department can decide, and offers no form
+    // and no input box at all — the department completes it in the copy it exports.
+    await expect(page.getByPlaceholder("To be confirmed")).toHaveCount(0);
+    await expect(page.getByText(/TO BE CONFIRMED BY THE DEPARTMENT/).first()).toBeVisible();
 
-    // The SAME answer is now printed in the drafted policy.
-    await page.getByRole("link", { name: "Drafted policy", exact: true }).click();
-    await expect(page.getByText("Office of the Accountant-General").first()).toBeVisible();
+    expectCleanRuntime();
+  });
+
+  test("every run screen carries one Back control, and it returns to the Overview (owner's instruction)", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await enterWorkspace(page);
+    await page
+      .getByPlaceholder(/Draft the policy text/)
+      .fill("A draft used to check the one back control.");
+    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
+      timeout: 30_000,
+    });
+
+    // The run page itself.
+    await page.getByRole("link", { name: "Back", exact: true }).click();
+    await expect(page).toHaveURL(/\/app$/);
+
+    // The register.
+    await page.getByRole("link", { name: "Simulation Register", exact: true }).click();
+    await page.getByRole("link", { name: "Back", exact: true }).click();
+    await expect(page).toHaveURL(/\/app$/);
+
+    // A document screen of the run — the back control the shared strip carries.
+    await page.getByRole("link", { name: "Simulation Register", exact: true }).click();
+    await page.getByRole("link", { name: "Complete" }).first().click();
+    await expect(page.getByRole("heading", { name: "Executive Summary" })).toBeVisible();
+    await page.getByRole("link", { name: "Back", exact: true }).click();
+    await expect(page).toHaveURL(/\/app$/);
 
     expectCleanRuntime();
   });

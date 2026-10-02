@@ -3,6 +3,7 @@ import { findDepartment } from "@/config/departments";
 import { VOCABULARY } from "@/config/brand";
 import { RevisionBadge } from "@/components/assessment/RevisionBadge";
 import { ReRunSimulationLink } from "@/components/assessment/ReRunSimulationLink";
+import { BackToOverview } from "@/components/assessment/BackToOverview";
 import { REFERENCE_DATE_LABEL, getTimeHorizon } from "@/config/reference";
 import { useSession } from "@/session/useSession";
 import { useAssessmentRuns } from "@/services/assessment/useAssessmentRuns";
@@ -24,6 +25,8 @@ export default function Simulations() {
 
   return (
     <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+      {/* The owner's instruction (2026-10-02): one "← Back", always to the Overview. */}
+      <BackToOverview />
       <header>
         <h2 className="text-sm font-semibold tracking-tight text-foreground">Simulation Register</h2>
         <p className="text-xs text-muted-foreground">

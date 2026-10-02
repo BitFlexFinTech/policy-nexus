@@ -100,18 +100,20 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-02, after the sourcing-statement fix was published — the host and the working copy are IN STEP).**
+- **Status today (2026-10-02, after the owner's five changes were published — the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-7sZF-fGv.js` (`26a08ca04c08e65c4f9dbb8d0e8b40491f9a4367a7feb37cabdb04ae211fb1a2`) — fetched
+  `assets/index-w2OBNTQe.js` (`8ce3e4d7e90e83e4eaa7bba8fb1621ae18e150f5e439b7767fbcbf6d8c227a36`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
-  explicit FTPS, **never `--delete`** — 13 files, 1,358,916 bytes — and the SSL validation token
+  explicit FTPS, **never `--delete`** — 13 files, 1,353,774 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
   expansion — **72** canonical stakeholder groups, every department modelling **24** of them, and **160**
   reference indicators (ten per department) — plus the recommended-step actions (*Open what answers this*,
-  *Download this part*), the **Implementation pack**, and the answers the department enters once and which
-  then print into both the pack and the drafted policy. It also carries the **corrected sourcing sentence**
+  *Download this part*) and the **Implementation pack** (generated, read-only). The form that used to ask
+  an officer to fill the working matrices by hand is **gone** (the owner's instruction, 2026-10-02): those
+  cells print the marked blank, and the department completes them in the copy it exports. It also carries
+  the **corrected sourcing sentence**
   (the shares stand on ZIMSTAT's 2022 census **and** the Public Service Commission's *Public Service
   Sentinel*), which `src/test/reference-sources.test.tsx` now gates.
   `npm run validate` prints
@@ -132,7 +134,8 @@ client is registered.
 - **Phase L** rebuilt the public entry as a government-styled page: official masthead + 3px gold rule,
   coat of arms, service notice strip, tagline, four capability cards, a coverage strip computed
   from `src/config/departments.ts`, three "how it works" steps, and an official footer carrying
-  **"A Project by the Ministry of IT"** with **"For Internal Use Only"** beneath it in smaller text
+  **"A Project by the Ministry of ICT"** with **"For Internal Use Only"** beneath it in smaller text
+  (the owner corrected "Ministry of IT" to **ICT** on 2026-10-02)
   (asserted against the **real computed font size**: 11px vs 9px).
 - **Phase P** implemented the brief's §8–§16 (supplied after Phase O) and **reversed four Phase O
   decisions**. The hero now reads: eyebrow *Understanding before action*, `<h1>` "Zimbabwe AI Policy

@@ -8,9 +8,13 @@ connect. Remove only what is proven unnecessary.
   `--gold: 51 100% 50%`, `--success`, `--warning`). No new colour literals anywhere.
 - Inter + JetBrains Mono typography system (`tailwind.config.ts` fontFamily).
 - All `src/components/ui/**` shadcn primitives — keep byte-identical unless strictly required.
-- The visual identity of: header bar + coat of arms, KPI card strip, engine-vitals panel,
-  agent-feed rows (timestamp + coloured tag), simulation-history table, document-library rail,
-  sovereign footer, policy input textarea/upload zone/preset chips.
+- The visual identity of: header bar + coat of arms, engine-vitals panel, the Reference screen's
+  department-indicator list, agent-feed rows (timestamp + coloured tag), simulation-history table,
+  document-library rail, sovereign footer, policy input textarea/upload zone/preset chips.
+  (**Changed 2026-10-02 at the owner's instruction:** the department indicator cards were a strip at
+  the top of the Overview page — previously called the "KPI card strip" here — and the owner removed
+  them from that screen. The figures now live on the Reference screen, in full. Do not put a card
+  strip back on the Overview.)
 - No new runtime dependency without explicit user approval. `package.json` dependencies must
   be unchanged at the end of a task (only `name`/`scripts` may change).
 - `LICENSE` / `NOTICE` / licence headers are never altered.

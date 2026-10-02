@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import App from "@/App";
 import {
   DEPARTMENTS,
@@ -26,8 +26,6 @@ const renderAt = (path: string) => {
   window.history.pushState({}, "", path);
   return render(<App />);
 };
-
-const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * The month names in order, and the reference month's position, read out of
@@ -144,17 +142,30 @@ describe("department indicators — published with a named source, or plainly mo
     expect(NAMED_SOURCE_STATEMENT).toContain(MODELLED_INDICATOR_LABEL);
   });
 
-  it("renders the derived provenance on the drill-down and the derived split in the engine vitals", () => {
+  it("states the derived split in the engine vitals", () => {
     signInToDepartment("fin");
     renderAt("/app");
-    const department = findDepartment("fin")!;
-    const first = department.indicators[0];
-    fireEvent.click(screen.getByRole("button", { name: new RegExp(escapeRegex(first.label)) }));
-    expect(screen.getByText(`Source: ${indicatorBasisLabel(first.basis)}`)).toBeInTheDocument();
-    const split = countIndicatorsByBasis(department.indicators);
+    const split = countIndicatorsByBasis(findDepartment("fin")!.indicators);
     expect(
       screen.getByText(`${split.published} published · ${split.modelled} modelled`),
     ).toBeInTheDocument();
+  });
+
+  /**
+   * The owner's instruction, 2026-10-02: the indicator card strip was removed from the
+   * Overview, and every figure moved to the Reference screen with the same derived source
+   * line the cards printed. This is the gate for that move — all of them, never a subset.
+   */
+  it("states the derived provenance of every indicator on the Reference screen", () => {
+    signInToDepartment("fin");
+    renderAt("/app/reference");
+    const department = findDepartment("fin")!;
+    department.indicators.forEach((indicator) => {
+      expect(
+        screen.getAllByText(`Source: ${indicatorBasisLabel(indicator.basis)}`).length,
+        `${indicator.id} states its derived source line`,
+      ).toBeGreaterThan(0);
+    });
   });
 
   it("never describes the indicator set as published measures on the workspace", () => {
@@ -166,7 +177,6 @@ describe("department indicators — published with a named source, or plainly mo
   it("keeps the retired free-text field and the false phrase out of the source", () => {
     for (const file of [
       "src/components/EngineStatus.tsx",
-      "src/components/KPICards.tsx",
       "src/config/departments.ts",
       "src/services/assessment/documents.ts",
     ]) {
