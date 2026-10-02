@@ -100,19 +100,18 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-09-30, after Batch F — the host and the working copy are IN STEP).**
+- **Status today (2026-10-02, after the national policy-drafting build — the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-B1i84oxZ.js` (`a2faf64da1fd1abacd5accd72f2d98c4bc3be6be760a19c85f00ff80f671d41d`) — fetched
-  and hashed against the local `dist/` build (identical), and driven in a real browser against the live
-  origin, which read the department dashboard as **"Stakeholder groups modelled 16 — This department's set
-  · 36 nationally"** and the Reference screen as **"Stakeholder groups modelled nationally (36)"**, with 0
-  console errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
-  explicit FTPS, **never `--delete`** — 13 files, 1,332,879 bytes — and the SSL validation token
-  (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. The published
-  bundle carries the owner's items 1–11 — every department modelling **16** stakeholder groups — plus the
-  recommended-step actions (*Open what answers this*, *Download this part*), the **Implementation pack**,
-  and the answers the department enters once and which then print into both the pack and the drafted
-  policy.
+  `assets/index-CMAlJ9Ac.js` (`0a62dbcd26e66ae0b9878d7fb18b2e3af4ec09897f0bb1200bfe13588471564d`) — fetched
+  and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
+  errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
+  explicit FTPS, **never `--delete`** — 13 files, 1,358,840 bytes — and the SSL validation token
+  (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
+  sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
+  expansion — **72** canonical stakeholder groups, every department modelling **24** of them, and **160**
+  reference indicators (ten per department) — plus the recommended-step actions (*Open what answers this*,
+  *Download this part*), the **Implementation pack**, and the answers the department enters once and which
+  then print into both the pack and the drafted policy.
   `npm run validate` prints
   the served name and the locally built name side by side on every run, so any gap shows up in the machine
   output rather than in prose.

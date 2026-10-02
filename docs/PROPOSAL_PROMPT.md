@@ -336,19 +336,19 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
-- **What the live site actually is today (re-checked 2026-09-30, after the Batch F build was published).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-B1i84oxZ.js`
-  (`a2faf64da1fd1abacd5accd72f2d98c4bc3be6be760a19c85f00ff80f671d41d`), which is byte-identical to the
-  local build, so **the live site is the build published on 2026-09-30** — it carries the authority line, the modelled
+- **What the live site actually is today (re-checked 2026-10-02, after the national policy-drafting build was published).**
+  The host `nzwisiso.bitflex.app` serves `assets/index-CMAlJ9Ac.js`
+  (`0a62dbcd26e66ae0b9878d7fb18b2e3af4ec09897f0bb1200bfe13588471564d`), which is byte-identical to the
+  local build, so **the live site is the build published on 2026-10-02** — it carries the authority line, the modelled
   agent population, the named sources, the official Coat of Arms, the favicon set, the Nzwisiso.ai
   positioning section, all 24 published figures, and the owner's items 1–11, including the *Re-run
   simulation* action, the drafting stage, the recommended-step actions that open or send the part of the
-  policy that answers each step, the **Implementation pack**, and every department modelling **16**
+  policy that answers each step, the **Implementation pack**, and every department modelling **24**
   stakeholder groups. (When
   this was checked on 2026-09-28 the host served
   `assets/index-BeggQU9V.js`, which was
   behind the code; **R7** closed that gap, and later work rebuilt the bundle several times, so the current
-  build was published again on 2026-09-30.) **AB-7 is done (2026-09-29)**: this file asks for three
+  build was published again on 2026-10-02.) **AB-7 is done (2026-09-29)**: this file asks for three
   documents — the memo, the deck and the ask — and `npm run validate` now fails if it ever drifts
   back to the heavier pack.
 
