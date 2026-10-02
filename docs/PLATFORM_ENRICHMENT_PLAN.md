@@ -359,3 +359,37 @@ gated it. **R7** redeployed the site: the live host serves `assets/index-DRweHRf
 (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), byte-identical to the local build.
 **Nothing in PART 7 needs re-researching** — the 24 published figures and the 39 recorded no-equivalent
 reasons above are the record.
+
+---
+
+## PART 8 — The national policy-drafting expansion (2026-10-02)
+
+The owner asked to add **more stakeholder groups and more reference indicators**, with none of the
+new data needing a published source yet — *"this is just for demo purposes … once the project is
+approved we will add the real data for each."* So every new item is **MODELLED** (`share: null` /
+`basis: { kind: "modelled" }`), and **nothing already published was changed**.
+
+| | Before | After | Rule kept |
+|---|---|---|---|
+| Canonical stakeholder groups (`STAKEHOLDER_SEGMENTS`) | 36 | **72** (+36, all Modelled) | a group is still only ever published-or-`Modelled`, never a bare number |
+| Groups each of the 16 departments models | 16 | **24** | the "22–26, no repeats" gate in `src/test/departments.test.ts` still holds it |
+| Reference indicators per department | 3–4 | **10** | each still carries a `basis`; no free-text source |
+| Reference indicators (total) | 63 | **160** | published set unchanged (24); modelled 39 → **136** |
+
+**Files:** `src/config/reference.ts` (36 new groups); `src/config/departments.ts` (16 re-cut
+`segments` lists and 97 new indicator lines); `src/components/KPICards.tsx` (the strip now wraps with
+`repeat(auto-fit, minmax(150px, 1fr))`, so ten cards read cleanly while three or four still occupy one
+row); `src/lib/graph/palette.ts` (a stale "five to twelve groups" comment corrected to twenty-four).
+
+**Gates that moved with the data (all count-strings, fixed at source):** the pinned
+`DEPARTMENT_SEGMENTS` and the "22–26" range in `src/test/departments.test.ts`; the `MODELLED_IDS`
+list in `src/test/stakeholder-weights.test.ts`; `toHaveLength(72)` in `src/test/workspace.test.tsx`;
+the "72 nationally" text and heading in `e2e/journey.spec.ts`; and the "160 indicators" length in
+`src/test/indicator-basis.test.tsx`. **Three defects were found by the gates and fixed at source:**
+an energy indicator id clash (`energy-access` twice), a PSC id+label clash (`psc-establishment`
+twice, "Funded posts filled" twice), and the stale palette comment.
+
+**Verified on these bytes:** `npm run validate` **PASS (all checks green)** · typecheck **0** · lint
+**0 errors, 7 pre-existing warnings** · tests **489/489 across 46 files** · build **✓** emitting
+**`assets/index-CMAlJ9Ac.js`** · Playwright **17/17**. **Not yet deployed** — the site has not been
+updated this session; deploying the new build is the owner's decision.

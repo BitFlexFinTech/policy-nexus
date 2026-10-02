@@ -66,6 +66,10 @@ const requestFor = (departmentId: string): AssessmentRequest => {
  * The fix is the union: an indicator either names the body that publishes it, the
  * publication and the period, or it says plainly that it is modelled. There is no
  * third state, and these gates fail if one is reintroduced.
+ *
+ * 2026-10-02: the set grew from 63 to 160 for national policy drafting (ten indicators
+ * per department), the new ones all Modelled. The published set is unchanged, so the
+ * RECORDED list below still holds the whole published set.
  */
 describe("department indicators — published with a named source, or plainly modelled", () => {
   beforeEach(() => {
@@ -73,8 +77,8 @@ describe("department indicators — published with a named source, or plainly mo
     clearSession();
   });
 
-  it("gives every one of the 63 indicators a basis, and no free text that reads as a source", () => {
-    expect(EVERY).toHaveLength(63);
+  it("gives every one of the 160 indicators a basis, and no free text that reads as a source", () => {
+    expect(EVERY).toHaveLength(160);
     EVERY.forEach(({ department, indicator }) => {
       const where = `${department.id}/${indicator.id}`;
       expect(["published", "modelled"], `${where} basis`).toContain(indicator.basis.kind);

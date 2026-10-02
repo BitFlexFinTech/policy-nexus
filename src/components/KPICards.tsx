@@ -73,7 +73,12 @@ export function KPICards() {
   return (
     <div
       className="grid gap-3 border-b bg-card px-4 py-3"
-      style={{ gridTemplateColumns: `repeat(${indicators.length}, minmax(0, 1fr))` }}
+      /* Responsive wrap (2026-10-02): departments now carry ten indicators each, and a
+         fixed one-column-per-indicator row squeezed ten cards into ~130 px each. `auto-fit`
+         keeps the SAME single row for a three- or four-card department (each card stays
+         wider than its 150 px minimum, so the column count is unchanged) and wraps a
+         ten-card department onto further rows. Only this strip is affected. */
+      style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}
     >
       {indicators.map((indicator) => (
         <KPICard

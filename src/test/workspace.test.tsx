@@ -90,7 +90,7 @@ describe("workspace — all 16 departments, department-aware panels", () => {
   it("states the full canonical reference set on the reference screen", () => {
     signInToDepartment("ict");
     renderAt("/app/reference");
-    expect(STAKEHOLDER_SEGMENTS).toHaveLength(36);
+    expect(STAKEHOLDER_SEGMENTS).toHaveLength(72);
     STAKEHOLDER_SEGMENTS.forEach((segment) => {
       expect(screen.getAllByText(new RegExp(escapeRegex(segment.label))).length).toBeGreaterThan(0);
     });

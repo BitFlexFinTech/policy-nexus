@@ -15,9 +15,10 @@
  *
  * HONEST LIMIT, measured rather than assumed: FIVE colours is where distinct identity
  * ends for a red-green colour-blind reader (the probe that produced this number is
- * recorded in PROJECT_STATUS.md, Phase AB). A department models five to twelve groups,
- * so beyond the fifth the colour repeats and the LABEL carries the distinction. That is
- * why labels are never dropped, however crowded the picture gets.
+ * recorded in PROJECT_STATUS.md, Phase AB). A department models twenty-four groups
+ * (raised from sixteen on 2026-10-02), so beyond the fifth the colour repeats and the
+ * LABEL carries the distinction. That is why labels are never dropped, however crowded
+ * the picture gets.
  * `src/test/graph-palette.test.ts` enforces this — change a value here and it fails.
  *
  * DETERMINISM: pure data and pure arithmetic. No clock, no randomness.
