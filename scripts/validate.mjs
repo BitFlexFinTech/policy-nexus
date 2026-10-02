@@ -655,6 +655,127 @@ if (!existsSync(cssPath)) {
   }
 }
 
+// 17 — NO SUPERSEDED BUNDLE IS PRESENTED AS THE LIVE ONE. Check 12 proves the three record
+//      files AGREE on the live bundle; it cannot see a stale claim worded differently, and that
+//      is how four false statements survived a redeploy. Found on 2026-10-02, after the site had
+//      been republished: prose still told the reader the host was one build behind, one line
+//      still presented the Phase S bundle as "Live build (current — 2026-09-26)", and the block
+//      still said "the one action left for the whole project is the redeploy". A dated log row is
+//      the record of what was true then and is left alone; PROSE must be true now. This fails
+//      when, in prose:
+//        R1 — a present-tense "serves … <bundle>" names a bundle other than the agreed live one;
+//        R2 — the live host/site is said to be behind;
+//        R3 — a deploy/redeploy is said to be still to come;
+//        R4 — (when the records agree the host serves the build this copy produces) the RESUME
+//             HERE block fails to state the sync check's result.
+{
+  const recordFiles = ["PROJECT_STATUS.md", "PRODUCTION_READINESS.md", "docs/PROPOSAL_PROMPT.md"]
+    .map((f) => join(ROOT, f))
+    .filter(existsSync);
+  const problems = [];
+
+  // The bundle the records agree the live host serves, and the one this working copy builds.
+  const served = new Set();
+  for (const file of recordFiles) {
+    const text = readFileSync(file, "utf8").replace(/\s+/g, " ");
+    for (const m of text.matchAll(/serves\s*\*{0,2}\s*`?(assets\/index-[A-Za-z0-9_-]+\.js)/g)) {
+      served.add(m[1]);
+    }
+  }
+  const distHtml = join(ROOT, "dist/index.html");
+  const built = existsSync(distHtml)
+    ? (readFileSync(distHtml, "utf8").match(/assets\/index-[A-Za-z0-9_-]+\.js/) || [])[0]
+    : null;
+
+  if (served.size === 1) {
+    const live = [...served][0];
+    // Nothing is outstanding only when this copy builds exactly what the records say is live.
+    const outstanding = Boolean(built) && built !== live;
+
+    for (const file of recordFiles) {
+      // Prose is read as paragraphs — consecutive non-table lines joined — so a claim split
+      // across two lines is still seen, while a dated log row is skipped whole.
+      const paragraphs = [];
+      readFileSync(file, "utf8")
+        .split("\n")
+        .forEach((line, index) => {
+          const lineNo = index + 1;
+          // A blank line, a table row, or the start of a new bullet ends the paragraph.
+          if (/^\s*$/.test(line) || /^\s*\|/.test(line) || /^\s*[-*]\s/.test(line)) {
+            paragraphs.push(/^\s*[-*]\s/.test(line) ? { from: lineNo, to: lineNo, text: line } : null);
+            return;
+          }
+          const last = paragraphs[paragraphs.length - 1];
+          // Join only lines that really are consecutive prose; a blank line or a table
+          // row ends the paragraph.
+          if (last && last.to === lineNo - 1) {
+            last.text += " " + line;
+            last.to = lineNo;
+          } else {
+            paragraphs.push({ from: lineNo, to: lineNo, text: line });
+          }
+        });
+
+      for (const paragraph of paragraphs) {
+        if (!paragraph) continue;
+        const where = `${rel(file)}:${paragraph.from}`;
+
+        // R1 — a present-tense claim that the host serves some bundle.
+        for (const m of paragraph.text.matchAll(
+          /serves(?![a-z])[\s\S]{0,120}?(assets\/index-[A-Za-z0-9_-]+\.js)/g,
+        )) {
+          if (m[1] !== live) {
+            problems.push(
+              `${where}: says the host serves ${m[1]}, but the records agree the live host serves ${live} — a superseded bundle must not be presented as the live one`,
+            );
+          }
+        }
+
+        if (outstanding) continue; // being behind is true, and must be stated
+
+        for (const sentence of paragraph.text.split(/(?<=[.;])\s+/)) {
+          const said = sentence.trim().replace(/\s+/g, " ").slice(0, 110);
+          // R2 — the live host said to be behind.
+          if (/(host|site|origin)[^.]{0,80}\b(is|are)\b[^.]{0,40}\b(one build behind|behind)\b/i.test(sentence)) {
+            problems.push(
+              `${where}: says the live host is behind, but it serves the build this working copy produces (${live}) — the statement is stale: "${said}…"`,
+            );
+          }
+          // R3 — a deploy said to be still to come, in the same breath as the deploy word.
+          const deploy = sentence.match(/\b(redeploy\w*|deploy\w*)\b/i);
+          if (deploy) {
+            const near = sentence.slice(
+              Math.max(0, deploy.index - 40),
+              deploy.index + deploy[0].length + 40,
+            );
+            if (
+              /\b(still|left|outstanding|pending)\b/i.test(near) &&
+              !/\b(no|not|never|nothing|none|was|were|had|did)\b/i.test(sentence)
+            ) {
+              problems.push(
+                `${where}: says a deploy is still to come, but the host already serves the build this working copy produces (${live}) — the statement is stale: "${said}…"`,
+              );
+            }
+          }
+        }
+      }
+    }
+
+    // R4 — when nothing is outstanding, the record must say so in the sync check's own words.
+    const resumeSource = readFileSync(join(ROOT, "PROJECT_STATUS.md"), "utf8");
+    const at = resumeSource.indexOf("## RESUME HERE");
+    if (at < 0) {
+      problems.push("PROJECT_STATUS.md carries no `## RESUME HERE` block — the resume point must exist");
+    } else if (!outstanding && !/IN SYNC/.test(resumeSource.slice(at))) {
+      problems.push(
+        "PROJECT_STATUS.md: the records agree the host serves the current build, so RESUME HERE must state the sync check's result (IN SYNC) — the state must be stated, not left to be guessed",
+      );
+    }
+  }
+
+  check("no superseded bundle presented as the live one", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

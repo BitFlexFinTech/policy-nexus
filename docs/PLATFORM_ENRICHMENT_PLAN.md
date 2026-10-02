@@ -391,5 +391,7 @@ twice, "Funded posts filled" twice), and the stale palette comment.
 
 **Verified on these bytes:** `npm run validate` **PASS (all checks green)** · typecheck **0** · lint
 **0 errors, 7 pre-existing warnings** · tests **489/489 across 46 files** · build **✓** emitting
-**`assets/index-CMAlJ9Ac.js`** · Playwright **17/17**. **Not yet deployed** — the site has not been
-updated this session; deploying the new build is the owner's decision.
+**`assets/index-CMAlJ9Ac.js`** · Playwright **17/17**. **Not yet deployed at the time of writing** — the site had not been
+updated in that session; deploying the new build was the owner's decision. **(Deployed later the same day, and
+republished again after the sourcing-statement fix — the deployment state is recorded in `PROJECT_STATUS.md`'s
+2026-10-02 rows and in `PRODUCTION_READINESS.md` §6c.)**

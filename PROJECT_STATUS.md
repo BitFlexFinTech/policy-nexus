@@ -1579,9 +1579,10 @@ because the block it sits in already names itself.
 | 2026-09-30 | **BATCH E — item 11 rebuilt: every department's modelled stakeholder set, and the frame made a rule** (this session) | **The owner's chosen remedy:** *"a bigger researched set per department (about 15–18 each), so departments stay different from one another."* **What was built.** Each of the **16** departments now models **16** stakeholder groups, drawn from the **36** national groups (`STAKEHOLDER_SEGMENTS`, `src/config/reference.ts`) for what that department's policies genuinely affect — Finance takes exporters, pensioners and mining operators; Agriculture takes smallholder farmers, cooperatives and cross-border traders; Defence alone takes war veterans. Checked mechanically, not by eye: every department is **16 groups**, **no repeats**, **every group canonical**, **all 36 groups still modelled by at least one department** (no orphans), and the departments remain distinct. **The gate was raised, not removed:** `src/test/departments.test.ts` now requires **15–18** groups per department (it said 6–8) and its per-department pin was updated deliberately, with the reason written above it. **Reveal pacing changed to keep a run watchable:** rounds scale with groups, so `src/pages/SimulationRun.tsx` now reveals `ceil(total / 18)` rounds per tick (`RUN_REVEAL_TICKS = 18`, `RUN_ROUND_TICK_MS = 1150` unchanged) — the **content is untouched**, only the pacing; a run stays about 21 seconds. **Two further defects fixed at source:** (a) `src/lib/graph/swarm.ts` — the frame was a **soft force** only, so with more marks one could settle outside the picture (measured: y = 761.76 against a 750-high frame; −1.41 against a 0 edge). It is now a **hard clamp** after integration, with the outward velocity cleared on the clamped axis — without that second half the school could never come to a true rest, and the rest is what makes a mark clickable. The initial ring radius was also pulled inside by the frame padding. (b) `src/components/EngineStatus.tsx` + `src/pages/Reference.tsx` — the two screens both read *"Stakeholder segments"* with different numbers, which is precisely what made the owner's 8 look like a contradiction; they are now **"Stakeholder groups modelled"** (with *"This department's set · 36 nationally"*) and **"Stakeholder groups modelled nationally (36)"**. **Three engine tests were re-derived rather than relaxed, and the reason is recorded in each:** the risk *count* is no longer the measure of a better draft (a fuller draft adds action sentences, which legitimately raise the absorption risk) so the test now asserts that the bare draft raises `risk-scope`, that the complete draft raises none of the four risks its clauses answer, and that it raises no more risks than the bare one; the weighted-index tolerance is now **derived from the arithmetic** (`others / (1000 × boosted + others) × widest gap`) instead of the flat `2` that only made sense for eight groups; and a coincidence-based `confidence !==` assertion became `JSON.stringify(runWith) !== JSON.stringify(runWithout)`, because a rounded headline figure may legitimately match across two genuinely different runs. **Proved able to fail, then restored byte-identical:** putting one department back to 8 groups turned **2 gates red** while the range gate reported *"opc models 8 groups: expected 8 to be greater than or equal to 15"* (`src/config/departments.ts` sha256 `7543217305a744c70ced9aefeed6bde2ce6e7f840e96c3c9fff1bc367a2d4ccc` before and after); the frame gates were observed red before the clamp and green after. **New browser gate:** `e2e/journey.spec.ts` reads the rendered page, fails if the dashboard figure is below 15, fails if `36 nationally` is missing, and checks the Reference heading. Suite on these bytes: validate **18/18 PASS**, typecheck **0**, lint **0 errors, 7 warnings** (baseline), tests **470/470 across 43 files**, build **✓**, Playwright **16/16**. |
 | 2026-09-30 | **PUBLISHED (Batch E) — the item 11 fix went live, and the live figure was read off the page** | `npm run build` → `dist/` referencing **`assets/index-01cszBHW.js`**; uploaded with `lftp --env-password` over explicit FTPS, `mirror -R --only-newer`, **never `--delete`** — **13 files, 1,317,228 bytes** (1 new, 12 modified). Credentials read from `.env` inside a **600-permission** temporary script, never printed, never passed as a shell argument. **Verified live, and the specific thing the owner reported was re-read from the rendered page:** `https://nzwisiso.bitflex.app/` returned 200 and published **`assets/index-01cszBHW.js`**, whose sha256 was **`0e698f14d6244e5c3afc277361204f95b22c77c23556468e419a31d0c8551536`** — **identical** to the local build. A real browser against the live origin, after entering the Finance department, read the dashboard as **"Stakeholder groups modelled16This department's set · 36 nationally"** and the Reference screen as **"Stakeholder groups modelled nationally (36)"** — so the figure the owner saw as **8** now reads **16**, and the two labels no longer collide. The upload left `.well-known/pki-validation/` and `cgi-bin/` untouched. *(Superseded later the same day by the Batch F build, `assets/index-B1i84oxZ.js`.)* |
 | 2026-09-30 | **BATCH F — the recommended-step actions, the Implementation pack, and one answer that fills every document** (this session) | The owner asked what the actions would do, *"are these actionable things or is it necessary?"*, and to research before changing anything. **The research changed the design.** The platform ALREADY drafts what each step asks for — Table 4 (implementation matrix), Table 5 (cost categories), Table 6 (monitoring and evaluation matrix), Annex A (recommended steps) and Annex B (stakeholder analysis) — inside the drafted policy, with the department's own values marked `[TO BE CONFIRMED BY THE DEPARTMENT]`. So the gap was never "the plans are missing": it was **reach, send and finish**. The owner chose all three levels. **(A) Reach and send.** `src/services/assessment/recommendationActions.ts` maps every recommendation the engine can produce to the section that answers it and what the officer does with it; `RecommendationList` now renders *Open what answers this →* (a deep link to `#<section>`, which the drafted-policy screen scrolls to) and *Download this part (Word)* (that one section as its own `.docx`). `sliceDocumentSection` wraps one section as a document, so the existing renderer and export path carry it — no second renderer, and the download mechanism moved to `src/services/documents/documentExport.ts` so **one** place prepares a Word file. **(B) The Implementation pack.** `buildImplementationPack` composes the five working matrices as a fifth document, routed at `/app/assessments/:id/implementation-pack` and added to the shared strip. **(C) Finish it.** `src/services/documents/implementationStore.ts` keeps the answers per run (office, target date, funding source, amount, monitoring target, frequency); `ImplementationForm` collects them on the pack; they are passed explicitly into the builders, so the **drafted policy** prints them too. **Architecture that protects it:** the five matrices were extracted from `policyDraft.ts` into `src/services/assessment/matrices.ts`, so the policy and the pack are built from ONE source and cannot disagree; "the measures" (`sentencesOf`) and the blank marker moved with them; and the document-kind list, previously written in three files, is now `DOCUMENT_KINDS` in `types.ts`. **Proven, not assumed:** all 16 departments' drafted policies were fingerprinted **before and after** the extraction and are **byte-identical** (`opc:b82af9229d6604c6:35279 … zida:50b03f66bc833547:37573`), so a large refactor demonstrably changed nothing a reader sees. **Gates, each proved able to fail then restored byte-identical:** a destination removed and another pointed at a missing section → **3 red** (`recommendationActions.ts` sha256 `12a149b11dd392dcc6149bdae98de2b03410f9e44ae45e21f8dcdd6597db9491`); the entered answers ignored → **2 red** (`matrices.ts` `672ec85b9ab89b202828520c77eb8408565ef87aafd26437999e4f9f0d3b76fd`). **Two real defects found and fixed while building:** the loading hook's effect was missing `fills` from its dependencies (lint), and the cached-document key did not include the answers — so a changed answer would have shown a **stale document**. Both fixed, with the default answers made ONE frozen object so adding it to the dependencies cannot loop. **Real browser, on the LIVE site:** a simulation, **5** *Open what answers this →* actions, the pack with Table 4, one typed answer printed in **both** the pack and the drafted policy, and a genuine `.docx` download — with **0 console errors, 0 page errors, 0 off-origin requests**. Suite on these bytes: validate **18/18 PASS**, typecheck **0**, lint **0 errors, 7 warnings** (baseline), tests **489/489 across 46 files**, build **✓** emitting **`assets/index-B1i84oxZ.js`**, Playwright **17/17**, and **`npm run sync:check` IN SYNC**. |
-| 2026-10-02 | **national policy-drafting expansion — more stakeholder groups and more reference indicators (the owner's request: *"add more stakeholder groups and reference indicators … we don't need them to be real as this is just for demo purposes … we will add the real data for each"* after approval)** | **BUILT:** canonical stakeholder groups **36 → 72** (36 new, all `Modelled`) in `src/config/reference.ts`; every one of the 16 departments now models **24** groups (was 16) in `src/config/departments.ts`; reference indicators **63 → 160** (ten per department, 97 new, all `Modelled`). `src/components/KPICards.tsx` now wraps the strip (`repeat(auto-fit, minmax(150px, 1fr))`) so ten cards read cleanly. **NOTHING already published was changed** — the split is now **24 published / 136 modelled**. **TESTED on these bytes:** `npm run validate` **PASS — all checks green** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **489/489 across 46 files** · build **✓** emitting **`assets/index-CMAlJ9Ac.js`** · Playwright **17/17**. **Count-strings moved with the data (fixed at source):** the `DEPARTMENT_SEGMENTS` pin + the "22–26" range in `src/test/departments.test.ts`; `MODELLED_IDS` in `src/test/stakeholder-weights.test.ts`; `toHaveLength(72)` in `src/test/workspace.test.tsx`; the "72 nationally" text/heading in `e2e/journey.spec.ts`; the "160 indicators" length in `src/test/indicator-basis.test.tsx`. **Three defects found by the gates and fixed at source:** an energy indicator id clash (`energy-access` twice), a PSC id+label clash (`psc-establishment` twice, "Funded posts filled" twice), and a stale comment in `src/lib/graph/palette.ts` ("five to twelve groups" → twenty-four). **DEPLOYED and verified (2026-10-02):** uploaded over explicit FTPS (`lftp mirror -R --only-newer`, **never `--delete`**) — 13 files, 1,358,840 bytes; the live host serves **`assets/index-CMAlJ9Ac.js`** (sha256 **`0a62dbcd26e66ae0b9878d7fb18b2e3af4ec09897f0bb1200bfe13588471564d`**), **byte-identical** to the local build; `.well-known/` and `cgi-bin/` intact; the branch was pushed; **`npm run sync:check` reports IN SYNC**. |
+| 2026-10-02 | **national policy-drafting expansion — more stakeholder groups and more reference indicators (the owner's request: *"add more stakeholder groups and reference indicators … we don't need them to be real as this is just for demo purposes … we will add the real data for each"* after approval)** | **BUILT:** canonical stakeholder groups **36 → 72** (36 new, all `Modelled`) in `src/config/reference.ts`; every one of the 16 departments now models **24** groups (was 16) in `src/config/departments.ts`; reference indicators **63 → 160** (ten per department, 97 new, all `Modelled`). `src/components/KPICards.tsx` now wraps the strip (`repeat(auto-fit, minmax(150px, 1fr))`) so ten cards read cleanly. **NOTHING already published was changed** — the split is now **24 published / 136 modelled**. **TESTED on these bytes:** `npm run validate` **PASS — all checks green** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **489/489 across 46 files** · build **✓** emitting **`assets/index-CMAlJ9Ac.js`** · Playwright **17/17**. **Count-strings moved with the data (fixed at source):** the `DEPARTMENT_SEGMENTS` pin + the "22–26" range in `src/test/departments.test.ts`; `MODELLED_IDS` in `src/test/stakeholder-weights.test.ts`; `toHaveLength(72)` in `src/test/workspace.test.tsx`; the "72 nationally" text/heading in `e2e/journey.spec.ts`; the "160 indicators" length in `src/test/indicator-basis.test.tsx`. **Three defects found by the gates and fixed at source:** an energy indicator id clash (`energy-access` twice), a PSC id+label clash (`psc-establishment` twice, "Funded posts filled" twice), and a stale comment in `src/lib/graph/palette.ts` ("five to twelve groups" → twenty-four). **DEPLOYED and verified (2026-10-02):** uploaded over explicit FTPS (`lftp mirror -R --only-newer`, **never `--delete`**) — 13 files, 1,358,840 bytes; the live host was left carrying **`assets/index-CMAlJ9Ac.js`** (sha256 **`0a62dbcd26e66ae0b9878d7fb18b2e3af4ec09897f0bb1200bfe13588471564d`**), **byte-identical** to the local build; `.well-known/` and `cgi-bin/` intact; the branch was pushed; **`npm run sync:check` reports IN SYNC**. |
 
 
+| 2026-10-02 | **the sourcing-statement defect (the owner's question: *"what is left to clean up so the demo works flawlessly based on the proposal"*) — one wrong sentence fixed in the platform, and eight stale deployment claims fixed in the records, each with a new gate** | **THE DEFECT:** the reference screen's sourcing sentence said *"Stakeholder shares are ZIMSTAT's published 2022 census figures"*, while **one of the twenty published shares** is the **Public Service Commission's** (*Public Service Sentinel*, Q1 2026 — pensioners administered, 209,360, `src/config/reference.ts`). The screen therefore credited one publisher for shares that came from two — and the same sentence is quoted in the funding memo (Part B §11) and in the one-page ask, so the pack repeated it. **FIXED at source:** `SHARE_PUBLISHERS` (`["ZIMSTAT", "Public Service Commission"]`) added to `src/config/reference.ts` and the sentence rewritten to name both; **gate:** a new test in `src/test/reference-sources.test.tsx` — every published share must name one of those bodies, **every body on the list must really be used by a share** (so the list cannot name a phantom publisher), the sentence must name every body on the list, and the published/modelled split must stay **20 / 52**. **Proved able to fail:** the old sentence restored → `the sourcing rule names Public Service Commission: expected 'Stakeholder shares are ZIMSTAT's pub…' to contain 'Public Service Commission'` → 1 failed / 5 passed; `reference.ts` restored **byte-identical** (`sha256 79cce988e375b381461cec7705bcd83536915623a8fd85a5cfab91b53ca8d916`). **ALSO FIXED (the records, eight false present-tense statements about the live host, found by the new gate itself):** `PROJECT_STATUS.md` §Phase AD R7 prose ("the live origin now serves that exact file"), the Phase AE status-documents prose ("the deployed host is still on … the deployed site is behind until R7"), the truth-sweep prose ("the host is now one build behind"), the RESUME HERE "plan is COMPLETE" bullet, the RESUME HERE "live host serves the build published on 2026-09-29" bullet, the RESUME HERE "the one action left … is the redeploy" bullet, and `PRODUCTION_READINESS.md` §6e prose and §8's **"Live build (current — 2026-09-26): the host serves the Phase S bundle"**. A dated log row keeps its present-tense wording on purpose (it records what was true then) — except the 2026-10-02 deploy row, whose "serves" was put in the past so the deployment-agreement check has one name to agree on. **NEW GATE — validate check 17, "no superseded bundle presented as the live one":** R1 a present-tense `serves … <bundle>` in prose must name the agreed live bundle; R2 prose may not say the live host/site is behind; R3 prose may not say a deploy is still to come; R4 the RESUME HERE block must state the sync check's result — all four only bite when the records agree the host serves the build this working copy produces. **Proved able to fail:** it reported **9 violations** before the fixes and **0** after. **DEPLOYED and verified (2026-10-02):** `npm run build` → **`assets/index-7sZF-fGv.js`**; FTPS reverse mirror (`lftp -R --only-newer`, **never `--delete`**) — 13 files, 1,358,916 bytes; the served file's sha256 (**`26a08ca04c08e65c4f9dbb8d0e8b40491f9a4367a7feb37cabdb04ae211fb1a2`**) is **identical** to the local `dist/` build; the site returns **200**; `.well-known/pki-validation/` token **200** and `cgi-bin/` intact. **TESTED on these bytes:** `npm run validate` **PASS — 19/19** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **490/490 across 46 files** · build **✓** · Playwright **17/17** · `npm run sync:check` **IN SYNC**. **Not touched, by the owner's instruction:** `Minister Submission/**` (the owner has handled the proposal) — noted in the report that this copy still carries the old sentence and no web address. |
 | 2026-09-30 | **defect inventory (Batch A, second half — every defect found, and its disposition)** | Five **FIXED at source**, one **BLOCKED**. (1) The drafted-policy screen's own comment said *"editing is local state only"* — false the moment item 7 landed; corrected. (2) The new strip file introduced a lint warning (a component file that also exports data breaks fast refresh, taking lint from the recorded 7 to 8); fixed by moving the destination list into `documentViews.ts`, so lint is back to the baseline 7 in stock shadcn/ui files. (3) The first `usePolicyDraft` made `raw` an *unnecessary dependency* of `useMemo` — a real signal that the memo was not deriving from the value it subscribed to; fixed by adding `draftTextIn(raw, runId)` so the wording is read from the snapshot itself. (4) Three stale statements in the records — `PRODUCTION_READINESS.md` and `PROJECT_STATUS.md` both still called the published bundle the working copy, the RESUME HERE said *nothing is outstanding*, and the expected test counts were 427/428/431 behind — all corrected, with the built bundle named. (5) The Playwright run was made once against a **stale `dist/`** because the validation chain stops at the first non-zero step; recorded as a trap in the log and in RESUME HERE rather than left unexplained. **BLOCKED at the time, RESOLVED the same day (2026-09-30):** the owner's **original fix list was not in the repository** — only six of its eleven items. The full list was **recovered from the conversation itself and is recorded verbatim, with the true state of every item, at the top of this file**. Nothing about it has to be guessed again. |
 
 
@@ -1709,11 +1710,13 @@ so the provenance clause is **trimmed at source** from all 24 notes; `fin-defici
 clause back on `fin-deficit` → `fin/fin-deficit does not name world bank in the note`), `departments.ts`
 restored **byte-identical** (`sha256 e5aecfe4…`).
 
-**R7 — the bundle is redeployed and the live host is current.** `npm run build` emitted
+**R7 — the bundle was redeployed, and the live host was current at that point.** `npm run build` emitted
 `assets/index-DRweHRfT.js` (647,867 bytes, `sha256 c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`);
-the FTPS reverse mirror uploaded `dist/` into the document root (**no `--delete`**). The live origin now
-serves that exact file — fetching `https://nzwisiso.bitflex.app/assets/index-DRweHRfT.js` and hashing it
-gives the same `c601422c…` — and `index.html` references it. The SSL validation token
+the FTPS reverse mirror uploaded `dist/` into the document root (**no `--delete`**). The live origin was
+left carrying that exact file — fetching `https://nzwisiso.bitflex.app/assets/index-DRweHRfT.js` and hashing
+it gave the same `c601422c…` — and `index.html` referenced it. (Later sessions rebuilt and republished the
+bundle; **the DEMO HOST bullet in RESUME HERE states which build the host carries now**.) The SSL
+validation token
 (`.well-known/pki-validation/01a0d6ee-8023-7203-9abc-a37b9060f00d.txt`) and `cgi-bin/` were confirmed
 still present afterwards. A real browser was driven against the live origin: the title, the hero heading,
 a **pure landing page** (0 department-picker groups), the chooser listing **16** departments, one-click
@@ -3156,8 +3159,8 @@ Both halves were proved able to fail by mutation, and both mutated files were re
 defect inventory, and RESUME HERE) and `PRODUCTION_READINESS.md` §6c — **four false deployment statements
 corrected**: the Known-red DEPLOYED entry's "byte-for-byte the local build", the K‑row's "THE LIVE SITE IS
 NOW THIS BUILD", §6c's "the same value as the local build", and `docs/PROPOSAL_PROMPT.md`'s "the live site
-is current". Each now says plainly that the deployed host is still on `assets/index-BeggQU9V.js` while the
-local build emits `assets/index-Cz472pbV.js`, so **the deployed site is behind** until R7.
+is current". Each said plainly that the deployed host was then still on `assets/index-BeggQU9V.js` while the
+local build emitted `assets/index-Cz472pbV.js`, so **the deployed site was behind** until R7.
 
 **Not in the repo, deliberately:** the Wikimedia SVG itself, and the render and Pillow scripts, live in
 `/tmp/coa/` — no scratch tooling, and no second copy of the artwork, was added to the project. The artwork
@@ -3175,8 +3178,9 @@ the *RESUME HERE* block, the *Known-red / open items* paragraph that pointed at 
 timeline (the three rows above). **No application source, test, config, script, style or asset changed**;
 `package.json` is untouched, no dependency moved, and the emerald/gold palette, typography, route map and
 determinism rules are unchanged. The build emitted the same bundle as before (`assets/index-BgYDS9X7.js`),
-and that build was **published at the end of this session** — true when written; a later session changed
-source, so the host is now one build behind. The only tracked file this session touched is this one
+and that build was **published at the end of this session** — true when written; later sessions changed
+source and the host has since been republished, so **the DEMO HOST bullet in RESUME HERE states what it
+carries now**. The only tracked file this session touched is this one
 (`dist/` is gitignored).
 
 The nine corrected statements, and the check that keeps each honest, are listed in the truth-sweep row of
@@ -3336,9 +3340,50 @@ row, the RESUME HERE summary ("five are done…"), the eleven-item tally, the ex
 | Real-browser proof: the action, the `.docx` download, the pack, and one answer in both documents | `e2e/journey.spec.ts` | DONE |
 
 
+## Files touched in the sourcing-statement session (2026-10-02, this session)
+
+- `src/config/reference.ts` — **`SHARE_PUBLISHERS`** added (the bodies the stakeholder shares stand on,
+  named once), and `NAMED_SOURCE_STATEMENT`'s share sentence rewritten to name **both** publishers the
+  twenty published shares use. No colour, type, route or layout change.
+- `src/test/reference-sources.test.tsx` — the new gate: every published share names a listed publisher,
+  **every listed publisher is really used by a share**, the sentence names every listed publisher, and the
+  published/modelled split stays **20 / 52**.
+- `scripts/validate.mjs` — **check 17, "no superseded bundle presented as the live one"** (R1–R4 above).
+- `PROJECT_STATUS.md` — the eight stale deployment statements, the new 2026-10-02 timeline row, this
+  section, the PLAIN SUMMARY, and the RESUME HERE counts (**19/19**, **490/490**).
+- `PRODUCTION_READINESS.md` — §6c's status block brought to the new bundle and fingerprint, §6e's stale
+  prose put in the past, §8's *"Live build (current — 2026-09-26)"* relabelled as deployment history.
+- `docs/PROPOSAL_PROMPT.md` — the live-site paragraph brought to the new bundle and fingerprint, and the
+  corrected sourcing sentence noted.
+- **Not touched, by the owner's instruction:** `Minister Submission/**` (the owner has handled the
+  proposal — this copy still carries the old sentence and no web address, stated in the report),
+  `src/components/ui/**`, `package.json` (no dependency moved), the palette, the typography and the route
+  map.
+
 ## RESUME HERE
 
 **PLAIN SUMMARY (OWNER-FACING).**
+
+**This session (2026-10-02 — one wrong sentence in the platform, and the project's own notes brought
+up to date).** **The demo is ready: every check is green, and the live website carries exactly the build
+that is on this machine** (proved by fingerprint, not by saying so). Two things were fixed:
+1. **One wrong sentence, in the platform and in the proposal.** The Reference screen said *every*
+   stakeholder share came from ZIMSTAT's 2022 census. **Nineteen of the twenty do; one does not** — it
+   comes from the Public Service Commission's *Public Service Sentinel*. The sentence now names both, and
+   a test fails if it ever drifts again. (**Your copy of the proposal:** the copy inside this project still
+   carries the old sentence and still does not state the web address — you told me you had handled the
+   proposal, so **I did not touch your files**. If the copy you are taking to the meeting is the one from
+   this project, it needs those two lines.)
+2. **Eight places in the project's own notes that still said the live site was out of date** when it was
+   not. All eight are corrected, and a **new check fails the build** if a stale claim of that kind comes
+   back.
+**What you need to know before the meeting:** the address to demonstrate is `https://nzwisiso.bitflex.app/`
+— it is live now, and it makes **no internet request of its own**, so it also runs from a laptop with no
+connection (serve the built folder locally). A **Word document or pasted text is read by the platform
+today; a PDF is not read yet** — that is build step 1 in the proposal, and the screen says so plainly.
+**The one thing still waiting on you is the `®` mark** (the platform prints `™` and explains why).
+
+**Earlier summary (2026-09-30 — the item-11 correction, kept as the record).**
 **I was wrong, and it is now fixed.** I told you **all eleven** items were done. That was **not
 true** — item 11 was not done, and you caught it. It is **done now**, and this is what changed.
 
@@ -3474,33 +3519,35 @@ confirm it.
   memo, the deck and the one-page ask to the meeting. **If a future session is asked to change something,
   the next
   command to run is** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`,
-  then `npx playwright test` — expected **all green: validate 18/18, tests 489/489 across 46 files,
+  then `npx playwright test` — expected **all green: validate 19/19, tests 490/490 across 46 files,
   Playwright 17/17** (and **check that the build actually ran before Playwright** — a chain stops at the
   first non-zero step, and Playwright then tests a stale `dist/`). **Do not re-fetch anything in PART 7 of
   `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
   24 published figures and the 39 recorded no-equivalent reasons are both there. **Read first:** the
-  **Batch A second-half rows** in the verification log (what changed last), then `docs/PROPOSAL_PROMPT.md`,
+  **sourcing-statement row** at the top of the verification log (2026-10-02 — what changed last), then `docs/PROPOSAL_PROMPT.md`,
   `scripts/validate.mjs`
   (**check 14**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-CMAlJ9Ac.js`
-  (`0a62dbcd26e66ae0b9878d7fb18b2e3af4ec09897f0bb1200bfe13588471564d`)** — the **national policy-drafting
-  build (2026-10-02)**: **72** canonical stakeholder groups, **24** modelled per department, and **160**
-  reference indicators (ten per department). Published 2026-10-02 and **verified, not assumed**: the
-  served file's sha256 is **identical** to the local `dist/` build (`curl` on the served file vs
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-7sZF-fGv.js`
+  (`26a08ca04c08e65c4f9dbb8d0e8b40491f9a4367a7feb37cabdb04ae211fb1a2`)** — the **sourcing-statement fix**
+  on top of the **national policy-drafting** build: **72** canonical stakeholder groups, **24** modelled
+  per department, **160** reference indicators (ten per department), and the reference screen's sourcing
+  sentence now naming **both** publishers the shares stand on (ZIMSTAT and the Public Service Commission),
+  which `src/test/reference-sources.test.tsx` gates. Published 2026-10-02 and **verified, not assumed**:
+  the served file's sha256 is **identical** to the local `dist/` build (`curl` on the served file vs
   `shasum` on the local build), the site returns **200**, and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` (25 Sep) were confirmed **intact** afterwards.
-  **`npm run sync:check` reports IN SYNC.** (Supersedes `assets/index-B1i84oxZ.js` / `a2faf64…`, the
-  Batch F build, published and verified on 2026-09-30.)
+  **`npm run sync:check` reports IN SYNC.** (Supersedes `assets/index-CMAlJ9Ac.js` / `0a62dbcd…`, the
+  2026-10-02 drafting build.)
 - **No page claims Government hosting.** The sovereignty statement (`SOVEREIGNTY_STATEMENT` in
   `src/config/brand.ts`) states the **compute path** — computed locally in the reader's browser, nothing
   leaves it — which is true wherever the page is served from. It made a **hosting** claim until the
   sovereignty-copy session, which the platform cannot know from where it runs; **validate checks 1 and 11
   now fail if that claim returns**, in the app or in a document.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test`, and finally **`npm run sync:check`** — expected **all green**: validate **18/18**,
+  then `npx playwright test`, and finally **`npm run sync:check`** — expected **all green**: validate **19/19**,
   typecheck **exit 0**, lint **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files),
-  tests **489/489 across 46 files**, build **✓**, Playwright **17/17**, and the sync check reporting
+  tests **490/490 across 46 files**, build **✓**, Playwright **17/17**, and the sync check reporting
   **IN SYNC** (local files · GitHub · the website). **But run the build as its own step or check its output**,
   because `&&` stops at the first non-zero step and the browser tests then silently run against a stale
   `dist/` (that happened in an earlier session). The `--destructive` known-red is **retired**, and the
@@ -3553,8 +3600,8 @@ confirm it.
   promoter, drafted-policy, product-mark and positioning work then rebuilt the bundle, and the
   **truth-sweep session published the current build** (`assets/index-BgYDS9X7.js`). **Batch A then changed
   source** — the engine's starting code removed from every document, the department order and the card
-  sentence — so the locally built file is now `assets/index-BrYtdYWT.js` and the demonstration host is
-  **one build behind** until it is redeployed. The user's decision on the 63
+  sentence — which produced `assets/index-BrYtdYWT.js`; later sessions rebuilt and republished the bundle,
+  so **the DEMO HOST bullet below states what the host carries now**. The user's decision on the 63
   indicator values was taken in the R4/R5 session and **Phase AD** delivered it, so that question is
   **closed**. What remains is not a work item — it is to **use the prompt**: paste it into Claude and take
   the funding memo, the deck and the ask to the meeting.
@@ -3668,13 +3715,14 @@ confirm it.
   `src/components/public/SimulationVisuals.tsx` and `ENGINE_EXPLANATION` in `src/config/brand.ts`;
   the guards live in `src/test/landing.test.tsx` (`What happens behind the assessment`) and
   `e2e/journey.spec.ts` (homepage test + the 390px overflow test).
-- **The live host serves the build published on 2026-09-29.** It was redeployed that day (FTPS reverse
-  mirror, **no `--delete`**: 13 files, 2 new, exit 0) and then verified in a real browser against the live
+- **The host was republished on 2026-09-29, and again on 2026-10-02.** The 2026-09-29 redeploy (FTPS reverse
+  mirror, **no `--delete`**: 13 files, 2 new, exit 0) was then verified in a real browser against the live
   origin — the 16 departments, 0 console errors, 0 page errors, 0 off-origin requests, and the SSL
-  validation token file still returning 200. **A later session changed source**, so the host is one build
-  behind the working copy until it is redeployed; `npm run validate` prints the served name beside the
-  locally built name on every run, so neither name has to be trusted from this file. To publish any
-  further change: `npm run build`, then the `.env`-based FTPS `mirror -R dist .` command below.
+  validation token file still returning 200. Source has changed and been republished since, so **the DEMO
+  HOST bullet below states which build the host carries now, with the sha256 that proves it**, and
+  `npm run validate` prints the served name beside the locally built name on every run, so neither name has
+  to be trusted from this file. To publish any further change: `npm run build`, then the `.env`-based FTPS
+  `mirror -R dist .` command below.
 - **Branch:** `feature/unified-platform` · **HEAD: always run `git rev-parse HEAD`** rather than trusting
   this line; `git log --oneline -6 | cat` is the second opinion on state. `tree:` clean. **The latest
   code changes are the five commits named at the top of this block** (the positioning work, and the four
@@ -3709,7 +3757,8 @@ confirm it.
   `src/components/public/PublicPageShell.tsx` before touching the landing page.**
 - **Nothing is outstanding on the landing page itself.** The two recorded known-reds (`--destructive`
   contrast, the hand-maintained `index.html` description) are both **RESOLVED** — see *Known-red / open
-  items*. The one action left for the whole project is the **redeploy** named in this block.
+  items*. **Nothing is outstanding for the project either: the build is published and `npm run sync:check`
+  reports IN SYNC** — the DEMO HOST bullet below states which build, with its sha256.
 - **Baseline tag:** `baseline-pre-unified-platform` (`7451db0`) — the original app, always restorable
   with `git checkout baseline-pre-unified-platform`. **Do not read `main` as that baseline:** `main` is
   now `b2e2745`, the Phase W merge, so `git checkout main` gives the merged platform, not the original.
@@ -3719,14 +3768,15 @@ confirm it.
   the **BLOCKER** that used to sit in *Known-red / open items* is gone. The agent has pushed nothing to
   `main` since; the feature branch carries all later work. Deployment is an FTP upload of `dist/`, not a
   git push.
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-CMAlJ9Ac.js`,
-  `0a62dbcd26e66ae0b9878d7fb18b2e3af4ec09897f0bb1200bfe13588471564d`** — the **national policy-drafting**
-  build (2026-10-02), verified in the strongest form a local machine can: the served file's
-  sha256 is **identical** to the local `dist/` build, and the site returns **200**. The SSL
-  validation token and `cgi-bin/` were confirmed intact afterwards, and **`npm run sync:check` reports IN
-  SYNC** (local files · GitHub · the website).
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-7sZF-fGv.js`,
+  `26a08ca04c08e65c4f9dbb8d0e8b40491f9a4367a7feb37cabdb04ae211fb1a2`** — the **national policy-drafting**
+  build with the sourcing-statement fix (2026-10-02), verified in the strongest form a local machine can:
+  the served file's sha256 is **identical** to the local `dist/` build, and the site returns **200**. The
+  SSL validation token and `cgi-bin/` were confirmed intact afterwards, and **`npm run sync:check` reports
+  IN SYNC** (local files · GitHub · the website).
   *(This bullet has named each published build in turn — Phase S, the truth-sweep build
-  `assets/index-BgYDS9X7.js`, then Batch F `assets/index-B1i84oxZ.js`. The served name and the built name
+  `assets/index-BgYDS9X7.js`, then Batch F `assets/index-B1i84oxZ.js`, then the drafting build
+  `assets/index-CMAlJ9Ac.js`. The served name and the built name
   are printed together by `npm run validate` on every run, so the host can never be claimed current when it
   is not.)*
   To publish any further change, the credentials are **already saved**:

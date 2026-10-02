@@ -100,18 +100,20 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-02, after the national policy-drafting build — the host and the working copy are IN STEP).**
+- **Status today (2026-10-02, after the sourcing-statement fix was published — the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-CMAlJ9Ac.js` (`0a62dbcd26e66ae0b9878d7fb18b2e3af4ec09897f0bb1200bfe13588471564d`) — fetched
+  `assets/index-7sZF-fGv.js` (`26a08ca04c08e65c4f9dbb8d0e8b40491f9a4367a7feb37cabdb04ae211fb1a2`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
-  explicit FTPS, **never `--delete`** — 13 files, 1,358,840 bytes — and the SSL validation token
+  explicit FTPS, **never `--delete`** — 13 files, 1,358,916 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
   expansion — **72** canonical stakeholder groups, every department modelling **24** of them, and **160**
   reference indicators (ten per department) — plus the recommended-step actions (*Open what answers this*,
   *Download this part*), the **Implementation pack**, and the answers the department enters once and which
-  then print into both the pack and the drafted policy.
+  then print into both the pack and the drafted policy. It also carries the **corrected sourcing sentence**
+  (the shares stand on ZIMSTAT's 2022 census **and** the Public Service Commission's *Public Service
+  Sentinel*), which `src/test/reference-sources.test.tsx` now gates.
   `npm run validate` prints
   the served name and the locally built name side by side on every run, so any gap shows up in the machine
   output rather than in prose.
@@ -292,10 +294,10 @@ on the Phase S bundle) is superseded:** the live host was redeployed on 2026-09-
 `assets/index-BeggQU9V.js`
 (`c3d7055dda81f0ab50e65378899635a928b73258ac06f68d3a09f9ccf818529b`) — the same file the local build
 produced that day — and it was redeployed again in **R7** (2026-09-29). Later work rebuilt the bundle,
-which left the host behind; the **truth-sweep session published `assets/index-BgYDS9X7.js`**
+which left the host behind at that point; the **truth-sweep session published `assets/index-BgYDS9X7.js`**
 (`bba26a71cb41038120a1079dc6f37ce241c07c9ac820ea5d09bab0a66b4bbcc5`). **Batch A then changed source again**,
-so the locally built file is now `assets/index-BrYtdYWT.js` and the host is one build behind until it is
-redeployed.
+which produced `assets/index-BrYtdYWT.js`, and the host was one build behind until it was redeployed again;
+**the current deployment state is stated at §6c above.**
 
 ## 7. Disabled by default (deliberate)
 
@@ -342,7 +344,7 @@ and has since appeared in transcripts more than once, so **rotating it in cPanel
 remains good practice** — but it is never committed, and a build-time check confirms it does **not**
 reach `dist/` (Vite exposes only `VITE_`-prefixed variables).
 
-**Live build (current — 2026-09-26):** the host serves the **Phase S** bundle —
+**Deployment history (2026-09-26): the host was on the Phase S bundle —**
 `assets/index-qUyirbLr.js` + `assets/index-tZ1V4AO9.css`. Deployed upload-only (10 files, 1.41 MB,
 2 new / 8 modified) with **no `--delete`**; `.well-known/pki-validation/01a0d6ee-…f00d.txt` and
 `.htaccess` verified intact afterwards, and the live origin verified in a real browser: **2/2 checks

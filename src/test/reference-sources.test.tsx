@@ -9,6 +9,8 @@ import {
   NAMED_SOURCE_STATEMENT,
   REFERENCE_DATE_LABEL,
   REFERENCE_RATES,
+  SHARE_PUBLISHERS,
+  STAKEHOLDER_SEGMENTS,
 } from "@/config/reference";
 import { clearSession, signInToDepartment } from "@/session/session";
 
@@ -74,6 +76,49 @@ describe("reference provenance (AB-5) — no figure without a named source", () 
     expect(NAMED_SOURCE_STATEMENT).toContain(MODELLED_SHARE_LABEL);
     expect(NAMED_SOURCE_STATEMENT).toContain("reference inputs");
     expect(NAMED_SOURCE_STATEMENT.length).toBeGreaterThan(120);
+  });
+
+  /**
+   * The defect this gate exists for (found 2026-10-02): the sentence said every stakeholder
+   * share was a ZIMSTAT 2022 census figure, while one of the twenty published shares is the
+   * Public Service Commission's. The screen therefore credited one publisher for shares that
+   * came from two — and the same sentence is quoted in the funding memo and the deck.
+   */
+  it("names every publisher the shares actually use, and no publisher they do not", () => {
+    const published = STAKEHOLDER_SEGMENTS.filter(
+      (segment) => segment.shareSource !== MODELLED_SHARE_LABEL,
+    );
+    const modelled = STAKEHOLDER_SEGMENTS.filter(
+      (segment) => segment.shareSource === MODELLED_SHARE_LABEL,
+    );
+
+    // The two figures the funding memo and the deck state. If a share is added or
+    // removed, those documents must move with it, so this fails rather than drifting.
+    expect(published, "published shares (the documents state 20)").toHaveLength(20);
+    expect(modelled, "shares labelled Modelled (the documents state 52)").toHaveLength(52);
+
+    // Every published share names one of the bodies on the list...
+    published.forEach((segment) => {
+      expect(
+        SHARE_PUBLISHERS.some((publisher) => segment.shareSource.includes(publisher)),
+        `${segment.id} names its publisher: "${segment.shareSource}"`,
+      ).toBe(true);
+    });
+
+    // ...every body on the list is really used by a share, so the list cannot name a
+    // publisher the data does not have...
+    SHARE_PUBLISHERS.forEach((publisher) => {
+      expect(
+        published.some((segment) => segment.shareSource.includes(publisher)),
+        `${publisher} is used by at least one published share`,
+      ).toBe(true);
+    });
+
+    // ...and the sentence the reference screen prints names every one of them, so the
+    // screen can never credit one publisher for shares that came from two.
+    SHARE_PUBLISHERS.forEach((publisher) => {
+      expect(NAMED_SOURCE_STATEMENT, `the sourcing rule names ${publisher}`).toContain(publisher);
+    });
   });
 
   it("shows each rate's publisher and period on the reference screen", () => {

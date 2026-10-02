@@ -336,11 +336,12 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
-- **What the live site actually is today (re-checked 2026-10-02, after the national policy-drafting build was published).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-CMAlJ9Ac.js`
-  (`0a62dbcd26e66ae0b9878d7fb18b2e3af4ec09897f0bb1200bfe13588471564d`), which is byte-identical to the
+- **What the live site actually is today (re-checked 2026-10-02, after the sourcing-statement fix was published).**
+  The host `nzwisiso.bitflex.app` serves `assets/index-7sZF-fGv.js`
+  (`26a08ca04c08e65c4f9dbb8d0e8b40491f9a4367a7feb37cabdb04ae211fb1a2`), which is byte-identical to the
   local build, so **the live site is the build published on 2026-10-02** — it carries the authority line, the modelled
-  agent population, the named sources, the official Coat of Arms, the favicon set, the Nzwisiso.ai
+  agent population, the named sources (with the corrected sentence naming both publishers the stakeholder
+  shares stand on), the official Coat of Arms, the favicon set, the Nzwisiso.ai
   positioning section, all 24 published figures, and the owner's items 1–11, including the *Re-run
   simulation* action, the drafting stage, the recommended-step actions that open or send the part of the
   policy that answers each step, the **Implementation pack**, and every department modelling **24**

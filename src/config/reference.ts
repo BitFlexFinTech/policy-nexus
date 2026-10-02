@@ -75,13 +75,28 @@ export const getNamedSource = (id: NamedSourceId) => {
 };
 
 /**
+ * The bodies whose published figures the stakeholder shares stand on.
+ *
+ * Named once, in one list, so the sentence below cannot claim a publisher the share data does
+ * not use, or leave one out that it does. The defect this exists for (found 2026-10-02): the
+ * sentence said every share was a ZIMSTAT 2022 census figure, while one of the twenty published
+ * shares is the Public Service Commission's — so the screen contradicted the data printed a few
+ * lines under it. `src/test/reference-sources.test.tsx` checks the list both ways: every
+ * published share must name one of these bodies, every body here must be used by at least one
+ * share, and the sentence must name every body here.
+ */
+export const SHARE_PUBLISHERS = ["ZIMSTAT", "Public Service Commission"] as const;
+
+/**
  * The named-source statement (AB-5). Each sentence is a rule the platform
- * actually follows, so it stays true whatever the data does. It is rendered on
- * the reference screen by the "Named sources" section.
+ * actually follows, so it stays true whatever the data does — and the share
+ * sentence names every publisher in `SHARE_PUBLISHERS`, checked by a test. It is
+ * rendered on the reference screen by the "Named sources" section.
  */
 export const NAMED_SOURCE_STATEMENT =
-  "Stakeholder shares are ZIMSTAT's published 2022 census figures, each naming the figure and the " +
-  "base it is a share of; where no official figure exists the share is labelled " +
+  "Stakeholder shares are published national figures, each naming the figure and the base it is " +
+  "a share of — the ZIMSTAT 2022 census, and the Public Service Commission's Public Service " +
+  "Sentinel; where no official figure exists the share is labelled " +
   `${MODELLED_SHARE_LABEL} rather than estimated. The reference inputs name the body that publishes ` +
   "them and the period the figure is for. Each department indicator either names the body that " +
   "publishes it, the publication it is taken from and the period it is for, or it is shown as " +
