@@ -4,6 +4,11 @@ Source of truth for project state. **Read this FIRST at every session.**
 Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE right now.
 `DONE` only appears where it was verified in the same session it was written.
 
+> **NEXT TASK (approved 2026-10-03, NOT STARTED — nothing was built): the live date and each document
+> dated when it was made.** Read the section *"NEXT TASK — the live date…"* (immediately above
+> `## RESUME HERE`), then the `RESUME HERE` block below it. The other outstanding work is listed in
+> *"NEXT PHASE"* under it and **is not being removed**.
+
 ---
 
 ## Locked constraints (do not re-derive, do not "improve")
@@ -3394,7 +3399,108 @@ row, the RESUME HERE summary ("five are done…"), the eleven-item tally, the ex
 - **Not touched:** `Minister Submission/**` (the owner's), `src/components/ui/**`, `package.json` (no
   dependency moved), the palette, the typography and the route map.
 
+## NEXT TASK — the live date, and every document dated when it was made (approved 2026-10-03)
+
+**Status: `NOT STARTED` — approved by the owner, recorded here so the next session continues without
+asking. NOTHING WAS BUILT when this section was written; no application file was changed.**
+
+**The owner's instruction, verbatim:** *"the date should be the live date and time not the date of
+deploy … for the documents it should be when the document was created."* On the one open choice the
+owner asked for a recommendation and took it: **one timestamp per run** — every document of a run
+carries that run's own date and time, so the documents of one run always agree.
+
+**The defect it fixes.** Nothing in the platform shows the current date, and nothing is dated when it
+happens. The date is a single hardcoded constant — `REFERENCE_DATE = "2026-09-24"` (line 11) and
+`REFERENCE_DATE_LABEL = "24 September 2026"` (line 14) in `src/config/reference.ts` — shown in about
+fifteen places and inside every generated document, so **only a build could ever change it**. On
+2026-10-03 the platform still said 24 September and the owner reported it. The owner also rejected the
+"date of the build/deploy" idea outright: the display must be the **live** date and time.
+
+**What to build, by file and line (read each file immediately before editing it):**
+
+1. **A live clock for the display.** New `src/lib/clock.ts`: a `useNow()` hook reading the system clock
+   and refreshing on a timer (so it keeps moving while the page is open), plus date/time formatters.
+   Render it in the chrome, replacing the fixed reference date:
+   `src/components/public/PublicPageShell.tsx` (header ~line 100, footer ~177–180) ·
+   `src/pages/Reference.tsx` (line 31) · `src/pages/Simulations.tsx` (line 153) ·
+   `src/pages/SimulationRun.tsx` (line 232) · `src/pages/Compare.tsx` (line 195) ·
+   `src/components/HistoryTable.tsx` (lines 90–91) · `src/components/AgentFeed.tsx` (line 55).
+   Label it as today, e.g. `3 October 2026 · 14:32`. `formatReferenceDate(iso)` (`reference.ts` line 813)
+   already formats an ISO date; add a time-aware sibling rather than a second date parser.
+2. **A real timestamp per run.** `src/services/assessment/runStore.ts` line 111 writes
+   `savedAt: REFERENCE_DATE` today — it becomes the real moment the run is recorded
+   (`new Date().toISOString()`), and `src/services/assessment/scenario.ts` line 803
+   (`createdAt: REFERENCE_DATE`) becomes that same stored moment, so the run and its documents agree.
+   The officer's saved input (`src/services/documents/policyInputStore.ts` line 184) and the saved draft
+   wording (`src/services/documents/draftStore.ts` line 136) get real timestamps too — internal, not shown.
+3. **Every document dated from that stored moment** (one date per run): the builders
+   `src/services/assessment/documents.ts`, `src/services/assessment/policyDraft.ts`,
+   `src/services/assessment/implementationPack.ts`; the assessment screens
+   (`src/components/assessment/AssessmentSections.tsx` line 348 — the "Reference date" row becomes the
+   run's own date); the export line in `src/components/assessment/DocumentActions.tsx` (line 15); and the
+   created-date inside the Word file (`src/services/documents/docx.ts` line 92).
+4. **Narrow the clock rule — do NOT remove it.** `scripts/validate.mjs` lines 140–152 ban
+   `Math.random(`, `Date.now(` and `new Date(` across `src/`. Scope it: the clock is **allowed only in the
+   display** (`src/lib/clock.ts` and the components that render it) and **stays banned in the engine, the
+   run and every document builder** — the part that protects the proposal's "same policy, always the same
+   result" promise. Correct `.clinerules/04-determinism-and-validation.md` and
+   `.clinerules/01-minimal-context.md` with it (both still record `REFERENCE_DATE = "2026-09-24"` as a
+   stable fact).
+5. **Tests that pin the old date.** `e2e/journey.spec.ts` line 349 asserts the served page says
+   *"Reference date 24 September 2026"* → assert against the configuration instead (the spec already
+   imports from `../src/config/*`); `src/test/docx.test.ts` line 139 asserts `2026-09-24T00:00:00Z` →
+   derive it from the run. Add two new ones: **the clock advances** (fake timers) and **a document carries
+   its run's stored timestamp**.
+6. **Then prove it:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`,
+   then `npx playwright test`, then publish (`lftp mirror -R --only-newer`, **never `--delete`**), then
+   **`npm run sync:check` IN SYNC** — and the direct evidence the owner asked for: `curl` the live page and
+   show **today's** date. Finish with the records (this file, `PRODUCTION_READINESS.md`, the deployment
+   claim and bundle fingerprint) and a review zip.
+
+**Two facts recorded so the next session does not have to ask:**
+- **The pack needs one line changed, and that file is the owner's** (`Minister Submission/**`): its
+  wording "prepared against the 24 September 2026 reference date" stops being true once the date is live.
+  Report it; do not edit it.
+- **A run recorded before this change keeps its own stored date** (`2026-09-24`) — honest, because that is
+  when it was recorded under the old scheme. Do not rewrite history.
+
+## NEXT PHASE — after the live-date task (NOT STARTED; these stay, nothing is being removed)
+
+Recorded 2026-10-03 so the next session knows what is still outstanding **after** the live-date task,
+in the order the owner has raised them.
+
+1. **The national-scale dataset expansion** (owner's instruction, 2026-10-02/03). The platform holds
+   **72** canonical stakeholder groups (20 with a published share, 52 `Modelled`), **24** modelled per
+   department, and **160** reference indicators (10 per department: **24 published, 136 `Modelled`**) —
+   so **44 of 232 figures (19%) stand on a published source**. Target: national groups **72 → about 150**,
+   each department's set **24 → about 40**, indicators **10 → 20 per department (320)** — and, first,
+   **expand the published set with real sourced figures** (ZIMSTAT, the Reserve Bank, the line ministries,
+   and the World Bank / WHO / UNICEF / UNESCO / ITU series the platform already cites), with everything
+   unsourced staying labelled `Modelled`. Gates to move with the data: the pinned counts in
+   `src/test/departments.test.ts` (the "22–26" range), `src/test/stakeholder-weights.test.ts`
+   (`MODELLED_IDS`), `src/test/workspace.test.tsx` (`toHaveLength(72)`),
+   `src/test/indicator-basis.test.tsx` ("160 indicators") and `e2e/journey.spec.ts` ("72 nationally").
+   **The proposal and the deck quote 72 / 24 per institution / 160 / 20 published / 52 modelled /
+   24 published / 136 modelled — so the pack must be updated in step, and that file is the owner's.**
+2. **`/platform-admin` needs a real guard.** Recorded open on 2026-09-29: the screen is reachable by
+   anyone who types the address and can save the service configuration; hiding it is not protecting it.
+3. **The three funded build steps** the proposal asks for: server-side document text extraction (so a real
+   PDF can be read), server-side identity verification (real sign-in), and deployment onto Government
+   infrastructure.
+4. **The `®` product mark** — the owner's legal decision (`src/config/brand.ts` deliberately prints `™`
+   with the reason written beside it).
+5. **Two items in the pack** (the owner's file, reported and untouched): the named-source statement still
+   reads ZIMSTAT-only in the copy in this repo, and the demonstration address is still not stated there.
+6. **The offline-demo sheet** — the one-page instruction that makes the deck's "the demonstration does not
+   need the network" claim true on the day (copy `dist/` to the demo laptop and serve it locally).
+7. **A risk to watch, not a task:** the phone layout fits the primary action by **2 px**; a change to the
+   heading size or the masthead padding breaks it (recorded in *Known-red / open items*).
+
 ## RESUME HERE
+
+**NEXT TASK: the live date and each document's own timestamp — see the section immediately above. Nothing
+of it is built yet; the *NEXT PHASE* list above it holds the work that comes after, and none of it has
+been dropped.** The rest of this block is the state as at the last completed session (2026-10-02).
 
 **PLAIN SUMMARY (OWNER-FACING).**
 
@@ -3415,6 +3521,12 @@ row, the RESUME HERE summary ("five are done…"), the eleven-item tally, the ex
 **The live address is `https://nzwisiso.bitflex.app/` and it carries exactly this build** — proved by
 fingerprint, not by saying so. One rule I have written down and now follow: **no change to what you see
 without your approval.**
+
+**What happens next — nothing has been built yet.** The next task is **the date**: the app will show
+**today's date and time**, updating while you watch, and every document will be dated **when it was
+created** — the moment you press Run Simulation — so the four documents of one run agree with each
+other. The bigger **expansion** (more stakeholder groups and more indicators) is recorded as the phase
+after that, together with every other outstanding item, and **none of them has been dropped.**
 
 **Earlier summary (2026-10-02 — the sourcing sentence and the deployment notes).**
 
