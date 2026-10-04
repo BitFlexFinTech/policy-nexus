@@ -12,7 +12,7 @@
  * re-render the moment a run is recorded.
  */
 
-import { REFERENCE_DATE } from "@/config/reference";
+import { nowIso } from "@/lib/clock";
 import { isDepartmentId } from "@/config/departments";
 import { createKeyValueStore } from "@/lib/browserStorage";
 import { runIdFor } from "./seed";
@@ -20,10 +20,10 @@ import type { AssessmentRequest } from "./types";
 
 export const RUNS_STORAGE_KEY = "nzwisiso.runs.v1";
 
-/** A persisted request plus the deterministic id and the date it was recorded. */
+/** A persisted request plus its deterministic id. The moment it was recorded lives on the
+ *  request itself (`recordedAt`), so a run and every document it produces read one date. */
 export interface StoredRun extends AssessmentRequest {
   id: string;
-  savedAt: string;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -108,7 +108,7 @@ export const getRunRequest = (runId: string): StoredRun | undefined =>
  */
 export const saveRunRequest = (request: AssessmentRequest): string => {
   const id = runIdFor(request);
-  const record: StoredRun = { ...request, id, savedAt: REFERENCE_DATE };
+  const record: StoredRun = { ...request, id, recordedAt: nowIso() };
   const existing = getRunsSnapshot().filter((run) => run.id !== id);
   const next = [record, ...existing].slice(0, 60);
   storage.write(RUNS_STORAGE_KEY, JSON.stringify(next));

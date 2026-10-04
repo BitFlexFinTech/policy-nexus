@@ -125,6 +125,12 @@ describe("the officer's working copy of a drafted policy survives leaving the sc
     // "Reset to generated" is the same call, and it is safe on a run that has none.
     saveDraftText("fin-abc", "Second attempt.");
     saveDraftText("", "Never stored — no run to attach it to.");
-    expect(listDrafts()).toEqual({ "fin-abc": { text: "Second attempt.", savedAt: REFERENCE_DATE } });
+    // The working copy is keyed by its run only, and carries the real moment it was written —
+    // never the platform's fixed reference date, which would mean the wording was never dated.
+    const stored = listDrafts()["fin-abc"];
+    expect(Object.keys(listDrafts())).toEqual(["fin-abc"]);
+    expect(stored.text).toBe("Second attempt.");
+    expect(stored.savedAt).not.toBe(REFERENCE_DATE);
+    expect(stored.savedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
   });
 });

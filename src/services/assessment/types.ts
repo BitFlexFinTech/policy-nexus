@@ -72,6 +72,14 @@ export interface AssessmentRequest {
    * is a genuinely different run.
    */
   documents?: DepartmentDocumentInput[];
+  /**
+   * The moment this run was recorded, in ISO form. The run store sets it the instant the
+   * officer presses Run Simulation, so the run and every document it produces carry one
+   * date. Absent on a request that was built but never recorded — and on every run stored
+   * before the platform kept a real date — in which case a run falls back to the platform's
+   * reference date, so an older run is never rewritten.
+   */
+  recordedAt?: string;
 }
 
 /**
@@ -165,7 +173,11 @@ export interface AssessmentRun {
   policyText: string;
   source: AssessmentSource;
   fileNames: string[];
-  /** ISO date of the run. Always REFERENCE_DATE in scenario mode. */
+  /**
+   * The moment the run was recorded, in ISO form. The run's own recorded instant, or the
+   * platform's reference date when a run was built but never recorded (which includes every
+   * run stored before the platform kept a real date).
+   */
   createdAt: string;
   /** The exact seed string the engine was initialised with. */
   seed: string;

@@ -20,6 +20,11 @@ export interface DocumentExportPayload {
   title: string;
   text: string;
   fileStem: string;
+  /**
+   * The moment the document was recorded (ISO), carried into the Word file's own created date.
+   * Omitted for a document with no run behind it.
+   */
+  createdAt?: string;
 }
 
 /**
@@ -30,7 +35,7 @@ export interface DocumentExportPayload {
  */
 export const downloadAsWord = (payload: DocumentExportPayload): string => {
   try {
-    const blob = createDocxBlob({ title: payload.title, body: payload.text });
+    const blob = createDocxBlob({ title: payload.title, body: payload.text, createdAt: payload.createdAt });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;

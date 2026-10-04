@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { BRAND, PROMOTER, SOVEREIGNTY_STATEMENT, WORDMARK } from "@/config/brand";
 import { REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR } from "@/config/reference";
+import { formatClock, useNow } from "@/lib/clock";
 import { COVERAGE } from "@/lib/coverage";
 import { logoSrc } from "@/config/content";
 import { useContent } from "@/config/useContent";
@@ -83,8 +84,11 @@ function OfficialMasthead({ markSrc }: { markSrc: string }) {
   );
 }
 
-/** What this service is, and the fixed reference frame it is read against. */
+/** What this service is, and the live date plus the fixed reference frame it is read
+ *  against. The reference date is the frame the platform's figures are computed for;
+ *  "Today" is the real date and time, so a reader can always see when they are looking. */
 function OfficialNoticeStrip() {
+  const now = useNow();
   return (
     <div className="border-b bg-primary-tint">
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-4 gap-y-1.5 px-4 py-2.5 sm:px-6">
@@ -96,6 +100,12 @@ function OfficialNoticeStrip() {
           are modelled, and are labelled as simulated wherever they appear.
         </span>
         <span className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+          {/* The live date. Hidden on the narrowest phones only, where the strip already
+              wraps; it is always shown from the small breakpoint up, and the footer carries
+              it on every width. Keeps the phone's primary action above the fold. */}
+          <span className="hidden sm:inline">
+            Today <span className="font-semibold text-foreground">{formatClock(now)}</span>
+          </span>
           <span>
             Reference date <span className="font-semibold text-foreground">{REFERENCE_DATE_LABEL}</span>
           </span>
@@ -115,6 +125,7 @@ function OfficialNoticeStrip() {
  * in both the unit and the browser tests.
  */
 function OfficialFooter() {
+  const now = useNow();
   return (
     <footer className="border-t border-primary-foreground/10 bg-primary text-primary-foreground">
       <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
@@ -173,6 +184,9 @@ function OfficialFooter() {
             <h2 className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary-foreground/75">
               Reference frame
             </h2>
+            <p className="text-xs leading-relaxed text-primary-foreground/85">
+              Today {formatClock(now)}
+            </p>
             <p className="text-xs leading-relaxed text-primary-foreground/85">
               Fiscal year {REFERENCE_FISCAL_YEAR}
             </p>

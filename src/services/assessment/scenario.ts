@@ -800,7 +800,7 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
           }))
         : undefined,
     fileNames: request.fileNames ?? [],
-    createdAt: REFERENCE_DATE,
+    createdAt: request.recordedAt ?? REFERENCE_DATE,
     seed,
     timeHorizon,
     horizonLabel,

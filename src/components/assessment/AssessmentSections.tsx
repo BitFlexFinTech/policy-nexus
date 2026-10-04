@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { findDepartment } from "@/config/departments";
-import { REFERENCE_DATE_LABEL } from "@/config/reference";
+import { formatInstant } from "@/lib/clock";
 import { VOCABULARY } from "@/config/brand";
 import { buildPolicyDraft, renderDocumentText, sliceDocumentSection } from "@/services/assessment/documents";
 import {
@@ -345,7 +345,7 @@ export function InputRecord({ run }: { run: AssessmentRun }) {
         Run inputs
       </div>
       <dl className="grid grid-cols-1 gap-x-8 md:grid-cols-2">
-        <Row label="Reference date" value={REFERENCE_DATE_LABEL} />
+        <Row label="Recorded" value={formatInstant(run.createdAt)} />
         <Row label="Horizon" value={run.horizonLabel} />
         <Row label="Source" value={run.source} />
         <Row label="Version" value={String(revisionNumber(run.id))} />

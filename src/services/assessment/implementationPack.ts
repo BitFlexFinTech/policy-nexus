@@ -21,7 +21,7 @@
 
 import type { Department } from "@/config/departments";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
-import { REFERENCE_DATE_LABEL } from "@/config/reference";
+import { formatInstant } from "@/lib/clock";
 import {
   BLANK,
   costCategoriesTable,
@@ -40,7 +40,7 @@ export const buildImplementationPack = (
     id: "pack-purpose",
     heading: "What this pack is for",
     paragraphs: [
-      `This is the working pack for "${run.policyTitle}", prepared by ${department.name} from examination ${run.reference} on ${REFERENCE_DATE_LABEL}. It gathers the parts of the policy that offices act on — the implementation matrix, the cost categories to be costed, the monitoring and evaluation matrix, the recommended steps and the stakeholder analysis — so they can be worked on and circulated without the rest of the instrument.`,
+      `This is the working pack for "${run.policyTitle}", prepared by ${department.name} from examination ${run.reference} on ${formatInstant(run.createdAt)}. It gathers the parts of the policy that offices act on — the implementation matrix, the cost categories to be costed, the monitoring and evaluation matrix, the recommended steps and the stakeholder analysis — so they can be worked on and circulated without the rest of the instrument.`,
       `Every table here is the same table that appears in the drafted policy for this examination, from the same source. The pack adds no figure, no date and no office of its own: where a value is the department's to set, it is printed as ${BLANK} so that what still has to be completed is obvious.`,
       "Nothing in this pack is an adopted decision. It is the working record of what the examination modelled and what the department has yet to settle.",
     ],
@@ -104,7 +104,7 @@ export const buildImplementationPack = (
   return {
     kind: "implementation-pack",
     title: `Implementation pack — ${run.policyTitle}`,
-    subtitle: `${department.name} · derived from ${run.reference} · reference date ${REFERENCE_DATE_LABEL}`,
+    subtitle: `${department.name} · derived from ${run.reference} · recorded ${formatInstant(run.createdAt)}`,
     fileStem: `${run.reference}-implementation-pack`,
     sections: [purpose, implementation, costs, monitoring, steps, stakeholders, method],
   };

@@ -20,10 +20,12 @@
  * NAME and their text is dropped, and `filesReadable` is false so the screen can say so
  * plainly. Nothing is silently truncated: the officer is told those files must be added again.
  *
- * Determinism: the record carries REFERENCE_DATE, never a clock.
+ * Determinism: the run's figures do not depend on the clock. This record carries the moment it
+ * was written (a real timestamp, so the officer's work is dated when they made it), but nothing
+ * shown on screen or inside a document is derived from it.
  */
 
-import { REFERENCE_DATE } from "@/config/reference";
+import { nowIso } from "@/lib/clock";
 import { isDepartmentId, type DepartmentId } from "@/config/departments";
 import { createKeyValueStore } from "@/lib/browserStorage";
 import { DEFAULT_LEVERS, resolveLevers, type ScenarioLevers } from "@/services/assessment/levers";
@@ -181,7 +183,7 @@ export const savePolicyInput = (input: Omit<StoredPolicyInput, "savedAt" | "file
       files,
       filesReadable,
       levers: resolveLevers(input.levers),
-      savedAt: REFERENCE_DATE,
+      savedAt: nowIso(),
     },
   });
 };

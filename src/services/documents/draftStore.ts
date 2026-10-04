@@ -18,7 +18,7 @@
  * for the visit and reports that plainly through `isDraftStorePersistent()`.
  */
 
-import { REFERENCE_DATE } from "@/config/reference";
+import { nowIso } from "@/lib/clock";
 import { createKeyValueStore } from "@/lib/browserStorage";
 
 export const DRAFTS_STORAGE_KEY = "nzwisiso.policy-drafts.v1";
@@ -133,7 +133,7 @@ export const saveDraftText = (runId: string, text: string): void => {
     clearDraftText(runId);
     return;
   }
-  write({ ...listDrafts(), [runId]: { text, savedAt: REFERENCE_DATE } });
+  write({ ...listDrafts(), [runId]: { text, savedAt: nowIso() } });
 };
 
 /** Forget the working copy, so the generated draft is shown again. */

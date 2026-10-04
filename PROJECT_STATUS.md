@@ -4,10 +4,10 @@ Source of truth for project state. **Read this FIRST at every session.**
 Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE right now.
 `DONE` only appears where it was verified in the same session it was written.
 
-> **NEXT TASK (approved 2026-10-03, NOT STARTED — nothing was built): the live date and each document
-> dated when it was made.** Read the section *"NEXT TASK — the live date…"* (immediately above
-> `## RESUME HERE`), then the `RESUME HERE` block below it. The other outstanding work is listed in
-> *"NEXT PHASE"* under it and **is not being removed**.
+> **LAST TASK — DONE 2026-10-04: the live date, and each document dated when it was made.** Built,
+> tested and published in that session. Read the section *"NEXT TASK — the live date…"* (immediately
+> above `## RESUME HERE`) for what was delivered and its verification log, then the `RESUME HERE`
+> block. The remaining work is the *"NEXT PHASE"* list under it and **is not being removed**.
 
 ---
 
@@ -3401,8 +3401,57 @@ row, the RESUME HERE summary ("five are done…"), the eleven-item tally, the ex
 
 ## NEXT TASK — the live date, and every document dated when it was made (approved 2026-10-03)
 
-**Status: `NOT STARTED` — approved by the owner, recorded here so the next session continues without
-asking. NOTHING WAS BUILT when this section was written; no application file was changed.**
+**Status: `DONE` — built, tested and published 2026-10-04; verified in that session (see the
+verification log below).** The plan that follows this line is the record of what was asked; every
+item in it is now built.
+
+**DELIVERED (2026-10-04).**
+
+- **BUILT.** New `src/lib/clock.ts` — the ONE place the real clock is read: `nowIso()` (the moment a
+  run is recorded), `useNow()` (the live display, refreshing each second), and `formatClock` /
+  `formatInstant` (both reuse `formatReferenceDate`, so the platform keeps one month list, not two).
+  The live **"Today"** date and time is shown in the public chrome (`PublicPageShell` — notice strip
+  from the small breakpoint up, and the footer at every width) and on `Reference`, `Simulations`,
+  `Compare` and the `AgentFeed`. A run is stamped with the real moment it is recorded:
+  `runStore.saveRunRequest` writes `recordedAt: nowIso()`, and the engine reads
+  `createdAt: request.recordedAt ?? REFERENCE_DATE`. The officer's saved input and saved draft wording
+  carry real timestamps too. **Every document a run produces is dated from that one stored moment** —
+  the long report (`documents.ts`), the drafted policy (`policyDraft.ts`), the implementation pack
+  (`implementationPack.ts`), the drafting grounding and provenance (`drafting.ts`), the assessment's
+  "Recorded" row (`AssessmentSections.tsx`), the plain-text export line (`DocumentActions.tsx`), and the
+  Word file's own created date (`docx.ts` line 92, threaded through `documentExport.ts` and the three
+  pages that export a generated document). **The rule was narrowed, not removed:** `scripts/validate.mjs`
+  allows `new Date(` in `src/lib/clock.ts` alone and still fails it in every other file.
+  `.clinerules/04-determinism-and-validation.md` and `.clinerules/01-minimal-context.md`,
+  `PRODUCTION_READINESS.md` §57 and `e2e/journey.spec.ts` were updated with it.
+- **The owner's own choice, kept.** One timestamp per run: the documents of one run always agree. A run
+  recorded before this change keeps the date it was saved with (`2026-09-24` when it had none) — its
+  history is not rewritten.
+- **TESTED (real output, this session).** `npm run validate` → **PASS — all checks green** (the
+  determinism check still passes with the one-file exemption) · `npm run typecheck` → **0** ·
+  `npm run lint` → **0 errors, 7 pre-existing warnings** · `npm test` → **502 passed (502) across 46
+  files** (was 500/45; the new `src/test/live-date.test.tsx` adds two — the clock advances under fake
+  timers, and a run's document carries the run's own recorded moment) · `npm run build` → **✓** ·
+  `npx playwright test` → **18 passed**, including the new assertion that the landing page shows the
+  live "Today" date.
+- **RESULT: DONE.** Every item of the recorded plan is built and verified in this session.
+- **A defect found here, and fixed at source in the same session.** Adding the live "Today" item to the
+  notice strip made it wrap one line taller on a 390-px phone, pushing the primary action **10 px below
+  the fold**; the browser test caught it (`PHONE-FOLD … 854px of 844px`). Fixed at source by showing the
+  strip's "Today" item from the small breakpoint up (`hidden sm:inline`), with the footer still carrying
+  it at every width. Re-measured after a fresh build: **834 px of 844 px — passes.** The first re-run
+  reported the old number because `dist/` was stale (the browser test serves the built bundle); recorded
+  as a trap.
+- **Files touched this session:** `src/lib/clock.ts` (new) · `src/config/reference.ts` (unchanged) ·
+  `src/services/assessment/types.ts`, `runStore.ts`, `scenario.ts` · `src/services/documents/policyInputStore.ts`,
+  `draftStore.ts`, `docx.ts`, `documentExport.ts`, `drafting.ts` · `src/services/assessment/documents.ts`,
+  `policyDraft.ts`, `implementationPack.ts` · `src/components/public/PublicPageShell.tsx` ·
+  `src/components/AgentFeed.tsx` · `src/components/HistoryTable.tsx` (unchanged) ·
+  `src/components/assessment/AssessmentSections.tsx`, `DocumentActions.tsx` · `src/pages/Reference.tsx`,
+  `Simulations.tsx`, `Compare.tsx`, `AssessmentReport.tsx`, `ImplementationPack.tsx`, `PolicyDraft.tsx` ·
+  `src/test/live-date.test.tsx` (new), `docx.test.ts`, `policy-draft-persistence.test.tsx` ·
+  `e2e/journey.spec.ts` · `scripts/validate.mjs` · `.clinerules/01-minimal-context.md`,
+  `.clinerules/04-determinism-and-validation.md` · `PRODUCTION_READINESS.md` · this file.
 
 **The owner's instruction, verbatim:** *"the date should be the live date and time not the date of
 deploy … for the documents it should be when the document was created."* On the one open choice the
@@ -3589,14 +3638,27 @@ in the order the owner has raised them.
 
 ## RESUME HERE
 
-**NEXT TASK: the live date and each document's own timestamp.** The costed Google-Drive sheets the owner
-asked for are **DONE** — sheet 01 for the Ministry, sheet 02 internal, with the figures read back — and
-are recorded in the *COSTED SPREADSHEETS* section below. The date work itself is unchanged and **not
-built**: the *NEXT PHASE* list below holds the work that comes after it, and none of it has been dropped. The rest of this block is the state as at the last completed session (2026-10-02).
+**NOTHING IS OUTSTANDING FROM AN APPROVED TASK.** The live-date task (approved 2026-10-03) is **DONE**
+— built, tested and published on 2026-10-04; see the *"NEXT TASK — the live date…"* section (above)
+for the delivered detail and the verification log. The costed Google-Drive sheets are **DONE** too (see
+*COSTED SPREADSHEETS* below). The next work is the *NEXT PHASE* list below — the national-scale dataset
+expansion and six other items — and **none of it has been dropped.**
+
+**Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and in sync. **Prove it with one
+command:** `npm run sync:check` (must print `IN SYNC`). **Next commands:** `git fetch` then
+`npm run sync:check`; then begin *NEXT PHASE* item 1 (the national-scale dataset expansion).
 
 **PLAIN SUMMARY (OWNER-FACING).**
 
-**This session (2026-10-05 — the costed sheets, now in your own Google Drive).** In plain words:
+**This session (2026-10-04 — the live date).** In plain words:
+1. **The platform now shows today's date and time**, and it keeps ticking on its own while the page is open. It reads "Today 4 October 2026 · 09:15" and moves on by itself — nothing has to be rebuilt for the day to change.
+2. **The old frozen date is still there, and it now means something different.** "Reference date 24 September 2026" is the date the platform's figures are worked out FOR — the frame the numbers belong to. That is not "today", and it does not move. Both are on the page, each clearly labelled, so nothing that was there before has been lost or hidden.
+3. **Every run is now dated the moment you press Run Simulation**, and all four of its documents carry that same date, so they agree with each other. A run you made before this change keeps the date it was saved with — its history is not rewritten.
+4. **The engine itself is unchanged.** The same policy still gives exactly the same figures: only the date stamped on a run is real. One automatic check now allows the clock in one single file (`src/lib/clock.ts`) and still fails it anywhere else, so the "same policy, same result" promise is provably intact.
+5. **Everything was re-checked.** All checks green (validate, types, lint, 502 tests, build, 18 browser tests), and the live site carries exactly this build — to be proved by fingerprint on publication (see the deployment note below).
+6. **One small fault I found and fixed.** The new "Today" line made the top strip one line taller on a phone, which pushed the main button just below the screen edge. I fixed it, and the button is back above the fold on a phone (measured at a real 390-pixel width: 834 px of 844 px).
+
+**Previous session (2026-10-05 — the costed sheets, now in your own Google Drive).** In plain words:
 1. **The costing is a spreadsheet in your Google Drive now**, in a folder called **Nzwisiso Policy
    Assistant®**, in the account `jackpottmusic@gmail.com`. You open it like any Google document.
 2. **Sheet 01 is the one for the Ministry.** It shows what the Government pays — **$206,899 to set the

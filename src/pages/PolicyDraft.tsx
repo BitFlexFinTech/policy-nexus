@@ -239,7 +239,7 @@ export default function PolicyDraft() {
       )}
 
       <DocumentActions
-        document={{ title: generated.title, text, fileStem: generated.fileStem }}
+        document={{ title: generated.title, text, fileStem: generated.fileStem, createdAt: run.createdAt }}
       />
 
       <div className="flex flex-wrap items-center gap-2" data-print="hide">

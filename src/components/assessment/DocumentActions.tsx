@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BRAND, DISCLAIMER } from "@/config/brand";
-import { REFERENCE_DATE_LABEL } from "@/config/reference";
+import { formatInstant } from "@/lib/clock";
 import { downloadAsWord, type DocumentExportPayload } from "@/services/documents/documentExport";
 import type { AssessmentRun } from "@/services/assessment/types";
 
@@ -12,7 +12,7 @@ const buildPlainText = (run: AssessmentRun, scope: DocumentScope): string => {
   const lines = [
     `${BRAND.productName}`,
     `${run.reference} — ${run.policyTitle}`,
-    `${run.departmentName} · ${run.horizonLabel} · reference date ${REFERENCE_DATE_LABEL}`,
+    `${run.departmentName} · ${run.horizonLabel} · recorded ${formatInstant(run.createdAt)}`,
     "",
     run.summary,
     "",
@@ -82,6 +82,7 @@ export function DocumentActions({
           title: `${run.reference} — ${run.policyTitle}`,
           text: buildPlainText(run, scope ?? "full"),
           fileStem: fileNameFor(run, scope ?? "full"),
+          createdAt: run.createdAt,
         }
       : null;
 

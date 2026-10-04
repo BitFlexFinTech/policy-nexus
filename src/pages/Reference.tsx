@@ -11,6 +11,7 @@ import {
   STAKEHOLDER_SEGMENTS,
 } from "@/config/reference";
 import { useSession } from "@/session/useSession";
+import { formatClock, useNow } from "@/lib/clock";
 
 /**
  * Reference — methodology and limitations. This is where the platform states its
@@ -20,6 +21,7 @@ import { useSession } from "@/session/useSession";
 export default function Reference() {
   const session = useSession();
   const department = findDepartment(session?.departmentId);
+  const now = useNow();
 
   if (!department) return null;
 
@@ -28,7 +30,7 @@ export default function Reference() {
       <header>
         <h2 className="text-sm font-semibold tracking-tight text-foreground">Methodology and Limitations</h2>
         <p className="text-xs text-muted-foreground">
-          {BRAND.productName} · reference date {REFERENCE_DATE_LABEL} · fiscal year {REFERENCE_FISCAL_YEAR}
+          {BRAND.productName} · today {formatClock(now)} · reference date {REFERENCE_DATE_LABEL} · fiscal year {REFERENCE_FISCAL_YEAR}
         </p>
       </header>
 

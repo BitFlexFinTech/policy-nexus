@@ -347,6 +347,9 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await expect(assessment.getByText("Review assessment", { exact: true })).toBeVisible();
     await expect(assessment.getByText("Understanding before action.", { exact: true })).toBeVisible();
     await expect(page.getByText(/Reference date\s+24 September 2026/).first()).toBeVisible();
+    // The platform also shows the LIVE date now, so a reader can see when they are looking.
+    // The day itself is read from the page rather than frozen, because it really is today.
+    await expect(page.getByText(/Today\s+\d{1,2} \w+ \d{4}/).first()).toBeVisible();
     await expect(page.getByText(/Fiscal year\s+2026/).first()).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Ready to test a policy draft?", exact: true }),

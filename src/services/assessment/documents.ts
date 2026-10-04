@@ -16,7 +16,7 @@
 
 import { type Department } from "@/config/departments";
 import { DISCLAIMER, SOVEREIGNTY_STATEMENT, VOCABULARY } from "@/config/brand";
-import { REFERENCE_DATE_LABEL } from "@/config/reference";
+import { formatInstant } from "@/lib/clock";
 import { createRng } from "@/lib/prng";
 import type {
   AssessmentRun,
@@ -93,7 +93,7 @@ export const buildLongReport = (run: AssessmentRun, department: Department): Gen
     id: "purpose",
     heading: "Purpose and scope of this report",
     paragraphs: [
-      `This is the long-form record of simulation ${run.reference}, completed by ${run.departmentName} on ${REFERENCE_DATE_LABEL} over a ${run.horizonLabel.toLowerCase()} horizon. The policy text was supplied as a ${run.source} input and is reproduced in full below.`,
+      `This is the long-form record of simulation ${run.reference}, completed by ${run.departmentName} on ${formatInstant(run.createdAt)} over a ${run.horizonLabel.toLowerCase()} horizon. The policy text was supplied as a ${run.source} input and is reproduced in full below.`,
       rng.pick(REPORT_PURPOSE),
       `The workspace produces three outputs from one run: the executive summary (the short version), this report (the full narrative record), and the drafted policy — the policy text itself, revised to answer what the simulation found.`,
     ],
@@ -179,7 +179,7 @@ export const buildLongReport = (run: AssessmentRun, department: Department): Gen
       `Anyone holding the inputs below can reproduce this exact result, because the generator is seeded from them and holds no other state.`,
     ],
     bullets: [
-      `Reference date — ${REFERENCE_DATE_LABEL}`,
+      `Recorded — ${formatInstant(run.createdAt)}`,
       `Horizon — ${run.horizonLabel}`,
       `Source — ${run.source}`,
       `Uploaded files — ${run.fileNames.length > 0 ? run.fileNames.join(", ") : "none"}`,
@@ -201,7 +201,7 @@ export const buildLongReport = (run: AssessmentRun, department: Department): Gen
   return {
     kind: "report",
     title: `${run.policyTitle} — full report`,
-    subtitle: `${run.departmentName} · ${run.reference} · long-form report · reference date ${REFERENCE_DATE_LABEL}`,
+    subtitle: `${run.departmentName} · ${run.reference} · long-form report · recorded ${formatInstant(run.createdAt)}`,
     fileStem: `${run.reference}-full-report`,
     sections: [
       purpose,

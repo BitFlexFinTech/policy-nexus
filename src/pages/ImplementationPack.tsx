@@ -67,7 +67,12 @@ export default function ImplementationPack() {
       </p>
 
       <DocumentActions
-        document={{ title: pack.title, text: renderDocumentText(pack), fileStem: pack.fileStem }}
+        document={{
+          title: pack.title,
+          text: renderDocumentText(pack),
+          fileStem: pack.fileStem,
+          createdAt: run.createdAt,
+        }}
       />
 
       <GeneratedDocumentView document={pack} />

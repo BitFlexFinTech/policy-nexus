@@ -58,7 +58,12 @@ export default function AssessmentReport() {
       </div>
 
       <DocumentActions
-        document={{ title: report.title, text: renderDocumentText(report), fileStem: report.fileStem }}
+        document={{
+          title: report.title,
+          text: renderDocumentText(report),
+          fileStem: report.fileStem,
+          createdAt: run.createdAt,
+        }}
       />
 
       <GeneratedDocumentView document={report} />

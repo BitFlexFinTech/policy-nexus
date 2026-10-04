@@ -8,7 +8,8 @@
  *  2. Forbidden predictive phrasing (claims about real public opinion / certainty)
  *  3. Vendor terminology (MiroFish / OASIS / GraphRAG / Zep / Puter / Vultr / Neo4j / ...) — no exception
  *  4. Implementation vocabulary (LLM / API), permitted in exactly one owner-approved sentence
- *  5. Non-determinism (Math.random / Date.now / new Date) in app source
+ *  5. Non-determinism (Math.random / Date.now / new Date) in app source — allowed in
+ *     exactly one file, `src/lib/clock.ts`, and nowhere else (see the check below)
  *  6. Runtime network URLs in app source or index.html
  *  7. 16 departments with the exact stable IDs
  *  8. REFERENCE_DATE pinned to 2026-09-24
@@ -149,7 +150,13 @@ const uiHits = scan(uiFiles, determinism, { ignoreLine: commentLine });
 if (uiHits.length) {
   notes.push(`INFO  excluded ${uiHits.length} hit(s) inside src/components/ui/** (stock shadcn primitives, not app logic):\n` + uiHits.map((h) => `    ${h}`).join("\n"));
 }
-check("determinism (no Math.random/Date.now/new Date)", scan(appFiles, determinism, { ignoreLine: commentLine }));
+// The clock is allowed in ONE file — `src/lib/clock.ts` — and nowhere else. That file is
+// the only place the system clock is read; every other module receives a moment as data,
+// so the engine, the register and every document builder stay deterministic. A `new Date(`
+// anywhere else in the app still fails, which is what keeps the proposal's "same policy,
+// always the same result" promise true.
+const clockFile = join(ROOT, "src", "lib", "clock.ts");
+check("determinism (no Math.random/Date.now/new Date)", scan(appFiles.filter((p) => p !== clockFile), determinism, { ignoreLine: commentLine }));
 
 // 5 — no runtime network calls
 check("no runtime network URLs", scan(srcFiles, [

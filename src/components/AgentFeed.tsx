@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { findDepartment, type Department } from "@/config/departments";
 import { VOCABULARY } from "@/config/brand";
-import { REFERENCE_DATE_LABEL, getStakeholderSegment } from "@/config/reference";
+import { getStakeholderSegment } from "@/config/reference";
+import { formatClock, useNow } from "@/lib/clock";
 import { useSession } from "@/session/useSession";
 import {
   FEED_SYSTEM_TONE,
@@ -26,7 +27,7 @@ interface AgentMessage {
  * one entry per modelled segment, framed by the scenario opening and closing
  * lines. No vendor terminology and no generated figures.
  */
-const buildFeed = (department: Department): AgentMessage[] => {
+const buildFeed = (department: Department, today: string): AgentMessage[] => {
   const entries: Array<{ agent: string; type: AgentMessage["type"]; message: string }> = [
     {
       agent: "System",
@@ -52,7 +53,7 @@ const buildFeed = (department: Department): AgentMessage[] => {
   entries.push({
     agent: "System",
     type: "system",
-    message: `${VOCABULARY.scenarioEngine} ready. Prepared drafts: ${department.policyTemplates.length}. Reference date ${REFERENCE_DATE_LABEL}.`,
+    message: `${VOCABULARY.scenarioEngine} ready. Prepared drafts: ${department.policyTemplates.length}. Today ${today}.`,
   });
 
   const toneByAgent = new Map<string, string>();
@@ -89,7 +90,10 @@ const buildFeed = (department: Department): AgentMessage[] => {
 export function AgentFeed() {
   const session = useSession();
   const department = findDepartment(session?.departmentId);
-  const messages = useMemo(() => (department ? buildFeed(department) : []), [department]);
+  // The live date, so the feed names the day the officer is working. The value only
+  // changes when the minute does, so the feed's own timestamp rows stay stable.
+  const today = formatClock(useNow());
+  const messages = useMemo(() => (department ? buildFeed(department, today) : []), [department, today]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

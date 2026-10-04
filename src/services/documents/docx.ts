@@ -35,6 +35,12 @@ export interface DocxInput {
   title: string;
   /** Body text. One paragraph per line; `- ` and `* ` lines become bullet points. */
   body: string;
+  /**
+   * The moment the document was recorded (ISO), carried into the file's own created date so a
+   * Word file is dated when it was made. Omitted for a document with no run behind it, in which
+   * case the platform's reference date is used.
+   */
+  createdAt?: string;
 }
 
 const escapeXml = (value: string): string =>
@@ -80,16 +86,22 @@ const subst = (template: string, values: Record<string, string>): string =>
  * The archive's entries, in order. Exported so a test can re-read the parts
  * without going through a Blob.
  */
-export const buildDocxParts = ({ title, body }: DocxInput): ZipEntry[] => {
+export const buildDocxParts = ({ title, body, createdAt }: DocxInput): ZipEntry[] => {
   const encoder = new TextEncoder();
+  // The document's own date: the run's recorded moment when there is one, otherwise the
+  // platform's reference date. It is a fixed value handed in, never the clock read here, so
+  // the same document always produces the same bytes.
+  const docDate =
+    createdAt && createdAt.includes("T") ? createdAt : `${createdAt ?? REFERENCE_DATE}T00:00:00Z`;
   const identity = {
     TITLE: escapeXml(title),
     CREATOR: escapeXml(`${BRAND.productName} (${BRAND.entityCustodian})`),
     DESCRIPTION: escapeXml(BRAND.summary),
     APPLICATION: escapeXml(BRAND.productName),
     COMPANY: escapeXml(BRAND.entity),
-    // Fixed reference date, never the clock — keeps the bytes deterministic.
-    DATE: `${REFERENCE_DATE}T00:00:00Z`,
+    // The document's own recorded moment (or the reference date) — never the clock, so the
+    // bytes stay deterministic.
+    DATE: docDate,
   };
   const document = subst(documentTemplate, {
     TITLE: identity.TITLE,

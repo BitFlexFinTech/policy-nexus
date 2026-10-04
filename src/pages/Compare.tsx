@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { RunError, RunNotFound, RunPending } from "@/components/assessment/AssessmentSections";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
-import { REFERENCE_DATE_LABEL } from "@/config/reference";
+import { formatClock, useNow } from "@/lib/clock";
 import { compareRuns } from "@/services/assessment/compare";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
 
@@ -43,6 +43,7 @@ export default function Compare() {
   const params = useParams();
   const first = useRun(params.a ? decodeURIComponent(params.a) : undefined);
   const second = useRun(params.b ? decodeURIComponent(params.b) : undefined);
+  const now = useNow();
 
   if (first.pending || second.pending) return <RunPending heading="Compare two drafts" />;
   if (first.error) return <RunError heading="Compare two drafts" message={first.error} />;
@@ -192,7 +193,7 @@ export default function Compare() {
 
       <p className="rounded-lg border bg-card p-3 text-[10px] leading-relaxed text-muted-foreground">
         {DISCLAIMER.long} Computed locally by the {VOCABULARY.simulationCore}; no external request was
-        made. Reference date {REFERENCE_DATE_LABEL}.
+        made. Today {formatClock(now)}.
       </p>
 
       <div className="flex flex-wrap gap-3 text-xs">

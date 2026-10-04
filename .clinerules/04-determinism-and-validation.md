@@ -1,12 +1,22 @@
 # 04 — DETERMINISM, EVIDENCE, AND VALIDATION
 
 ## Determinism (this is a frontend-only scenario build)
-- NEVER use `Math.random()`, `Date.now()`, or `new Date()` to generate or display content.
+- NEVER use `Math.random()`, `Date.now()`, or `new Date()` to generate or analyse content —
+  with ONE exception. `src/lib/clock.ts` is the single place the real clock is read. It gives
+  the live on-screen date and the moment a run is recorded; every other module receives a
+  moment as data, and `scripts/validate.mjs` fails the build on `new Date(` in any file except
+  that one. So a screen can show "today" without the engine ever reading the clock.
 - Use the seeded PRNG (`src/lib/prng.ts`, `mulberry32` over a string hash of
   `departmentId + normalised policy text + template id`).
-- Dates come from `REFERENCE_DATE = "2026-09-24"` (`src/config/reference.ts`).
-- Same department + same policy input ⇒ byte-identical scenario result. Proven by a
-  deep-equal replay test, not by inspection.
+- Two different dates, and they must not be confused:
+  - the **live DISPLAY date** — the real date and time, from `src/lib/clock.ts` (`useNow()`);
+  - the **data frame** — `REFERENCE_DATE = "2026-09-24"` (`src/config/reference.ts`), the date
+    every figure is computed FOR. It is not "today" and it does not move.
+  A run itself is dated with the real moment it was recorded (`AssessmentRequest.recordedAt`,
+  written by `runStore.ts`), and every document it produces carries that same moment.
+- Same department + same policy input ⇒ byte-identical scenario result. The recorded date is
+  metadata: it is never part of the seed, so it cannot change a figure. Proven by a deep-equal
+  replay test, not by inspection.
 - No runtime network: no CDN scripts, no AI APIs, no Puter, no external fonts at runtime.
   The only permitted external requests are none.
 - Mock-first: the UI talks to an `AssessmentService` interface only. Scenario implementation

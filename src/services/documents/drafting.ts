@@ -25,9 +25,9 @@ import {
 import {
   getStakeholderSegment,
   MODELLED_SHARE_LABEL,
-  REFERENCE_DATE_LABEL,
   type StakeholderSegmentId,
 } from "@/config/reference";
+import { formatInstant } from "@/lib/clock";
 import type { AssessmentRun, GeneratedDocument, GeneratedSection } from "@/services/assessment/types";
 import { CITATIONS_ANNEX } from "@/services/assessment/documentStructure";
 
@@ -93,7 +93,7 @@ export const buildDraftingGrounding = (
   departmentAbbr: department.abbr,
   reference: run.reference,
   seed: run.seed,
-  referenceDate: REFERENCE_DATE_LABEL,
+  referenceDate: formatInstant(run.createdAt),
   policyTitle: run.policyTitle,
   policyText: run.policyText,
   horizonLabel: run.horizonLabel,
@@ -248,7 +248,7 @@ export const buildDraftingProvenance = (
   departmentName: department.name,
   reference: run.reference,
   seed: run.seed,
-  referenceDate: REFERENCE_DATE_LABEL,
+  referenceDate: formatInstant(run.createdAt),
   groupsModelled: department.segments.length,
   indicatorsUsed: department.indicators.length,
   instrumentsCited: verification.citations.length,
@@ -265,6 +265,6 @@ export const provenanceParagraphs = (
   department: Department,
   verification: CitationVerification,
 ): string[] => [
-  `Provenance: this draft was produced from simulation ${run.reference} on ${REFERENCE_DATE_LABEL}, grounded in the ${department.indicators.length} reference indicators of ${department.shortName} and the modelled positions of the ${department.segments.length} groups it models.`,
+  `Provenance: this draft was produced from simulation ${run.reference} on ${formatInstant(run.createdAt)}, grounded in the ${department.indicators.length} reference indicators of ${department.shortName} and the modelled positions of the ${department.segments.length} groups it models.`,
   `Citations: ${verification.citations.length} instrument(s) are listed in ${CITATIONS_ANNEX}. Every one was checked against the platform's cited-instrument table; ${verification.unknown.length + verification.outsideRegister.length + verification.strayChapters.length} could not be verified.`,
 ];

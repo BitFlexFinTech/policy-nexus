@@ -25,7 +25,10 @@ Goal: understand enough to act correctly, without paying to re-read the repo eve
 - LOCKED: ONE shared dashboard layout for all 16 departments, config-driven.
 - Identity strings live ONLY in `src/config/brand.ts`; departments ONLY in
   `src/config/departments.ts`; result types ONLY in `src/services/assessment/types.ts`.
-- Determinism: no `Math.random`, no `Date.now()`, no `new Date()`. `REFERENCE_DATE = "2026-09-24"`.
+- Determinism: no `Math.random`, no `Date.now()`, no `new Date()` — **except in
+  `src/lib/clock.ts`**, the one place the real clock is read (the live display and the moment
+  a run is recorded). `REFERENCE_DATE = "2026-09-24"` is the fixed **data frame** the figures
+  are computed for, not "today"; a run's own date is `AssessmentRequest.recordedAt`.
 - No runtime network: no CDN scripts, no AI APIs, no Puter. Scenario mode only.
 
 ## Commands

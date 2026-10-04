@@ -21,9 +21,9 @@ import { BRAND, DISCLAIMER, SOVEREIGNTY_STATEMENT, VOCABULARY } from "@/config/b
 import { officerDisplayName } from "@/config/officer";
 import {
   MODELLED_SHARE_LABEL,
-  REFERENCE_DATE_LABEL,
   STAKEHOLDER_SEGMENTS,
 } from "@/config/reference";
+import { formatInstant } from "@/lib/clock";
 import { createRng } from "@/lib/prng";
 import { ANNEX, CLAUSE } from "./documentStructure";
 import {
@@ -146,7 +146,7 @@ export const buildPolicyDraft = (
       department.name,
       `DRAFT POLICY — ${run.policyTitle}`,
       `${BRAND.initiative} · prepared on ${BRAND.productName}`,
-      `Run reference ${run.reference} · reference date ${REFERENCE_DATE_LABEL} · horizon ${run.horizonLabel} (${run.horizonMonths} months)`,
+      `Run reference ${run.reference} · recorded ${formatInstant(run.createdAt)} · horizon ${run.horizonLabel} (${run.horizonMonths} months)`,
       // Item 1 — the paper trail, on the instrument itself. One line, inside the block that
       // already identifies the run, so the document's mandated structure is unchanged.
       `Prepared by: ${preparerDisclosure(run, department)}`,
@@ -486,7 +486,7 @@ export const buildPolicyDraft = (
     ],
     bullets: [
       `Department: ${department.name} (${department.abbr})`,
-      `Run reference: ${run.reference} · completed ${REFERENCE_DATE_LABEL} (the platform's reference date)`,
+      `Run reference: ${run.reference} · completed ${formatInstant(run.createdAt)}`,
       `Source of the policy text: ${run.source}${run.fileNames.length > 0 ? ` · files: ${listOf(run.fileNames)}` : ""}`,
       `Policy text submitted: ${run.policyText.length} characters`,
       `Horizon: ${run.horizonLabel} (${run.horizonMonths} months)`,
@@ -534,7 +534,7 @@ export const buildPolicyDraft = (
   const identity = {
     kind: "policy-draft" as const,
     title: `Draft policy — ${run.policyTitle}`,
-    subtitle: `${department.name} · derived from ${run.reference} · reference date ${REFERENCE_DATE_LABEL}`,
+    subtitle: `${department.name} · derived from ${run.reference} · recorded ${formatInstant(run.createdAt)}`,
     fileStem: `${run.reference}-policy-draft`,
   };
 

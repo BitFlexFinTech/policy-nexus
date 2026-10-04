@@ -5,6 +5,7 @@ import { RevisionBadge } from "@/components/assessment/RevisionBadge";
 import { ReRunSimulationLink } from "@/components/assessment/ReRunSimulationLink";
 import { BackToOverview } from "@/components/assessment/BackToOverview";
 import { REFERENCE_DATE_LABEL, getTimeHorizon } from "@/config/reference";
+import { formatClock, useNow } from "@/lib/clock";
 import { useSession } from "@/session/useSession";
 import { useAssessmentRuns } from "@/services/assessment/useAssessmentRuns";
 
@@ -18,6 +19,7 @@ export default function Simulations() {
   const session = useSession();
   const department = findDepartment(session?.departmentId);
   const { runs } = useAssessmentRuns(session?.departmentId ?? null);
+  const now = useNow();
 
   if (!department) return null;
 
@@ -155,6 +157,7 @@ export default function Simulations() {
           Review the policy register →
         </Link>
       </p>
+      <p className="text-[10px] text-muted-foreground">Today {formatClock(now)}.</p>
     </div>
   );
 }
