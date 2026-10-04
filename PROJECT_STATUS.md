@@ -1542,9 +1542,9 @@ because the block it sits in already names itself.
 | 2026-09-29 | `npm run validate && npm run typecheck && npm run lint && npm test && npm run build` (sovereignty-copy session, final bytes) | **ALL GREEN**: validate **15/15 (exit 0)** · typecheck **exit 0** · lint **exit 0, 0 errors** (the same 7 pre-existing `react-refresh` warnings) · **381/381 across 32 files** · build **✓** emitting **`assets/index-Bl2FOMF-.js`** — a NEW bundle name, because source changed — so the demonstration host, which still carries the R7 build `assets/index-DRweHRfT.js` (`c601422c680a15fa077c1cdb9e599f37bdbdb79196d8fa35d7f057b2a6b3f24f`), is now **one build behind** until it is redeployed |
 | 2026-09-29 | `npx playwright test` (sovereignty-copy session, final bytes) | **PASS — 11 passed (26.9 s)** against the production preview build, 0 console errors and 0 off-origin requests per test |
 | 2026-09-29 | **defect inventory (sovereignty-copy session) — every defect found, and its disposition** | All **FIXED at source**; none BLOCKED. **(1)** The **retired hosting claim** — the footer and every generated document asserted the simulation ran inside national Government infrastructure; corrected to the compute-path statement, **and the duplicate inside `documents.ts` removed** so there is one source. **(2)** **A stale deployment claim found by the gate**: after the rebuild, three current-state bullets still said the demonstration host served *this* build; all three corrected (the historical log rows were deliberately left as the record of what was true then). **(3)** **A false statement in `PRODUCTION_READINESS.md`** (§ the two deployment paragraphs), corrected the same way. **(4)** My own **abbreviated sha256** in a corrected bullet, caught by check 12 and fixed. **Not a defect, recorded so it is not mistaken for one:** the demonstration host being one build behind is the *honest* state after any source change and is printed by `npm run validate` on every run |
-| 2026-09-29 | **Oreida Pvt Ltd recorded as the project promoter** (user instruction — recorded, not yet written into the proposal) | **Oreida Pvt Ltd** is the **project promoter**, led by **Edmore Zviitwah (Business Lead)** and **Tadii Tendayi (Technical Lead)**. Recorded here because the funding paperwork will name them. **Not recorded as supplier or host:** the user's decision this session is that the platform is hosted on **the Ministry's own data centre / a GISP-managed server**, and a private company supplying or managing Government infrastructure falls under the **Public Procurement and Disposal of Public Assets Act [Chapter 22:23] (Act 5 of 2017)**, regulated by **PRAZ**, which keeps a register of suppliers. The proposal will therefore place Oreida's role beside the procurement route as a `[QUESTION — needs a decision]` (funding prompt, Part 1 section 7) rather than assert an appointment |
+| 2026-09-29 | **Oreida Pvt Ltd recorded as the project promoter** (user instruction — recorded, not yet written into the proposal) | **Oreida Pvt Ltd** is the **project promoter**, led by **Edmore Zviitwah (Business Lead)** and **Tadii Tendayi (Technical Lead)**. Recorded here because the funding paperwork will name them. **Not recorded as supplier or host:** the user's decision this session is that the platform is hosted on **the Ministry's own data centre / a GISP-managed server**, and a private company supplying or managing Government infrastructure falls under the **Public Procurement and Disposal of Public Assets Act [Chapter 22:23] (Act 5 of 2017)**, regulated by **PRAZ**, which keeps a register of suppliers. The proposal will therefore place **Oreida Pvt Ltd**'s role beside the procurement route as a `[QUESTION — needs a decision]` (funding prompt, Part 1 section 7) rather than assert an appointment |
 
-| 2026-09-29 | **the project promoter credit added to both footers, small** (user instruction) | **Oreida Pvt Ltd — Project promoter**, with **Edmore Zviitwah (Business Lead)** and **Tadii Tendayi (Technical Lead)**, is now shown on the site: one small line (`text-[9px]`) in the **public footer** and in the **workspace footer**, placed beneath the Ministry's own attribution and never larger than it, so the Ministry line stays dominant. Written **once** — `PROMOTER.line` in `src/config/brand.ts`, derived from its parts — and read by both footers, so the name is never retyped into a page. **Wording rule recorded in the code and the gate:** Oreida is the *promoter*; not a government body, not the owner, holding no appointment to supply or operate the platform (the procurement point is recorded separately, above). **Gates, both proved able to fail and then restored byte-identical:** (1) the credit must be in the public footer and **not larger than the attribution** — mutating it to `text-[12px]` failed with *expected 12 to be less than or equal to 11*; (2) the company name must exist in **one place only** — pasting `"Oreida Pvt Ltd"` into `Landing.tsx` failed with *expected [ 'src/pages/Landing.tsx' ] to deeply equal []*. Both files restored byte-identical (`src/components/public/PublicPageShell.tsx` sha256 `a3d34cad2e4f9435d6a74dafb29b7ef254072d8b1a5b8ff6b7bdf2217030fee1`, `src/pages/Landing.tsx` sha256 `58ca86f271e7263bc8940b0338d141a95d0dcc9aa742f219c77285cfcb6b451c`). New test file **`src/test/promoter.test.tsx`** (3 guards). **The contrast gate caught my first attempt**: `text-primary-foreground/60` measured below the AA floor in both footers (`/75` is the floor) — raised to `/75`, which is the accessibility fix rather than a workaround. **Also in this pass:** the deployment bullets were changed to read the current build name from `npm run validate`'s own output instead of restating it, so they cannot go stale on the next source change |
+| 2026-09-29 | **the project promoter credit added to both footers, small** (user instruction) | **Oreida Pvt Ltd — Project promoter**, with **Edmore Zviitwah (Business Lead)** and **Tadii Tendayi (Technical Lead)**, is now shown on the site: one small line (`text-[9px]`) in the **public footer** and in the **workspace footer**, placed beneath the Ministry's own attribution and never larger than it, so the Ministry line stays dominant. Written **once** — `PROMOTER.line` in `src/config/brand.ts`, derived from its parts — and read by both footers, so the name is never retyped into a page. **Wording rule recorded in the code and the gate:** Oreida Pvt Ltd is the *promoter*; not a government body, not the owner, holding no appointment to supply or operate the platform (the procurement point is recorded separately, above). **Gates, both proved able to fail and then restored byte-identical:** (1) the credit must be in the public footer and **not larger than the attribution** — mutating it to `text-[12px]` failed with *expected 12 to be less than or equal to 11*; (2) the company name must exist in **one place only** — pasting `"Oreida Pvt Ltd"` into `Landing.tsx` failed with *expected [ 'src/pages/Landing.tsx' ] to deeply equal []*. Both files restored byte-identical (`src/components/public/PublicPageShell.tsx` sha256 `a3d34cad2e4f9435d6a74dafb29b7ef254072d8b1a5b8ff6b7bdf2217030fee1`, `src/pages/Landing.tsx` sha256 `58ca86f271e7263bc8940b0338d141a95d0dcc9aa742f219c77285cfcb6b451c`). New test file **`src/test/promoter.test.tsx`** (3 guards). **The contrast gate caught my first attempt**: `text-primary-foreground/60` measured below the AA floor in both footers (`/75` is the floor) — raised to `/75`, which is the accessibility fix rather than a workaround. **Also in this pass:** the deployment bullets were changed to read the current build name from `npm run validate`'s own output instead of restating it, so they cannot go stale on the next source change |
 
 | 2026-09-29 | **THE DRAFTED POLICY IS NOW A REAL ZIMBABWEAN INSTRUMENT** (user instruction: *"it is supposed to draft an actual Government level policy whether its 5 or 10 pages… do deep research on real government policies in Zimbabwe and replicate their format, length"*) | Researched from the published documents themselves — downloaded and read with `pypdf`, kept in `/tmp` outside the repository: the **National AI Strategy 2026–2030 (73 pp)**, the **National Health Strategy 2021–2025 (104 pp)**, the **National ICT Policy 2015 (42 pp)**, the **Devolution and Decentralisation Policy (70 pp)**, **NDS1 (200+ pp)**, the **National Agriculture Policy Framework 2019–2030**, **ZEPARI's *Strengthening the Zimbabwe National Policy Making Process* (47 pp)** and, as the regional comparator, **South Africa's National Policy Development Framework 2020** (approved by Cabinet 2 December 2020, carrying "Appendix A — A template for policy development"). (The National ICT Policy 2022–2027 PDF could not be downloaded — HTTP 404 on the ministry address and on the mirror — so the ministry's own 2015 policy and 2026 AI Strategy served as the format models; the National Labour Migration Policy returned 403.) Their common shape is what the generator now produces: **front matter** (cover · contents · foreword · acknowledgements · acronyms · executive summary), **eleven numbered clauses** (introduction and background · situation analysis · vision, mission, objectives and guiding principles · legal and institutional framework · policy measures · implementation framework · risk management · stakeholder engagement and communication · financial implications · monitoring, evaluation and review · transitional provisions), **Annexes A–E** (implementation matrix · stakeholder analysis · instruments relied on · run inputs and reproducibility · method and limitations) and a closing note. **The citations clause is now Annex C**, keeping the same section `id`, so the platform's citation check reads exactly what it always read. The generator moved to its own module — **`src/services/assessment/policyDraft.ts`** — and `documents.ts` re-exports `buildPolicyDraft`, so no caller or test had to change its import. **Measured before and after: 1,512–1,725 words across 10 sections became 5,770–6,491 words across 27 parts for all 16 departments** (smallest MoICT 5,770 · largest MoF 6,491) — about 12–13 pages of continuous text, and roughly 15–20 printed pages once the front matter, the six matrices and the page breaks are laid out |
 | 2026-09-29 | **the matrices are real tables, on screen, in the export and on paper** | `GeneratedSection` gains a `table` shape (`caption`, `columns`, `rows`): **Table 1** modelled position · **Table 2** reference indicators with each figure's basis · **Table 3** modelled group position with each group's published share · **Table 4** implementation matrix (measure · responsible office · target date · funding source) · **Table 5** cost categories · **Table 6** monitoring and evaluation matrix · **Table A1** recommended steps · **Table B1** group, share, position and engagement. Rendered as a real `<table>` with scoped column headers on screen, as pipe-separated rows in the plain-text and Word exports, and inside `@media print` with borders, a repeating header row (`table-header-group`) and page breaks after the cover and the contents. A row that does not carry one cell per column fails the build |
@@ -3358,7 +3358,7 @@ row, the RESUME HERE summary ("five are done…"), the eleven-item tally, the ex
   published/modelled split stays **20 / 52**.
 - `scripts/validate.mjs` — **check 17, "no superseded bundle presented as the live one"** (R1–R4 above).
 - `PROJECT_STATUS.md` — the eight stale deployment statements, the new 2026-10-02 timeline row, this
-  section, the PLAIN SUMMARY, and the RESUME HERE counts (**19/19**, **500/500**).
+  section, the PLAIN SUMMARY, and the RESUME HERE counts (**20/20**, **500/500**).
 - `PRODUCTION_READINESS.md` — §6c's status block brought to the new bundle and fingerprint, §6e's stale
   prose put in the past, §8's *"Live build (current — 2026-09-26)"* relabelled as deployment history.
 - `docs/PROPOSAL_PROMPT.md` — the live-site paragraph brought to the new bundle and fingerprint, and the
@@ -3464,6 +3464,97 @@ fifteen places and inside every generated document, so **only a build could ever
 - **A run recorded before this change keeps its own stored date** (`2026-09-24`) — honest, because that is
   when it was recorded under the old scheme. Do not rewrite history.
 
+## COSTED SPREADSHEETS — DELIVERED 2026-10-05 (the owner's Google Drive)
+
+**Status: `DONE`.** The owner asked for a costed spreadsheet to take to the Ministry, with the buying
+links kept in a separate internal sheet. Both were built in the owner's own Google Drive
+(`jackpottmusic@gmail.com`), inside the folder **`Nzwisiso Policy Assistant®`**. This is the first
+thing in this project that lives outside the repository, so it is recorded here in full.
+
+**The folder.** `Nzwisiso Policy Assistant®` —
+https://drive.google.com/drive/folders/17eO0fAV2V7-5mtN164S79m68EHOTXMGB
+
+**Sheet 01 — what the Ministry sees.** `01 — Costed Setup & Monthly Costs (Oreida Pvt Ltd)` —
+https://docs.google.com/spreadsheets/d/1NrzlnnK1qjt8w50MmWIwfzYrBFojdU9mRhLKy3H1tfE
+Tabs: **READ ME · One-off Setup · Monthly Running · What you get.** It carries the **price to
+Government only** — no internal costs, no margin, and **none of the buying links** (the owner's
+instruction: *"the Ministry version should not have that"*). Each line is the price the Government
+pays, and every total is a formula.
+
+**Sheet 02 — internal, Oreida Pvt Ltd only.** `02 — Admin: Costs, Margin & Where to Buy (Oreida Pvt Ltd)`
+— https://docs.google.com/spreadsheets/d/1yU4h1lYPC4FG9q0ntOh1GKM938koiToT7cugxNPrgpo
+Tabs: **READ ME · Costed Setup · Monthly Costs · Pricing & Margin · Where to Buy.** It carries the cost
+**low / mid / high** per line, a **Basis** column (`Verified` / `Estimate` / `Quote required`), the
+per-line Government price, the **margin cells**, and the **buying links** for every item. Its READ ME
+says plainly that it is internal and must not be sent to the ministry.
+
+**The figures, read back from the sheets (evidence, not memory):** setup cost **mid $165,514**
+(low $140,980 / high $189,960) · monthly cost **mid $7,350** (low $3,850 / high $10,850) · margin
+**25%** → **setup price $206,899** and **monthly fee $9,188**, which are exactly the totals sheet 01
+shows · year 1 **$317,155** · three years **$537,667**. The 20 line items cover 8 × Mac Studio M5 Ultra
+512 GB, the Mac mini platform server, the optional spare Studio, AppleCare, 10 GbE switch, 1 Gbps fibre
+and a backup link, inverter, ~22 kWh battery, 14 kW solar, mounting, installation, cabinet, air
+conditioning, desk and monitor, NAS backup, and Oreida Pvt Ltd's own commissioning and training.
+
+**The growth path it prices.** Today's demonstration runs **without AI** — a deterministic engine in
+the browser. Sheet 02 prices the platform with the **local AI model inside it**, running on that
+hardware at Oreida Pvt Ltd's offices, so nothing about a policy is ever sent to an outside service.
+
+**A defect found in the first build, and fixed at source in the same session.** The Ministry line
+prices had been rounded in Python while the Admin price was computed from the unrounded mid cost, so
+the two sheets disagreed by **$6.50** on the setup and **$0.50** on the month — two numbers for one
+price. The fix removes the second rule rather than adjusting a number: the Admin sheet now computes
+each line's Government price with the **same** rounding rule (`ROUND(...,0)`, half up) and the price
+rows are the **sums of those lines**, so the two sheets are computed from one rule and cannot drift.
+Re-read after the fix: `$206,899.00` on both, `$9,188.00` on both.
+
+**Costs were actually verified, not invented:** who signed in — the Drive API returned
+`jackpottmusic@gmail.com`; the folder and both files were listed back from the folder itself; and every
+total above was read from the computed cells rather than from the script that wrote them.
+
+**Open, and honestly stated:** the lines marked `Estimate` are still estimates, and three need a firm
+quote (**fibre, the certified electrical installation, and the local room fittings**). The **25% margin
+is my default, not the owner's decision** — it sits in one cell per tab, so the owner can set it
+without touching anything else. And the whole sheet prices a **future funded build** (hardware plus the
+local model); it is not a claim that any of that hardware has been bought.
+
+**Costing basis, recorded so it is not re-derived:** the demonstration runs without AI today; the
+target is a **self-hosted open-weight model** at Oreida Pvt Ltd's offices once funded, with
+**OpenRouter + a DeepSeek Flash-class model** named as the intended software. The exact model has not
+been fixed, and the model's size is what decides **4 or 8** computers — sheet 02 prices **8**, on the
+recommendation of the working note at
+`docs/PLATFORM_ENRICHMENT_PLAN.md`/`docs/SERVER_CONTRACT.md` (see those files for the server contract).
+
+**The naming rule (owner instruction), now enforced by a gate.** The company is always written
+**Oreida Pvt Ltd**, never the shortened name on its own. Two violations were found in this file — a possessive on
+line 1545 and a bare subject on line 1547 — and both are fixed. Validate **check 20** now scans the app
+source, the copy files and both record files and fails on the shortened name written on its own. Proved able to fail and then
+restored byte-identical: appending a probe line to `PRODUCTION_READINESS.md` produced
+`FAIL  the promoter is always named Oreida Pvt Ltd — 1 violation(s)` naming
+`PRODUCTION_READINESS.md:422`; the file was restored with **the same sha256**,
+`e9e9bcd51153c000fa190bac591f79f5b03388f2920de528d81cfcd58575d086`. The validator's own header list
+was also incomplete — it documented **18** checks while **19** ran — so entries 19 and 20 are now
+listed. `npm run validate` prints **19 PASS lines plus this one = 20 checks, all green**.
+
+**Verification log — this session's real output, not a claim.** `npm run validate` →
+`VALIDATE: PASS — all checks green`, with `PASS  the promoter is always named Oreida Pvt Ltd` among
+the 20 · `npm run typecheck` **exit 0** · `npm run lint` **exit 0, 0 errors** · `npm test` →
+**500 passed (500) across 45 files** · `npm run build` → **✓ built in 740ms**, emitting
+`assets/index-w2OBNTQe.js` — **the same file the live host serves**, because no application source
+changed · `npx playwright test` → **18 passed (25.5 s)** against the production preview.
+
+**A second defect the gate caught, in my own writing, and fixed.** The first draft of this section wrote
+the shortened company name three times while explaining the rule that forbids it (a line at 3529, one at
+3531, and one in the plain summary). `npm run validate` failed with
+`FAIL  the promoter is always named Oreida Pvt Ltd — 3 violation(s)`, naming each line. The wording was
+changed to read "the shortened name", and the suite went green. Recorded because it is the proof the
+gate bites: it caught the author of the rule, on the day the rule was made.
+
+**What this session did NOT touch:** no application source, no test, no document under
+`Minister Submission/**` (the owner's), and no dependency. The only repository changes are this file
+and one new check in `scripts/validate.mjs`.
+
+
 ## NEXT PHASE — after the live-date task (NOT STARTED; these stay, nothing is being removed)
 
 Recorded 2026-10-03 so the next session knows what is still outstanding **after** the live-date task,
@@ -3498,11 +3589,34 @@ in the order the owner has raised them.
 
 ## RESUME HERE
 
-**NEXT TASK: the live date and each document's own timestamp — see the section immediately above. Nothing
-of it is built yet; the *NEXT PHASE* list above it holds the work that comes after, and none of it has
-been dropped.** The rest of this block is the state as at the last completed session (2026-10-02).
+**NEXT TASK: the live date and each document's own timestamp.** The costed Google-Drive sheets the owner
+asked for are **DONE** — sheet 01 for the Ministry, sheet 02 internal, with the figures read back — and
+are recorded in the *COSTED SPREADSHEETS* section below. The date work itself is unchanged and **not
+built**: the *NEXT PHASE* list below holds the work that comes after it, and none of it has been dropped. The rest of this block is the state as at the last completed session (2026-10-02).
 
 **PLAIN SUMMARY (OWNER-FACING).**
+
+**This session (2026-10-05 — the costed sheets, now in your own Google Drive).** In plain words:
+1. **The costing is a spreadsheet in your Google Drive now**, in a folder called **Nzwisiso Policy
+   Assistant®**, in the account `jackpottmusic@gmail.com`. You open it like any Google document.
+2. **Sheet 01 is the one for the Ministry.** It shows what the Government pays — **$206,899 to set the
+   platform up** and **$9,188 every month** — with no internal costs, no margin and **none of the buying
+   links**.
+3. **Sheet 02 is yours alone.** It holds the real costs, a low / middle / high range for each item, the
+   **25% margin** (one cell — yours to change) and **the link for where to buy every single item**. Its
+   first line says, in capitals, that it must not go to the Ministry.
+4. **The money in one line:** the equipment and the work come to **$165,514** in the middle of the
+   range, the monthly running cost to **$7,350**, and over three years the contract is worth
+   **$537,667**.
+5. **Three prices still need a firm quote from a supplier** — the fibre line, the electrical
+   installation, and the fittings for the room. The sheet says so beside each one, so an estimate is
+   never mistaken for an agreed price.
+6. **This prices the finished platform, with the AI computer inside it**, running at Oreida Pvt Ltd's
+   offices — not today's demonstration, which runs without AI. That is deliberate: it shows the
+   Ministry what the real thing costs.
+7. **Nothing has been bought.** This is a plan and a price, not a purchase.
+8. **One rule now enforced by an automatic check:** the company is always written **Oreida Pvt Ltd**,
+   never the shortened name. I found two places in my own notes that broke it, and both are fixed.
 
 **This session (2026-10-02 — your five corrections: all built, tested and live).** In plain words:
 1. **The footer now reads "A Project by the Ministry of ICT"** (it said "Ministry of IT"). It is one line
@@ -3688,7 +3802,7 @@ confirm it.
   memo, the deck and the one-page ask to the meeting. **If a future session is asked to change something,
   the next
   command to run is** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`,
-  then `npx playwright test` — expected **all green: validate 19/19, tests 500/500 across 45 files,
+  then `npx playwright test` — expected **all green: validate 20/20, tests 500/500 across 45 files,
   Playwright 18/18** (and **check that the build actually ran before Playwright** — a chain stops at the
   first non-zero step, and Playwright then tests a stale `dist/`). **Do not re-fetch anything in PART 7 of
   `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
@@ -3715,7 +3829,7 @@ confirm it.
   sovereignty-copy session, which the platform cannot know from where it runs; **validate checks 1 and 11
   now fail if that claim returns**, in the app or in a document.
 - **The next command to run:** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`
-  then `npx playwright test`, and finally **`npm run sync:check`** — expected **all green**: validate **19/19**,
+  then `npx playwright test`, and finally **`npm run sync:check`** — expected **all green**: validate **20/20**,
   typecheck **exit 0**, lint **0 errors** (7 pre-existing `react-refresh` warnings in stock shadcn/ui files),
   tests **500/500 across 45 files**, build **✓**, Playwright **18/18**, and the sync check reporting
   **IN SYNC** (local files · GitHub · the website). **But run the build as its own step or check its output**,

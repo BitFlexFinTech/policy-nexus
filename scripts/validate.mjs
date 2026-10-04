@@ -27,6 +27,9 @@
  *     in one place only
  * 18. An internal service is not offered to search engines — no crawler is allowed while the
  *     classification says "For Internal Use Only", and the served page carries the same instruction
+ * 19. No superseded bundle is presented as the live one — every deployment claim the records make is
+ *     checked against the bundle this working copy actually builds
+ * 20. The promoter is always named in full — "Oreida Pvt Ltd", never "Oreida" alone
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -774,6 +777,40 @@ if (!existsSync(cssPath)) {
   }
 
   check("no superseded bundle presented as the live one", problems);
+}
+
+// ---------------------------------------------------------------------------------------------
+// check 20 — the promoter is always named in full
+// The company is written "Oreida Pvt Ltd" everywhere. The short form was found twice in the records
+// on 2026-10-05 (a possessive and a bare subject); this gate fails if it comes back, so the naming
+// rule cannot be forgotten by a later session copying an old sentence.
+{
+  const problems = [];
+  const files = [
+    ...new Set([
+      ...appFiles,
+      ...copyFiles,
+      join(ROOT, "PROJECT_STATUS.md"),
+      join(ROOT, "PRODUCTION_READINESS.md"),
+    ]),
+  ];
+  for (const file of files) {
+    let text;
+    try {
+      text = readFileSync(file, "utf8");
+    } catch {
+      continue;
+    }
+    text.split("\n").forEach((line, index) => {
+      const bare = line.match(/\bOreida\b(?! Pvt Ltd)/g);
+      if (bare) {
+        problems.push(
+          `${rel(file)}:${index + 1}: writes "Oreida" alone (${bare.length}×) — the promoter is always written "Oreida Pvt Ltd": "${line.trim().slice(0, 80)}…"`,
+        );
+      }
+    });
+  }
+  check("the promoter is always named Oreida Pvt Ltd", problems);
 }
 
 // summary
