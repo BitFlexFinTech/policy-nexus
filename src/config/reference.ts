@@ -114,6 +114,13 @@ export const NAMED_SOURCES = [
     figures: "The title and chapter of every Act the platform cites",
     publication: "The official consolidated index of Zimbabwean Acts",
   },
+  {
+    id: "who",
+    name: "World Health Organization (WHO)",
+    figures:
+      "Global health estimates and country statistics — life expectancy and healthy life expectancy, mortality by cause and age, maternal and child health, the health workforce, and non-communicable disease and injury indicators",
+    publication: "WHO Global Health Observatory",
+  },
 ] as const;
 
 export type NamedSourceId = (typeof NAMED_SOURCES)[number]["id"];

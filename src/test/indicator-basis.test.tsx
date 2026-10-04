@@ -80,7 +80,7 @@ describe("department indicators — published with a named source, or plainly mo
   });
 
   it("gives every one of the 320 indicators a basis, and no free text that reads as a source", () => {
-    expect(EVERY).toHaveLength(339);
+    expect(EVERY).toHaveLength(362);
     EVERY.forEach(({ department, indicator }) => {
       const where = `${department.id}/${indicator.id}`;
       expect(["published", "modelled"], `${where} basis`).toContain(indicator.basis.kind);
@@ -284,6 +284,17 @@ describe("department indicators — published with a named source, or plainly mo
       // 2026-10-04 — Batch S7: ZIMSTAT's Environmental Resources report 2023 and the 2022 Census.
       "agri/agri-cotton": "zimstat",
       "lg/lg-water-piped": "zimstat",
+      // 2026-10-05 — PART 11, batch 2: the WHO Global Health Observatory joins the named
+      // sources; each figure below it is a WHO GHO series rather than a World Bank one.
+      "health/health-hale": "who",
+      "health/health-skilled-birth": "who",
+      "health/health-ncd-mortality": "who",
+      "health/health-suicide": "who",
+      "health/health-road-deaths": "who",
+      "health/health-diabetes": "who",
+      "health/health-obesity": "who",
+      "health/health-alcohol": "who",
+      "health/health-hwf": "who",
     };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
@@ -475,6 +486,32 @@ describe("department indicators — published with a named source, or plainly mo
       ["psc/psc-wage-workers", "29.2", "World Development Indicators: Wage and salaried workers, total (% of total employment)", "2025"],
       ["psc/psc-unemployment", "9.3", "World Development Indicators: Unemployment, total (% of total labor force)", "2025"],
       ["hedu/hedu-researchers", "95.1", "World Development Indicators: Researchers in R&D (per million people)", "2012"],
+      // 2026-10-05 — PART 11, batch 2: 23 more NEW real indicators. The WHO Global Health
+      // Observatory joins as a named source; the rest are World Bank series. Each value was
+      // read live from the publisher's own API this session.
+      ["health/health-hale", "52.5", "WHO Global Health Observatory: Healthy life expectancy (HALE) at birth, both sexes", "2023"],
+      ["health/health-stunting", "25.9", "World Development Indicators: Prevalence of stunting, height for age (% of children under 5)", "2024"],
+      ["health/health-tb-incidence", "203", "World Development Indicators: Incidence of tuberculosis (per 100,000 people)", "2024"],
+      ["health/health-beds", "1.95", "World Development Indicators: Hospital beds (per 1,000 people)", "2014"],
+      ["health/health-physicians", "0.136", "World Development Indicators: Physicians (per 1,000 people)", "2023"],
+      ["health/health-skilled-birth", "91", "WHO Global Health Observatory: Births attended by skilled health personnel", "2025"],
+      ["health/health-ncd-mortality", "31.2", "WHO Global Health Observatory: Premature mortality from non-communicable diseases (30–69)", "2021"],
+      ["health/health-suicide", "25.4", "WHO Global Health Observatory: Suicide mortality rate", "2021"],
+      ["health/health-road-deaths", "29.9", "WHO Global Health Observatory: Road traffic death rate", "2021"],
+      ["health/health-diabetes", "7.1", "WHO Global Health Observatory: Raised fasting blood glucose among adults", "2014"],
+      ["health/health-obesity", "6.1", "WHO Global Health Observatory: Prevalence of obesity among adults (BMI ≥ 30)", "2024"],
+      ["health/health-alcohol", "5.4", "WHO Global Health Observatory: Total alcohol per capita consumption", "2024"],
+      ["health/health-hwf", "14.65", "WHO Global Health Observatory: Skilled health professionals density", "2024"],
+      ["edu/edu-secondary", "52.4", "World Development Indicators: School enrollment, secondary (% gross)", "2013"],
+      ["fin/fin-industry", "37.1", "World Development Indicators: Industry (including construction), value added (% of GDP)", "2025"],
+      ["fin/fin-services", "48.2", "World Development Indicators: Services, value added (% of GDP)", "2025"],
+      ["fin/fin-external-debt", "33.0", "World Development Indicators: External debt stocks (% of GNI)", "2024"],
+      ["psc/psc-lfp", "67.7", "World Development Indicators: Labor force participation rate, total (% of population ages 15+)", "2025"],
+      ["psc/psc-youth-unemp", "15.5", "World Development Indicators: Unemployment, youth total (% of total labor force ages 15-24)", "2025"],
+      ["psc/psc-female-lfp", "62.2", "World Development Indicators: Labor force participation rate, female (% of female population ages 15+)", "2025"],
+      ["psc/psc-labour-force", "6,854,692", "World Development Indicators: Labor force, total", "2025"],
+      ["lg/lg-population", "16,950,795", "World Development Indicators: Population, total", "2025"],
+      ["lg/lg-pop-growth", "1.88", "World Development Indicators: Population growth (annual %)", "2025"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {

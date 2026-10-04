@@ -107,8 +107,8 @@ or imply that it already runs on Government infrastructure or in the Government 
   naming the figure it stands for and the publication it came from; the remaining **130 are
   explicitly labelled `Modelled`**, because no published count exists. Each department models the
   **40** groups its own mandate covers, drawn from these 150.
-- **339 reference indicators** across those 16 institutions, each with a plain note and a **stated
-  basis**: **51 are published figures**, each naming its publisher, its publication and its period,
+- **362 reference indicators** across those 16 institutions, each with a plain note and a **stated
+  basis**: **127 are published figures**, each naming its publisher, its publication and its period,
   and **281 are explicitly labelled `Modelled`**, because no publisher publishes that return. Say it
   exactly that way. They are coverage, not evidence of outcomes or savings.
 - **48 prepared policy drafts** — three per institution — ready to be run today, so a demonstration
@@ -369,14 +369,14 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
-- **What the live site actually is today (re-checked 2026-10-04, after the dataset-expansion build was published).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-7_V6cxnW.js`
-  (`d17d6a38ac70db6964fff120a34dcfdb174cc021d12c9cfcbe43a357ad144d8f`), which is byte-identical to the
-  local build, so **the live site is the build published on 2026-10-04** — it shows the **live date and
-  time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (104 published / 235 modelled), and it carries the authority line, the modelled
+- **What the live site actually is today (re-checked 2026-10-05, after the PART 11 batch-2 build was published).**
+  The host `nzwisiso.bitflex.app` serves `assets/index-C3L7Q_LQ.js`
+  (`2a67ae3851c1e3145246b67ade26d498e247515e3f0da433d760354887730848`), which is byte-identical to the
+  local build, so **the live site is the build published on 2026-10-05** — it shows the **live date and
+  time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (127 published / 235 modelled), and it carries the authority line, the modelled
   agent population, the named sources (with the corrected sentence naming both publishers the stakeholder
   shares stand on), the official Coat of Arms, the favicon set, the Nzwisiso.ai
-  positioning section, all 104 published figures, and the owner's items 1–11, including the *Re-run
+  positioning section, all 127 published figures, and the owner's items 1–11, including the *Re-run
   simulation* action, the drafting stage, the recommended-step actions that open or send the part of the
   policy that answers each step, the **Implementation pack** (generated and read-only — the form that asked
   an officer to hand-fill the working matrices was removed at the owner's instruction on 2026-10-02), and
