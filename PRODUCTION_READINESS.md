@@ -102,10 +102,10 @@ client is registered.
   bundle name and carry the hash, so the claim cannot go stale in silence.
 - **Status today (2026-10-04, after the dataset-expansion build was published — the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-CULxfrPY.js` (`e3c2c9fe9eba9f253792193e7746bcf6ad11e9b75b6994728fb71a6b0ed1f857`) — fetched
+  `assets/index-CzWGCJjD.js` (`6ca2fd533ead2971c2b3fc7010f98a5b740456db86113801f318676e80483fae`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
-  explicit FTPS, **never `--delete`** — 13 files, 1,400,728 bytes — and the SSL validation token
+  explicit FTPS, **never `--delete`** — 13 files, 1,400,957 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
   expansion and the 2026-10-04 dataset-expansion batches 1–4 — **150** canonical stakeholder groups, every

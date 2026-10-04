@@ -46,7 +46,7 @@ export function EngineStatus() {
       <div className="flex items-center justify-between border-b px-4 py-2.5">
         <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Engine Vitals</span>
         <div className="flex gap-1.5">
-          <StatusPill label={VOCABULARY.simulationCore} status="idle" value="Scenario (Mock)" />
+          <StatusPill label={VOCABULARY.simulationCore} status="idle" value="Scenario engine · output simulated" />
           <StatusPill
             label={VOCABULARY.knowledgeMap}
             status="idle"
@@ -78,6 +78,12 @@ export function EngineStatus() {
         <Metric label="Policy templates" value={String(department.policyTemplates.length)} sub="Prepared departmental drafts" />
         <Metric label={zigRate.label} value={String(zigRate.value)} sub={zigRate.unit} />
       </div>
+      {/* The engine and the evidence are two different things and must not be confused: the
+          reference figures come from named published sources, while a run's OUTPUT is a
+          projection and is plainly labelled as simulated. */}
+      <p className="border-t px-4 py-2 text-[10px] leading-relaxed text-muted-foreground">
+        Evidence: figures from named published sources. Output: simulated — a projection, not an outcome.
+      </p>
     </div>
   );
 }

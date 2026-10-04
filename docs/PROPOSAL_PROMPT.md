@@ -370,8 +370,8 @@ do not omit it to look authoritative.
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
 - **What the live site actually is today (re-checked 2026-10-04, after the dataset-expansion build was published).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-CULxfrPY.js`
-  (`e3c2c9fe9eba9f253792193e7746bcf6ad11e9b75b6994728fb71a6b0ed1f857`), which is byte-identical to the
+  The host `nzwisiso.bitflex.app` serves `assets/index-CzWGCJjD.js`
+  (`6ca2fd533ead2971c2b3fc7010f98a5b740456db86113801f318676e80483fae`), which is byte-identical to the
   local build, so **the live site is the build published on 2026-10-04** — it shows the **live date and
   time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the
   eleven newly published indicator figures (35 published / 125 modelled), and it carries the authority line, the modelled
