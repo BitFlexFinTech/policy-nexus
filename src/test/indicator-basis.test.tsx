@@ -256,6 +256,7 @@ describe("department indicators — published with a named source, or plainly mo
       "zimra/zimra-register": "zimra",
       "edu/edu-lower-secondary": "unesco",
       "hedu/hedu-stem": "unesco",
+      "agri/agri-tobacco": "timb",
     };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
@@ -353,6 +354,11 @@ describe("department indicators — published with a named source, or plainly mo
       // found in the UIS definitions list first, then Zimbabwe's values read from the UIS data service.
       ["edu/edu-lower-secondary", "72.4", "UIS: completion rate, lower secondary education, both sexes", "2015"],
       ["hedu/hedu-stem", "23.8", "UIS: percentage of tertiary graduates from STEM programmes, both sexes", "2024"],
+      // 2026-10-04 — S2 continues with a ZIMBABWEAN publisher: TIMB's own marketing-season statistics, read
+      // from its site this session (year-to-date sold mass 359,099,787 kg as at 22 September 2026). The
+      // measure is tobacco SOLD through the floors, so the label moved from "Tobacco output" to "Tobacco
+      // sold" to say exactly what the publisher counts.
+      ["agri/agri-tobacco", "359.1", "Marketing-season statistics: year-to-date sold mass", "September 2026"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {

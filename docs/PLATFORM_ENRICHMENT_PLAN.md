@@ -692,3 +692,38 @@ previous wording did not. **UNESCO was added to `NAMED_SOURCES`.** Split: **61 p
 **Still to read in S2:** ZIMSTAT's agriculture and trade tables (their file addresses are now known —
 `zimstat.co.zw/wp-content/uploads/Macro/…`), the Ministry of Lands' crop and livestock assessments, and the
 mines and energy publishers.
+
+### 10.5 Batch S2 continues — a Zimbabwean publisher again: TIMB and the tobacco season (2026-10-04)
+
+**TIMB (the Tobacco Industry and Marketing Board)** publishes the season's marketing statistics on its own
+site, and its front page carried, on the day of this session:
+
+> **DAY 127 · DATE: 22/09/2026 · SOLD MASS: 980 KGS · YTD MASS: 359,099,787 KGS · AVERAGE PRICE: 2.49 US$/KG**
+
+| Department / indicator | Value now shown | Published figure | Period |
+|---|---|---|---|
+| agri / **"Tobacco sold"** (`agri-tobacco`) | **359.1** million kg | Year-to-date **sold mass 359,099,787 kg** — TIMB marketing-season statistics | season to 22 September 2026 |
+
+**The label moved from "Tobacco output" to "Tobacco sold"**, because that is exactly what TIMB counts —
+tobacco sold through the auction and contract floors — and "output" would claim something the publisher
+does not state. **TIMB was added to `NAMED_SOURCES`.** Split: **62 published / 258 modelled.**
+
+**Checked in S2 and not converted — with the reason:**
+- **ZERA (the energy regulator)** — its 2024 Annual Report exists (13.47 MB) but the site returns **403
+  Forbidden** to a direct download and its download page yields no usable link, so nothing could be read
+  from it this session. Its front page does publish current prices (petrol, diesel, electricity, LPG as at
+  17 September 2026), but those are **prices**, not the "tariff cost recovery" the platform's indicator
+  states.
+- **The Ministry of Mines** — `mines.gov.zw` returns **404** (and `/index.php` returns 403), so no ministry
+  report could be read.
+- **MMCZ (the Minerals Marketing Corporation)** — reachable, and its news pages state mineral exports of
+  **US$3.4 billion in FY2025**, but its annual-report page yields no downloadable file and the figure does
+  not match any indicator the platform holds (the platform's `mfa-exports` figure is already published from
+  the World Bank).
+- **ZIMSTAT's agriculture statistics page** hosts **no data files** (only a descriptive page), and its
+  **external-trade tables are at 8-digit HS product level** — a "horticulture exports" total would have to
+  be **summed across dozens of HS lines**, which is a derived figure, not a published one. The tables exist
+  and are downloadable (`zimstat.co.zw/wp-content/uploads/Macro/Trade/…`), so a later batch can use them if
+  the owner wants a derived total with its method stated.
+- **The Chamber of Mines of Zimbabwe** — reachable, but the site is stale (its own header reads *Saturday,
+  03 November 2018*), so nothing current could be sourced from it.

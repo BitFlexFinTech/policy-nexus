@@ -73,6 +73,13 @@ export const NAMED_SOURCES = [
     publication: "World Economic Outlook — General government gross debt (% of GDP)",
   },
   {
+    id: "timb",
+    name: "Tobacco Industry and Marketing Board (TIMB)",
+    figures:
+      "Tobacco sold through the auction and contract floors, season to date, and the season's average price",
+    publication: "TIMB marketing-season statistics",
+  },
+  {
     id: "unesco",
     name: "UNESCO Institute for Statistics (UIS)",
     figures:
