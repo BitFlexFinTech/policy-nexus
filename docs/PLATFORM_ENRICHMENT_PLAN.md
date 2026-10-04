@@ -782,10 +782,17 @@ now **"Armed forces personnel"** and the value is a headcount. **Split: 66 publi
   wildlife, rivers), the rest of `def-*` (readiness, vehicles, aircraft, logistics), and `zida-*` — these are
   the **departments' own operational returns**; no publisher publishes them for Zimbabwe.
 
-**A duplicate found while searching — and it needs the owner's decision (BLOCKED, not fixed):**
+**A duplicate found while searching — put to the owner, decided, and FIXED the same day:**
 `ict-data-cost` (**"Data cost" 4.1 % of GNI**) and `ict-affordability` (**"Data basket cost" 3.2 % of
-income**) measure **the same thing** — the cost of a mobile data basket as a share of income — with two
-different numbers. Neither has a published source. Resolving it means **keeping one and removing the other,
-or changing one into a different measure**, which changes the platform's shape, so it is the owner's
-decision and is recorded as open work. **It is NOT fixed, and neither indicator may be presented as
-sourced.**
+income**) measured **the same thing** — the cost of a mobile data basket as a share of income — with two
+different numbers, and neither had a published source. The owner was shown what each option would change and
+chose **keep one data-cost figure, and use the freed slot for a genuinely different measure with a real
+published source**. So:
+
+| Department / indicator | Value now shown | Series | Period |
+|---|---|---|---|
+| ict / **Secure Internet servers** (`ict-secure-servers`) | **90.0** per 1 million people | *Secure Internet servers (per 1 million people)* (`IT.NET.SECR.P6`) — World Bank, World Development Indicators | 2024 |
+
+The duplicate row (`ict-affordability`) is **gone**; `ict-data-cost` remains the department's single
+data-cost figure; the department still carries **twenty** indicators; and the freed slot now carries a
+**real** published figure. **Split: 67 published / 253 modelled.**

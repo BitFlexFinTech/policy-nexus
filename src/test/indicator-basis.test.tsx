@@ -372,6 +372,12 @@ describe("department indicators — published with a named source, or plainly mo
       // platform's indicator was "Personnel strength (% of establishment)", which no publisher states; the
       // published measure is the total number of armed forces personnel, so the label moved to match it.
       ["def/def-personnel", "51,000", "World Development Indicators: Armed forces personnel, total", "2020"],
+      // 2026-10-04 — the owner's decision on the DUPLICATE measure found in S4: `ict-data-cost`
+      // ("Data cost", 4.1 % of GNI) and `ict-affordability` ("Data basket cost", 3.2 % of income) were the
+      // same question asked twice. The owner chose option 1 — keep one data-cost figure and use the freed
+      // slot for a genuinely different measure with a real published source. The duplicate row is gone and
+      // this real series sits in its place, so the department keeps its twenty indicators.
+      ["ict/ict-secure-servers", "90.0", "World Development Indicators: Secure Internet servers (per 1 million people)", "2024"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {
