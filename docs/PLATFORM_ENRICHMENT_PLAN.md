@@ -445,3 +445,39 @@ every published figure"* fail) and restored byte-identical.
   tables rather than the World Bank API.
 - **The pack** (`Minister Submission/**`) quotes the old 24 / 136 split and is the owner's file — **reported,
   not edited**.
+
+### 9.4 Batch 2 — the rest of the modelled set swept (2026-10-04)
+
+Every remaining modelled indicator was checked against the same World Bank API. **Four more genuinely measure
+what their indicator says** and were converted (each value read live this session):
+
+| Department / indicator (id) | Value now shown | World Development Indicators series | Period |
+|---|---|---|---|
+| env / Freshwater withdrawals (`env-water`) | **40.0** % of internal resources | Annual freshwater withdrawals, total (% of internal resources) — `ER.H2O.FWTL.ZS` | 2022 |
+| health / Malaria incidence (`health-malaria`) | **11.4** per 1,000 at risk | Incidence of malaria (per 1,000 population at risk) — `SH.MLR.INCD.P3` | 2024 |
+| health / Antenatal visits (`health-anc`) | **71.5** % | Pregnant women receiving prenatal care of at least four visits (% of pregnant women) — `SH.STA.ANV4.ZS` | 2019 |
+| agri / Cereal yield (`agri-maize`) | **743.9** kg per hectare | Cereal yield (kg per hectare) — `AG.YLD.CREL.KG` | 2023 |
+
+**Two re-framed to the published measure:** `health-malaria`'s unit is now *"per 1,000 population at risk"*
+(the series is per population **at risk**, not per head) and `agri-maize` is now **"Cereal yield"** (the series
+counts all cereals, not maize alone) — the previous wording would have been untrue beside the number.
+
+**The split is now 160 indicators: 39 published / 121 modelled.** The four rows were added to the gate in
+`src/test/indicator-basis.test.tsx`.
+
+### 9.5 The modelled indicators that have no matching series (stay `Modelled`)
+
+Checked and **rejected** this session because the series measures something **materially different** (or has
+no Zimbabwe data), so the indicator keeps its honest `Modelled` label:
+
+- `fin-debt` / `fin-debt-gdp` — the only debt series for Zimbabwe is **external** debt (`DT.DOD.DECT.CD`,
+  `DT.DOD.DECT.GN.ZS`), which is not the **total public** debt these indicators state.
+- `health-deliveries` — the series is **births attended by skilled staff** (`SH.STA.BRTC.ZS`), not births
+  **in a facility**.
+- `lg-water-piped` — the series is **safely managed** drinking water (`SH.H2O.SMDW.ZS`), not piped supply.
+- `health-facilities` — the series is **hospital beds per 1,000** (`SH.MED.BEDS.ZS`, latest 2014), which
+  measures capacity, not whether a primary facility is open and staffed (already rejected in PART 7).
+- `hedu-research-spend` — `GB.XPD.RSDV.GD.ZS` holds **no Zimbabwe value**.
+- Everything else checked is an **operational or administrative return** (border-clearance time, licence
+  turnaround, filing rates, uptime, grievances, inspections, readiness, and the whole `opc` / `psc` / `zimra`
+  / `zida` / `def` sets) that no publisher publishes for Zimbabwe.

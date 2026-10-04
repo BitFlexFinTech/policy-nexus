@@ -280,6 +280,14 @@ describe("department indicators — published with a named source, or plainly mo
       ["mfa/mfa-exports", "USD 7.50B", "World Development Indicators: Exports of goods and services (current US$)", "2024"],
       ["env/env-emissions", "0.8", "World Development Indicators: Carbon dioxide (CO2) emissions excluding LULUCF per capita (t CO2e/capita)", "2024"],
       ["env/env-renewable", "88.3", "World Development Indicators: Renewable electricity output (% of total electricity output)", "2021"],
+      // 2026-10-04 — batch 2 of the expansion. The rest of the modelled set was swept against the
+      // same API; these four genuinely measure what their indicator says, so they convert. The
+      // remaining modelled ones are operational returns with no matching series (recorded in PART 9
+      // of docs/PLATFORM_ENRICHMENT_PLAN.md) and stay Modelled.
+      ["env/env-water", "40.0", "World Development Indicators: Annual freshwater withdrawals, total (% of internal resources)", "2022"],
+      ["health/health-malaria", "11.4", "World Development Indicators: Incidence of malaria (per 1,000 population at risk)", "2024"],
+      ["health/health-anc", "71.5", "World Development Indicators: Pregnant women receiving prenatal care of at least four visits (% of pregnant women)", "2019"],
+      ["agri/agri-maize", "743.9", "World Development Indicators: Cereal yield (kg per hectare)", "2023"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {

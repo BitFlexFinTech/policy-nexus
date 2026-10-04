@@ -86,8 +86,8 @@ or imply that it already runs on Government infrastructure or in the Government 
   explicitly labelled `Modelled`**, because no published count exists. Each department models the
   **24** groups its own mandate covers, drawn from these 72.
 - **160 reference indicators** across those 16 institutions, each with a plain note and a **stated
-  basis**: **35 are published figures**, each naming its publisher, its publication and its period,
-  and **125 are explicitly labelled `Modelled`**, because no publisher publishes that return. Say it
+  basis**: **39 are published figures**, each naming its publisher, its publication and its period,
+  and **121 are explicitly labelled `Modelled`**, because no publisher publishes that return. Say it
   exactly that way. They are coverage, not evidence of outcomes or savings.
 - **48 prepared policy drafts** — three per institution — ready to be run today, so a demonstration
   needs no preparation by the department being shown.
@@ -348,8 +348,8 @@ do not omit it to look authoritative.
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
 - **What the live site actually is today (re-checked 2026-10-04, after the dataset-expansion build was published).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-BmqMV5WB.js`
-  (`598e9f2a7d705345391bf1d5321e66ed6ba7830b92c2d4e47abb9e589e743329`), which is byte-identical to the
+  The host `nzwisiso.bitflex.app` serves `assets/index-BjP6kM3z.js`
+  (`146a4ad47b2ac23039797532aeb69bec5d2edee8687a9d61d18e994d74fc6447`), which is byte-identical to the
   local build, so **the live site is the build published on 2026-10-04** — it shows the **live date and
   time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the
   eleven newly published indicator figures (35 published / 125 modelled), and it carries the authority line, the modelled
