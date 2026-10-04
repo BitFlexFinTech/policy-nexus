@@ -727,3 +727,32 @@ does not state. **TIMB was added to `NAMED_SOURCES`.** Split: **62 published / 2
   the owner wants a derived total with its method stated.
 - **The Chamber of Mines of Zimbabwe** — reachable, but the site is stale (its own header reads *Saturday,
   03 November 2018*), so nothing current could be sourced from it.
+
+### 10.6 Batch S3 begins — UNESCO's school-facility series (2026-10-04)
+
+The earlier sweeps never queried UNESCO's **school-facility** indicators (they sit outside the enrolment and
+completion series). Three now convert, each value read from the UIS data service:
+
+| Department / indicator | Value now shown | UIS series (code) | Period |
+|---|---|---|---|
+| edu / Schools with internet (`edu-connectivity`) | **35.3** % | Proportion of **primary** schools with access to the internet for pedagogical purposes (`SCHBSP.1.WINTERN`) | 2024 |
+| edu / Schools with safe water (`edu-water`) | **92.0** % | Proportion of **primary** schools with access to basic drinking water (`SCHBSP.1.WWATA`) | 2024 |
+| edu / **"Schools with single-sex sanitation"** (`edu-sanitation`) | **99.3** % | Proportion of **primary** schools with single-sex basic sanitation facilities (`SCHBSP.1.WTOILA`) | 2024 |
+
+**One measure was re-framed:** `edu-sanitation` was *"School sanitation ratio (1:48)"* — pupils per toilet —
+which UIS does not publish. UIS publishes the **proportion of schools** with single-sex basic sanitation, so
+the label is now **"Schools with single-sex sanitation"** and the note says "primary schools". The other two
+notes now say **primary** schools too, which is the level those series cover.
+
+**Split: 65 published / 255 modelled.**
+
+**Checked in S3 and rejected — with the reason:**
+- `health-bed-occupancy` — WHO's bed series (`MH_13`, `MH_16`, `MH_15`) count **mental-health beds**, not the
+  occupancy rate of general hospital beds the indicator states.
+- `health-blood` — WHO publishes no blood-donation series for Zimbabwe (its "blood" indicators are blood
+  pressure and blood glucose).
+- `health-facilities` and `health-chw` — already recorded (9.5 and 10.4): no Zimbabwe value for the measures
+  the platform uses.
+- `health-mental` — WHO's mental-health outpatient series (`MH_20`, 572.8 per 100,000 in **2014**) is the
+  right measure in principle, but the value is twelve years old and the indicator's unit is per 10,000; left
+  `Modelled` rather than re-framed onto a 2014 figure.

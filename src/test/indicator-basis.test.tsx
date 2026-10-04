@@ -257,6 +257,9 @@ describe("department indicators — published with a named source, or plainly mo
       "edu/edu-lower-secondary": "unesco",
       "hedu/hedu-stem": "unesco",
       "agri/agri-tobacco": "timb",
+      "edu/edu-sanitation": "unesco",
+      "edu/edu-connectivity": "unesco",
+      "edu/edu-water": "unesco",
     };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
@@ -359,6 +362,12 @@ describe("department indicators — published with a named source, or plainly mo
       // measure is tobacco SOLD through the floors, so the label moved from "Tobacco output" to "Tobacco
       // sold" to say exactly what the publisher counts.
       ["agri/agri-tobacco", "359.1", "Marketing-season statistics: year-to-date sold mass", "September 2026"],
+      // 2026-10-04 — S3 begins with UNESCO's SCHOOL-FACILITY series, which the earlier sweeps never queried.
+      // Each value read from the UIS data service. `edu-sanitation` was re-framed from a pupils-per-toilet
+      // ratio to the published proportion of schools, because that is the measure UIS actually holds.
+      ["edu/edu-connectivity", "35.3", "UIS: proportion of primary schools with access to the internet for pedagogical purposes", "2024"],
+      ["edu/edu-water", "92.0", "UIS: proportion of primary schools with access to basic drinking water", "2024"],
+      ["edu/edu-sanitation", "99.3", "UIS: proportion of primary schools with single-sex basic sanitation facilities", "2024"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {

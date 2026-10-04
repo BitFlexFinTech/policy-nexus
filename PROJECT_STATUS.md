@@ -11,7 +11,7 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
 > carry a real published figure** (`fin-currency` **45.7 %** foreign-currency deposits, `fin-npl` **3.47 %**,
 > `zimra-collection` **110.3 %** of target, `zimra-register` **120,234** active taxpayers, `zimra-audit`
 > **3.53 %** coverage). **ZIMRA was added as a named source** and the RBZ entry extended; the split moved to
-> **62 published / 258 modelled** (the S1 batch took it to **59 / 261**, and **S2 has already begun**:
+> **65 published / 255 modelled** (the S1 batch took it to **59 / 261**, and **S2 and S3 have already begun**:
 > UNESCO's statistics institute was queried properly, and **TIMB's own season statistics** gave the tobacco
 > figure — see the *BATCH S2* section). **A false statement in my own records was corrected at source** — PART
 > 9.8.2 claimed no publisher holds these measures, and now states the narrower, true limit — and **PART 10**
@@ -1625,6 +1625,7 @@ because the block it sits in already names itself.
 | 2026-10-04 | **Batch S1 — THE NATIONAL SOURCES: the sweep the owner asked for (ZIMRA Annual Report 2024 + RBZ Bank Supervision Annual Report 2025)** | **The owner asked whether the search for real data had really been exhausted. It had not.** The earlier sweeps read only the **six international data services** with a queryable interface and **never Zimbabwe's own publishers**, and two of their probes were malformed (the WHO query searched indicator *names* for "Zimbabwe", which can never match; the UNESCO query used guessed indicator codes). **Two national publications were then read in full and their figures written in:** **ZIMRA Annual Report 2024** (181 pages, fetched from `zimra.co.zw` with a browser user-agent) — **`zimra-collection`** now **110.3 %** of target (net collections **ZWG116.47 bn** against a target of **ZWG105.63 bn**, exceeded by **10.26 %**), **`zimra-register`** now **120,234** (active registered taxpayers), **`zimra-audit`** re-framed to **"Audit coverage" 3.53 %** (4,243 audits of 120,234 active registered taxpayers); **RBZ Bank Supervision Annual Report 2025** (54 pages) — **`fin-npl`** now **3.47 %** (non-performing loans to total loans, 31 Dec 2025) and **`fin-currency`** re-framed to **"Foreign currency deposits" 45.7 %** (the share the RBZ consolidated balance sheet states). **`NAMED_SOURCES` gained ZIMRA**; the **RBZ** entry was extended to its banking-sector statistics and this report. **Split 54 / 266 → 59 / 261.** **Rejections recorded with reasons (PART 10.2):** `zimra-refunds` (ZIMRA publishes the refund **amounts**, not a "paid in time" rate), the other `zimra-*` operational measures the report does not state, `fin-debt` (no USD debt stock in the RBZ documents read), and the Treasury's budget/debt documents and the `mfa` set, **not read in this batch**. **A false statement of my own corrected at source:** PART 9.8.2 had claimed *"no publisher publishes them for Zimbabwe"* and *"no source can be invented"*; it now states the narrow, true limit, and PART 10 records the national sweep. **A defect the existing gate caught:** validate check 21 failed the instant the data changed — **5 violations** (the prompt document, the readiness record and the RESUME HERE block all still said 54 / 266) — and passed once the records moved with the data. **TESTED on these bytes:** `npm run validate` **PASS** (21 check groups) · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-BN7hKato.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**) — **1 new file, 12 modified**, 1,402,505 bytes; the served file's sha256 **`416dee6212c2940a0fa01c091a592042ada4dd833a8096244ff9c34c9138a4d5`** is **identical** to the local build; site **200**; the SSL validation token returns **200**; and the served bundle contains *"Zimbabwe Revenue Authority"*, *"Bank Supervision Annual Report"*, *"active registered taxpayers"* and *"foreign currency deposits"*. **Not touched:** `Minister Submission/**` (the owner's file — still quotes 150 / 40 / 320 / 51·269; it now needs **59 published / 261 modelled**; **reported, not edited**). |
 | 2026-10-04 | **Batch S2 begins — UNESCO's statistics institute queried PROPERLY (the earlier probe used guessed codes), two more published figures** | **The earlier sweep's UNESCO probe was malformed** — it used guessed indicator codes, so UIS was wrongly reported as holding nothing. This time the **UIS definitions list (5,063 indicators)** was fetched first, the right codes found **by name**, and Zimbabwe's values then read from the UIS data service: **`edu-lower-secondary`** now **72.4 %** (completion rate, lower secondary education, both sexes — `CR.2`, 2015; Zimbabwe's series is 71.66 / 70.09 / 69.74 / 72.42 for 2010–2015) and **`hedu-stem`** now **23.8 %** (percentage of tertiary graduates from STEM programmes, both sexes — `FOSGP.5T8.F500600700`, 2024; series 25.2 / 24.16 / 24.33 / 30.22 / **23.79**). **`NAMED_SOURCES` gained UNESCO**, and `hedu-stem`'s note now states what the series counts (a share of all tertiary graduates). **Split 59 / 261 → 61 / 259.** **Rejected with reasons (PART 10.4):** `edu-numeracy` (UIS holds no Zimbabwe value for Grade 3 mathematics proficiency), `hedu-graduation` (UIS's gross graduation ratio is 1.35 % in 2013 — relative to the whole graduation-age population, not the share of enrolled students who graduate), `health-chw` (WHO's community-health-worker series holds no Zimbabwe value), `health-outpatient` (WHO's outpatient series sits in its mental-health set and is dated 2014), `fin-revenue-gdp` (the IMF's government-revenue series holds no Zimbabwe value). **TESTED on these bytes:** `npm run validate` **PASS** (21 check groups) · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-Bge_iwdU.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**); the served file's sha256 **`a02cd37a7f0da924f98dbd2dbe257a138778946e306e3a37a46bbcd8a735e0e8`** is **identical** to the local build; site **200**. **Not touched:** `Minister Submission/**` (the owner's file — still quotes 150 / 40 / 320 / 51·269; it now needs **61 published / 259 modelled**; **reported, not edited**). |
 | 2026-10-04 | **Batch S2 continues — a Zimbabwean publisher again: TIMB's tobacco marketing-season statistics** | **`agri-tobacco`** is now **359.1 million kg** — TIMB's own front-page season statistics (*year-to-date sold mass **359,099,787 kg** as at 22 September 2026*). Its label moved from **"Tobacco output"** to **"Tobacco sold"**, because that is what TIMB counts (tobacco sold through the auction and contract floors) and "output" would claim something the publisher does not state. **`NAMED_SOURCES` gained TIMB.** **Split 61 / 259 → 62 / 258.** **Checked and rejected with reasons (PART 10.5):** **ZERA** (its 2024 Annual Report is behind a **403** and its download page yields no usable link; the prices it publishes are prices, not tariff cost recovery), **the Ministry of Mines** (`mines.gov.zw` 404, `/index.php` 403), **MMCZ** (reachable, no downloadable report, and its US$3.4 bn FY2025 mineral-export figure matches no indicator held), **ZIMSTAT agriculture** (the page hosts no data files) and **ZIMSTAT trade** (8-digit HS level — a horticulture total would be a **derived** figure, not a published one), and **the Chamber of Mines** (site stale, dated 2018). **TESTED on these bytes:** `npm run validate` **PASS** (21 check groups) · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-B-kimHp_.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**); the served file's sha256 **`eba175f81e7d670fa0dc5c37f315353981178246049efbb8f0731f53d525c005`** is **identical** to the local build; site **200**. **Not touched:** `Minister Submission/**` (the owner's file — it now needs **62 published / 258 modelled**; **reported, not edited**). |
+| 2026-10-04 | **Batch S3 begins — UNESCO's school-facility series (never queried before): three more published figures** | The earlier sweeps never queried UNESCO's **school-facility** indicators (they sit outside the enrolment and completion series). Three now convert, each value read from the UIS data service: **`edu-connectivity`** **35.3 %** (proportion of **primary** schools with internet access for teaching — `SCHBSP.1.WINTERN`, 2024), **`edu-water`** **92.0 %** (primary schools with basic drinking water — `SCHBSP.1.WWATA`, 2024) and **`edu-sanitation`**, re-framed from a *pupils-per-toilet ratio (1:48)* to **"Schools with single-sex sanitation" 99.3 %** (`SCHBSP.1.WTOILA`, 2024), because UIS publishes the proportion of schools, not a ratio. **Split 62 / 258 → 65 / 255.** **Rejected with reasons (PART 10.6):** `health-bed-occupancy` (WHO's bed series count **mental-health** beds, not general bed occupancy), `health-blood` (no Zimbabwe blood-donation series in WHO's catalogue), `health-mental` (WHO's mental-health outpatient series is the right measure but its Zimbabwe value is **2014**, so it stays `Modelled`). **TESTED on these bytes:** `npm run validate` **PASS** (21 check groups) · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-Cfj_1_9v.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**); the served file's sha256 **`1a8bbb3dfef9fdb531e6f2caeffbdd5bf74c4dc94a51afc49788452e17fc01ad`** is **identical** to the local build; site **200**. **Not touched:** `Minister Submission/**` (the owner's file — it now needs **65 published / 255 modelled**; **reported, not edited**). |
 
 
 
@@ -3533,6 +3534,28 @@ governs, where it is the honest label for a client with no real credentials yet.
   readiness split, `266 → 265`, was caught and restored **byte-identical**), while dated history rows are
   left untouched.
 
+## BATCH S3 — UNESCO's school-facility series (2026-10-04, this session)
+
+**Status: `IN PROGRESS` — three education figures converted; the rest of S3 named below.**
+
+- **BUILT.** UNESCO's **school-facility** indicators had never been queried (they sit outside the enrolment
+  and completion series). Three now convert, each value read from the UIS data service:
+  - **`edu-connectivity`** — **35.3 %** of **primary** schools have internet access for teaching (UIS
+    `SCHBSP.1.WINTERN`, 2024).
+  - **`edu-water`** — **92.0 %** of **primary** schools have basic drinking water (UIS `SCHBSP.1.WWATA`,
+    2024).
+  - **`edu-sanitation`** — re-framed to **"Schools with single-sex sanitation" 99.3 %** (UIS
+    `SCHBSP.1.WTOILA`, 2024): the old indicator was a *pupils-per-toilet ratio (1:48)*, which UIS does not
+    publish, and the published measure is the proportion of schools with single-sex basic sanitation.
+  - **Split: 62 published / 258 modelled → 65 published / 255 modelled.**
+- **REJECTED, with the reason recorded** (PART 10.6): `health-bed-occupancy` (WHO's bed series count
+  **mental-health** beds, not general bed occupancy); `health-blood` (WHO publishes no blood-donation series
+  for Zimbabwe); `health-mental` (WHO's mental-health outpatient series is the right measure but its Zimbabwe
+  value is **2014**, so it was left `Modelled` rather than re-framed onto a twelve-year-old figure).
+- **NEXT:** the rest of S3 — public service and local government (the Public Service Commission, the
+  Auditor-General), then **S4** (ICT, environment, defence, ZIDA) — and, as the owner asked, **more
+  stakeholder groups and more indicators**.
+
 ## BATCH S2 — THE NATIONAL SOURCES CONTINUE: UNESCO's statistics institute, queried properly (2026-10-04, this session)
 
 **Status: `IN PROGRESS` — two education figures converted; the rest of S2 named below.**
@@ -3629,6 +3652,19 @@ corrected rather than defended.
 - `PRODUCTION_READINESS.md` — the split chain and the live-build paragraph updated.
 - `PROJECT_STATUS.md` — this record (top note, the BATCH B section, the verification-log row, *NEXT PHASE*
   item 1, the DEMO HOST bullets, RESUME HERE and the PLAIN SUMMARY).
+- **Not touched:** `Minister Submission/**` (the owner's pack) — **reported, not edited**.
+
+## Files touched in Batch S3 (2026-10-04, this session)
+
+- `src/config/departments.ts` — three indicators converted to published figures (`edu-connectivity`,
+  `edu-water`, `edu-sanitation`); `edu-sanitation` re-labelled and its unit changed to a percentage, because
+  UIS publishes the proportion of schools, not a pupils-per-toilet ratio.
+- `src/test/indicator-basis.test.tsx` — the recorded published set gained the three rows, and their publisher
+  added to `SOURCE_OVERRIDES`.
+- `docs/PLATFORM_ENRICHMENT_PLAN.md` — **PART 10.6** added (the school-facility batch and the four
+  rejections with reasons).
+- `docs/PROPOSAL_PROMPT.md`, `PRODUCTION_READINESS.md`, `PROJECT_STATUS.md` — the split moved to
+  **65 published / 255 modelled**.
 - **Not touched:** `Minister Submission/**` (the owner's pack) — **reported, not edited**.
 
 ## Files touched in Batch S2 (2026-10-04, this session)
@@ -3955,8 +3991,8 @@ in the order the owner has raised them.
 
 1. ~~**The national-scale dataset expansion**~~ — **DONE 2026-10-04 (batches 1–4).** The platform now holds
    **150** canonical stakeholder groups (20 with a published share, 130 `Modelled`), every department models
-   **40** of them, and **320** reference indicators (20 per department: **62 published, 258 `Modelled`**).
-   So **82 of 470 figures (17%) stand on a published source**. The published-set step (24 → 62 published,
+   **40** of them, and **320** reference indicators (20 per department: **65 published, 255 `Modelled`**).
+   So **85 of 470 figures (18%) stand on a published source**. The published-set step (24 → 65 published,
    each read live from the World Bank's own API or, for public debt, the IMF's) and both count targets
    (160 → 320 indicators; 72 → 150 groups,
    24 → 40 per department) are met. Gates moved with the data: the `DEPARTMENT_SEGMENTS` pin and the "36–44"
@@ -3991,7 +4027,7 @@ really been exhausted, and it had not** — the earlier sweep checked only **six
 and never Zimbabwe's own publishers. The rules are fixed (a global **`data-must-be-real-sources.md`**; **ONE**
 review zip) and `check-rules.mjs` → **`RULES_CHECK_PASS (16 passed, 0 failed)`**. **Batch S1 is part-way
 `DONE`:** ZIMRA's Annual Report 2024 and the RBZ Bank Supervision Annual Report 2025 were read, **five more
-indicators carry real published figures** (**62 published / 258 modelled**), **ZIMRA joined `NAMED_SOURCES`**
+indicators carry real published figures** (**65 published / 255 modelled**), **ZIMRA joined `NAMED_SOURCES`**
 and the RBZ entry was extended, and **the false claim in PART 9.8.2 was corrected**. **The sweep continues:**
 S1's remaining step is the Treasury's budget and debt documents (`fin-budget`, `fin-expenditure`,
 `fin-capital`, `fin-revenue-gdp`, `fin-taxbase`, `fin-sovereign`) and the `mfa` set; then **S2** (ZIMSTAT
@@ -4011,8 +4047,8 @@ remainder **or** continue at **Batch C** (the graph), which needs no decision.
 **This session (2026-10-04, later — the national sweep continues: seven made-up figures replaced with real published ones so far).** In plain words:
 1. **You asked whether the search for real data had really been exhausted. It had not, and the search is now under way.** Seven figures that were the platform's own "Modelled" numbers are now real, official numbers read from the publisher's own document or data service.
 2. **From Zimbabwe's own publishers (Batch S1):** **non-performing loans 3.47 %**, **foreign currency deposits 45.7 %** (Reserve Bank of Zimbabwe, 31 December 2025), **revenue collected against target 110.3 %**, **registered taxpayers 120,234**, **audit coverage 3.53 %** (ZIMRA Annual Report 2024). The tax authority (ZIMRA) is now named on the Reference screen as a publisher.
-3. **From UNESCO's statistics institute (Batch S2), which my earlier search had wrongly reported as empty:** **lower-secondary completion 72.4 %** (2015) and **science and technology graduates 23.8 %** of all tertiary graduates (2024). UNESCO is now named as a publisher too. **And from TIMB (the tobacco board), whose own front page carries the season's sales: tobacco sold 359.1 million kg** (season to 22 September 2026) — that indicator is now called **"Tobacco sold"**, which is exactly what the board counts.
-4. **The scoreboard moved from 54 real figures to 62** (out of 320). **258 figures remain plainly marked "Modelled"**, and that number keeps falling as the sweep continues.
+3. **From UNESCO's statistics institute (Batch S2), which my earlier search had wrongly reported as empty:** **lower-secondary completion 72.4 %** (2015), **science and technology graduates 23.8 %** of all tertiary graduates (2024), **primary schools with internet 35.3 %**, **primary schools with safe water 92.0 %** and **primary schools with single-sex sanitation 99.3 %** (all 2024). UNESCO is now named as a publisher too. **And from TIMB (the tobacco board), whose own front page carries the season's sales: tobacco sold 359.1 million kg** (season to 22 September 2026) — that indicator is now called **"Tobacco sold"**, which is exactly what the board counts.
+4. **The scoreboard moved from 54 real figures to 65** (out of 320). **255 figures remain plainly marked "Modelled"**, and that number keeps falling as the sweep continues.
 5. **Every "no source exists" answer is now written down with its reason**, so the same ground is never re-covered: four more measures were checked in this batch and rejected **because the published series measures something different or holds no Zimbabwe value** — for example, UNESCO's "graduation ratio" is 1.35 %, which counts graduates against the whole adult population, not the share of students who finish.
 6. **The search is not finished.** Next: ZIMSTAT's agriculture and trade tables and the Ministry of Lands' crop and livestock figures (tobacco, wheat, cotton, cattle), then mines and energy, then health, education, public service and local government, then ICT, environment, defence and the investment agency. **And as you asked, more stakeholder groups and more indicators.**
 7. **Everything was re-checked and it is live.** All checks green, and the public site serves exactly this build (proved by fingerprint — the served file's code is identical to the build on this machine).
@@ -4099,7 +4135,7 @@ remainder **or** continue at **Batch C** (the graph), which needs no decision.
    build, 18 browser tests), and the public site now serves exactly this build.
 6. **Your pack still needs one small edit, and that file is yours.** The proposal and the slide deck still
    quote the older, smaller platform (72 groups, 24 per department, 160 figures, 24 published / 136 modelled).
-   It should now read **150 groups, 40 per department, 320 figures, 62 published / 258 modelled**. I have
+   It should now read **150 groups, 40 per department, 320 figures, 65 published / 255 modelled**. I have
    **not** edited your file; I am telling you so you can update it before the meeting.
 
 7. **I also wrote the one-page sheet for demonstrating with no internet.** `docs/OFFLINE_DEMO.md` explains, in
@@ -4326,15 +4362,16 @@ confirm it.
   Playwright 18/18** (and **check that the build actually ran before Playwright** — a chain stops at the
   first non-zero step, and Playwright then tests a stale `dist/`). **Do not re-fetch anything in PART 7 of
   `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
-  62 published figures and the recorded no-equivalent reasons (PARTs 9.5, 9.8 and 10) are both there. **Read
+  65 published figures and the recorded no-equivalent reasons (PARTs 9.5, 9.8 and 10) are both there. **Read
   first:** the **owner’s-five-changes row** at the top of the verification log (2026-10-02 — what changed last), then `docs/PROPOSAL_PROMPT.md`,
   `scripts/validate.mjs`
   (**checks 14 and 21**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-B-kimHp_.js`
-  (`eba175f81e7d670fa0dc5c37f315353981178246049efbb8f0731f53d525c005`)** — the **S2-continuation build
-  of 2026-10-04** (TIMB's own season statistics: **"Tobacco sold" 359.1 million kg**, with **TIMB** named
-  as a publisher: **62 published / 258 modelled**) on top of the **Batch S2 build
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-Cfj_1_9v.js`
+  (`1a8bbb3dfef9fdb531e6f2caeffbdd5bf74c4dc94a51afc49788452e17fc01ad`)** — the **S3 build
+  of 2026-10-04** (UNESCO's school-facility series: schools with internet, safe water and single-sex
+  sanitation now real: **65 published / 255 modelled**) on top of the **S2-continuation build
+  of 2026-10-04** on top of the **Batch S2 build
   of 2026-10-04** on top of the **Batch S1 build
   of 2026-10-04** on top of the **Batch B part 2 build of 2026-10-04** on top of the
   **dataset-expansion build
@@ -4579,9 +4616,10 @@ confirm it.
   the **BLOCKER** that used to sit in *Known-red / open items* is gone. The agent has pushed nothing to
   `main` since; the feature branch carries all later work. Deployment is an FTP upload of `dist/`, not a
   git push.
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-B-kimHp_.js`,
-  `eba175f81e7d670fa0dc5c37f315353981178246049efbb8f0731f53d525c005`** — the **S2-continuation build of
-  2026-10-04** (62 published / 258 modelled indicators, with TIMB added as a named source) on top of
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-Cfj_1_9v.js`,
+  `1a8bbb3dfef9fdb531e6f2caeffbdd5bf74c4dc94a51afc49788452e17fc01ad`** — the **S3 build of
+  2026-10-04** (65 published / 255 modelled indicators; UNESCO's school-facility figures added) on top of
+  the S2-continuation build of 2026-10-04 on top of
   the Batch S2 build of 2026-10-04 on top of the Batch S1 build of 2026-10-04 on top of
   the Batch B part 2 build of 2026-10-04 on top of the dataset-expansion build of 2026-10-04 on top of the
   live-date build of
