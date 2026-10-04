@@ -291,6 +291,22 @@ describe("department indicators — published with a named source, or plainly mo
       ["health/health-malaria", "11.4", "World Development Indicators: Incidence of malaria (per 1,000 population at risk)", "2024"],
       ["health/health-anc", "71.5", "World Development Indicators: Pregnant women receiving prenatal care of at least four visits (% of pregnant women)", "2019"],
       ["agri/agri-maize", "743.9", "World Development Indicators: Cereal yield (kg per hectare)", "2023"],
+      // 2026-10-04 — Batch B (real evidence base). Twelve more modelled indicators were found to have a
+      // real World Bank series that measures the same thing; each value was read live this session. Three
+      // were re-framed to the published measure (fin-trade now % of GDP; edu-literacy is the adult rate;
+      // energy-coal/hydro are shares of output), so the wording stays true.
+      ["fin/fin-interest", "13.5", "World Development Indicators: Interest payments (% of revenue)", "2018"],
+      ["fin/fin-inflation", "104.7", "World Development Indicators: Inflation, consumer prices (annual %)", "2022"],
+      ["fin/fin-trade", "-5.4", "World Development Indicators: External balance on goods and services (% of GDP)", "2024"],
+      ["fin/fin-remit-gdp", "8.5", "World Development Indicators: Personal remittances, received (% of GDP)", "2024"],
+      ["health/health-full-immunisation", "91", "World Development Indicators: Immunization, DPT (% of children ages 12-23 months)", "2024"],
+      ["health/health-maternal", "358", "World Development Indicators: Maternal mortality ratio (modeled estimate, per 100,000 live births)", "2023"],
+      ["health/health-tb", "91", "World Development Indicators: Tuberculosis treatment success rate (% of new cases)", "2023"],
+      ["edu/edu-literacy", "93.2", "World Development Indicators: Literacy rate, adult total (% of people ages 15 and above)", "2019"],
+      ["mines/mines-rents", "4.2", "World Development Indicators: Mineral rents (% of GDP)", "2021"],
+      ["energy/energy-coal", "54.1", "World Development Indicators: Electricity production from coal sources (% of total)", "2023"],
+      ["energy/energy-hydro", "45.1", "World Development Indicators: Electricity production from hydroelectric sources (% of total)", "2023"],
+      ["energy/energy-rural", "46.6", "World Development Indicators: Access to electricity, rural (% of rural population)", "2024"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {
