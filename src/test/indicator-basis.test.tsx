@@ -68,6 +68,9 @@ const requestFor = (departmentId: string): AssessmentRequest => {
  * 2026-10-02: the set grew from 63 to 160 for national policy drafting (ten indicators
  * per department), the new ones all Modelled. The published set is unchanged, so the
  * RECORDED list below still holds the whole published set.
+ *
+ * 2026-10-04: batch 3 of the national-scale expansion raised the set to 320 (twenty
+ * indicators per department), all the new ones Modelled — demo figures, per the owner.
  */
 describe("department indicators — published with a named source, or plainly modelled", () => {
   beforeEach(() => {
@@ -75,8 +78,8 @@ describe("department indicators — published with a named source, or plainly mo
     clearSession();
   });
 
-  it("gives every one of the 160 indicators a basis, and no free text that reads as a source", () => {
-    expect(EVERY).toHaveLength(160);
+  it("gives every one of the 320 indicators a basis, and no free text that reads as a source", () => {
+    expect(EVERY).toHaveLength(320);
     EVERY.forEach(({ department, indicator }) => {
       const where = `${department.id}/${indicator.id}`;
       expect(["published", "modelled"], `${where} basis`).toContain(indicator.basis.kind);

@@ -4,13 +4,13 @@ Source of truth for project state. **Read this FIRST at every session.**
 Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE right now.
 `DONE` only appears where it was verified in the same session it was written.
 
-> **LAST TASK — DONE 2026-10-04: national-scale dataset expansion, batch 1.** Eleven modelled
-> department indicators were re-researched against the World Bank's own API and converted to real
-> published figures — the split moved from **24 published / 136 modelled** to **39 published / 121
-> modelled**. Built, tested and published in that session. Read the section *"DATASET EXPANSION —
-> batch 1…"* (above `## RESUME HERE`) for the delivered detail and its verification log, then the
-> `RESUME HERE` block. The previous task (the live date, 2026-10-04) is also DONE; the remaining work
-> is the *"NEXT PHASE"* list and **is not being removed**.
+> **LAST TASK — DONE 2026-10-04: national-scale dataset expansion, batches 1–3.** Fifteen modelled
+> indicators became real published figures (the split moved from **24 published / 136 modelled** to **39
+> published / 281 modelled**), and the platform now holds **320 reference indicators** (twenty per
+> department, up from ten). Built, tested and published in that session. Read the section *"DATASET
+> EXPANSION — batches 1–3…"* (above `## RESUME HERE`) for the delivered detail and its verification log,
+> then the `RESUME HERE` block. The previous task (the live date, 2026-10-04) is also DONE; the remaining
+> work is the *"NEXT PHASE"* list and **is not being removed**.
 
 ---
 
@@ -1595,8 +1595,9 @@ because the block it sits in already names itself.
 | 2026-10-02 | **the sourcing-statement defect (the owner's question: *"what is left to clean up so the demo works flawlessly based on the proposal"*) — one wrong sentence fixed in the platform, and eight stale deployment claims fixed in the records, each with a new gate** | **THE DEFECT:** the reference screen's sourcing sentence said *"Stakeholder shares are ZIMSTAT's published 2022 census figures"*, while **one of the twenty published shares** is the **Public Service Commission's** (*Public Service Sentinel*, Q1 2026 — pensioners administered, 209,360, `src/config/reference.ts`). The screen therefore credited one publisher for shares that came from two — and the same sentence is quoted in the funding memo (Part B §11) and in the one-page ask, so the pack repeated it. **FIXED at source:** `SHARE_PUBLISHERS` (`["ZIMSTAT", "Public Service Commission"]`) added to `src/config/reference.ts` and the sentence rewritten to name both; **gate:** a new test in `src/test/reference-sources.test.tsx` — every published share must name one of those bodies, **every body on the list must really be used by a share** (so the list cannot name a phantom publisher), the sentence must name every body on the list, and the published/modelled split must stay **20 / 52**. **Proved able to fail:** the old sentence restored → `the sourcing rule names Public Service Commission: expected 'Stakeholder shares are ZIMSTAT's pub…' to contain 'Public Service Commission'` → 1 failed / 5 passed; `reference.ts` restored **byte-identical** (`sha256 79cce988e375b381461cec7705bcd83536915623a8fd85a5cfab91b53ca8d916`). **ALSO FIXED (the records, eight false present-tense statements about the live host, found by the new gate itself):** `PROJECT_STATUS.md` §Phase AD R7 prose ("the live origin now serves that exact file"), the Phase AE status-documents prose ("the deployed host is still on … the deployed site is behind until R7"), the truth-sweep prose ("the host is now one build behind"), the RESUME HERE "plan is COMPLETE" bullet, the RESUME HERE "live host serves the build published on 2026-09-29" bullet, the RESUME HERE "the one action left … is the redeploy" bullet, and `PRODUCTION_READINESS.md` §6e prose and §8's **"Live build (current — 2026-09-26): the host serves the Phase S bundle"**. A dated log row keeps its present-tense wording on purpose (it records what was true then) — except the 2026-10-02 deploy row, whose "serves" was put in the past so the deployment-agreement check has one name to agree on. **NEW GATE — validate check 17, "no superseded bundle presented as the live one":** R1 a present-tense `serves … <bundle>` in prose must name the agreed live bundle; R2 prose may not say the live host/site is behind; R3 prose may not say a deploy is still to come; R4 the RESUME HERE block must state the sync check's result — all four only bite when the records agree the host serves the build this working copy produces. **Proved able to fail:** it reported **9 violations** before the fixes and **0** after. **DEPLOYED and verified (2026-10-02):** `npm run build` → **`assets/index-7sZF-fGv.js`**; FTPS reverse mirror (`lftp -R --only-newer`, **never `--delete`**) — 13 files, 1,358,916 bytes; the served file's sha256 (**`26a08ca04c08e65c4f9dbb8d0e8b40491f9a4367a7feb37cabdb04ae211fb1a2`**) is **identical** to the local `dist/` build; the site returns **200**; `.well-known/pki-validation/` token **200** and `cgi-bin/` intact. **TESTED on these bytes:** `npm run validate` **PASS — 19/19** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **490/490 across 46 files** · build **✓** · Playwright **17/17** · `npm run sync:check` **IN SYNC**. **Not touched, by the owner's instruction:** `Minister Submission/**` (the owner has handled the proposal) — noted in the report that this copy still carries the old sentence and no web address. |
 | 2026-10-02 | **the owner's five corrections — the footer wording, the Overview cards, the hand-fill form, the run-page actions, and one Back control (the owner: *"this is unacceptable. remove them now. never ever make a UI/UX decision without approval"*)** | **(1) Footer.** `BRAND.attribution` → **"A Project by the Ministry of ICT"** (was "Ministry of IT"), with the three test assertions (`landing.test.tsx`, `e2e/journey.spec.ts` ×2) and four record lines that repeated it updated. **(2) The Overview cards removed.** `<KPICards />` was the ONLY usage anywhere; `src/components/KPICards.tsx` is **deleted** (references before: 2 — the file and one test list; after: 0). Every indicator now renders on the **Reference** screen in a new *"Department indicators (N)"* section carrying the same derived source line the cards printed (`indicatorBasisLabel`), so no figure is lost and none is re-worded by hand. **The gate moved with the figures:** `src/test/workspace.test.tsx` now requires **every indicator of all 16 departments on `/app/reference`** (label + source line) instead of on `/app`, and `indicator-basis.test.tsx`'s drill-down test became two tests (the engine-vitals split, and every indicator's derived source line on the Reference screen). `.clinerules/03-preserve-existing-ui-and-no-break.md` — which listed the "KPI card strip" as part of the locked visual identity — was corrected in the same change, so no future session can be told to preserve a strip the owner removed. **(3) The hand-fill form removed (deep removal, no dead code).** Deleted: `ImplementationForm.tsx`, `useImplementationFills.ts`, `implementationStore.ts`, `implementation-fills.test.tsx`, and the whole `fills` plumbing through `matrices.ts` (`FillValue`/`DocumentFills`/`FillField`/`fillableRows`/`filled`/the row keys), `implementationPack.ts`, `policyDraft.ts`, `useGeneratedDocument.ts` and `remoteDraftingClient.ts`. The four matrices now print `BLANK` (and the policy's own phasing where a date is its own). **Kept:** the pack itself (now read-only), its chip on the strip, its route, and the *"Open what answers this →"* navigation. The browser test now proves the **opposite** of what it did: the pack carries **0** `To be confirmed` inputs and prints the marked blank. **(4) The run-page actions at top and bottom.** Extracted to ONE component (`RunActions.tsx`) and rendered twice, so the two rows cannot drift; the unit test and the browser test assert **two** of each. **(5) One "← Back" to the Overview.** `BackToOverview.tsx`, used by the shared strip (all five document screens), the run page and the register; the strip test now **requires** it and asserts `href="/app"`, plus a new browser test that clicks it from the run page, the register and a document screen. **A naming defect found and fixed while wiring it:** the control's first accessible name ("Back to the Overview") collided with the nav's "Overview" link — Playwright's strict mode caught it (2 elements) — so the accessible name is the visible word **"Back"**, with the destination in `title`. **TESTED on these bytes:** `npm run validate` **PASS — 19/19** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **500/500 across 45 files** · build **✓** emitting **`assets/index-w2OBNTQe.js`** · Playwright **18/18**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,353,774 bytes; the served file's sha256 **`8ce3e4d7e90e83e4eaa7bba8fb1621ae18e150f5e439b7767fbcbf6d8c227a36`** is **identical** to the local build, the site returns **200**, the SSL token returns **200** and `cgi-bin/` is intact. |
 | 2026-09-30 | **defect inventory (Batch A, second half — every defect found, and its disposition)** | Five **FIXED at source**, one **BLOCKED**. (1) The drafted-policy screen's own comment said *"editing is local state only"* — false the moment item 7 landed; corrected. (2) The new strip file introduced a lint warning (a component file that also exports data breaks fast refresh, taking lint from the recorded 7 to 8); fixed by moving the destination list into `documentViews.ts`, so lint is back to the baseline 7 in stock shadcn/ui files. (3) The first `usePolicyDraft` made `raw` an *unnecessary dependency* of `useMemo` — a real signal that the memo was not deriving from the value it subscribed to; fixed by adding `draftTextIn(raw, runId)` so the wording is read from the snapshot itself. (4) Three stale statements in the records — `PRODUCTION_READINESS.md` and `PROJECT_STATUS.md` both still called the published bundle the working copy, the RESUME HERE said *nothing is outstanding*, and the expected test counts were 427/428/431 behind — all corrected, with the built bundle named. (5) The Playwright run was made once against a **stale `dist/`** because the validation chain stops at the first non-zero step; recorded as a trap in the log and in RESUME HERE rather than left unexplained. **BLOCKED at the time, RESOLVED the same day (2026-09-30):** the owner's **original fix list was not in the repository** — only six of its eleven items. The full list was **recovered from the conversation itself and is recorded verbatim, with the true state of every item, at the top of this file**. Nothing about it has to be guessed again. |
-| 2026-10-04 | **the national-scale dataset expansion, batch 1 — eleven modelled indicators become real published figures** | Eleven of the modelled department indicators were re-researched against the **World Bank's own API** (`api.worldbank.org/v2/country/ZW/indicator/<series>`) and found to have a series that measures the same thing; each value was **read live this session** and written in: `fin-reserves` 0.5 months of imports (FI.RES.TOTL.MO, 2024), `fin-savings` 10.7% of GDP (NY.GNS.ICTR.ZS, 2024), `fin-money` 708.9% (FM.LBL.BMNY.ZG, 2023), `health-life` 63.1 years (SP.DYN.LE00.IN, 2024), `health-hiv` 95% (SH.HIV.ARTC.ZS, 2024), `edu-repetition` 1.9% (SE.PRM.REPT.ZS, 2013), `edu-ecd` 74.3% gross (SE.PRE.ENRR, 2021), `ict-internet` 41.6% (IT.NET.USER.ZS, 2024), `mfa-exports` USD 7.50B (NE.EXP.GNFS.CD, 2024), `env-emissions` 0.8 t CO2e (EN.GHG.CO2.PC.CE.AR5, 2024), `env-renewable` 88.3% (EG.ELC.RNEW.ZS, 2021). **Two notes re-framed to the published measure** (`mfa-exports` → "goods and services"; `env-renewable` → "including hydro"). **Split 24 / 136 → 35 / 125.** The published-figure gate (`src/test/indicator-basis.test.tsx`) gained the eleven rows and was **proved able to fail** by mutation (`fin-money` 708.9 → 708.8 → *"holds every published figure"* FAIL), restored **byte-identical** (`sha256 f1a7b871…`). **A stale statement found and fixed at source:** `docs/PROPOSAL_PROMPT.md` still described 36 groups / 63 indicators / 16·39 modelled — corrected to 72 / 160 / 20·52 and 35·125, with the full 72-group list. **TESTED on these bytes:** `npm run validate` **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-BjP6kM3z.js`** · Playwright **18/18** (phone fold 834/844) · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,356,998 bytes; the served file's sha256 **`146a4ad47b2ac23039797532aeb69bec5d2edee8687a9d61d18e994d74fc6447`** is **identical** to the local build; the site returns **200**; `.well-known/pki-validation/` and `cgi-bin/` intact (25 Sep). **Not touched:** `Minister Submission/**` (the owner's — still quotes 24/136, reported not edited). |
-| 2026-10-04 | **dataset expansion batch 2 — the rest of the modelled set swept; four more real figures** | Every remaining modelled indicator was checked against the World Bank API; **four** genuinely measure what their indicator says and converted: `env-water` 40.0% of internal resources (`ER.H2O.FWTL.ZS`, 2022), `health-malaria` 11.4 per 1,000 at risk (`SH.MLR.INCD.P3`, 2024), `health-anc` 71.5% (`SH.STA.ANV4.ZS`, 2019), `agri-maize` → **Cereal yield** 743.9 kg/ha (`AG.YLD.CREL.KG`, 2023). **Two re-framed to the published measure** (`health-malaria` unit → "per 1,000 at risk"; `agri-maize` label → "Cereal yield"). The rest **stay `Modelled` with a recorded reason** (external debt vs public debt; skilled attendance vs facility delivery; safely managed vs piped water; hospital beds vs functional facilities; and the operational returns) — **PART 9.5** of `docs/PLATFORM_ENRICHMENT_PLAN.md`. **Split 35/125 → 39/121.** The gate gained the four rows. **TESTED:** validate **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-BjP6kM3z.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,356,998 bytes; served sha256 **`146a4ad47b2ac23039797532aeb69bec5d2edee8687a9d61d18e994d74fc6447`** identical to the local build; site **200**; `.well-known/` and `cgi-bin/` intact. |
+| 2026-10-04 | **the national-scale dataset expansion, batch 1 — eleven modelled indicators become real published figures** | Eleven of the modelled department indicators were re-researched against the **World Bank's own API** (`api.worldbank.org/v2/country/ZW/indicator/<series>`) and found to have a series that measures the same thing; each value was **read live this session** and written in: `fin-reserves` 0.5 months of imports (FI.RES.TOTL.MO, 2024), `fin-savings` 10.7% of GDP (NY.GNS.ICTR.ZS, 2024), `fin-money` 708.9% (FM.LBL.BMNY.ZG, 2023), `health-life` 63.1 years (SP.DYN.LE00.IN, 2024), `health-hiv` 95% (SH.HIV.ARTC.ZS, 2024), `edu-repetition` 1.9% (SE.PRM.REPT.ZS, 2013), `edu-ecd` 74.3% gross (SE.PRE.ENRR, 2021), `ict-internet` 41.6% (IT.NET.USER.ZS, 2024), `mfa-exports` USD 7.50B (NE.EXP.GNFS.CD, 2024), `env-emissions` 0.8 t CO2e (EN.GHG.CO2.PC.CE.AR5, 2024), `env-renewable` 88.3% (EG.ELC.RNEW.ZS, 2021). **Two notes re-framed to the published measure** (`mfa-exports` → "goods and services"; `env-renewable` → "including hydro"). **Split 24 / 136 → 35 / 125.** The published-figure gate (`src/test/indicator-basis.test.tsx`) gained the eleven rows and was **proved able to fail** by mutation (`fin-money` 708.9 → 708.8 → *"holds every published figure"* FAIL), restored **byte-identical** (`sha256 f1a7b871…`). **A stale statement found and fixed at source:** `docs/PROPOSAL_PROMPT.md` still described 36 groups / 63 indicators / 16·39 modelled — corrected to 72 / 160 / 20·52 and 35·125, with the full 72-group list. **TESTED on these bytes:** `npm run validate` **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-4bQWQK-P.js`** · Playwright **18/18** (phone fold 834/844) · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,384,454 bytes; the served file's sha256 **`9ebb0b5788dcc336b175bbe39c812fb2b3c909d1ac21850fbd83e2e91179ec24`** is **identical** to the local build; the site returns **200**; `.well-known/pki-validation/` and `cgi-bin/` intact (25 Sep). **Not touched:** `Minister Submission/**` (the owner's — still quotes 24/136, reported not edited). |
+| 2026-10-04 | **dataset expansion batch 2 — the rest of the modelled set swept; four more real figures** | Every remaining modelled indicator was checked against the World Bank API; **four** genuinely measure what their indicator says and converted: `env-water` 40.0% of internal resources (`ER.H2O.FWTL.ZS`, 2022), `health-malaria` 11.4 per 1,000 at risk (`SH.MLR.INCD.P3`, 2024), `health-anc` 71.5% (`SH.STA.ANV4.ZS`, 2019), `agri-maize` → **Cereal yield** 743.9 kg/ha (`AG.YLD.CREL.KG`, 2023). **Two re-framed to the published measure** (`health-malaria` unit → "per 1,000 at risk"; `agri-maize` label → "Cereal yield"). The rest **stay `Modelled` with a recorded reason** (external debt vs public debt; skilled attendance vs facility delivery; safely managed vs piped water; hospital beds vs functional facilities; and the operational returns) — **PART 9.5** of `docs/PLATFORM_ENRICHMENT_PLAN.md`. **Split 35/125 → 39/121.** The gate gained the four rows. **TESTED:** validate **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-4bQWQK-P.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,384,454 bytes; served sha256 **`9ebb0b5788dcc336b175bbe39c812fb2b3c909d1ac21850fbd83e2e91179ec24`** identical to the local build; site **200**; `.well-known/` and `cgi-bin/` intact. |
+| 2026-10-04 | **dataset expansion batch 3 — ten new indicators per department (160 → 320)** | The owner's target of **20 indicators per department (320)** is met: **ten new Modelled indicators added to each of the 16 departments** (160 new lines in `src/config/departments.ts`), each with a unique id, a plain note and a bounded score — demo figures, plainly labelled `Modelled` per the owner's instruction that real data comes after approval. The set is now **320 indicators (39 published / 281 modelled)**. The gate was raised `toHaveLength(160)` → `toHaveLength(320)` in `src/test/indicator-basis.test.tsx`; no other test needed changing (the per-department gate only requires ≥3). **TESTED:** validate **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-4bQWQK-P.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,384,454 bytes; served sha256 **`9ebb0b5788dcc336b175bbe39c812fb2b3c909d1ac21850fbd83e2e91179ec24`** identical to the local build; site **200**. **Not touched:** `Minister Submission/**` (the owner's — still quotes 160 / 24 published / 136 modelled; now **320 / 39 / 281**). |
 
 
 
@@ -3404,7 +3405,7 @@ row, the RESUME HERE summary ("five are done…"), the eleven-item tally, the ex
 - **Not touched:** `Minister Submission/**` (the owner's), `src/components/ui/**`, `package.json` (no
   dependency moved), the palette, the typography and the route map.
 
-## DATASET EXPANSION — batch 1: eleven modelled indicators become published (2026-10-04)
+## DATASET EXPANSION — batches 1–3: real published figures, then 20 indicators per department (2026-10-04)
 
 **Status: `DONE` — built, tested and published this session.**
 
@@ -3424,21 +3425,25 @@ already use.
   internal resources, `health-malaria` 11.4 per 1,000 at risk, `health-anc` 71.5%, `agri-maize` → **Cereal
   yield** 743.9 kg/ha), re-framing two so the wording stays true; the measures that have no matching series
   (external debt vs public debt, skilled attendance vs facility delivery, and the operational returns) stay
-  `Modelled` with a recorded reason. The split moved from **24 published / 136 modelled to 39 published / 121
-  modelled** (160 total). The full research record is **PART 9** of `docs/PLATFORM_ENRICHMENT_PLAN.md`.
+  `Modelled` with a recorded reason. **Batch 3 added ten new Modelled indicators to every one of the 16
+  departments** (demo figures, per the owner), so the set is now **320** (twenty per department). The split
+  moved from **24 published / 136 modelled** to **39 published / 281 modelled**. The full research record is
+  **PART 9** of `docs/PLATFORM_ENRICHMENT_PLAN.md`.
 - **A stale statement found and fixed at source.** `docs/PROPOSAL_PROMPT.md` still described **36**
   stakeholder groups, **63** indicators and **16 / 39** modelled — all stale since the 2026-10-02 expansion.
-  Corrected to **72** groups (20 published / 52 modelled, 24 per department) and **160** indicators (35
-  published / 125 modelled), with the full 72-group list.
+  Corrected to **72** groups (20 published / 52 modelled, 24 per department) and, at the time, **160**
+  indicators (35 published / 125 modelled) — **later raised to 320 by batch 3** (39 published / 281 modelled) —
+  with the full 72-group list.
 - **TESTED (real output, this session).** `npm run validate` → **PASS — all 20 checks green** ·
   `npm run typecheck` → **0** · `npm run lint` → **0 errors, 7 pre-existing warnings** · `npm test` →
-  **503 passed across 46 files** · `npm run build` → **✓ (`assets/index-BjP6kM3z.js`)** · `npx playwright
+  **503 passed across 46 files** · `npm run build` → **✓ (`assets/index-4bQWQK-P.js`)** · `npx playwright
   test` → **18 passed** (phone fold **834 px of 844 px**). The published-figure gate in
   `src/test/indicator-basis.test.tsx` was extended with the eleven rows and **proved able to fail** by
   mutation (`fin-money` `708.9` → `708.8` made *"holds every published figure"* FAIL); the file was restored
   **byte-identical** (`sha256 f1a7b871…`).
-- **RESULT: DONE for batch 1.** The rest of item 1 (more indicators, 160 → 320; more groups, 72 → ~150) is
-  **NOT STARTED** and stays on the NEXT PHASE list.
+- **RESULT: DONE for batches 1–3.** The indicators target (**160 → 320**) is now met. The remaining part of
+  item 1 is the **stakeholder groups (72 → ~150)**, which needs ZIMSTAT census tables — **NOT STARTED** and
+  still on the NEXT PHASE list.
 - **Not touched:** `Minister Submission/**` (the owner's file — it still quotes 24 / 136 and **is reported,
   not edited**), `src/components/ui/**`, `package.json` (no dependency moved), the palette, the typography
   and the route map.
@@ -3674,18 +3679,19 @@ in the order the owner has raised them.
 
 1. **The national-scale dataset expansion** (owner's instruction, 2026-10-02/03). The platform holds
    **72** canonical stakeholder groups (20 with a published share, 52 `Modelled`), **24** modelled per
-   department, and **160** reference indicators (10 per department: **39 published, 121 `Modelled`** —
-   24 published before batch 1, 35 after batch 1, 39 after batch 2) —
-   so **59 of 232 figures (25%) stand on a published source**. Target: national groups **72 → about 150**,
-   each department's set **24 → about 40**, indicators **10 → 20 per department (320)** — and, first,
-   **expand the published set with real sourced figures** (ZIMSTAT, the Reserve Bank, the line ministries,
-   and the World Bank / WHO / UNICEF / UNESCO / ITU series the platform already cites), with everything
-   unsourced staying labelled `Modelled`. Gates to move with the data: the pinned counts in
+   department, and **320** reference indicators (20 per department: **39 published, 281 `Modelled`**) —
+   so **59 of 392 figures (15%) stand on a published source**. Target: national groups **72 → about 150**,
+   each department's set **24 → about 40**, indicators **10 → 20 per department (320)**.
+   **Progress (2026-10-04): the indicators target is DONE (320) and the "expand the published set first"
+   step is DONE — batches 1–3 moved published figures 24 → 39, each read from the World Bank's own API.
+   What remains is the stakeholder groups (72 → ~150), which needs ZIMSTAT census tables.** Everything
+   unsourced stays labelled `Modelled`. Gates to move with the data: the pinned counts in
    `src/test/departments.test.ts` (the "22–26" range), `src/test/stakeholder-weights.test.ts`
    (`MODELLED_IDS`), `src/test/workspace.test.tsx` (`toHaveLength(72)`),
-   `src/test/indicator-basis.test.tsx` ("160 indicators") and `e2e/journey.spec.ts` ("72 nationally").
+   `src/test/indicator-basis.test.tsx` ("320 indicators") and `e2e/journey.spec.ts` ("72 nationally").
    **The proposal and the deck quote 72 / 24 per institution / 160 / 20 published / 52 modelled /
-   24 published / 136 modelled — so the pack must be updated in step, and that file is the owner's.**
+   24 published / 136 modelled — so the pack must be updated in step (now 320 indicators / 39 published /
+   281 modelled), and that file is the owner's.**
    **Batch 1 of this item is DONE (2026-10-04): the indicator split is now 35 published / 125 modelled
    (see *"DATASET EXPANSION — batch 1"*), so the pack's 24 / 136 is now stale and needs the owner's edit.**
 2. **`/platform-admin` needs a real guard.** Recorded open on 2026-09-29: the screen is reachable by
@@ -3709,9 +3715,9 @@ dataset expansion **batch 1** (the owner's choice, 2026-10-04) is **DONE** — e
 became real published figures, so the split is now **39 published / 121 modelled**; see the *"DATASET
 EXPANSION — batch 1"* section (above) for the delivered detail and the verification log. The live-date task
 (approved 2026-10-03) is **DONE** too, and the costed Google-Drive sheets are **DONE** (see *COSTED
-SPREADSHEETS* below). The next work is the **rest** of *NEXT PHASE* item 1 — **new indicators (160 → 320)**
-and **new stakeholder groups (72 → ~150)**, which need ZIMSTAT census tables rather than the World Bank API —
-plus the six other items; **none of it has been dropped.**
+SPREADSHEETS* below). The next work is the **last part** of *NEXT PHASE* item 1 — **new stakeholder groups
+(72 → ~150)**, which need ZIMSTAT census tables rather than the World Bank API (the indicators target, **320**,
+is now DONE) — plus the six other items; **none of it has been dropped.**
 
 **Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and IN SYNC (proved by
 `npm run sync:check`, which reports all four checks PASS). **Tip:** run `git log --oneline -1`. **Next
@@ -3728,9 +3734,10 @@ the remaining modelled indicators each need checking and, where no series matche
    read live from the **World Bank's own data service** during this session, never guessed: for example
    **life expectancy 63.1 years (2024)**, **HIV treatment coverage 95% (2024)**, **internet use 41.6% (2024)**,
    **export earnings US$7.50 billion (2024)**.
-2. **The scoreboard moved from 24 real figures to 39.** The platform holds 160 reference figures; before this
-   session **24** came from a named published source and **136** were labelled `Modelled`; now **39** are real
-   and **121** stay `Modelled`. Nothing was dressed up as official — anything without a real source stays
+2. **The scoreboard moved from 24 real figures to 39 — and the platform now holds twice as many figures.** It
+   holds **320** reference figures (twenty per department, up from ten); before this session **24** came from a
+   named published source and **136** were labelled `Modelled`; now **39** are real and **281** stay `Modelled`.
+   Nothing was dressed up as official — anything without a real source stays
    plainly marked `Modelled`.
 3. **Two descriptions were corrected so they stay honest.** The exports figure is now described as "goods and
    services" (that is what the official series counts), and the renewable-electricity figure as "including
@@ -3738,7 +3745,7 @@ the remaining modelled indicators each need checking and, where no series matche
    fixes the words would have been untrue beside the real number.
 4. **I found and fixed a stale description in my own notes.** One of the documents that tells Claude how to
    write your pack still described the older, smaller platform (36 groups, 63 figures). It now matches the
-   real platform (72 groups, 160 figures).
+   real platform (72 groups, 320 figures).
 5. **Everything was re-checked and it is live.** All checks green (validate, types, lint, 503 automatic tests,
    build, 18 browser tests), and the public site now serves exactly this build.
 6. **Your pack still needs one small edit, and that file is yours.** The proposal and the slide deck still say
@@ -3939,7 +3946,8 @@ confirm it.
 - **What to do next: the owner's ELEVEN-item list is now the authority — see the section of that name
   near the top of this file.** **All eleven are now done**, and item 11 is the one that had to be
   corrected and rebuilt on 2026-09-30, then expanded again on 2026-10-02: every department now models **24**
-  groups drawn from a **72**-group national list (the indicator set rose to **160**, ten per department),
+  groups drawn from a **72**-group national list (the indicator set rose to **160**, ten per department, then
+  to **320**, twenty per department, on 2026-10-04),
   the dashboard and Reference labels were separated, and a browser gate reads the figure off the page.
   Item 5's strip carries labels the
   assistant chose rather than the owner's words; that is the only item whose *wording* is not the owner's.
@@ -3968,8 +3976,8 @@ confirm it.
   `scripts/validate.mjs`
   (**check 14**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-BjP6kM3z.js`
-  (`146a4ad47b2ac23039797532aeb69bec5d2edee8687a9d61d18e994d74fc6447`)** — the **dataset-expansion build
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-4bQWQK-P.js`
+  (`9ebb0b5788dcc336b175bbe39c812fb2b3c909d1ac21850fbd83e2e91179ec24`)** — the **dataset-expansion build
   of 2026-10-04** (eleven modelled indicators now carry real World Bank figures: **35 published / 125
   modelled**) on top of the **live-date build of
   2026-10-04** on top of the **owner's five changes of
@@ -4212,8 +4220,8 @@ confirm it.
   the **BLOCKER** that used to sit in *Known-red / open items* is gone. The agent has pushed nothing to
   `main` since; the feature branch carries all later work. Deployment is an FTP upload of `dist/`, not a
   git push.
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-BjP6kM3z.js`,
-  `146a4ad47b2ac23039797532aeb69bec5d2edee8687a9d61d18e994d74fc6447`** — the **dataset-expansion build of
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-4bQWQK-P.js`,
+  `9ebb0b5788dcc336b175bbe39c812fb2b3c909d1ac21850fbd83e2e91179ec24`** — the **dataset-expansion build of
   2026-10-04** (35 published / 125 modelled indicators) on top of the live-date build of
   2026-10-04 on top of the national policy-drafting
   build with the sourcing-statement fix and the owner's five changes of 2026-10-02, verified in the

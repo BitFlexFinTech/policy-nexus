@@ -481,3 +481,33 @@ no Zimbabwe data), so the indicator keeps its honest `Modelled` label:
 - Everything else checked is an **operational or administrative return** (border-clearance time, licence
   turnaround, filing rates, uptime, grievances, inspections, readiness, and the whole `opc` / `psc` / `zimra`
   / `zida` / `def` sets) that no publisher publishes for Zimbabwe.
+
+### 9.6 Batch 3 — ten new indicators per department (2026-10-04)
+
+The owner's target was **20 indicators per department (320 total)**. Batch 3 added **ten new Modelled
+indicators to every one of the 16 departments** — 160 new lines in `src/config/departments.ts`. They are
+**demo figures**, plainly labelled `Modelled`, per the owner's instruction that real data comes after
+approval. Each carries a unique id, a plain note and a score, and the set is now **320 indicators
+(39 published / 281 modelled)**. The gate in `src/test/indicator-basis.test.tsx` was raised from
+`toHaveLength(160)` to `toHaveLength(320)`.
+
+**New indicators by department (id suffix — label):**
+- **opc:** delivery · directives · interfaces · maturity · reporting · bills · visits · provinces · satisfaction · analytics
+- **fin:** revenue-gdp · expenditure · interest · capital · currency · npl · inflation · trade · remit-gdp · sovereign
+- **agri:** wheat · cotton · horticulture · livestock-count · irrigated-hectares · mechanisation · storage · contracts · dams · climate
+- **health:** full-immunisation · maternal · tb · blood · mental · referrals · bed-occupancy · chw · amr · ncd
+- **edu:** literacy · numeracy · lower-secondary · girls · special · connectivity · absenteeism · water · feeding-kitchen · exam-pass
+- **hedu:** lecturer-ratio · gender · apprentices · incubation · industry · completion · distance · lab · innovation-grants · graduate-employment
+- **ict:** spectrum · fibre · mast · affordability · skills · govcloud · rural-broadband · incidents · ebusiness · school-lab
+- **mines:** gold · platinum · lithium · csr · fatalities · artisanal · rents · value-local · water · closure
+- **energy:** peak · coal · hydro · imports · gas · tariff · rural · netmeter · minigrid · efficiency
+- **psc:** retirement · gender · disability · recruitment · discipline · performance · innovation · wellness · ethics · mobility
+- **lg:** budget · capital · water-points · sanitation-hh · refuse · plans · audit · revenue-base · roads-grading · wards
+- **mfa:** trade-delegations · passports · diaspora-register · consular-cases · trade-desks · afcfta · bilateral · visa-on-arrival · remit-cost · investment-forum
+- **env:** air · wetlands · waste · carbon · trees · wildlife · eia-compliance · rivers · mine-sites · awareness
+- **def:** personnel · air · vehicles · medical · logistics · training-days · cyber · community · veteran-employment · readiness-days
+- **zimra:** e-payment · customs · risk · debt · education · refund-days · sme · transfer-pricing · integration · disputes
+- **zida:** approved · value · export-value · sez · incentives · grievances · sectors · local · training · followup
+
+**Still to do (the last part of item 1):** the **stakeholder groups, 72 → about 150**, which needs ZIMSTAT
+census tables rather than the World Bank API — **NOT STARTED**.
