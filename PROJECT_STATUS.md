@@ -3644,9 +3644,11 @@ for the delivered detail and the verification log. The costed Google-Drive sheet
 *COSTED SPREADSHEETS* below). The next work is the *NEXT PHASE* list below — the national-scale dataset
 expansion and six other items — and **none of it has been dropped.**
 
-**Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and in sync. **Prove it with one
-command:** `npm run sync:check` (must print `IN SYNC`). **Next commands:** `git fetch` then
-`npm run sync:check`; then begin *NEXT PHASE* item 1 (the national-scale dataset expansion).
+**Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and IN SYNC (proved by
+`npm run sync:check`, which reports all four checks PASS). **Tip:** run `git log --oneline -1`; this
+session's two commits are **`e00fc87`** (the live date — built, tested and published) and **`a0ac0a1`**
+(the records that published it). **Next commands:** `git fetch` then `npm run sync:check`; then begin
+*NEXT PHASE* item 1 (the national-scale dataset expansion).
 
 **PLAIN SUMMARY (OWNER-FACING).**
 
