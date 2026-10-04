@@ -4129,6 +4129,14 @@ duplicate, and **the Treasury joined `NAMED_SOURCES`**. **Split: 127 published /
 graph) still follows. *NEXT PHASE* **item 1** and **item 6** are **DONE**; items 2, 3, 4, 5 and 7 remain and
 **none has been dropped.**
 
+**BATCH 2 (2026-10-05) — the source list widened, and 23 more real indicators landed.** `NAMED_SOURCES` now
+includes the **WHO Global Health Observatory** (the platform's first WHO source); the other 22 new figures are
+World Bank series. **Split: 127 published / 235 modelled (362 indicators), up from 104 / 235 (339).** The build
+was published and **verified byte-identical on the live host** (`assets/index-C3L7Q_LQ.js`, sha256 `2a67ae38…`).
+**THE OWNER'S STRICT RULE (2026-10-05): the source list must keep expanding — never cap it. Every future session
+must look for new publishers; the census and the World Bank are a floor, not a ceiling.**
+
+
 **Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and IN SYNC (proved by
 `npm run sync:check`, which reports all four checks PASS). **Tip:** run `git log --oneline -1`. **Next
 commands:** `git fetch` then `npm run sync:check`; then continue adding new indicators, each on a real

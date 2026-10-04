@@ -1090,6 +1090,22 @@ work that reaches the goal**, never before, because it would fail today by desig
 **Not to be re-opened.** This goal is a **locked decision**. A future session must **read it here** and continue
 the batches — never ask the owner whether to expand, and never treat the old "Item 1 is complete" line (§9.7) as
 the end of the work; that line recorded the *indicator-count and group-count* targets, not this goal.
+
+### 11.2 Batch 2 — 23 more real indicators, and the source list widens (2026-10-05)
+
+**The owner's strict rule (2026-10-05): the source list must keep expanding — never cap it; every round must look
+for new publishers.** Batch 2 added **23 new real indicators**. **`NAMED_SOURCES` gained the WHO Global Health
+Observatory** — healthy life expectancy (52.5 yrs, 2023), skilled birth attendance (91%, 2025), premature NCD
+mortality (31.2%, 2021), suicide (25.4/100k, 2021), road-traffic deaths (29.9/100k, 2021), raised blood glucose
+(7.1%, 2014), adult obesity (6.1%, 2024), alcohol (5.4 L/capita, 2024) and health-worker density (14.65/10k, 2024)
+— and the other figures are World Bank series: child stunting (25.9%), tuberculosis incidence (203/100k), hospital
+beds (1.95/1k), physicians (0.136/1k), total secondary enrolment (52.4%), industry value added (37.1% of GDP),
+services value added (48.2%), external debt (33.0% of GNI), labour-force participation (67.7%), youth unemployment
+(15.5%), female labour participation (62.2%), labour force (6,854,692), population (16,950,795) and population
+growth (1.88%). **Split: 104 published / 235 modelled → 127 published / 235 modelled (362 indicators).** The gate
+`src/test/indicator-basis.test.tsx` was raised 339 → 362 and gained the 23 recorded rows; the build was published
+and verified byte-identical on the live host.
+
 ### 11.1 Batch 1 — 19 new real indicators added (2026-10-04)
 
 **What was done.** 23 new indicators were drafted, each with a Zimbabwe value read from the **World Bank's own
