@@ -100,16 +100,17 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-04, after the live-date build was published — the host and the working copy are IN STEP).**
+- **Status today (2026-10-04, after the dataset-expansion build was published — the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-YLqNp4cB.js` (`d0206e97578c1fd6c59c3c5553c1191d4be28599dbf359324536b380ac19c3b1`) — fetched
+  `assets/index-BmqMV5WB.js` (`598e9f2a7d705345391bf1d5321e66ed6ba7830b92c2d4e47abb9e589e743329`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
-  explicit FTPS, **never `--delete`** — 13 files, 1,353,774 bytes — and the SSL validation token
+  explicit FTPS, **never `--delete`** — 13 files, 1,356,425 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
-  expansion — **72** canonical stakeholder groups, every department modelling **24** of them, and **160**
-  reference indicators (ten per department) — plus the recommended-step actions (*Open what answers this*,
+  expansion and the 2026-10-04 dataset-expansion batch 1 — **72** canonical stakeholder groups, every
+  department modelling **24** of them, and **160** reference indicators (ten per department, of which
+  **35 are published figures and 125 are `Modelled`**) — plus the recommended-step actions (*Open what answers this*,
   *Download this part*) and the **Implementation pack** (generated, read-only). The form that used to ask
   an officer to fill the working matrices by hand is **gone** (the owner's instruction, 2026-10-02): those
   cells print the marked blank, and the department completes them in the copy it exports. It also carries
