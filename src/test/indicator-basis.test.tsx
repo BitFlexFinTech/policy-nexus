@@ -263,6 +263,23 @@ describe("department indicators — published with a named source, or plainly mo
       ["health/health-staffing", "3.1", "World Development Indicators: Nurses and midwives (per 1,000 people)", "2022"],
       ["edu/edu-transition", "86.0", "World Development Indicators: Primary completion rate, total (% of relevant age group)", "2024"],
       ["hedu/hedu-research", "519.9", "World Development Indicators: Scientific and technical journal articles", "2023"],
+      // 2026-10-04 — the national-scale dataset expansion (item 1), batch 1. Eleven of the
+      // modelled indicators that were added on 2026-10-02 were re-researched against the
+      // World Bank's own API and found to have a series that measures the same thing; each
+      // value below was read live from api.worldbank.org this session. The two re-framed
+      // notes (exports now "goods and services"; renewable now "including hydro") move with
+      // the published measure, so the wording stays true.
+      ["fin/fin-reserves", "0.5", "World Development Indicators: Total reserves in months of imports", "2024"],
+      ["fin/fin-savings", "10.7", "World Development Indicators: Gross savings (% of GDP)", "2024"],
+      ["fin/fin-money", "708.9", "World Development Indicators: Broad money growth (annual %)", "2023"],
+      ["health/health-life", "63.1", "World Development Indicators: Life expectancy at birth, total (years)", "2024"],
+      ["health/health-hiv", "95", "World Development Indicators: Antiretroviral therapy coverage (% of people living with HIV)", "2024"],
+      ["edu/edu-repetition", "1.9", "World Development Indicators: Repeaters, primary, total (% of total enrollment)", "2013"],
+      ["edu/edu-ecd", "74.3", "World Development Indicators: School enrollment, preprimary (% gross)", "2021"],
+      ["ict/ict-internet", "41.6", "World Development Indicators: Individuals using the Internet (% of population)", "2024"],
+      ["mfa/mfa-exports", "USD 7.50B", "World Development Indicators: Exports of goods and services (current US$)", "2024"],
+      ["env/env-emissions", "0.8", "World Development Indicators: Carbon dioxide (CO2) emissions excluding LULUCF per capita (t CO2e/capita)", "2024"],
+      ["env/env-renewable", "88.3", "World Development Indicators: Renewable electricity output (% of total electricity output)", "2021"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {

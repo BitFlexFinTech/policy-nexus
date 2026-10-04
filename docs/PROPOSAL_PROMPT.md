@@ -62,21 +62,32 @@ or imply that it already runs on Government infrastructure or in the Government 
   and Public Works; Ministry of Foreign Affairs and International Trade; Ministry of Environment,
   Climate and Wildlife; Ministry of Defence and War Veterans Affairs; Zimbabwe Revenue Authority;
   Zimbabwe Investment and Development Agency.
-- **36 modelled stakeholder groups** — civil servants; urban and rural households; informal traders
+- **72 modelled stakeholder groups** — civil servants; urban and rural households; informal traders
   and transporters; informal-sector workers; cross-border traders; formal business; manufacturers;
   mining operators and artisanal small-scale miners; smallholder farmers; the diaspora; youth;
   women; women-led enterprises; pensioners; the financial sector; exporters; local authorities;
   development partners; health workers; educators; researchers and technical professionals;
   traditional leaders; faith-based organisations; trade unions; employer federations; cooperatives;
   the media and broadcasting; tourism operators; transport operators; energy and water utilities;
-  ICT and network operators; communities living by protected areas; persons with disabilities; and
-  war veterans and their dependants. **20 of the 36 stand on a published national share**, each
-  naming the figure it stands for and the publication it came from; the remaining **16 are
+  ICT and network operators; communities living by protected areas; persons with disabilities;
+  war veterans and their dependants; parliament and legislators; the judiciary and the courts;
+  small and medium enterprises; farmer unions and commodity associations; mining host communities;
+  fishing communities; refugees, migrants and returnees; professional regulatory councils; tertiary
+  students; water user associations; village savings and loan groups; commuter transport
+  associations; traditional healers; youth councils and organisations; cross-border labour
+  migrants; informal settlement residents; urban ratepayers; rural district councils; religious
+  leaders; teachers' unions; nurses and health worker associations; horticulture growers;
+  livestock producers; timber and forestry operators; wildlife conservancies; safari and hunting
+  operators; hospitality and hoteliers; aviation operators; freight and logistics operators;
+  fintech and mobile money providers; microfinance institutions; the insurance sector;
+  construction contractors; pharmaceutical manufacturers and distributors; medical aid societies;
+  and private and independent schools. **20 of the 72 stand on a published national share**, each
+  naming the figure it stands for and the publication it came from; the remaining **52 are
   explicitly labelled `Modelled`**, because no published count exists. Each department models the
-  **6 to 8** groups its own mandate covers, drawn from these 36.
-- **63 reference indicators** across those 16 institutions, each with a plain note and a **stated
-  basis**: **24 are published figures**, each naming its publisher, its publication and its period,
-  and **39 are explicitly labelled `Modelled`**, because no publisher publishes that return. Say it
+  **24** groups its own mandate covers, drawn from these 72.
+- **160 reference indicators** across those 16 institutions, each with a plain note and a **stated
+  basis**: **35 are published figures**, each naming its publisher, its publication and its period,
+  and **125 are explicitly labelled `Modelled`**, because no publisher publishes that return. Say it
   exactly that way. They are coverage, not evidence of outcomes or savings.
 - **48 prepared policy drafts** — three per institution — ready to be run today, so a demonstration
   needs no preparation by the department being shown.

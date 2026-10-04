@@ -395,3 +395,53 @@ twice, "Funded posts filled" twice), and the stale palette comment.
 updated in that session; deploying the new build was the owner's decision. **(Deployed later the same day, and
 republished again after the sourcing-statement fix — the deployment state is recorded in `PROJECT_STATUS.md`'s
 2026-10-02 rows and in `PRODUCTION_READINESS.md` §6c.)**
+
+---
+
+## PART 9 — The national-scale dataset expansion, batch 1 (2026-10-04)
+
+The owner chose **item 1** of the NEXT PHASE list: expand the datasets with **real published figures first**.
+Batch 1 re-researched the **modelled** department indicators — the 97 added on 2026-10-02 were never
+researched — against the **World Bank's own Open Data API**, the same source the original 24 published
+figures use (`api.worldbank.org/v2/country/ZW/indicator/<series>`). **Every value below was read live from
+that API during the session; nothing was invented.** Where a series measures something *materially different*
+from the indicator's wording, the indicator **stays `Modelled`** and is not re-valued (the PART 7 discipline).
+
+### 9.1 Eleven modelled indicators converted to published figures
+
+| Department / indicator (id) | Value now shown | World Development Indicators series | Period |
+|---|---|---|---|
+| fin / Reserve cover (`fin-reserves`) | **0.5** months of imports | Total reserves in months of imports — `FI.RES.TOTL.MO` | 2024 |
+| fin / National savings (`fin-savings`) | **10.7** % of GDP | Gross savings (% of GDP) — `NY.GNS.ICTR.ZS` | 2024 |
+| fin / Broad money growth (`fin-money`) | **708.9** % | Broad money growth (annual %) — `FM.LBL.BMNY.ZG` | 2023 |
+| health / Life expectancy (`health-life`) | **63.1** years | Life expectancy at birth, total (years) — `SP.DYN.LE00.IN` | 2024 |
+| health / HIV treatment coverage (`health-hiv`) | **95** % | Antiretroviral therapy coverage (% of people living with HIV) — `SH.HIV.ARTC.ZS` | 2024 |
+| edu / Repetition rate (`edu-repetition`) | **1.9** % | Repeaters, primary, total (% of total enrollment) — `SE.PRM.REPT.ZS` | 2013 |
+| edu / Early childhood enrolment (`edu-ecd`) | **74.3** % gross | School enrollment, preprimary (% gross) — `SE.PRE.ENRR` | 2021 |
+| ict / Individuals using the Internet (`ict-internet`) | **41.6** % | Individuals using the Internet (% of population) — `IT.NET.USER.ZS` | 2024 |
+| mfa / Export earnings (`mfa-exports`) | **USD 7.50B** | Exports of goods and services (current US$) — `NE.EXP.GNFS.CD` | 2024 |
+| env / Emissions per capita (`env-emissions`) | **0.8** t CO2e | CO2 emissions excluding LULUCF per capita (t CO2e/capita) — `EN.GHG.CO2.PC.CE.AR5` | 2024 |
+| env / Renewable electricity share (`env-renewable`) | **88.3** % | Renewable electricity output (% of total electricity output) — `EG.ELC.RNEW.ZS` | 2021 |
+
+**Two notes were re-framed to the published measure, not quietly re-valued:** `mfa-exports` now reads
+*"goods and services"* (the series counts both) and `env-renewable` now reads *"including hydro"* (the series
+counts hydro, which is why Zimbabwe's share is high) — the previous wording would have been untrue beside the
+published number.
+
+### 9.2 The split after batch 1
+
+**160 indicators: 35 published / 125 modelled** (was 24 / 136). The split is derived
+(`countIndicatorsByBasis`), so no screen states a number the configuration does not hold. The full published
+set is pinned, value by value, in `src/test/indicator-basis.test.tsx`; the eleven new rows were added there,
+and the gate was proved able to fail by mutation (changing `fin-money` from `708.9` to `708.8` made *"holds
+every published figure"* fail) and restored byte-identical.
+
+### 9.3 Still to do (the rest of item 1, NOT done in batch 1)
+
+- **More indicators with published figures** — the remaining modelled indicators were **not** all re-checked
+  in this batch; those with no matching series stay `Modelled` (to be recorded here as each is checked).
+- **New indicators, 10 → 20 per department (160 → 320)** — not started.
+- **More stakeholder groups, 72 → about 150, with more published shares** — not started; needs ZIMSTAT census
+  tables rather than the World Bank API.
+- **The pack** (`Minister Submission/**`) quotes the old 24 / 136 split and is the owner's file — **reported,
+  not edited**.

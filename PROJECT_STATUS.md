@@ -4,10 +4,13 @@ Source of truth for project state. **Read this FIRST at every session.**
 Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE right now.
 `DONE` only appears where it was verified in the same session it was written.
 
-> **LAST TASK — DONE 2026-10-04: the live date, and each document dated when it was made.** Built,
-> tested and published in that session. Read the section *"NEXT TASK — the live date…"* (immediately
-> above `## RESUME HERE`) for what was delivered and its verification log, then the `RESUME HERE`
-> block. The remaining work is the *"NEXT PHASE"* list under it and **is not being removed**.
+> **LAST TASK — DONE 2026-10-04: national-scale dataset expansion, batch 1.** Eleven modelled
+> department indicators were re-researched against the World Bank's own API and converted to real
+> published figures — the split moved from **24 published / 136 modelled** to **35 published / 125
+> modelled**. Built, tested and published in that session. Read the section *"DATASET EXPANSION —
+> batch 1…"* (above `## RESUME HERE`) for the delivered detail and its verification log, then the
+> `RESUME HERE` block. The previous task (the live date, 2026-10-04) is also DONE; the remaining work
+> is the *"NEXT PHASE"* list and **is not being removed**.
 
 ---
 
@@ -3399,7 +3402,40 @@ row, the RESUME HERE summary ("five are done…"), the eleven-item tally, the ex
 - **Not touched:** `Minister Submission/**` (the owner's), `src/components/ui/**`, `package.json` (no
   dependency moved), the palette, the typography and the route map.
 
-## NEXT TASK — the live date, and every document dated when it was made (approved 2026-10-03)
+## DATASET EXPANSION — batch 1: eleven modelled indicators become published (2026-10-04)
+
+**Status: `DONE` — built, tested and published this session.**
+
+The owner chose **item 1** of the NEXT PHASE list (the national-scale dataset expansion), to **start with real
+published figures**. Batch 1 re-researched the **modelled** department indicators — the 97 added on
+2026-10-02 were never researched — against the **World Bank's own Open Data API**
+(`api.worldbank.org/v2/country/ZW/indicator/<series>`), the same source the original 24 published figures
+already use.
+
+- **BUILT.** Eleven modelled indicators now carry a real published figure, each read live from the World
+  Bank API this session (nothing invented): `fin-reserves` 0.5 months of imports, `fin-savings` 10.7 % of
+  GDP, `fin-money` 708.9 %, `health-life` 63.1 years, `health-hiv` 95 %, `edu-repetition` 1.9 %,
+  `edu-ecd` 74.3 % gross, `ict-internet` 41.6 %, `mfa-exports` USD 7.50B, `env-emissions` 0.8 t CO2e,
+  `env-renewable` 88.3 %. **Two notes were re-framed to the published measure** so they stay true beside the
+  number (`mfa-exports` → "goods and services"; `env-renewable` → "including hydro"). The split moved from
+  **24 published / 136 modelled to 35 published / 125 modelled** (160 total). The full research record is
+  **PART 9** of `docs/PLATFORM_ENRICHMENT_PLAN.md`.
+- **A stale statement found and fixed at source.** `docs/PROPOSAL_PROMPT.md` still described **36**
+  stakeholder groups, **63** indicators and **16 / 39** modelled — all stale since the 2026-10-02 expansion.
+  Corrected to **72** groups (20 published / 52 modelled, 24 per department) and **160** indicators (35
+  published / 125 modelled), with the full 72-group list.
+- **TESTED (real output, this session).** `npm run validate` → **PASS — all 20 checks green** ·
+  `npm run typecheck` → **0** · `npm run lint` → **0 errors, 7 pre-existing warnings** · `npm test` →
+  **503 passed across 46 files** · `npm run build` → **✓ (`assets/index-BmqMV5WB.js`)** · `npx playwright
+  test` → **18 passed** (phone fold **834 px of 844 px**). The published-figure gate in
+  `src/test/indicator-basis.test.tsx` was extended with the eleven rows and **proved able to fail** by
+  mutation (`fin-money` `708.9` → `708.8` made *"holds every published figure"* FAIL); the file was restored
+  **byte-identical** (`sha256 f1a7b871…`).
+- **RESULT: DONE for batch 1.** The rest of item 1 (more indicators, 160 → 320; more groups, 72 → ~150) is
+  **NOT STARTED** and stays on the NEXT PHASE list.
+- **Not touched:** `Minister Submission/**` (the owner's file — it still quotes 24 / 136 and **is reported,
+  not edited**), `src/components/ui/**`, `package.json` (no dependency moved), the palette, the typography
+  and the route map.
 
 **Status: `DONE` — built, tested and published 2026-10-04; verified in that session (see the
 verification log below).** The plan that follows this line is the record of what was asked; every
@@ -3632,8 +3668,9 @@ in the order the owner has raised them.
 
 1. **The national-scale dataset expansion** (owner's instruction, 2026-10-02/03). The platform holds
    **72** canonical stakeholder groups (20 with a published share, 52 `Modelled`), **24** modelled per
-   department, and **160** reference indicators (10 per department: **24 published, 136 `Modelled`**) —
-   so **44 of 232 figures (19%) stand on a published source**. Target: national groups **72 → about 150**,
+   department, and **160** reference indicators (10 per department: **35 published, 125 `Modelled`** —
+   24 published before batch 1, 35 after it) —
+   so **55 of 232 figures (24%) stand on a published source**. Target: national groups **72 → about 150**,
    each department's set **24 → about 40**, indicators **10 → 20 per department (320)** — and, first,
    **expand the published set with real sourced figures** (ZIMSTAT, the Reserve Bank, the line ministries,
    and the World Bank / WHO / UNICEF / UNESCO / ITU series the platform already cites), with everything
@@ -3643,6 +3680,8 @@ in the order the owner has raised them.
    `src/test/indicator-basis.test.tsx` ("160 indicators") and `e2e/journey.spec.ts` ("72 nationally").
    **The proposal and the deck quote 72 / 24 per institution / 160 / 20 published / 52 modelled /
    24 published / 136 modelled — so the pack must be updated in step, and that file is the owner's.**
+   **Batch 1 of this item is DONE (2026-10-04): the indicator split is now 35 published / 125 modelled
+   (see *"DATASET EXPANSION — batch 1"*), so the pack's 24 / 136 is now stale and needs the owner's edit.**
 2. **`/platform-admin` needs a real guard.** Recorded open on 2026-09-29: the screen is reachable by
    anyone who types the address and can save the service configuration; hiding it is not protecting it.
 3. **The three funded build steps** the proposal asks for: server-side document text extraction (so a real
@@ -3659,21 +3698,48 @@ in the order the owner has raised them.
 
 ## RESUME HERE
 
-**NOTHING IS OUTSTANDING FROM AN APPROVED TASK.** The live-date task (approved 2026-10-03) is **DONE**
-— built, tested and published on 2026-10-04; see the *"NEXT TASK — the live date…"* section (above)
-for the delivered detail and the verification log. The costed Google-Drive sheets are **DONE** too (see
-*COSTED SPREADSHEETS* below). The next work is the *NEXT PHASE* list below — the national-scale dataset
-expansion and six other items — and **none of it has been dropped.**
+**NOTHING IS OUTSTANDING FROM AN APPROVED TASK; the newest approved work is DONE.** The national-scale
+dataset expansion **batch 1** (the owner's choice, 2026-10-04) is **DONE** — eleven modelled indicators
+became real published figures, so the split is now **35 published / 125 modelled**; see the *"DATASET
+EXPANSION — batch 1"* section (above) for the delivered detail and the verification log. The live-date task
+(approved 2026-10-03) is **DONE** too, and the costed Google-Drive sheets are **DONE** (see *COSTED
+SPREADSHEETS* below). The next work is the **rest** of *NEXT PHASE* item 1 — **new indicators (160 → 320)**
+and **new stakeholder groups (72 → ~150)**, which need ZIMSTAT census tables rather than the World Bank API —
+plus the six other items; **none of it has been dropped.**
 
 **Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and IN SYNC (proved by
-`npm run sync:check`, which reports all four checks PASS). **Tip:** run `git log --oneline -1`; this
-session's two commits are **`e00fc87`** (the live date — built, tested and published) and **`a0ac0a1`**
-(the records that published it). **Next commands:** `git fetch` then `npm run sync:check`; then begin
-*NEXT PHASE* item 1 (the national-scale dataset expansion).
+`npm run sync:check`, which reports all four checks PASS). **Tip:** run `git log --oneline -1`. **Next
+commands:** `git fetch` then `npm run sync:check`; then continue *NEXT PHASE* item 1 with the **new**
+indicators and groups (the "expand the published set first" step is done for the eleven found in batch 1;
+the remaining modelled indicators each need checking and, where no series matches, a recorded reason).
 
 **PLAIN SUMMARY (OWNER-FACING).**
 
-**This session (2026-10-04 — the live date).** In plain words:
+**This session (2026-10-04 — eleven made-up figures replaced with real published ones).** In plain words:
+1. **You asked to start with real published figures, and I did that for eleven of them.** The platform shows
+   numbers for each department, and until now most were the platform's own "Modelled" figures — clearly
+   labelled as not official. Eleven of them now carry a **real figure from a named official source**, each
+   read live from the **World Bank's own data service** during this session, never guessed: for example
+   **life expectancy 63.1 years (2024)**, **HIV treatment coverage 95% (2024)**, **internet use 41.6% (2024)**,
+   **export earnings US$7.50 billion (2024)**.
+2. **The scoreboard moved from 24 real figures to 35.** The platform holds 160 reference figures; before this
+   session **24** came from a named published source and **136** were labelled `Modelled`; now **35** are real
+   and **125** stay `Modelled`. Nothing was dressed up as official — anything without a real source stays
+   plainly marked `Modelled`.
+3. **Two descriptions were corrected so they stay honest.** The exports figure is now described as "goods and
+   services" (that is what the official series counts), and the renewable-electricity figure as "including
+   hydro" (the official series includes hydro, which is why Zimbabwe's share is high). Without those wording
+   fixes the words would have been untrue beside the real number.
+4. **I found and fixed a stale description in my own notes.** One of the documents that tells Claude how to
+   write your pack still described the older, smaller platform (36 groups, 63 figures). It now matches the
+   real platform (72 groups, 160 figures).
+5. **Everything was re-checked and it is live.** All checks green (validate, types, lint, 503 automatic tests,
+   build, 18 browser tests), and the public site now serves exactly this build.
+6. **Your pack still needs one small edit, and that file is yours.** The proposal and the slide deck still say
+   "24 published / 136 modelled". That is now out of date — it should read **35 published / 125 modelled**. I
+   have **not** edited your file; I am telling you so you can update it before the meeting.
+
+**Previous session (2026-10-04 — the live date).** In plain words:
 1. **The platform now shows today's date and time**, and it keeps ticking on its own while the page is open. It reads "Today 4 October 2026 · 09:15" and moves on by itself — nothing has to be rebuilt for the day to change.
 2. **The old frozen date is still there, and it now means something different.** "Reference date 24 September 2026" is the date the platform's figures are worked out FOR — the frame the numbers belong to. That is not "today", and it does not move. Both are on the page, each clearly labelled, so nothing that was there before has been lost or hidden.
 3. **Every run is now dated the moment you press Run Simulation**, and all four of its documents carry that same date, so they agree with each other. A run you made before this change keeps the date it was saved with — its history is not rewritten.
