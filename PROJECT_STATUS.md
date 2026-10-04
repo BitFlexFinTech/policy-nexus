@@ -4,19 +4,31 @@ Source of truth for project state. **Read this FIRST at every session.**
 Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE right now.
 `DONE` only appears where it was verified in the same session it was written.
 
-> **LAST TASK — DONE 2026-10-04: national-scale dataset expansion, batches 1–4 — item 1 complete; and the
-> offline-demo sheet (item 6).** Fifteen modelled indicators became real published figures (the split moved
-> from **24 published / 136 modelled** to **39 published / 281 modelled**), the platform now holds **320
-> reference indicators** (twenty per department, up from ten) and **150 stakeholder groups** (every
-> department models 40, up from 24). The offline-demo sheet **`docs/OFFLINE_DEMO.md`** makes the deck's "no
-> network needed" claim runnable on the day. Built, tested and published in that session. Read the sections
-> *"DATASET EXPANSION — batches 1–4…"* and *"OFFLINE-DEMO SHEET…"* (above `## RESUME HERE`) for the delivered
-> detail and the verification log, then the `RESUME HERE` block. The previous task (the live date,
-> 2026-10-04) is also DONE; the remaining work is the *"NEXT PHASE"* list and **is not being removed**.
+> **LAST TASK — DONE 2026-10-04: the rules were fixed at the root (real sources; one review zip).** The owner
+> reported that the "real data" decision was never written into a rule, and that the review zip made a new
+> file every task. Both are fixed in **every** rules location: a new global rule
+> **`data-must-be-real-sources.md`**, the review-zip rule corrected to **ONE** zip, a pre-existing manifest
+> defect fixed, and the 47 zips consolidated into one. Verified by **`check-rules.mjs` →
+> `RULES_CHECK_PASS (16 passed, 0 failed)`**. See *"RULES FIXED…"* (above `## RESUME HERE`). **Next: Batch B**
+> — make the platform's evidence base real. Earlier the same day: the dataset expansion (batches 1–4, item 1)
+> and the offline-demo sheet (item 6), both DONE; the remaining work is the *"NEXT PHASE"* list and **is not
+> being removed**.
 
 ---
 
 ## Locked constraints (do not re-derive, do not "improve")
+- **REAL SOURCES ONLY (the owner, 2026-10-04 — a LOCKED decision; do NOT re-open or re-ask):** every figure
+  the platform shows as **evidence** must come from a **real, named, published source** (the body, the
+  publication, the period). **No invented figures.** `Modelled` is **not** a shelter for a placeholder — a
+  made-up number labelled "Modelled" is still made-up. **Where a measure has no published source, the measure
+  is REPLACED** with one that does. The one permitted exception is a **simulation's OUTPUT**, which is
+  inherently a projection and must be plainly labelled as simulated. **Evidence in = real; simulation out =
+  labelled.** Written into the global rule **`data-must-be-real-sources.md`** (both global folders **and**
+  this project's `.clinerules/`), so it can never be re-litigated.
+- **ONE REVIEW ZIP, UPDATED IN PLACE (the owner, 2026-10-04 — LOCKED):** the review zip is a **single file**,
+  `Review Zip/nzwisiso-policy-dashboard-review.zip`, **overwritten** at the end of every task. A new numbered
+  zip per task is **forbidden** (it had accumulated **47** files). Written into the global rule
+  **`always-export-review-zip.md`**.
 - **Palette LOCKED**: `src/index.css` `:root` — `--primary: 120 100% 20%` (emerald #006400),
   `--gold: 51 100% 50%` (#FFD700), `--success`, `--warning`. No new colour literals anywhere.
 - **Typography LOCKED**: Inter + JetBrains Mono (`tailwind.config.ts` fontFamily). Self-hosted
@@ -3409,6 +3421,39 @@ row, the RESUME HERE summary ("five are done…"), the eleven-item tally, the ex
 - **Not touched:** `Minister Submission/**` (the owner's), `src/components/ui/**`, `package.json` (no
   dependency moved), the palette, the typography and the route map.
 
+## RULES FIXED — real sources, and one review zip (2026-10-04, the owner's instruction)
+
+**Status: `DONE` — verified this session.**
+
+The owner reported two rule failures and asked why decided changes were not in the rules. Both were real, and
+both are now fixed **at the root**, in **every location the runtime reads**.
+
+- **A rule that never existed: `data-must-be-real-sources.md`.** There was **no** rule anywhere saying figures
+  must come from real published sources — the decision lived only in chat and a status note, which is exactly
+  why it kept coming back. It now exists, **byte-identical**, in `~/.cline/rules/`, `~/Documents/Cline/Rules/`
+  **and** this project's `.clinerules/`; it is listed in `RULES-MANIFEST.json` (declared + mirrored + 3
+  required markers); and its decision is a **locked constraint** (above). It states: real named published
+  sources only; **no invented figures**; `Modelled` is **not** a shelter for a placeholder; **where a measure
+  has no source, the measure is REPLACED**; only a **simulation's OUTPUT** may be labelled simulated.
+- **The review-zip rule corrected: ONE zip, overwritten.** The old rule told every session to create a **new
+  numbered** zip, which filled this project's `Review Zip/` with **47** files. It now names **one** file
+  (`<project>-review.zip`), deletes older numbered zips, and overwrites the single file. Fixed in **both**
+  global folders.
+- **A pre-existing global defect fixed too:** `RULES-MANIFEST.json`'s project check named two pointer files
+  (`operating-model.md`, `protection-rules.md`) that belong to a **different** project, so every other project
+  failed for files it was never meant to have. The check now scans the project's own rules folder for the
+  marker — project-agnostic.
+- **The 47 zips consolidated** into **`Review Zip/nzwisiso-policy-dashboard-review.zip`**.
+
+**TESTED (real output):** `node ~/.cline/rules/check-rules.mjs --project "<this project>"` →
+**`RULES_CHECK_PASS (16 passed, 0 failed, 19 rules declared)`**; both global folders byte-identical; the
+project carries both shared rules byte-identical; the single zip created with **no `.env` secret inside**.
+
+**NEXT (the rest of the approved plan):** **Batch B** — make the platform's **evidence base** real (real
+figures for the group shares and the indicators, replacing any measure that has no published source);
+**Batch C** — the graph (more colours, better quality, the MiroFish click behaviour); **Batch D** — the
+engine-vitals wording ("Scenario engine · evidence: real published figures · output: simulated").
+
 ## DATASET EXPANSION — batches 1–4: real published figures, 20 indicators per department, and 150 groups (2026-10-04)
 
 **Status: `DONE` — built, tested and published this session.**
@@ -3734,20 +3779,20 @@ in the order the owner has raised them.
 
 ## RESUME HERE
 
-**NOTHING IS OUTSTANDING FROM AN APPROVED TASK; the newest approved work is DONE.** *NEXT PHASE* **item 1
-(the national-scale dataset expansion) is DONE — batches 1–4 (2026-10-04)** (indicators 160 → 320; groups
-72 → 150, 24 → 40 per department; published figures 24 → 39), and **item 6 (the offline-demo sheet) is DONE
-too** — `docs/OFFLINE_DEMO.md`; see the *"OFFLINE-DEMO SHEET"* section (above). The live-date task
-(approved 2026-10-03) and the costed Google-Drive sheets are **DONE** as well. The next work is the **five
-remaining *NEXT PHASE* items** — item 2 (the `/platform-admin` guard, which needs the funded sign-in build to
-be real), item 3 (the three funded server-side build steps), item 4 (the `®` mark — a legal call), item 5
-(two wording items in the owner's pack), and item 7 (a watch item, not a task); **none of it has been
-dropped.**
+**THE RULES ARE FIXED (2026-10-04) AND AN APPROVED PLAN IS IN FLIGHT.** A new global rule
+**`data-must-be-real-sources.md`** now exists in **every** rules location — the decision that kept coming back
+is finally written down — and the review-zip rule keeps **ONE** zip. `check-rules.mjs` →
+**`RULES_CHECK_PASS (16 passed, 0 failed)`**. **The approved plan continues at Batch B** (make the platform's
+evidence base real), then **Batch C** (the graph: more colours, better quality, the MiroFish click behaviour)
+and **Batch D** (the engine-vitals wording) — see *"RULES FIXED…"* (above). *NEXT PHASE* **item 1** (the
+dataset expansion, batches 1–4) and **item 6** (the offline-demo sheet) are **DONE**. The remaining *NEXT
+PHASE* items are item 2 (the `/platform-admin` guard, which needs the funded sign-in build to be real), item 3
+(the three funded server-side build steps), item 4 (the `®` mark — a legal call), item 5 (two wording items in
+the owner's pack), and item 7 (a watch item, not a task); **none of it has been dropped.**
 
 **Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and IN SYNC (proved by
 `npm run sync:check`, which reports all four checks PASS). **Tip:** run `git log --oneline -1`. **Next
-commands:** `git fetch` then `npm run sync:check`; then pick up any of the five remaining *NEXT PHASE* items
-(items 1 and 6 are complete).
+commands:** `git fetch` then `npm run sync:check`; then continue the approved plan at **Batch B**.
 
 **PLAIN SUMMARY (OWNER-FACING).**
 
