@@ -58,6 +58,12 @@ export const NAMED_SOURCES = [
       "World Development Indicators — each series compiled from national sources and, where the series requires it, from WHO/UNICEF, ITU, UNESCO or UN Comtrade, as the series metadata states",
   },
   {
+    id: "imf",
+    name: "International Monetary Fund",
+    figures: "Zimbabwe's general government gross debt as a share of GDP",
+    publication: "World Economic Outlook — General government gross debt (% of GDP)",
+  },
+  {
     id: "acts-index",
     name: "veritaszim A–Z List of Acts (official consolidated index)",
     figures: "The title and chapter of every Act the platform cites",

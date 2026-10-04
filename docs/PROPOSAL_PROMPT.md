@@ -370,18 +370,17 @@ do not omit it to look authoritative.
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
 - **What the live site actually is today (re-checked 2026-10-04, after the dataset-expansion build was published).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-CzWGCJjD.js`
-  (`6ca2fd533ead2971c2b3fc7010f98a5b740456db86113801f318676e80483fae`), which is byte-identical to the
+  The host `nzwisiso.bitflex.app` serves `assets/index-DP-v24Lw.js`
+  (`3dd2c2aa1a9f90b46b24e0b25133bdd1663d1a79a6a4cf557d64c6a552570f03`), which is byte-identical to the
   local build, so **the live site is the build published on 2026-10-04** — it shows the **live date and
-  time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the
-  eleven newly published indicator figures (35 published / 125 modelled), and it carries the authority line, the modelled
+  time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (54 published / 266 modelled), and it carries the authority line, the modelled
   agent population, the named sources (with the corrected sentence naming both publishers the stakeholder
   shares stand on), the official Coat of Arms, the favicon set, the Nzwisiso.ai
-  positioning section, all 24 published figures, and the owner's items 1–11, including the *Re-run
+  positioning section, all 54 published figures, and the owner's items 1–11, including the *Re-run
   simulation* action, the drafting stage, the recommended-step actions that open or send the part of the
   policy that answers each step, the **Implementation pack** (generated and read-only — the form that asked
   an officer to hand-fill the working matrices was removed at the owner's instruction on 2026-10-02), and
-  every department modelling **24**
+  every department modelling **40**
   stakeholder groups. (When
   this was checked on 2026-09-28 the host served
   `assets/index-BeggQU9V.js`, which was

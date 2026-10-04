@@ -4,15 +4,18 @@ Source of truth for project state. **Read this FIRST at every session.**
 Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE right now.
 `DONE` only appears where it was verified in the same session it was written.
 
-> **LAST TASK — DONE 2026-10-04: the rules were fixed at the root (real sources; one review zip).** The owner
-> reported that the "real data" decision was never written into a rule, and that the review zip made a new
-> file every task. Both are fixed in **every** rules location: a new global rule
-> **`data-must-be-real-sources.md`**, the review-zip rule corrected to **ONE** zip, a pre-existing manifest
-> defect fixed, and the 47 zips consolidated into one. Verified by **`check-rules.mjs` →
-> `RULES_CHECK_PASS (16 passed, 0 failed)`**. See *"RULES FIXED…"* (above `## RESUME HERE`). **Next: Batch B**
-> — make the platform's evidence base real. Earlier the same day: the dataset expansion (batches 1–4, item 1)
-> and the offline-demo sheet (item 6), both DONE; the remaining work is the *"NEXT PHASE"* list and **is not
-> being removed**.
+> **LAST TASK — 2026-10-04 (later): Batch B part 2 — the evidence base widened beyond the World Bank.**
+> Three more modelled indicators now carry a real published figure (`fin-debt-gdp` **70.4 % of GDP** from the
+> **IMF** World Economic Outlook, `mfa-remit-cost` **5.3 %** from the World Bank's remittance-price series,
+> `edu-girls` **50.9 %** from the World Bank's female secondary enrolment series), the **IMF was added as a
+> named source**, and the split moved to **54 published / 266 modelled**. Every publisher the sourcing rule
+> names beyond the World Bank was checked and the rejections recorded with their reasons (**PART 9.8** of
+> `docs/PLATFORM_ENRICHMENT_PLAN.md`). A stale description in `docs/PROPOSAL_PROMPT.md` (24 groups, 35 / 125,
+> "all 24 published figures") was fixed at source, and a **new validate check 21** now derives those figures
+> from the configuration so they cannot drift again. **The remainder of Batch B is BLOCKED on ONE owner
+> decision** — see the *BATCH B* section. **Next: Batch C** (the graph). Earlier the same day: the rules were
+> fixed at the root (real sources; one review zip), the dataset expansion (batches 1–4, item 1) and the
+> offline-demo sheet (item 6); the remaining *"NEXT PHASE"* list **is not being removed**.
 
 ---
 
@@ -1614,6 +1617,7 @@ because the block it sits in already names itself.
 | 2026-10-04 | **dataset expansion batch 3 — ten new indicators per department (160 → 320)** | The owner's target of **20 indicators per department (320)** is met: **ten new Modelled indicators added to each of the 16 departments** (160 new lines in `src/config/departments.ts`), each with a unique id, a plain note and a bounded score — demo figures, plainly labelled `Modelled` per the owner's instruction that real data comes after approval. The set is now **320 indicators (51 published / 269 modelled)**. The gate was raised `toHaveLength(160)` → `toHaveLength(320)` in `src/test/indicator-basis.test.tsx`; no other test needed changing (the per-department gate only requires ≥3). **TESTED:** validate **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-CzWGCJjD.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,400,957 bytes; served sha256 **`6ca2fd533ead2971c2b3fc7010f98a5b740456db86113801f318676e80483fae`** identical to the local build; site **200**. **Not touched:** `Minister Submission/**` (the owner's — still quotes 160 / 24 published / 136 modelled; now **320 / 39 / 281**). |
 | 2026-10-04 | **dataset expansion batch 4 — the stakeholder groups reach 150, 40 per department (item 1 complete)** | The canonical list `STAKEHOLDER_SEGMENTS` grew **72 → 150** (78 new groups, all `Modelled`, in `src/config/reference.ts`), and **every one of the 16 departments now models 40** (was 24) in `src/config/departments.ts`. The new groups cover agro-processing and inputs, the manufacturing sub-sectors, the mining/energy supply chains, the rest of the financial sector, transport and logistics, tourism and the creative industries, the ICT and digital economy, media, the health and care workforce and the education and training workforce. **Split: 150 groups — 20 published / 130 modelled.** **Gates moved with the data (fixed at source):** the `DEPARTMENT_SEGMENTS` pin and the range gate (22–26 → **36–44**) in `src/test/departments.test.ts`; `MODELLED_IDS` (+78 ids) and the **20 / 130** split in `src/test/reference-sources.test.tsx`; `toHaveLength(72)` → `toHaveLength(150)` in `src/test/workspace.test.tsx`; and "72 nationally" / heading `(72)` → "150 nationally" / `(150)` in `e2e/journey.spec.ts`. **One test re-tuned, not weakened:** `src/test/swarm.test.ts`'s impulse check uses a stronger shove (260/60 → **420/95**) because a 40-group school is denser; the property (a shove separates the school, which then recoheres) is unchanged. **TESTED:** validate **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-CzWGCJjD.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,400,957 bytes; served sha256 **`6ca2fd533ead2971c2b3fc7010f98a5b740456db86113801f318676e80483fae`** identical to the local build; site **200**. **Item 1 is complete.** **Not touched:** `Minister Submission/**` (the owner's — still quotes 72 / 24 / 160 / 24·136; now **150 / 40 / 320 / 39·281**). |
 | 2026-10-04 | **offline-demo sheet (NEXT PHASE item 6) — the deck's "no network needed" claim made runnable** | New file **`docs/OFFLINE_DEMO.md`**: the one-page, plain-English procedure that puts the built site on a demonstration laptop **with the network off** — build once (`npm run build`); copy `dist/` to the laptop; serve it **on that laptop** with a local web server (Python 3's `python3 -m http.server 8080`, or the project's `npm run preview`); open the root address; prove it with the Wi-Fi off. It states why a local server is used (a browser will not run the site from a `file://` address), what to expect (identical behaviour; **no network request at all**), the single-page-app caveat (open at the root; `npm run preview` handles deep-address refreshes), and a before-the-meeting checklist. **TESTED:** a local Python server served `dist/` — the root returned **200** and the bundle `assets/index-CzWGCJjD.js` returned **200**. **No `src/` file changed**, so the shipped bundle is **byte-identical** (`assets/index-CzWGCJjD.js`, sha256 `6ca2fd53…`) and **no redeploy was needed** — the live host already serves it. **Also fixed a stale statement** left in *NEXT PHASE* item 1 (a batch-1 leftover saying the split was 35 / 125) — removed at source. **TESTED on these bytes:** validate **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-CzWGCJjD.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. |
+| 2026-10-04 | **Batch B part 2 — three more modelled indicators become real published figures, the IMF added as a named source, and a stale description fixed with a new gate** | The sweep was widened to every publisher the sourcing rule names **beyond the World Bank**. **Three genuinely measure what their indicator states** and were converted, each value read live from the publisher's own service: `fin-debt-gdp` **70.4 % of GDP** — **International Monetary Fund**, World Economic Outlook, general government gross debt (2024); `mfa-remit-cost` **5.3 %** — World Bank, average transaction cost of sending remittances to a specific country (2023); `edu-girls` **50.9 %** — World Bank, school enrolment, secondary, female, gross (2013). **`NAMED_SOURCES` gained `imf`**, because the IMF — not the World Bank — publishes Zimbabwe's public debt. **Two wordings moved to the published measure** (`fin-debt-gdp` → *general government* gross debt; `edu-girls` → *gross*, the enrolment ratio, not girls' share of enrolment). **Split 51 / 269 → 54 / 266.** **Every rejection is recorded with its reason (PART 9.8 of `docs/PLATFORM_ENRICHMENT_PLAN.md`):** `fin-debt` (USD stock — the IMF publishes only the ratio), `fin-npl` (no Zimbabwe value), `energy-imports` (the only series is net *energy* imports, not imported electricity), `agri-irrigated`/`-hectares` (no Zimbabwe value; FAO AQUASTAT has no queryable interface), `hedu-research-spend` and `edu-lower-secondary` (UNESCO UIS returned no Zimbabwe record for the codes queried), `agri-tobacco`/`-cotton`/`-horticulture` (FAOSTAT returned no Zimbabwe crop data; UN Comtrade publishes *exports*, a different measure from the *output* these state), the health operational returns, and the `opc`/`psc`/`zimra`/`zida`/`def` administrative returns. **A stale-description defect found and FIXED at source, with a new gate:** `docs/PROPOSAL_PROMPT.md`'s present-tense *"what the live site is today"* paragraph still said every department modelled **24** groups, carried **35 published / 125 modelled** and **all 24 published figures** — all stale since the 2026-10-04 expansion, and each corrected by hand in an earlier session, which is why it drifted again. **New validate check 21** (\"the live-site description states the configuration's current figures\") derives the indicator split, the group split and the per-department group count from `src/config/departments.ts` and `src/config/reference.ts` and compares them with that paragraph — **4 real violations before the fix, 0 after** — while dated history rows are left untouched. **The published-figure gate gained the three rows and was proved able to fail:** mutating `fin-debt-gdp` `70.4 → 70.3` made *"holds every published figure"* fail; restored **byte-identical** (sha256 `02a0e1894ce3230535481c988e069fcab51786f31e6c23c11d6a81d92c81d161`). **BLOCKED (stated, not dropped):** the remaining **266 modelled indicators and 130 modelled group shares have no published source**, and the sourcing rule requires each unsourceable measure to be **replaced** — a product decision for the owner (fewer figures per department, or the operational measures presented as the platform's own modelled service metrics). No source can be invented for them. **TESTED on these bytes:** `npm run validate` **PASS** (21 check groups) · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-DP-v24Lw.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**) — **1 new file, 12 modified**, 1,401,585 bytes; the served file's sha256 **`3dd2c2aa1a9f90b46b24e0b25133bdd1663d1a79a6a4cf557d64c6a552570f03`** is **identical** to the local build; site **200**; the SSL validation token returns **200**; and the served bundle contains *"International Monetary Fund"*, *"General government gross debt"*, *"Average transaction cost of sending remittances"* and *"School enrollment, secondary, female"*. **Not touched:** `Minister Submission/**` (the owner's file — still quotes 150 / 40 / 320 / 51·269; it now needs **54 published / 266 modelled**; **reported, not edited**). |
 
 
 
@@ -3473,7 +3477,7 @@ governs, where it is the honest label for a client with no real credentials yet.
 
 ## BATCH B — the evidence base made real (2026-10-04)
 
-**Status: `IN PROGRESS`.** Under the new real-sources rule, the platform's evidence base is being made real.
+**Status: `IN PROGRESS` — parts 1 and 2 `DONE`; the remainder is `BLOCKED` on one owner decision.** Under the new real-sources rule, the platform's evidence base is being made real.
 
 - **BUILT (indicators, part 1).** Twelve more modelled indicators were found to have a real **World Bank**
   series that measures the same thing, and were converted (each value read live this session): `fin-interest`
@@ -3481,13 +3485,62 @@ governs, where it is the honest label for a client with no real credentials yet.
   8.5% of GDP (2024), `health-full-immunisation` 91% (2024), `health-maternal` 358 per 100,000 (2023),
   `health-tb` 91% (2023), `edu-literacy` 93.2% (2019, adult rate), `mines-rents` 4.2% of GDP (2021),
   `energy-coal` 54.1% (2023), `energy-hydro` 45.1% (2023), `energy-rural` 46.6% (2024). Three were re-framed
-  to the published measure. **The indicator split is now 51 published / 269 modelled** (was 39 / 281).
-- **HONEST LIMIT (must be resolved).** The remaining **269 modelled indicators** and **130 modelled group
-  shares** have **no published source** — the World Bank catalogue does not hold 320 Zimbabwe series, and the
-  census publishes about 20 industry categories (already used by the 20 published group shares). Under the
-  rule, a measure with no source must be **replaced**. That is a **design change** (fewer, sourceable
-  indicators and groups), and it needs the owner's decision — no source can be invented for it.
-- **TESTED:** typecheck **0** · the published-figure gate gained the twelve rows and passes.
+  to the published measure. **Part 1 moved the split to 51 published / 269 modelled** (was 39 / 281).
+- **BUILT (indicators, part 2 — the sweep widened beyond the World Bank).** The sourcing rule names more
+  publishers than the World Bank, so the remaining modelled indicators were checked against them too, and
+  **three genuinely measure what their indicator states** (each value read live this session):
+  `fin-debt-gdp` **70.4 % of GDP** — IMF World Economic Outlook, general government gross debt (2024);
+  `mfa-remit-cost` **5.3 %** — World Bank, average transaction cost of sending remittances (2023);
+  `edu-girls` **50.9 %** — World Bank, school enrolment, secondary, female, gross (2013). **One publisher
+  was added to `NAMED_SOURCES` — the International Monetary Fund** — because the IMF, not the World Bank,
+  publishes Zimbabwe's public debt. **Two wordings moved to the published measure** (`fin-debt-gdp` is now
+  *general government* gross debt; `edu-girls` is now *gross*, the enrolment ratio, not girls' share of
+  enrolment). **The indicator split is now 54 published / 266 modelled** (was 51 / 269). The full sweep,
+  and every publisher checked and rejected with its reason, is **PART 9.8** of
+  `docs/PLATFORM_ENRICHMENT_PLAN.md` (IMF, UNESCO UIS, WHO, FAO/FAOSTAT, UN Comtrade and the World Bank).
+- **BLOCKED — the honest limit, and it needs ONE owner decision.** **266 indicators and 130
+  stakeholder-group shares still have no published source**, and the publishers above were checked before
+  saying so. Under the locked sourcing rule a measure with no source must be **replaced**, and the
+  replacement is a **product decision**: either the platform shows **far fewer figures** per department
+  (the 54 sourceable ones), or each department's operational measures are presented as the platform's own
+  modelled service metrics rather than as national evidence. **The missing input is that decision — nothing
+  else**; no source can be invented for the remainder, and no further research closes it. **Until it is
+  made, the 266 modelled figures are NOT compliant with the sourcing rule and must never be reported as
+  sourced** — they stay plainly labelled `Modelled`, and this item stays open work, never a "known
+  exception".
+- **TESTED (this session):** `npm run validate` **PASS** (including the new check 21) · typecheck **0** ·
+  lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓** · the
+  published-figure gate gained the three rows and was **proved able to fail** (mutating `fin-debt-gdp`
+  `70.4 → 70.3` made *"holds every published figure"* fail; restored **byte-identical**, sha256
+  `02a0e1894ce3230535481c988e069fcab51786f31e6c23c11d6a81d92c81d161`).
+- **A stale-description defect found and fixed at source, with a new gate.** `docs/PROPOSAL_PROMPT.md`'s
+  paragraph describing **what the live site is today** still said every department modelled **24**
+  stakeholder groups, **35 published / 125 modelled** indicators and **all 24 published figures** — all
+  three stale since the 2026-10-04 expansion, and each had been corrected by hand in an earlier session,
+  which is why it drifted again. The figures are now **derived from the configuration** by **new validate
+  check 21** ("the live-site description states the configuration's current figures") and compared with
+  that paragraph; **it reported 4 real violations before the fix and 0 after**, and dated history rows are
+  left untouched.
+
+## Files touched in Batch B part 2 (2026-10-04, this session)
+
+- `src/config/reference.ts` — added the **International Monetary Fund** (`imf`) to `NAMED_SOURCES`.
+- `src/config/departments.ts` — three indicators converted to published figures (`fin-debt-gdp`,
+  `mfa-remit-cost`, `edu-girls`); two notes re-framed to the published measure.
+- `src/test/indicator-basis.test.tsx` — the recorded published set gained the three rows, and each row's
+  publisher is now stated explicitly (`SOURCE_OVERRIDES`, so a figure cannot be re-attributed by accident);
+  `type NamedSourceId` imported.
+- `scripts/validate.mjs` — **new check 21**, *"the live-site description states the configuration's current
+  figures"*.
+- `docs/PROPOSAL_PROMPT.md` — the stale present-tense paragraph corrected (**24 → 40** groups;
+  **35 / 125 → 54 / 266**; *"all 24 published figures"* → **54**), and the served bundle name and hash
+  updated.
+- `docs/PLATFORM_ENRICHMENT_PLAN.md` — **PART 9.8** added (the widened sweep, the three conversions, and
+  every rejection with its reason).
+- `PRODUCTION_READINESS.md` — the split chain and the live-build paragraph updated.
+- `PROJECT_STATUS.md` — this record (top note, the BATCH B section, the verification-log row, *NEXT PHASE*
+  item 1, the DEMO HOST bullets, RESUME HERE and the PLAIN SUMMARY).
+- **Not touched:** `Minister Submission/**` (the owner's pack) — **reported, not edited**.
 
 ## DATASET EXPANSION — batches 1–4: real published figures, 20 indicators per department, and 150 groups (2026-10-04)
 
@@ -3784,9 +3837,10 @@ in the order the owner has raised them.
 
 1. ~~**The national-scale dataset expansion**~~ — **DONE 2026-10-04 (batches 1–4).** The platform now holds
    **150** canonical stakeholder groups (20 with a published share, 130 `Modelled`), every department models
-   **40** of them, and **320** reference indicators (20 per department: **51 published, 269 `Modelled`**).
-   So **59 of 470 figures (13%) stand on a published source**. The published-set step (24 → 51 published,
-   each read from the World Bank's own API) and both count targets (160 → 320 indicators; 72 → 150 groups,
+   **40** of them, and **320** reference indicators (20 per department: **54 published, 266 `Modelled`**).
+   So **74 of 470 figures (16%) stand on a published source**. The published-set step (24 → 54 published,
+   each read live from the World Bank's own API or, for public debt, the IMF's) and both count targets
+   (160 → 320 indicators; 72 → 150 groups,
    24 → 40 per department) are met. Gates moved with the data: the `DEPARTMENT_SEGMENTS` pin and the "36–44"
    range in `src/test/departments.test.ts`, `MODELLED_IDS` and the 20 / 130 split in the reference and
    weights tests, `toHaveLength(150)` in `src/test/workspace.test.tsx`, `toHaveLength(320)` in
@@ -3814,22 +3868,58 @@ in the order the owner has raised them.
 
 ## RESUME HERE
 
-**THE RULES ARE FIXED (2026-10-04) AND AN APPROVED PLAN IS IN FLIGHT.** A new global rule
-**`data-must-be-real-sources.md`** now exists in **every** rules location — the decision that kept coming back
-is finally written down — and the review-zip rule keeps **ONE** zip. `check-rules.mjs` →
-**`RULES_CHECK_PASS (16 passed, 0 failed)`**. **The approved plan continues at Batch B** (make the platform's
-evidence base real), then **Batch C** (the graph: more colours, better quality, the MiroFish click behaviour)
-and **Batch D** (the engine-vitals wording) — see *"RULES FIXED…"* (above). *NEXT PHASE* **item 1** (the
-dataset expansion, batches 1–4) and **item 6** (the offline-demo sheet) are **DONE**. The remaining *NEXT
-PHASE* items are item 2 (the `/platform-admin` guard, which needs the funded sign-in build to be real), item 3
-(the three funded server-side build steps), item 4 (the `®` mark — a legal call), item 5 (two wording items in
-the owner's pack), and item 7 (a watch item, not a task); **none of it has been dropped.**
+**BATCH B IS PART-WAY DONE, AND THE REST IS BLOCKED ON ONE OWNER DECISION (2026-10-04).** The rules are
+fixed — a global rule **`data-must-be-real-sources.md`** exists in **every** location, and the review-zip
+rule keeps **ONE** zip — and `check-rules.mjs` → **`RULES_CHECK_PASS (16 passed, 0 failed)`**. **Batch B
+parts 1 and 2 are `DONE`:** fifteen modelled indicators now carry real published figures, the **IMF** has
+been added as a named source, and the split is **54 published / 266 modelled**. **The remainder is `BLOCKED`
+on ONE owner decision** — see the *BATCH B* section: **266 modelled indicators and 130 modelled group shares
+have no published source**, the sourcing rule requires each unsourceable measure to be **replaced**, and that
+replacement is a product decision (fewer figures per department, or the departments' operational measures
+presented as the platform's own modelled service metrics). **No source can be invented for them, so only
+that decision closes it.** **Then the approved plan continues at Batch C** (the graph: more colours, better
+quality, the MiroFish click behaviour); **Batch D** (the engine-vitals wording) is **DONE**. *NEXT PHASE*
+**item 1** (the dataset expansion, batches 1–4) and **item 6** (the offline-demo sheet) are **DONE**. The
+remaining *NEXT PHASE* items are item 2 (the `/platform-admin` guard, which needs the funded sign-in build to
+be real), item 3 (the three funded server-side build steps), item 4 (the `®` mark — a legal call), item 5 (two
+wording items in the owner's pack), and item 7 (a watch item, not a task); **none of it has been dropped.**
 
 **Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and IN SYNC (proved by
 `npm run sync:check`, which reports all four checks PASS). **Tip:** run `git log --oneline -1`. **Next
-commands:** `git fetch` then `npm run sync:check`; then continue the approved plan at **Batch B**.
+commands:** `git fetch` then `npm run sync:check`; then **either** take the owner's decision on Batch B's
+remainder **or** continue at **Batch C** (the graph), which needs no decision.
 
 **PLAIN SUMMARY (OWNER-FACING).**
+
+**This session (2026-10-04, later — three more made-up figures replaced, the IMF added as a source, and a stale description fixed so it cannot drift again).** In plain words:
+1. **Three more of the platform's own "Modelled" figures are now real, official numbers.** The debt figure
+   now comes from the **International Monetary Fund** (general government gross debt, **70.4% of GDP**,
+   2024); the remittance-cost figure from the **World Bank's** own remittance-price series (**5.3%**, 2023);
+   and the girls'-secondary-enrolment figure from the **World Bank's** enrolment series (**50.9%**, 2013).
+   Each was read live from the publisher's own service, never guessed.
+2. **The IMF is now named on the Reference screen as a publisher**, because the IMF — not the World Bank —
+   is the body that publishes Zimbabwe's public debt.
+3. **The scoreboard moved from 51 real figures to 54** (out of 320), so **266 figures remain plainly marked
+   "Modelled"**.
+4. **I checked every other publisher the rule names, and wrote down why each one cannot help.** UNESCO, the
+   World Health Organisation, the Food and Agriculture Organisation and UN Comtrade were all queried; the
+   answers are recorded in **PART 9.8** of the enrichment plan, so nobody has to repeat that search.
+5. **I found a stale description in my own notes, fixed it, and added a machine check so it cannot come
+   back.** One document that describes what the live site shows today still said the platform modelled **24**
+   stakeholder groups and carried **35 published / 125 modelled** figures — both from before the big
+   expansion. It now states the true numbers, and a new automatic check reads the real numbers straight from
+   the platform's own data and fails the build if any document disagrees again.
+6. **Everything was re-checked, and it is live.** All checks green, and the public site now serves exactly
+   this build — proved by fingerprint (the served file's code is byte-identical to the build on this
+   machine).
+7. **One decision is needed from you before the rest of this work can be finished.** In plain words: **266
+   of the figures on the platform are still the platform's own "Modelled" numbers, and no official source
+   publishes them.** The rule you set says a figure with no real source must be **replaced**. There are two
+   ways to do that, and it changes what you see, so it is your call: **(a)** show **only** the figures that
+   have a real source — the department pages become much shorter; or **(b)** keep the departments'
+   operational numbers (turnaround times, filing rates, readiness) but present them clearly as the
+   platform's own modelled service measures, **not** as national evidence. If nothing is done, the platform
+   keeps working exactly as it does now, with those 266 figures plainly labelled "Modelled".
 
 **This session (2026-10-04 — fifteen made-up figures replaced with real published ones, the platform doubled in size, and a one-page offline demo sheet).** In plain words:
 1. **You asked to start with real published figures, and I did that for fifteen of them.** The platform shows
@@ -3854,7 +3944,7 @@ commands:** `git fetch` then `npm run sync:check`; then continue the approved pl
    build, 18 browser tests), and the public site now serves exactly this build.
 6. **Your pack still needs one small edit, and that file is yours.** The proposal and the slide deck still
    quote the older, smaller platform (72 groups, 24 per department, 160 figures, 24 published / 136 modelled).
-   It should now read **150 groups, 40 per department, 320 figures, 51 published / 269 modelled**. I have
+   It should now read **150 groups, 40 per department, 320 figures, 54 published / 266 modelled**. I have
    **not** edited your file; I am telling you so you can update it before the meeting.
 
 7. **I also wrote the one-page sheet for demonstrating with no internet.** `docs/OFFLINE_DEMO.md` explains, in
@@ -4081,15 +4171,16 @@ confirm it.
   Playwright 18/18** (and **check that the build actually ran before Playwright** — a chain stops at the
   first non-zero step, and Playwright then tests a stale `dist/`). **Do not re-fetch anything in PART 7 of
   `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
-  24 published figures and the 39 recorded no-equivalent reasons are both there. **Read first:** the
-  **owner’s-five-changes row** at the top of the verification log (2026-10-02 — what changed last), then `docs/PROPOSAL_PROMPT.md`,
+  54 published figures and the recorded no-equivalent reasons (PARTs 9.5 and 9.8) are both there. **Read
+  first:** the **owner’s-five-changes row** at the top of the verification log (2026-10-02 — what changed last), then `docs/PROPOSAL_PROMPT.md`,
   `scripts/validate.mjs`
-  (**check 14**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
+  (**checks 14 and 21**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-CzWGCJjD.js`
-  (`6ca2fd533ead2971c2b3fc7010f98a5b740456db86113801f318676e80483fae`)** — the **dataset-expansion build
-  of 2026-10-04** (eleven modelled indicators now carry real World Bank figures: **35 published / 125
-  modelled**) on top of the **live-date build of
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-DP-v24Lw.js`
+  (`3dd2c2aa1a9f90b46b24e0b25133bdd1663d1a79a6a4cf557d64c6a552570f03`)** — the **Batch B part 2 build
+  of 2026-10-04** (three more modelled indicators now carry real published figures and the **IMF** is a
+  named source: **54 published / 266 modelled**) on top of the **dataset-expansion build
+  of 2026-10-04** on top of the **live-date build of
   2026-10-04** on top of the **owner's five changes of
   2026-10-02** on top of the national policy-drafting build: the footer reads **"A Project by the Ministry
   of ICT"**; the indicator cards are **gone from the Overview** and every figure (with its named source)
@@ -4330,9 +4421,10 @@ confirm it.
   the **BLOCKER** that used to sit in *Known-red / open items* is gone. The agent has pushed nothing to
   `main` since; the feature branch carries all later work. Deployment is an FTP upload of `dist/`, not a
   git push.
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-CzWGCJjD.js`,
-  `6ca2fd533ead2971c2b3fc7010f98a5b740456db86113801f318676e80483fae`** — the **dataset-expansion build of
-  2026-10-04** (35 published / 125 modelled indicators) on top of the live-date build of
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-DP-v24Lw.js`,
+  `3dd2c2aa1a9f90b46b24e0b25133bdd1663d1a79a6a4cf557d64c6a552570f03`** — the **Batch B part 2 build of
+  2026-10-04** (54 published / 266 modelled indicators, with the IMF added as a named source) on top of
+  the dataset-expansion build of 2026-10-04 on top of the live-date build of
   2026-10-04 on top of the national policy-drafting
   build with the sourcing-statement fix and the owner's five changes of 2026-10-02, verified in the
   strongest form a local machine can:

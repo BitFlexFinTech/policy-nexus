@@ -532,3 +532,63 @@ school is denser than a 24-group one and needs a bigger shove for the same visib
 (a shove separates the school, which then recoheres) is unchanged.
 
 **Item 1 is now complete** — the indicators target (160 → 320) and the groups target (72 → 150) are both met.
+
+### 9.8 Batch B part 2 — the sweep widened beyond the World Bank (2026-10-04)
+
+The sourcing rule names more publishers than the World Bank, so the remaining modelled indicators were
+checked against them too. **Three genuinely measure what their indicator says** and were converted; each
+value was read live this session:
+
+| Department / indicator (id) | Value now shown | Series, and the body that publishes it | Period |
+|---|---|---|---|
+| fin / Debt to GDP (`fin-debt-gdp`) | **70.4** % of GDP | *General government gross debt (% of GDP)* — **International Monetary Fund**, World Economic Outlook | 2024 |
+| mfa / Remittance cost (`mfa-remit-cost`) | **5.3** % | *Average transaction cost of sending remittances to a specific country (%)* — World Bank, World Development Indicators | 2023 |
+| edu / Girls' secondary enrolment (`edu-girls`) | **50.9** % | *School enrollment, secondary, female (% gross)* — World Bank, World Development Indicators | 2013 |
+
+**One publisher was added** — the **International Monetary Fund** (`imf`) in `NAMED_SOURCES`, because the
+IMF's World Economic Outlook, not the World Bank, is the body that publishes Zimbabwe's public debt. **Two
+wordings moved to the published measure** so they stay true beside the number: `fin-debt-gdp` is now
+*"general government gross debt"* (the IMF series counts general government, not central government), and
+`edu-girls` is now *"gross"* (the series is the gross enrolment ratio, not girls' share of total
+enrolment — the earlier note described a different measure).
+
+**The split is now 320 indicators: 54 published / 266 modelled** (was 51 / 269).
+
+#### 9.8.1 Checked and rejected — no publisher holds the measure
+
+- `fin-debt` (**USD stock**) — the IMF's data service publishes general government debt **only as a share
+  of GDP**; it holds no USD debt-stock series for Zimbabwe. Only the ratio could be converted.
+- `fin-npl` — `FB.AST.NPER.ZS` holds **no Zimbabwe value**.
+- `energy-imports` — the indicator states **imported electricity** as a share of supply. The only World
+  Bank series, `EG.IMP.CONS.ZS`, is **net *energy* imports (% of energy use)**, 17.0 (2022) — all energy,
+  not electricity. Materially different, so it stays `Modelled`.
+- `agri-irrigated` / `agri-irrigated-hectares` — `AG.LND.IRIG.AG.ZS` holds **no Zimbabwe value**; FAO's
+  AQUASTAT publishes irrigation area in downloadable tables with no queryable interface.
+- `hedu-research-spend` — **UNESCO UIS**, the body that publishes research spending, returned no Zimbabwe
+  record for the indicator codes queried; the World Bank series holds no Zimbabwe value either (9.5).
+- `agri-tobacco` / `agri-cotton` / `agri-horticulture` — FAOSTAT's query interface returned **no Zimbabwe
+  crop-production data**. **UN Comtrade does** publish Zimbabwe's trade, but it publishes **exports**, not
+  **output** (tobacco exports 2024: 231.9 million kg / USD 1.33 billion; seed cotton 10.4 million kg). An
+  export figure is a different measure from the output these indicators state, so they stay `Modelled`
+  rather than being re-framed — re-framing would change what the department's dashboard reports, which is
+  the owner's decision, not a research one.
+- `edu-lower-secondary` — the World Bank series (`SE.SEC.CUAT.LO.ZS`) is **educational attainment** of the
+  population aged 25+, not the completion rate the indicator states; UNESCO UIS returned no Zimbabwe
+  record for the completion-rate codes queried.
+- **The health operational returns** — WHO's Global Health Observatory publishes no series for medicine
+  stock-outs, bed occupancy, referral turnaround, blood units collected, community health workers active,
+  antibiotic-use monitoring or non-communicable screening.
+- **The `opc` / `psc` / `zimra` / `zida` / `def` sets** — operational and administrative returns
+  (turnaround times, filing rates, readiness, inspections, grievances). No publisher publishes them for
+  Zimbabwe.
+
+#### 9.8.2 The honest limit, restated (BLOCKED — needs the owner's decision)
+
+**266 indicators and 130 stakeholder-group shares still have no published source**, and the publishers
+above were checked before saying so. Under the sourcing rule a measure with no source must be
+**replaced**, and the replacement is a **product decision**: it means the platform shows **far fewer
+figures** per department (the 54 sourceable ones), or the departments' operational measures are presented
+as the platform's own modelled service metrics rather than as national evidence. **No source can be
+invented for the remainder**, so this is BLOCKED on that one decision and is carried as open work in
+`PROJECT_STATUS.md` — it is not dropped, and the modelled figures stay plainly labelled `Modelled` until
+it is made.

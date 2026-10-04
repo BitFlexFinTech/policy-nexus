@@ -16,6 +16,7 @@ import {
   NAMED_SOURCES,
   NAMED_SOURCE_STATEMENT,
   REFERENCE_DATE_LABEL,
+  type NamedSourceId,
 } from "@/config/reference";
 import { assessmentService } from "@/services/assessment/AssessmentService";
 import { buildPolicyDraft, renderDocumentText } from "@/services/assessment/documents";
@@ -240,6 +241,15 @@ describe("department indicators — published with a named source, or plainly mo
    * drifts, and it fails if the platform's published set grows without being recorded.
    */
   it("holds every published figure, with the value and period it was read from", () => {
+    /**
+     * Who publishes each recorded figure. Every row below is a World Bank series except
+     * the ones named here, so a figure cannot be re-attributed to another body by
+     * accident — and a new publisher must also be named in `NAMED_SOURCES`, which the
+     * test above requires before a row may point at it.
+     */
+    const SOURCE_OVERRIDES: Readonly<Record<string, NamedSourceId>> = {
+      "fin/fin-debt-gdp": "imf",
+    };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
       ["fin/fin-revenue", "7.2", "World Development Indicators: Tax revenue (% of GDP)", "2018"],
@@ -307,6 +317,18 @@ describe("department indicators — published with a named source, or plainly mo
       ["energy/energy-coal", "54.1", "World Development Indicators: Electricity production from coal sources (% of total)", "2023"],
       ["energy/energy-hydro", "45.1", "World Development Indicators: Electricity production from hydroelectric sources (% of total)", "2023"],
       ["energy/energy-rural", "46.6", "World Development Indicators: Access to electricity, rural (% of rural population)", "2024"],
+      // 2026-10-04 — Batch B part 2 (the rest of the evidence base). The World Bank sweep was widened to the
+      // publishers the sourcing rule names beyond it, and two more modelled indicators were found to measure
+      // exactly what a published series measures: `mfa-remit-cost` (the World Bank's own remittance-price
+      // series) and `edu-girls` (the female secondary enrolment ratio, re-framed as "gross" because that is
+      // what the series counts). One publisher was added for the third — `fin-debt-gdp` — because the IMF's
+      // World Economic Outlook, not the World Bank, is the body that publishes Zimbabwe's general government
+      // gross debt; the wording moved from "central government debt" to the published measure. Each value was
+      // read live this session. Everything else checked is an operational return with no published series,
+      // and is recorded in PART 9 of docs/PLATFORM_ENRICHMENT_PLAN.md.
+      ["fin/fin-debt-gdp", "70.4", "World Economic Outlook: General government gross debt (% of GDP)", "2024"],
+      ["mfa/mfa-remit-cost", "5.3", "World Development Indicators: Average transaction cost of sending remittances to a specific country (%)", "2023"],
+      ["edu/edu-girls", "50.9", "World Development Indicators: School enrollment, secondary, female (% gross)", "2013"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {
@@ -316,7 +338,9 @@ describe("department indicators — published with a named source, or plainly mo
       expect(indicator.value, `${where} value`).toBe(value);
       expect(indicator.basis.kind, `${where} is published`).toBe("published");
       if (indicator.basis.kind !== "published") return;
-      expect(indicator.basis.sourceId, `${where} source`).toBe("worldbank");
+      expect(indicator.basis.sourceId, `${where} source`).toBe(
+        SOURCE_OVERRIDES[where] ?? "worldbank",
+      );
       expect(indicator.basis.publication, `${where} publication`).toBe(publication);
       expect(indicator.basis.asOf, `${where} period`).toBe(asOf);
     });

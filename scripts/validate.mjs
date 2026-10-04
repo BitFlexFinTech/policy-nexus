@@ -820,6 +820,111 @@ if (!existsSync(cssPath)) {
   check("the promoter is always named Oreida Pvt Ltd", problems);
 }
 
+// ---------------------------------------------------------------------------------------------
+// check 21 — the description of the live site states the figures the configuration actually holds
+// The defect this exists for: `docs/PROPOSAL_PROMPT.md` describes what the live site is "today" and
+// still said every department modelled **24** stakeholder groups and carried **35 published / 125
+// modelled** indicators and **all 24 published figures** — all three stale since the 2026-10-04
+// expansion. Each stale number had been corrected by hand in an earlier session, which is exactly
+// why it drifted again. So the numbers are now DERIVED from the configuration and compared with the
+// paragraph that describes the present state; a superseded figure fails the build instead of being
+// noticed by eye. Dated history rows are untouched — only the present-tense paragraph is checked.
+{
+  const problems = [];
+  const deptText = readFileSync(join(ROOT, "src/config/departments.ts"), "utf8");
+  const refText = readFileSync(join(ROOT, "src/config/reference.ts"), "utf8");
+
+  // Every row carrying a `basis` is a department indicator; the retired shape (a free-text
+  // `source`) and the departments' priority rows carry none, so they cannot inflate the count.
+  let indicators = 0;
+  let publishedIndicators = 0;
+  for (const line of deptText.split("\n")) {
+    if (!/\{ id: "[a-z0-9-]+", label: "/.test(line)) continue;
+    if (!/basis: \{ kind: "(published|modelled)"/.test(line)) continue;
+    indicators += 1;
+    if (/basis: \{ kind: "published"/.test(line)) publishedIndicators += 1;
+  }
+  const modelledIndicators = indicators - publishedIndicators;
+
+  // Stakeholder groups: one `shareSource` per segment — the named publisher, or the platform's
+  // own Modelled word.
+  const groups = [...refText.matchAll(/shareSource:/g)].length;
+  const modelledGroups = [...refText.matchAll(/shareSource: MODELLED_SHARE_LABEL/g)].length;
+  const publishedGroups = groups - modelledGroups;
+
+  // How many groups each department models — its own `segments` list, the first one in its record.
+  const perDepartment = [...new Set(deptText
+    .split(/\n  \{\n    id: "/)
+    .slice(1)
+    .map((chunk) => {
+      const m = chunk.match(/segments: \[([^\]]*)\]/);
+      return m ? (m[1].match(/"[a-z0-9-]+"/g) || []).length : -1;
+    }))];
+  if (perDepartment.length !== 1) {
+    problems.push(
+      `the departments do not model the same number of stakeholder groups (${perDepartment.join(", ")}) — the records state one number, so the configuration must hold one`,
+    );
+  }
+  const deptGroups = perDepartment[0];
+
+  const promptPath = join(ROOT, "docs/PROPOSAL_PROMPT.md");
+  if (existsSync(promptPath)) {
+    const prompt = readFileSync(promptPath, "utf8");
+    const start = prompt.indexOf("What the live site actually is today");
+    if (start < 0) {
+      problems.push(
+        "docs/PROPOSAL_PROMPT.md no longer states what the live site is today — the present state must be stated, not dropped",
+      );
+    } else {
+      const rest = prompt.slice(start);
+      const boundary = rest.slice(1).search(/\n(?:- |---|## )/);
+      const excerpt = (boundary < 0 ? rest : rest.slice(0, boundary + 1)).replace(/\s+/g, " ");
+
+      if (!excerpt.includes(`${publishedIndicators} published / ${modelledIndicators} modelled`)) {
+        problems.push(
+          `docs/PROPOSAL_PROMPT.md describes the live site without its current indicator split (${publishedIndicators} published / ${modelledIndicators} modelled)`,
+        );
+      }
+      for (const m of excerpt.matchAll(/all (\d+) published figures/g)) {
+        if (Number(m[1]) !== publishedIndicators) {
+          problems.push(
+            `docs/PROPOSAL_PROMPT.md says "all ${m[1]} published figures" — the configuration holds ${publishedIndicators}`,
+          );
+        }
+      }
+      const modelling = [...excerpt.matchAll(/modelling\s*\*{0,2}(\d+)\*{0,2}\s+stakeholder groups/g)];
+      if (!modelling.length) {
+        problems.push(
+          "docs/PROPOSAL_PROMPT.md no longer says how many stakeholder groups a department models",
+        );
+      }
+      for (const m of modelling) {
+        if (Number(m[1]) !== deptGroups) {
+          problems.push(
+            `docs/PROPOSAL_PROMPT.md says a department models ${m[1]} stakeholder groups — the configuration holds ${deptGroups}`,
+          );
+        }
+      }
+      const allowed = [
+        `${publishedIndicators} / ${modelledIndicators}`,
+        `${publishedGroups} / ${modelledGroups}`,
+      ];
+      for (const m of excerpt.matchAll(/(\d+) published \/ (\d+) modelled/g)) {
+        if (!allowed.includes(`${m[1]} / ${m[2]}`)) {
+          problems.push(
+            `docs/PROPOSAL_PROMPT.md states the superseded split "${m[1]} published / ${m[2]} modelled" — the configuration holds ${publishedIndicators} / ${modelledIndicators} indicators and ${publishedGroups} / ${modelledGroups} groups`,
+          );
+        }
+      }
+      notes.push(
+        `INFO  configuration today: ${indicators} indicators (${publishedIndicators} published / ${modelledIndicators} modelled) · ` +
+          `${groups} stakeholder groups (${publishedGroups} published / ${modelledGroups} modelled), ${deptGroups} modelled per department`,
+      );
+    }
+  }
+  check("the live-site description states the configuration's current figures", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));
