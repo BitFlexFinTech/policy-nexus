@@ -281,6 +281,9 @@ describe("department indicators — published with a named source, or plainly mo
       "lg/lg-sanitation-hh": "zimstat",
       "env/env-eia": "ema",
       "env/env-licences": "ema",
+      // 2026-10-04 — Batch S7: ZIMSTAT's Environmental Resources report 2023 and the 2022 Census.
+      "agri/agri-cotton": "zimstat",
+      "lg/lg-water-piped": "zimstat",
     };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
@@ -443,6 +446,12 @@ describe("department indicators — published with a named source, or plainly mo
       ["lg/lg-sanitation-hh", "77", "Zimbabwe Demographic and Health Survey 2023-24: households with improved sanitation", "2024"],
       ["env/env-eia", "1,180", "Annual Report 2024: full environmental and social impact assessments processed", "2024"],
       ["env/env-licences", "11,432", "Annual Report 2024: environmental licences issued", "2024"],
+      // 2026-10-04 — Batch S7: ZIMSTAT's Environmental Resources Statistics Report 2023 (cotton
+      // production, from the crop-production table) and the 2022 Population and Housing Census
+      // (households whose main water source is piped — a measure distinct from `lg-water`, which is
+      // the population-level basic-drinking-water series).
+      ["agri/agri-cotton", "63,627", "Environmental Resources Statistics Report 2023: cotton production", "2023"],
+      ["lg/lg-water-piped", "29.6", "2022 Population and Housing Census: households whose main water source is piped", "2022"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {

@@ -40,9 +40,9 @@ export const NAMED_SOURCES = [
     id: "zimstat",
     name: "Zimbabwe National Statistics Agency (ZIMSTAT)",
     figures:
-      "Population, household, labour, poverty and inflation figures; external trade; the quarterly index of mineral production and index of electricity generation; the health, nutrition and household figures of the Demographic and Health Survey",
+      "Population, household, labour, poverty and inflation figures; external trade; the quarterly index of mineral production and index of electricity generation; the health, nutrition and household figures of the Demographic and Health Survey; agriculture and environment statistics",
     publication:
-      "2022 Population and Housing Census; Quarterly Labour Force Survey; monthly price statistics; monthly External Trade release; quarterly Index of Mineral Production and Index of Electricity Generation; Zimbabwe Demographic and Health Survey",
+      "2022 Population and Housing Census; Quarterly Labour Force Survey; monthly price statistics; monthly External Trade release; quarterly Index of Mineral Production and Index of Electricity Generation; Zimbabwe Demographic and Health Survey; Environmental Resources and Human Settlement Statistics reports",
   },
   {
     id: "rbz",

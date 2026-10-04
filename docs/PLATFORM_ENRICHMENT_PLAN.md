@@ -987,3 +987,59 @@ widened** to name the Demographic and Health Survey. **Split: 79 published / 241
 
 **Still to do in the national sweep:** the remaining `psc-*`, `lg-*`, `env-*` and `zida-*` measures (where a
 publisher may exist), and — as the owner asked — **more stakeholder groups and more indicators**.
+### 10.11 Batch S7 — ZIMSTAT's environmental, settlement and agriculture statistics (2026-10-04)
+
+This batch finishes the conversion sweep. ZIMSTAT's three **Environmental Statistics reports 2023** were
+already downloaded for the environment work; the **crop-production** and **household water-source** tables
+inside them carry real figures that match two modelled indicators.
+
+**The publishers read, and where the documents are:**
+
+| Publisher | Document read | Where it lives |
+|---|---|---|
+| **ZIMSTAT** | **Environmental Resources Statistics Report 2023** (50 pages, Tables 3.1/3.2 — crop production) | `zimstat.co.zw/wp-content/uploads/production/environment/Environmental Resources_2023_final.pdf` |
+| **ZIMSTAT** | **Human Settlement and Environmental Health 2023** (20 pages, Table 1.3 — household water source) | `zimstat.co.zw/wp-content/uploads/production/environment/Human_Settlement_and_Envionmental_Health_2023_final.pdf` |
+
+**Two modelled indicators now carry a real published figure:**
+
+| Department / indicator | Value now shown | Published figure, and where it is stated | Period |
+|---|---|---|---|
+| agri / Cotton output (`agri-cotton`) | **63,627** t | *Cotton* production — crop-production table, Tables 3.1/3.2 (source: ZIMSTAT Agriculture and Environment Statistics Branch) | 2023 |
+| lg / Piped water coverage (`lg-water-piped`) | **29.6** % | Households whose main water source is *piped water inside dwelling/yard/plot* — Table 1.3, 2022 Population and Housing Census | 2022 |
+
+**`lg-water-piped` is now clearly distinct from `lg-water`** (the population-level *basic drinking water
+services* series, 67.2 %): one is a household count of piped supply, the other a population-level service
+ladder — so the two are no longer near-duplicates in wording.
+
+**ZIMSTAT's entry in `NAMED_SOURCES` was widened** to name its agriculture and environment statistics.
+**Split: 83 published / 237 modelled → 85 published / 235 modelled.**
+
+**The otherwise-modelled set is exhausted — this is the honest position.** Every remaining `Modelled`
+figure is a department's **own operational return**, which no publisher states for Zimbabwe:
+
+- **`psc-*`** — the Public Service Commission's own returns (funded posts filled, appraisals completed,
+  grievances resolved, training days, days-to-fill a post, ethics declarations, transfers). No publisher.
+- **`lg-*`** — councils' own returns (council revenue collected, roads graded, waste collected, clean
+  audits, ward committees, boreholes functional). No publisher.
+- **`zida-*`** — the investment agency's own returns (licences issued, pipeline value, zone occupancy,
+  investor grievances). No accessible report.
+- **`env-*`** — the operational environment measures (wetlands protection %, waste diversion, poaching
+  incidents, air stations, trees planted, wildlife trend, rivers, mine sites, awareness reach). The ZIMSTAT
+  environment reports and the EMA report state **licence and inspection counts and ambient-monitoring
+  data**, not these.
+- **`opc-*`, `def-*`** — whole-of-government delivery and defence operational returns. No publisher.
+- **`mfa-*`** — **`zimfa.gov.zw` still returns `503`** (retried twice this session).
+
+**Checked and rejected in S7 — with the reason:**
+- `hedu-gender` — the World Bank holds only a **gross** female tertiary enrolment ratio (`SE.TER.ENRR.FE`,
+  8.7 %), which measures female students against the female tertiary-age population and would **duplicate**
+  the already-published `hedu-enrolment` (the total gross ratio). No publisher states the *share* the
+  indicator means.
+- `hedu-research-spend` — no publisher holds a Zimbabwe R&D-spending figure (`GB.XPD.RSDV.GD.ZS` is empty).
+- `edu-exam-pass` — ZIMSEC's site did not respond (timed out), so no pass-rate figure could be read.
+- `agri-livestock-count` — no publisher states Zimbabwe's national cattle herd.
+- `env-wetlands` — the environment report shows a **wetland map**, not a protection percentage.
+
+**What remains for the owner's asked-for expansion:** **more stakeholder groups and more indicators, each on
+a real published figure** — this is a structural step (it changes how many figures a department shows and the
+platform total), so it needs a scope decision before it is built.
