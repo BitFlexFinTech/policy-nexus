@@ -46,8 +46,17 @@ export const NAMED_SOURCES = [
   {
     id: "rbz",
     name: "Reserve Bank of Zimbabwe",
-    figures: "The official ZiG exchange rate and the bank policy rate",
-    publication: "Published exchange-rate and interest-rate statistics",
+    figures:
+      "The official ZiG exchange rate, the bank policy rate, and the banking sector's own balance sheet — deposits, loans and the non-performing-loan ratio",
+    publication:
+      "Published exchange-rate and interest-rate statistics, and the Bank Supervision Annual Report",
+  },
+  {
+    id: "zimra",
+    name: "Zimbabwe Revenue Authority (ZIMRA)",
+    figures:
+      "Revenue collected against the annual target, the number of active registered taxpayers, and audit coverage",
+    publication: "ZIMRA Annual Report",
   },
   {
     id: "worldbank",

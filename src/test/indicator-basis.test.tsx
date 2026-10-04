@@ -249,6 +249,11 @@ describe("department indicators — published with a named source, or plainly mo
      */
     const SOURCE_OVERRIDES: Readonly<Record<string, NamedSourceId>> = {
       "fin/fin-debt-gdp": "imf",
+      "fin/fin-currency": "rbz",
+      "fin/fin-npl": "rbz",
+      "zimra/zimra-audit": "zimra",
+      "zimra/zimra-collection": "zimra",
+      "zimra/zimra-register": "zimra",
     };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
@@ -329,6 +334,18 @@ describe("department indicators — published with a named source, or plainly mo
       ["fin/fin-debt-gdp", "70.4", "World Economic Outlook: General government gross debt (% of GDP)", "2024"],
       ["mfa/mfa-remit-cost", "5.3", "World Development Indicators: Average transaction cost of sending remittances to a specific country (%)", "2023"],
       ["edu/edu-girls", "50.9", "World Development Indicators: School enrollment, secondary, female (% gross)", "2013"],
+      // 2026-10-04 — the NATIONAL sources (S1 of the widened sweep): Zimbabwe's own publishers, not the
+      // international databases. The defect this answers: the earlier sweep checked only the six international
+      // data services and wrongly concluded that no publisher holds these measures. ZIMRA's Annual Report and
+      // the RBZ Bank Supervision Annual Report do. Each value below was read from the publisher's own document.
+      // Two measures were re-framed to the published one (`fin-currency` is now *foreign* currency deposits,
+      // the figure the RBZ balance sheet states; `zimra-audit` is now *audit coverage*, which the report
+      // states as a percentage, instead of a yield per case it does not state).
+      ["fin/fin-currency", "45.7", "Bank Supervision Annual Report: consolidated balance sheet — foreign currency deposits", "December 2025"],
+      ["fin/fin-npl", "3.47", "Bank Supervision Annual Report: asset quality — non-performing loans to total loans", "December 2025"],
+      ["zimra/zimra-collection", "110.3", "Annual Report: net revenue collections against target", "2024"],
+      ["zimra/zimra-register", "120,234", "Annual Report: active registered taxpayers", "2024"],
+      ["zimra/zimra-audit", "3.53", "Annual Report: audit coverage of active registered taxpayers", "2024"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {

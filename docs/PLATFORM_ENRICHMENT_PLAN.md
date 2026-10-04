@@ -582,13 +582,81 @@ enrolment — the earlier note described a different measure).
   (turnaround times, filing rates, readiness, inspections, grievances). No publisher publishes them for
   Zimbabwe.
 
-#### 9.8.2 The honest limit, restated (BLOCKED — needs the owner's decision)
+#### 9.8.2 The limit as it was stated then — and the correction
 
-**266 indicators and 130 stakeholder-group shares still have no published source**, and the publishers
-above were checked before saying so. Under the sourcing rule a measure with no source must be
-**replaced**, and the replacement is a **product decision**: it means the platform shows **far fewer
-figures** per department (the 54 sourceable ones), or the departments' operational measures are presented
-as the platform's own modelled service metrics rather than as national evidence. **No source can be
-invented for the remainder**, so this is BLOCKED on that one decision and is carried as open work in
-`PROJECT_STATUS.md` — it is not dropped, and the modelled figures stay plainly labelled `Modelled` until
-it is made.
+**This section originally claimed that "no publisher publishes them for Zimbabwe" and that "no source can
+be invented for the remainder". That was WRONG, and it is corrected here.** The sweep in 9.8 covered only
+the **six international data services with a queryable interface** (the World Bank, the IMF, UNESCO UIS,
+WHO, FAO and UN Comtrade). It never looked at **Zimbabwe's own publishers** — ZIMSTAT, the Reserve Bank of
+Zimbabwe, ZIMRA, the line ministries and their agencies — and two of its probes were malformed (the WHO
+query searched indicator *names* for the word "Zimbabwe", which can never match anything; the UNESCO query
+used guessed indicator codes). The owner asked whether the search had really been exhausted. It had not.
+
+**The correct statement of that limit:** *the six international data services checked hold no series for
+these measures; national publications had not been searched at that point.* The national search then began
+(**PART 10**), and it found real published figures straight away — which is the proof that the earlier
+conclusion was premature. What remains `Modelled` after each national batch is recorded there, with the
+reason, and the replacement decision for those is the owner's (it is no longer a decision about 266
+figures, because that number was based on an incomplete search).
+
+---
+
+## PART 10 — THE NATIONAL SOURCES (the sweep the owner asked for)
+
+### 10.1 Batch S1 — money and the state of the economy (`fin`, `zimra`)
+
+**The publishers read in this batch, and where the documents are:**
+
+| Publisher | Document read | Where it lives |
+|---|---|---|
+| **Zimbabwe Revenue Authority (ZIMRA)** | **Annual Report 2024** (181 pages) | `zimra.co.zw` → About us → Annual Reports (`?download=4361:zimra-2024-annual-report`) |
+| **Reserve Bank of Zimbabwe** | **Bank Supervision Annual Report 2025** (54 pages, the banking sector's own accounts) | `rbz.co.zw/documents/bank_sup/BSD_Annual_Reports/2025_BSD_Annual_Report.pdf` |
+| **Reserve Bank of Zimbabwe** | **Statistics tables** — bank deposits, loans and advances, monetary aggregates (XLSX) | `rbz.co.zw/documents/statistics/2026/July/…` |
+
+**Five indicators now carry a real published figure** (each value read from the document itself):
+
+| Department / indicator | Value now shown | Published figure, and where it is stated | Period |
+|---|---|---|---|
+| fin / Foreign currency deposits (`fin-currency`) | **45.7** % | *Foreign currency deposits, % of total deposits* — RBZ Bank Supervision Annual Report 2025, consolidated balance sheet | 31 December 2025 |
+| fin / Non-performing loans (`fin-npl`) | **3.47** % | *Non-performing loans to total loans* — RBZ Bank Supervision Annual Report 2025, asset quality | 31 December 2025 |
+| zimra / Collections against target (`zimra-collection`) | **110.3** % | Net collections **ZWG116.47 billion** against a target of **ZWG105.63 billion** (exceeded by **10.26 %**) — ZIMRA Annual Report 2024 | 2024 |
+| zimra / Registered taxpayers (`zimra-register`) | **120,234** | *Active registered taxpayers* — ZIMRA Annual Report 2024 | 2024 |
+| zimra / Audit coverage (`zimra-audit`) | **3.53** % | 4,243 audits against 120,234 active registered taxpayers — ZIMRA Annual Report 2024 | 2024 |
+
+**Two measures were re-framed to the published one**, because the platform's old wording described
+something the publisher does not state:
+- `fin-currency` was **"Local currency deposits"**; the RBZ balance sheet states the **foreign**-currency
+  share, so the indicator is now **"Foreign currency deposits"** (the local-currency share is the
+  complement, which would be a derived number rather than a published one).
+- `zimra-audit` was **"Audit yield per case (USD 18k)"**; ZIMRA states audit **coverage** as a percentage
+  (and its audit yield in two currencies at once, which cannot honestly be reduced to one figure per
+  case), so the indicator is now **"Audit coverage"**.
+
+**The split moved from 320 indicators: 54 published / 266 modelled to 59 published / 261 modelled.**
+
+### 10.2 Checked and not converted in S1 — with the reason
+
+- `zimra-refunds` (**"Refunds paid in time"**) — ZIMRA publishes the refund **amounts** for 2024 (ZWG6.0
+  billion: ZWG3.38 billion paid, ZWG2.62 billion outstanding; VAT 99.44 % of the total) but **not** a
+  "paid in time" rate. The published measure is not the one the indicator states, so it stays `Modelled`
+  rather than being replaced with a different question.
+- `zimra-filing` (on-time filing), `zimra-digital` (declarations filed online), `zimra-e-payment`,
+  `zimra-customs` (cleared same day), `zimra-risk`, `zimra-vat-gap`, `zimra-education`,
+  `zimra-refund-days`, `zimra-sme`, `zimra-transfer-pricing`, `zimra-integration`, `zimra-disputes`,
+  `zimra-clearance` — the 2024 Annual Report does not state these as the indicator uses them.
+- `fin-debt` (**USD stock**) — the RBZ documents read state the banking sector's balance sheet, not a USD
+  public-debt stock; the IMF publishes the **ratio** only (converted in Batch B part 2).
+- `fin-budget`, `fin-expenditure`, `fin-capital`, `fin-revenue-gdp`, `fin-taxbase`, `fin-sovereign` — the
+  Treasury's budget and debt documents were **not read in this batch**; they are the next S1 step.
+- The `mfa` set (passports, diaspora register, consular cases, trade desks) — the Ministry of Foreign
+  Affairs and the Registrar-General publish these, and they were **not read in this batch**.
+
+### 10.3 A practical note for whoever continues this
+
+**`rbz.co.zw` refuses direct downloads** — a captcha service (ShieldSquare) answers a plain `curl`, so the
+site's HTML pages cannot be read programmatically. The **document paths under `/documents/…` are not
+protected**, so a PDF or XLSX can be fetched directly once its address is known, and the addresses can be
+found by reading the site through a text-extraction reader (`r.jina.ai`). **`zimra.co.zw` needs a browser
+user-agent** to serve its PDFs. **ZIMSTAT's own pages are readable** and confirm it publishes agriculture,
+labour, external trade, energy, ICT, industrial, health, education and environment statistics — those are
+the S2 and S3 sources.
