@@ -1022,12 +1022,12 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
 
     // The two quantities are labelled apart, so the dashboard's figure can never again read
     // as a contradiction of the platform-wide list.
-    expect(body).toContain("72 nationally");
+    expect(body).toContain("150 nationally");
 
     // And the national list is named for what it is.
     await page.getByRole("link", { name: "Reference" }).click();
     await expect(
-      page.getByRole("heading", { name: /Stakeholder groups modelled nationally \(72\)/ }),
+      page.getByRole("heading", { name: /Stakeholder groups modelled nationally \(150\)/ }),
     ).toBeVisible();
 
     expectCleanRuntime();

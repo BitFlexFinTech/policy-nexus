@@ -56,7 +56,7 @@ client is registered.
 | The officer's working copy of a drafted policy | **REAL local storage — Batch A (2026-09-30).** `src/services/documents/draftStore.ts` keeps the officer's own wording in `localStorage["nzwisiso.policy-drafts.v1"]`, keyed by the run it belongs to. Only the officer's text is stored — the generated draft is recomputed from the run — and a browser that refuses persistent storage says so on the screen instead of losing the words silently. Nothing is sent anywhere. | Shared drafts held with the run on the server, so a drafting team sees one text | `src/services/documents/draftStore.ts` (the store) + `usePolicyDraft.ts` (the screen) |
 | The date shown, and a run's own date | **Split on 2026-10-04.** The DISPLAY shows the live date and time (`src/lib/clock.ts`, `useNow()` — the one place the real clock is read). The fixed `REFERENCE_DATE = "2026-09-24"` remains the **data frame** every figure is computed for (not "today"), and a run is dated with the real moment it was recorded (`AssessmentRequest.recordedAt` in `runStore.ts`), which every document it produces carries. | Stays — the display clock is real; the engine and the documents stay deterministic and byte-identical | `src/lib/clock.ts` · `src/config/reference.ts` · `src/services/assessment/runStore.ts` |
 | Reference rates (ZiG, policy rate, inflation) | **Reconciled to named sources in AB-5.** `REFERENCE_RATES` holds the **published figures** and each one now names the body that publishes it (`sourceId` → `NAMED_SOURCES`: Reserve Bank of Zimbabwe for the ZiG rate and the bank policy rate; ZIMSTAT for inflation) and the **period the figure is for** (`asOf`). The reference screen prints the publisher, what the figure is and its period under every rate, and states the platform's sourcing rule. AB-5 replaced three stale placeholders that matched no published figure (13.56 ZiG, 19.5%, 8.4% — the last contradicted ZIMSTAT's own release). | Live data feed | `src/config/reference.ts` |
-| Stakeholder segments | **72** canonical segments in `STAKEHOLDER_SEGMENTS` (20 with a published share and a named source, 52 explicitly `Modelled` — 36 groups were added on 2026-10-02 for national policy drafting); each of the 16 departments models **24** of them; departments may reference these ids only | CMS / segmentation service | `src/config/reference.ts` |
+| Stakeholder segments | **150** canonical segments in `STAKEHOLDER_SEGMENTS` (20 with a published share and a named source, 130 explicitly `Modelled` — 36 groups were added on 2026-10-02 and 78 on 2026-10-04 for national policy drafting); each of the 16 departments models **40** of them; departments may reference these ids only | CMS / segmentation service | `src/config/reference.ts` |
 | The platform's sourcing rule ("Named sources" statement) | **AB-5**, extended in **Phase AD.** `NAMED_SOURCE_STATEMENT` + `NAMED_SOURCES` in `src/config/reference.ts`, rendered by the reference screen. Four clauses, each stating a rule the platform actually follows: shares are ZIMSTAT's published census figures or labelled `Modelled`; the reference inputs name their publisher and period; **every department indicator either names the body that publishes it, the publication it is taken from and the period, or it is shown as `Modelled`**; and every cited instrument is a real Act from the consolidated Acts index. | Stays (the sourcing rule is permanent) | `src/config/reference.ts`, `src/pages/Reference.tsx` |
 
 ## 6. Non-credential work still outstanding (no credential can fix these)
@@ -102,14 +102,14 @@ client is registered.
   bundle name and carry the hash, so the claim cannot go stale in silence.
 - **Status today (2026-10-04, after the dataset-expansion build was published — the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-4bQWQK-P.js` (`9ebb0b5788dcc336b175bbe39c812fb2b3c909d1ac21850fbd83e2e91179ec24`) — fetched
+  `assets/index-oTw_NdGb.js` (`8c39eb3c07161af857ac5797636c48ee4d9a5ec12f9aae1bed7b7e472081c8af`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
-  explicit FTPS, **never `--delete`** — 13 files, 1,384,454 bytes — and the SSL validation token
+  explicit FTPS, **never `--delete`** — 13 files, 1,399,077 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
-  expansion and the 2026-10-04 dataset-expansion batch 1 — **72** canonical stakeholder groups, every
-  department modelling **24** of them, and **320** reference indicators (twenty per department, of which
+  expansion and the 2026-10-04 dataset-expansion batches 1–4 — **150** canonical stakeholder groups, every
+  department modelling **40** of them, and **320** reference indicators (twenty per department, of which
   **39 are published figures and 281 are `Modelled`**) — plus the recommended-step actions (*Open what answers this*,
   *Download this part*) and the **Implementation pack** (generated, read-only). The form that used to ask
   an officer to fill the working matrices by hand is **gone** (the owner's instruction, 2026-10-02): those

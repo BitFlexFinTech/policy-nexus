@@ -106,7 +106,7 @@ describe("swarm layout", () => {
     const restSpread = spread(state);
     const hub = state.nodes[0];
 
-    impulseAt(state, hub.x, hub.y, 260, 60);
+    impulseAt(state, hub.x, hub.y, 420, 95);
     for (let step = 0; step < 30; step += 1) stepSwarm(state, 1 / 60);
     expect(spread(state)).toBeGreaterThan(restSpread * 1.05);
 

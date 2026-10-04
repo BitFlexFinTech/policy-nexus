@@ -511,3 +511,24 @@ approval. Each carries a unique id, a plain note and a score, and the set is now
 
 **Still to do (the last part of item 1):** the **stakeholder groups, 72 → about 150**, which needs ZIMSTAT
 census tables rather than the World Bank API — **NOT STARTED**.
+
+### 9.7 Batch 4 — the stakeholder groups reach 150 (2026-10-04)
+
+The canonical stakeholder list grew from **72 to 150** (78 new groups, all `Modelled` — demo figures), and
+**every one of the 16 departments now models 40 of them** (was 24). The new groups cover the production and
+supply chains the platform previously did not name: agro-processing and input suppliers, the manufacturing
+sub-sectors, the mining and energy supply chains, the rest of the financial sector, transport and logistics,
+tourism and the creative industries, the ICT and digital economy, media, the health and care workforce, and
+the education and training workforce. Every new group is modelled (no published count), per the owner's
+instruction. The split is now **150 groups: 20 published / 130 modelled**.
+
+**Gates moved with the data (all fixed at source):** the `DEPARTMENT_SEGMENTS` pin and the range gate
+("22–26" → "**36–44**") in `src/test/departments.test.ts`; `MODELLED_IDS` (+78 ids) and the "20 / 130" split
+in `src/test/reference-sources.test.tsx` and `src/test/stakeholder-weights.test.ts`;
+`toHaveLength(72)` → `toHaveLength(150)` in `src/test/workspace.test.tsx`; and "72 nationally" / the heading
+`(72)` → "150 nationally" / `(150)` in `e2e/journey.spec.ts`. **One layout test was re-tuned, not weakened:**
+`src/test/swarm.test.ts`'s impulse check uses a stronger shove (260/60 → **420/95**), because a 40-group
+school is denser than a 24-group one and needs a bigger shove for the same visible separation — the property
+(a shove separates the school, which then recoheres) is unchanged.
+
+**Item 1 is now complete** — the indicators target (160 → 320) and the groups target (72 → 150) are both met.

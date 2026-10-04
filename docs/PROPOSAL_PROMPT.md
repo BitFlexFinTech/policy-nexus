@@ -62,7 +62,7 @@ or imply that it already runs on Government infrastructure or in the Government 
   and Public Works; Ministry of Foreign Affairs and International Trade; Ministry of Environment,
   Climate and Wildlife; Ministry of Defence and War Veterans Affairs; Zimbabwe Revenue Authority;
   Zimbabwe Investment and Development Agency.
-- **72 modelled stakeholder groups** — civil servants; urban and rural households; informal traders
+- **150 modelled stakeholder groups** — civil servants; urban and rural households; informal traders
   and transporters; informal-sector workers; cross-border traders; formal business; manufacturers;
   mining operators and artisanal small-scale miners; smallholder farmers; the diaspora; youth;
   women; women-led enterprises; pensioners; the financial sector; exporters; local authorities;
@@ -81,10 +81,32 @@ or imply that it already runs on Government infrastructure or in the Government 
   operators; hospitality and hoteliers; aviation operators; freight and logistics operators;
   fintech and mobile money providers; microfinance institutions; the insurance sector;
   construction contractors; pharmaceutical manufacturers and distributors; medical aid societies;
-  and private and independent schools. **20 of the 72 stand on a published national share**, each
-  naming the figure it stands for and the publication it came from; the remaining **52 are
+  private and independent schools; grain millers and processors; cotton ginners; sugar producers;
+  dairy producers; poultry producers; aquaculture and fish farmers; beekeepers and honey producers;
+  seed and input suppliers; agro-processors; tobacco merchants and contractors; cement and
+  building-material producers; food and beverage manufacturers; textile and clothing producers;
+  leather and footwear producers; chemical and plastics producers; furniture and woodwork
+  producers; printing and publishing firms; engineering and metal-fabrication firms; coal
+  producers; fuel retailers and depots; LPG distributors; solar installers and technicians; mine
+  equipment suppliers; smelters and refineries; mineral dealers and buyers; diamond sector
+  operators; pension fund administrators; insurance brokers; stockbrokers and securities dealers;
+  asset managers; bureaux de change operators; mobile money agents; building societies; savings and
+  credit cooperatives; micro-insurers; customs clearing and forwarding agents; commuter omnibus
+  operators; haulage and long-distance operators; taxi associations; shipping and port agents;
+  warehousing and storage operators; courier and express firms; drivers' associations; rail freight
+  users; tour operators; travel agents; hoteliers and lodges; restaurants and caterers; creative
+  and cultural industries; musicians and performers; film and television producers; software
+  developers; internet service providers; telecom tower companies; data-centre operators;
+  cybersecurity firms; e-commerce platforms; digital marketing firms; journalists and editors;
+  community radio stations; advertising agencies; public-relations firms; online content creators;
+  private clinics and surgeries; pharmacists and dispensers; medical laboratory technologists;
+  radiographers and imaging staff; ambulance and emergency services; community caregivers; rural
+  teachers; urban teachers; school heads and administrators; parents' and school associations;
+  early-childhood caregivers; TVET instructors; polytechnic lecturers; apprentices and trainees;
+  and quantity surveyors. **20 of the 150 stand on a published national share**, each
+  naming the figure it stands for and the publication it came from; the remaining **130 are
   explicitly labelled `Modelled`**, because no published count exists. Each department models the
-  **24** groups its own mandate covers, drawn from these 72.
+  **40** groups its own mandate covers, drawn from these 150.
 - **320 reference indicators** across those 16 institutions, each with a plain note and a **stated
   basis**: **39 are published figures**, each naming its publisher, its publication and its period,
   and **281 are explicitly labelled `Modelled`**, because no publisher publishes that return. Say it
@@ -348,8 +370,8 @@ do not omit it to look authoritative.
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
 - **What the live site actually is today (re-checked 2026-10-04, after the dataset-expansion build was published).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-4bQWQK-P.js`
-  (`9ebb0b5788dcc336b175bbe39c812fb2b3c909d1ac21850fbd83e2e91179ec24`), which is byte-identical to the
+  The host `nzwisiso.bitflex.app` serves `assets/index-oTw_NdGb.js`
+  (`8c39eb3c07161af857ac5797636c48ee4d9a5ec12f9aae1bed7b7e472081c8af`), which is byte-identical to the
   local build, so **the live site is the build published on 2026-10-04** — it shows the **live date and
   time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the
   eleven newly published indicator figures (35 published / 125 modelled), and it carries the authority line, the modelled

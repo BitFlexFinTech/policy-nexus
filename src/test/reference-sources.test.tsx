@@ -95,7 +95,7 @@ describe("reference provenance (AB-5) — no figure without a named source", () 
     // The two figures the funding memo and the deck state. If a share is added or
     // removed, those documents must move with it, so this fails rather than drifting.
     expect(published, "published shares (the documents state 20)").toHaveLength(20);
-    expect(modelled, "shares labelled Modelled (the documents state 52)").toHaveLength(52);
+    expect(modelled, "shares labelled Modelled (the documents state 130)").toHaveLength(130);
 
     // Every published share names one of the bodies on the list...
     published.forEach((segment) => {
