@@ -922,6 +922,47 @@ if (!existsSync(cssPath)) {
       );
     }
   }
+  // The readiness record states the split in its own words ("N are published figures and M are
+  // Modelled"). It is present-tense, so it must agree with the configuration — and it must state
+  // the split at all, so the current figures cannot be dropped instead of corrected.
+  const readinessPath = join(ROOT, "PRODUCTION_READINESS.md");
+  if (existsSync(readinessPath)) {
+    const readiness = readFileSync(readinessPath, "utf8").replace(/\s+/g, " ");
+    const claims = [...readiness.matchAll(/(\d+) are published figures and (\d+) are/g)];
+    if (!claims.length) {
+      problems.push(
+        "PRODUCTION_READINESS.md no longer states the current published / modelled split — the present state must be stated, not dropped",
+      );
+    }
+    for (const m of claims) {
+      if (Number(m[1]) !== publishedIndicators || Number(m[2]) !== modelledIndicators) {
+        problems.push(
+          `PRODUCTION_READINESS.md says "${m[1]} are published figures and ${m[2]} are Modelled" — the configuration holds ${publishedIndicators} / ${modelledIndicators}`,
+        );
+      }
+    }
+  }
+
+  // The RESUME HERE block is the present-tense state by definition, so the current indicator split
+  // must be stated there for the next session to start from a true figure.
+  const statusPath = join(ROOT, "PROJECT_STATUS.md");
+  if (existsSync(statusPath)) {
+    const status = readFileSync(statusPath, "utf8");
+    const start = status.indexOf("\n## RESUME HERE");
+    if (start < 0) {
+      problems.push("PROJECT_STATUS.md has no RESUME HERE block — the next session's entry point is missing");
+    } else {
+      const rest = status.slice(start + 1);
+      const end = rest.indexOf("\n## ", 1);
+      const block = (end < 0 ? rest : rest.slice(0, end));
+      if (!block.includes(`${publishedIndicators} published / ${modelledIndicators} modelled`)) {
+        problems.push(
+          `PROJECT_STATUS.md's RESUME HERE block does not state the current indicator split (${publishedIndicators} published / ${modelledIndicators} modelled)`,
+        );
+      }
+    }
+  }
+
   check("the live-site description states the configuration's current figures", problems);
 }
 
