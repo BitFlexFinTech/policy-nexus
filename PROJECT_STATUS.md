@@ -4,14 +4,15 @@ Source of truth for project state. **Read this FIRST at every session.**
 Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE right now.
 `DONE` only appears where it was verified in the same session it was written.
 
-> **LAST TASK — DONE 2026-10-04: national-scale dataset expansion, batches 1–4 — item 1 complete.** Fifteen
-> modelled indicators became real published figures (the split moved from **24 published / 136 modelled** to
-> **39 published / 281 modelled**), the platform now holds **320 reference indicators** (twenty per
-> department, up from ten) and **150 stakeholder groups** (every department models 40, up from 24). Built,
-> tested and published in that session. Read the section *"DATASET EXPANSION — batches 1–4…"* (above
-> `## RESUME HERE`) for the delivered detail and its verification log, then the `RESUME HERE` block. The
-> previous task (the live date, 2026-10-04) is also DONE; the remaining work is the *"NEXT PHASE"* list and
-> **is not being removed**.
+> **LAST TASK — DONE 2026-10-04: national-scale dataset expansion, batches 1–4 — item 1 complete; and the
+> offline-demo sheet (item 6).** Fifteen modelled indicators became real published figures (the split moved
+> from **24 published / 136 modelled** to **39 published / 281 modelled**), the platform now holds **320
+> reference indicators** (twenty per department, up from ten) and **150 stakeholder groups** (every
+> department models 40, up from 24). The offline-demo sheet **`docs/OFFLINE_DEMO.md`** makes the deck's "no
+> network needed" claim runnable on the day. Built, tested and published in that session. Read the sections
+> *"DATASET EXPANSION — batches 1–4…"* and *"OFFLINE-DEMO SHEET…"* (above `## RESUME HERE`) for the delivered
+> detail and the verification log, then the `RESUME HERE` block. The previous task (the live date,
+> 2026-10-04) is also DONE; the remaining work is the *"NEXT PHASE"* list and **is not being removed**.
 
 ---
 
@@ -1600,6 +1601,7 @@ because the block it sits in already names itself.
 | 2026-10-04 | **dataset expansion batch 2 — the rest of the modelled set swept; four more real figures** | Every remaining modelled indicator was checked against the World Bank API; **four** genuinely measure what their indicator says and converted: `env-water` 40.0% of internal resources (`ER.H2O.FWTL.ZS`, 2022), `health-malaria` 11.4 per 1,000 at risk (`SH.MLR.INCD.P3`, 2024), `health-anc` 71.5% (`SH.STA.ANV4.ZS`, 2019), `agri-maize` → **Cereal yield** 743.9 kg/ha (`AG.YLD.CREL.KG`, 2023). **Two re-framed to the published measure** (`health-malaria` unit → "per 1,000 at risk"; `agri-maize` label → "Cereal yield"). The rest **stay `Modelled` with a recorded reason** (external debt vs public debt; skilled attendance vs facility delivery; safely managed vs piped water; hospital beds vs functional facilities; and the operational returns) — **PART 9.5** of `docs/PLATFORM_ENRICHMENT_PLAN.md`. **Split 35/125 → 39/121.** The gate gained the four rows. **TESTED:** validate **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-oTw_NdGb.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,399,077 bytes; served sha256 **`8c39eb3c07161af857ac5797636c48ee4d9a5ec12f9aae1bed7b7e472081c8af`** identical to the local build; site **200**; `.well-known/` and `cgi-bin/` intact. |
 | 2026-10-04 | **dataset expansion batch 3 — ten new indicators per department (160 → 320)** | The owner's target of **20 indicators per department (320)** is met: **ten new Modelled indicators added to each of the 16 departments** (160 new lines in `src/config/departments.ts`), each with a unique id, a plain note and a bounded score — demo figures, plainly labelled `Modelled` per the owner's instruction that real data comes after approval. The set is now **320 indicators (39 published / 281 modelled)**. The gate was raised `toHaveLength(160)` → `toHaveLength(320)` in `src/test/indicator-basis.test.tsx`; no other test needed changing (the per-department gate only requires ≥3). **TESTED:** validate **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-oTw_NdGb.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,399,077 bytes; served sha256 **`8c39eb3c07161af857ac5797636c48ee4d9a5ec12f9aae1bed7b7e472081c8af`** identical to the local build; site **200**. **Not touched:** `Minister Submission/**` (the owner's — still quotes 160 / 24 published / 136 modelled; now **320 / 39 / 281**). |
 | 2026-10-04 | **dataset expansion batch 4 — the stakeholder groups reach 150, 40 per department (item 1 complete)** | The canonical list `STAKEHOLDER_SEGMENTS` grew **72 → 150** (78 new groups, all `Modelled`, in `src/config/reference.ts`), and **every one of the 16 departments now models 40** (was 24) in `src/config/departments.ts`. The new groups cover agro-processing and inputs, the manufacturing sub-sectors, the mining/energy supply chains, the rest of the financial sector, transport and logistics, tourism and the creative industries, the ICT and digital economy, media, the health and care workforce and the education and training workforce. **Split: 150 groups — 20 published / 130 modelled.** **Gates moved with the data (fixed at source):** the `DEPARTMENT_SEGMENTS` pin and the range gate (22–26 → **36–44**) in `src/test/departments.test.ts`; `MODELLED_IDS` (+78 ids) and the **20 / 130** split in `src/test/reference-sources.test.tsx`; `toHaveLength(72)` → `toHaveLength(150)` in `src/test/workspace.test.tsx`; and "72 nationally" / heading `(72)` → "150 nationally" / `(150)` in `e2e/journey.spec.ts`. **One test re-tuned, not weakened:** `src/test/swarm.test.ts`'s impulse check uses a stronger shove (260/60 → **420/95**) because a 40-group school is denser; the property (a shove separates the school, which then recoheres) is unchanged. **TESTED:** validate **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-oTw_NdGb.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED:** FTPS `mirror -R --only-newer` (**never `--delete`**) — 13 files, 1,399,077 bytes; served sha256 **`8c39eb3c07161af857ac5797636c48ee4d9a5ec12f9aae1bed7b7e472081c8af`** identical to the local build; site **200**. **Item 1 is complete.** **Not touched:** `Minister Submission/**` (the owner's — still quotes 72 / 24 / 160 / 24·136; now **150 / 40 / 320 / 39·281**). |
+| 2026-10-04 | **offline-demo sheet (NEXT PHASE item 6) — the deck's "no network needed" claim made runnable** | New file **`docs/OFFLINE_DEMO.md`**: the one-page, plain-English procedure that puts the built site on a demonstration laptop **with the network off** — build once (`npm run build`); copy `dist/` to the laptop; serve it **on that laptop** with a local web server (Python 3's `python3 -m http.server 8080`, or the project's `npm run preview`); open the root address; prove it with the Wi-Fi off. It states why a local server is used (a browser will not run the site from a `file://` address), what to expect (identical behaviour; **no network request at all**), the single-page-app caveat (open at the root; `npm run preview` handles deep-address refreshes), and a before-the-meeting checklist. **TESTED:** a local Python server served `dist/` — the root returned **200** and the bundle `assets/index-oTw_NdGb.js` returned **200**. **No `src/` file changed**, so the shipped bundle is **byte-identical** (`assets/index-oTw_NdGb.js`, sha256 `8c39eb3c…`) and **no redeploy was needed** — the live host already serves it. **Also fixed a stale statement** left in *NEXT PHASE* item 1 (a batch-1 leftover saying the split was 35 / 125) — removed at source. **TESTED on these bytes:** validate **PASS — 20/20** · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-oTw_NdGb.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. |
 
 
 
@@ -3584,6 +3586,26 @@ fifteen places and inside every generated document, so **only a build could ever
 - **A run recorded before this change keeps its own stored date** (`2026-09-24`) — honest, because that is
   when it was recorded under the old scheme. Do not rewrite history.
 
+## OFFLINE-DEMO SHEET — DONE 2026-10-04 (NEXT PHASE item 6)
+
+**Status: `DONE` — written, and the method tested this session.**
+
+- **BUILT.** New file **`docs/OFFLINE_DEMO.md`** — a one-page, plain-English instruction that makes the
+  deck's claim (*"the demonstration does not need the network"*) true on the day: build once
+  (`npm run build`), copy `dist/` to the demonstration laptop, serve it **on that laptop** with a local web
+  server (Python 3's `python3 -m http.server 8080`, or the project's `npm run preview`), open the root
+  address, then prove it with the Wi-Fi off. It explains why a local server is used (a browser will not run
+  the site from a `file://` address), what to expect (identical behaviour; no network request), the
+  single-page-app caveat (open at the root; `npm run preview` handles deep-address refreshes), and a
+  before-the-meeting checklist.
+- **TESTED.** The method was run this session: `cd dist && python3 -m http.server 8123` served the built
+  site — the root returned **200** and the bundle `assets/index-oTw_NdGb.js` returned **200**. **No `src/`
+  file changed**, so the shipped bundle is byte-identical (`assets/index-oTw_NdGb.js`, sha256
+  `8c39eb3c07161af857ac5797636c48ee4d9a5ec12f9aae1bed7b7e472081c8af`) and **no redeploy was needed** — the
+  live host already serves it.
+- **RESULT: DONE.** Item 6 is removed from the outstanding list.
+- **Not touched:** `package.json`, `src/**`, the palette, the typography, `Minister Submission/**`.
+
 ## COSTED SPREADSHEETS — DELIVERED 2026-10-05 (the owner's Google Drive)
 
 **Status: `DONE`.** The owner asked for a costed spreadsheet to take to the Ministry, with the buying
@@ -3691,8 +3713,6 @@ in the order the owner has raised them.
    `src/test/indicator-basis.test.tsx`, and "150 nationally" in `e2e/journey.spec.ts`.
    **The pack** (`Minister Submission/**`) still quotes 72 / 24 / 160 / 20 / 52 / 24 / 136 and is the
    owner's file — it now needs **150 / 40 / 320 / 20 / 130 / 39 / 281**; **reported, not edited.**
-   **Batch 1 of this item is DONE (2026-10-04): the indicator split is now 35 published / 125 modelled
-   (see *"DATASET EXPANSION — batch 1"*), so the pack's 24 / 136 is now stale and needs the owner's edit.**
 2. **`/platform-admin` needs a real guard.** Recorded open on 2026-09-29: the screen is reachable by
    anyone who types the address and can save the service configuration; hiding it is not protecting it.
 3. **The three funded build steps** the proposal asks for: server-side document text extraction (so a real
@@ -3702,29 +3722,36 @@ in the order the owner has raised them.
    with the reason written beside it).
 5. **Two items in the pack** (the owner's file, reported and untouched): the named-source statement still
    reads ZIMSTAT-only in the copy in this repo, and the demonstration address is still not stated there.
-6. **The offline-demo sheet** — the one-page instruction that makes the deck's "the demonstration does not
-   need the network" claim true on the day (copy `dist/` to the demo laptop and serve it locally).
+6. ~~**The offline-demo sheet**~~ — **DONE 2026-10-04.** `docs/OFFLINE_DEMO.md` is the one-page instruction
+   that makes the deck's *"the demonstration does not need the network"* claim true on the day: build once
+   (`npm run build`), copy `dist/` to the demonstration laptop, serve it **on that laptop** (Python 3's
+   `python3 -m http.server 8080`, or the project's `npm run preview`), open the root address, then prove it
+   with the Wi-Fi off. **The method was tested this session:** a local Python server served `dist/` — root
+   **200**, the bundle **200**. **No `src/` file changed, so the built site is byte-identical and needed no
+   redeploy.**
 7. **A risk to watch, not a task:** the phone layout fits the primary action by **2 px**; a change to the
    heading size or the masthead padding breaks it (recorded in *Known-red / open items*).
 
 ## RESUME HERE
 
 **NOTHING IS OUTSTANDING FROM AN APPROVED TASK; the newest approved work is DONE.** *NEXT PHASE* **item 1
-(the national-scale dataset expansion) is DONE — batches 1–4 (2026-10-04):** fifteen modelled indicators
-became real published figures (the published set grew **24 → 39**), the indicators reached **320** (twenty per
-department) and the stakeholder groups reached **150** (every department models **40**). See the *"DATASET
-EXPANSION — batches 1–4"* section (above) for the delivered detail and the verification log. The live-date
-task (approved 2026-10-03) is **DONE** too, and the costed Google-Drive sheets are **DONE** (see *COSTED
-SPREADSHEETS* below). The next work is the **six other *NEXT PHASE* items**; **none of it has been dropped.**
+(the national-scale dataset expansion) is DONE — batches 1–4 (2026-10-04)** (indicators 160 → 320; groups
+72 → 150, 24 → 40 per department; published figures 24 → 39), and **item 6 (the offline-demo sheet) is DONE
+too** — `docs/OFFLINE_DEMO.md`; see the *"OFFLINE-DEMO SHEET"* section (above). The live-date task
+(approved 2026-10-03) and the costed Google-Drive sheets are **DONE** as well. The next work is the **five
+remaining *NEXT PHASE* items** — item 2 (the `/platform-admin` guard, which needs the funded sign-in build to
+be real), item 3 (the three funded server-side build steps), item 4 (the `®` mark — a legal call), item 5
+(two wording items in the owner's pack), and item 7 (a watch item, not a task); **none of it has been
+dropped.**
 
 **Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and IN SYNC (proved by
 `npm run sync:check`, which reports all four checks PASS). **Tip:** run `git log --oneline -1`. **Next
-commands:** `git fetch` then `npm run sync:check`; then pick up any of the six remaining *NEXT PHASE* items
-(item 1 is complete).
+commands:** `git fetch` then `npm run sync:check`; then pick up any of the five remaining *NEXT PHASE* items
+(items 1 and 6 are complete).
 
 **PLAIN SUMMARY (OWNER-FACING).**
 
-**This session (2026-10-04 — eleven made-up figures replaced with real published ones).** In plain words:
+**This session (2026-10-04 — fifteen made-up figures replaced with real published ones, the platform doubled in size, and a one-page offline demo sheet).** In plain words:
 1. **You asked to start with real published figures, and I did that for fifteen of them.** The platform shows
    numbers for each department, and until now most were the platform's own "Modelled" figures — clearly
    labelled as not official. Fifteen of them now carry a **real figure from a named official source**, each
@@ -3749,6 +3776,11 @@ commands:** `git fetch` then `npm run sync:check`; then pick up any of the six r
    quote the older, smaller platform (72 groups, 24 per department, 160 figures, 24 published / 136 modelled).
    It should now read **150 groups, 40 per department, 320 figures, 39 published / 281 modelled**. I have
    **not** edited your file; I am telling you so you can update it before the meeting.
+
+7. **I also wrote the one-page sheet for demonstrating with no internet.** `docs/OFFLINE_DEMO.md` explains, in
+   plain steps, how to put the platform on a laptop and run it with the Wi-Fi switched off — build it once,
+   copy the built folder across, start a small local server on the laptop, open the address, and prove it.
+   I tested the method this session (a local server served the site correctly).
 
 **Previous session (2026-10-04 — the live date).** In plain words:
 1. **The platform now shows today's date and time**, and it keeps ticking on its own while the page is open. It reads "Today 4 October 2026 · 09:15" and moves on by itself — nothing has to be rebuilt for the day to change.

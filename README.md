@@ -49,4 +49,5 @@ npx playwright test
 
 - `PROJECT_STATUS.md` — current verified state, verification log and resume instructions.
 - `PRODUCTION_READINESS.md` — the mock → real go-live checklist.
+- `docs/OFFLINE_DEMO.md` — one page: run the demonstration on a laptop with **no network**.
 
