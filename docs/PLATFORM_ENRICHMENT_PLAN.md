@@ -660,3 +660,35 @@ found by reading the site through a text-extraction reader (`r.jina.ai`). **`zim
 user-agent** to serve its PDFs. **ZIMSTAT's own pages are readable** and confirm it publishes agriculture,
 labour, external trade, energy, ICT, industrial, health, education and environment statistics — those are
 the S2 and S3 sources.
+
+### 10.4 Batch S2 begins — UNESCO's statistics institute, queried properly (2026-10-04)
+
+The earlier sweep's UNESCO probe was malformed (guessed indicator codes), so UIS was wrongly reported as
+holding nothing. This time the **UIS definitions list (5,063 indicators)** was fetched first, the right
+codes found **by name**, and Zimbabwe's values then read from the UIS data service.
+
+| Department / indicator | Value now shown | UIS series (code) | Period |
+|---|---|---|---|
+| edu / Lower-secondary completion (`edu-lower-secondary`) | **72.4** % | Completion rate, lower secondary education, both sexes (`CR.2`) | 2015 |
+| hedu / Science and technology graduates (`hedu-stem`) | **23.8** % | Percentage of tertiary graduates from STEM programmes, both sexes (`FOSGP.5T8.F500600700`) | 2024 |
+
+`hedu-stem`'s note now states what the series counts — a **share of all tertiary graduates** — which the
+previous wording did not. **UNESCO was added to `NAMED_SOURCES`.** Split: **61 published / 259 modelled.**
+
+**Checked and rejected (S2, so far) — with the reason:**
+- `edu-numeracy` — UIS publishes *Grade 3 mathematics proficiency* (`MATH.G3`), but holds **no Zimbabwe
+  value**.
+- `hedu-graduation` — UIS's *gross graduation ratio from first degree programmes* (`GGR.6T7`) is **1.35 %**
+  for Zimbabwe (2013): graduates relative to the whole graduation-age population, **not** the share of
+  enrolled students who graduate that the indicator states. Rejected rather than re-framed, because a
+  1.4 % "graduation rate" would read as a failure rate and would be untrue to both measures.
+- `health-chw` — WHO's *Number of community health workers* (`HRH_06`) holds **no Zimbabwe value**.
+- `health-outpatient` — WHO's *Outpatient visits (per 100,000)* (`MH_20`) sits inside WHO's **mental-health**
+  series, so it is not the general outpatient measure the indicator states; its Zimbabwe value is also
+  dated 2014.
+- `fin-revenue-gdp` — the IMF's *Government revenue (% of GDP)* series holds **no Zimbabwe value**; the
+  Treasury's own budget documents remain the route for that one.
+
+**Still to read in S2:** ZIMSTAT's agriculture and trade tables (their file addresses are now known —
+`zimstat.co.zw/wp-content/uploads/Macro/…`), the Ministry of Lands' crop and livestock assessments, and the
+mines and energy publishers.

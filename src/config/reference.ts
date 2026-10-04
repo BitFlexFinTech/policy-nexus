@@ -73,6 +73,13 @@ export const NAMED_SOURCES = [
     publication: "World Economic Outlook — General government gross debt (% of GDP)",
   },
   {
+    id: "unesco",
+    name: "UNESCO Institute for Statistics (UIS)",
+    figures:
+      "Completion rates, enrolment ratios and the share of tertiary graduates by field of study",
+    publication: "UIS education statistics (UNESCO)",
+  },
+  {
     id: "acts-index",
     name: "veritaszim A–Z List of Acts (official consolidated index)",
     figures: "The title and chapter of every Act the platform cites",

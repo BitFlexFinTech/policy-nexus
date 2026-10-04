@@ -254,6 +254,8 @@ describe("department indicators — published with a named source, or plainly mo
       "zimra/zimra-audit": "zimra",
       "zimra/zimra-collection": "zimra",
       "zimra/zimra-register": "zimra",
+      "edu/edu-lower-secondary": "unesco",
+      "hedu/hedu-stem": "unesco",
     };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
@@ -346,6 +348,11 @@ describe("department indicators — published with a named source, or plainly mo
       ["zimra/zimra-collection", "110.3", "Annual Report: net revenue collections against target", "2024"],
       ["zimra/zimra-register", "120,234", "Annual Report: active registered taxpayers", "2024"],
       ["zimra/zimra-audit", "3.53", "Annual Report: audit coverage of active registered taxpayers", "2024"],
+      // 2026-10-04 — S2 begins, with UNESCO's own statistics institute (UIS), which the earlier sweep had
+      // queried with guessed indicator codes and therefore wrongly reported as empty. Both codes below were
+      // found in the UIS definitions list first, then Zimbabwe's values read from the UIS data service.
+      ["edu/edu-lower-secondary", "72.4", "UIS: completion rate, lower secondary education, both sexes", "2015"],
+      ["hedu/hedu-stem", "23.8", "UIS: percentage of tertiary graduates from STEM programmes, both sexes", "2024"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {
