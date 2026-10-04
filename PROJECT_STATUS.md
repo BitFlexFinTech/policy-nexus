@@ -3655,7 +3655,7 @@ command:** `npm run sync:check` (must print `IN SYNC`). **Next commands:** `git 
 2. **The old frozen date is still there, and it now means something different.** "Reference date 24 September 2026" is the date the platform's figures are worked out FOR — the frame the numbers belong to. That is not "today", and it does not move. Both are on the page, each clearly labelled, so nothing that was there before has been lost or hidden.
 3. **Every run is now dated the moment you press Run Simulation**, and all four of its documents carry that same date, so they agree with each other. A run you made before this change keeps the date it was saved with — its history is not rewritten.
 4. **The engine itself is unchanged.** The same policy still gives exactly the same figures: only the date stamped on a run is real. One automatic check now allows the clock in one single file (`src/lib/clock.ts`) and still fails it anywhere else, so the "same policy, same result" promise is provably intact.
-5. **Everything was re-checked.** All checks green (validate, types, lint, 502 tests, build, 18 browser tests), and the live site carries exactly this build — to be proved by fingerprint on publication (see the deployment note below).
+5. **Everything was re-checked, and it is live.** All checks green (validate, types, lint, 502 tests, build, 18 browser tests). The live site at `https://nzwisiso.bitflex.app/` now serves exactly this build — proved by fingerprint (the served file's sha256 is identical to the build on this machine), and I read the page back in a real browser: it showed **Today 4 October 2026 · 04:04** at the top and in the footer, beside the unchanged reference frame.
 6. **One small fault I found and fixed.** The new "Today" line made the top strip one line taller on a phone, which pushed the main button just below the screen edge. I fixed it, and the button is back above the fold on a phone (measured at a real 390-pixel width: 834 px of 844 px).
 
 **Previous session (2026-10-05 — the costed sheets, now in your own Google Drive).** In plain words:
@@ -3873,8 +3873,9 @@ confirm it.
   `scripts/validate.mjs`
   (**check 14**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-w2OBNTQe.js`
-  (`8ce3e4d7e90e83e4eaa7bba8fb1621ae18e150f5e439b7767fbcbf6d8c227a36`)** — the **owner's five changes of
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-DMlh2vYA.js`
+  (`f43cfc4d9ab96ca031357505a99e4bd56885170e99288aeeefc0d4aa6ff1d1c3`)** — the **live-date build of
+  2026-10-04** on top of the **owner's five changes of
   2026-10-02** on top of the national policy-drafting build: the footer reads **"A Project by the Ministry
   of ICT"**; the indicator cards are **gone from the Overview** and every figure (with its named source)
   now sits on the **Reference** screen; the Implementation pack's **hand-fill form is gone** (the pack is
@@ -4114,8 +4115,9 @@ confirm it.
   the **BLOCKER** that used to sit in *Known-red / open items* is gone. The agent has pushed nothing to
   `main` since; the feature branch carries all later work. Deployment is an FTP upload of `dist/`, not a
   git push.
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-w2OBNTQe.js`,
-  `8ce3e4d7e90e83e4eaa7bba8fb1621ae18e150f5e439b7767fbcbf6d8c227a36`** — the national policy-drafting
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-DMlh2vYA.js`,
+  `f43cfc4d9ab96ca031357505a99e4bd56885170e99288aeeefc0d4aa6ff1d1c3`** — the live-date build of
+  2026-10-04 on top of the national policy-drafting
   build with the sourcing-statement fix and the owner's five changes of 2026-10-02, verified in the
   strongest form a local machine can:
   the served file's sha256 is **identical** to the local `dist/` build, and the site returns **200**. The

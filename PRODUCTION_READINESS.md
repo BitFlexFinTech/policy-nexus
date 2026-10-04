@@ -100,9 +100,9 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-02, after the owner's five changes were published — the host and the working copy are IN STEP).**
+- **Status today (2026-10-04, after the live-date build was published — the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-w2OBNTQe.js` (`8ce3e4d7e90e83e4eaa7bba8fb1621ae18e150f5e439b7767fbcbf6d8c227a36`) — fetched
+  `assets/index-DMlh2vYA.js` (`f43cfc4d9ab96ca031357505a99e4bd56885170e99288aeeefc0d4aa6ff1d1c3`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
   explicit FTPS, **never `--delete`** — 13 files, 1,353,774 bytes — and the SSL validation token
