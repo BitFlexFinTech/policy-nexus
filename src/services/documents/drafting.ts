@@ -103,7 +103,7 @@ export const buildDraftingGrounding = (
     const instrument = getCitedInstrument(id);
     return { id, citation: citedInstrumentLabel(id), source: instrument.source };
   }),
-  prompt: draftingPromptFor(department),
+  prompt: draftingPromptFor(department, formatInstant(run.createdAt)),
 });
 
 /* ------------------------------------------------------------------------- */

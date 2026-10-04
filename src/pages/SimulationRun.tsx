@@ -16,7 +16,7 @@ import {
   feedTimestamp,
 } from "@/components/feedStyles";
 import { DISCLAIMER, VOCABULARY } from "@/config/brand";
-import { REFERENCE_DATE_LABEL } from "@/config/reference";
+import { formatInstant } from "@/lib/clock";
 import { cn } from "@/lib/utils";
 import { buildRelationshipGraph } from "@/services/assessment/network";
 import { useRun } from "@/services/assessment/useAssessmentRuns";
@@ -229,7 +229,7 @@ export default function SimulationRun() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-sm font-semibold text-foreground">Assessment Complete</h3>
             <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-              Reference date {REFERENCE_DATE_LABEL}
+              Recorded {formatInstant(run.createdAt)}
             </span>
           </div>
           <p className="max-w-3xl text-xs leading-relaxed text-foreground">{run.summary}</p>

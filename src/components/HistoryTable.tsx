@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { findDepartment } from "@/config/departments";
-import { REFERENCE_DATE_LABEL, getTimeHorizon } from "@/config/reference";
+import { getTimeHorizon } from "@/config/reference";
+import { formatClock, formatInstant, useNow } from "@/lib/clock";
 import { useSession } from "@/session/useSession";
 import { useAssessmentRuns } from "@/services/assessment/useAssessmentRuns";
 
@@ -14,6 +15,7 @@ export function HistoryTable() {
   const session = useSession();
   const department = findDepartment(session?.departmentId);
   const { runs } = useAssessmentRuns(session?.departmentId ?? null);
+  const now = useNow();
 
   if (!department) return null;
 
@@ -87,8 +89,8 @@ export function HistoryTable() {
       <div className="flex flex-wrap items-center justify-between gap-1 border-t px-4 py-2">
         <span className="text-[10px] text-muted-foreground">
           {runs.length > 0
-            ? `Result shown is the modelled composite confidence of the latest run. Reference date ${REFERENCE_DATE_LABEL}.`
-            : `No simulation has been run for ${department.shortName} yet. Reference date ${REFERENCE_DATE_LABEL}.`}
+            ? `Result shown is the modelled composite confidence of the latest run, recorded ${formatInstant(runs[0].createdAt)}.`
+            : `No simulation has been run for ${department.shortName} yet. Today ${formatClock(now)}.`}
         </span>
         <Link to="/app/simulations" className="text-[10px] font-medium text-primary hover:underline">
           Open the simulation register →

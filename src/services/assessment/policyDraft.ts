@@ -28,8 +28,6 @@ import { createRng } from "@/lib/prng";
 import { ANNEX, CLAUSE } from "./documentStructure";
 import {
   BLANK,
-  PHASE_ONE_DATE,
-  PHASE_TWO_DATE,
   SENTIMENT_WORD,
   costCategoriesTable,
   implementationMatrixTable,

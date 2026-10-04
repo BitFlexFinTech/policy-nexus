@@ -54,8 +54,11 @@ export interface AssessmentService {
 const createScenarioAssessmentService = (): AssessmentService => ({
   buildRun: (request) => Promise.resolve(buildScenarioRun(request)),
   run: (request) => {
-    saveRunRequest(request);
-    return Promise.resolve(buildScenarioRun(request));
+    const id = saveRunRequest(request);
+    // Rebuild from what was RECORDED, so the run handed back here carries the same recorded
+    // moment — and therefore the same date — that the register and every screen will show.
+    const stored = getRunRequest(id);
+    return Promise.resolve(buildScenarioRun(stored ?? request));
   },
   getRun: (runId) => {
     const stored = getRunRequest(runId);

@@ -13,11 +13,13 @@
  */
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { cleanup, render, screen, act } from "@testing-library/react";
+import App from "@/App";
 import { CLOCK_TICK_MS, formatInstant, useNow } from "@/lib/clock";
 import { REFERENCE_DATE } from "@/config/reference";
 import { findDepartment } from "@/config/departments";
+import { clearSession, signInToDepartment } from "@/session/session";
 import { clearRuns, getRunRequest, saveRunRequest } from "@/services/assessment/runStore";
-import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
+import { assessmentService, buildSimulatedRun } from "@/services/assessment/AssessmentService";
 import { buildLongReport, renderDocumentText } from "@/services/assessment/documents";
 
 /** Renders the live moment as a number, so a test can watch it move. */
@@ -51,6 +53,7 @@ describe("the live clock", () => {
 describe("a run's own date", () => {
   beforeEach(() => {
     window.localStorage.clear();
+    clearSession();
     clearRuns();
   });
 
@@ -79,5 +82,27 @@ describe("a run's own date", () => {
     expect(text).toContain(formatInstant(run.createdAt));
     // ...which is a real moment, never the fixed reference date.
     expect(formatInstant(run.createdAt)).not.toBe(formatInstant(REFERENCE_DATE));
+  });
+
+  it("shows a run's own recorded moment on the workspace history line, not a frozen date", async () => {
+    signInToDepartment("fin");
+    const run = await assessmentService.run({
+      departmentId: "fin",
+      policyText: "A second measure for the pilot.",
+      source: "paste",
+    });
+    // The run handed back carries the moment it was recorded, so the value the page renders and
+    // the value a caller sees are the same one.
+    expect(run.createdAt).not.toBe(REFERENCE_DATE);
+
+    window.history.pushState({}, "", "/app");
+    render(<App />);
+    await screen.findByText(/Simulation History/);
+    const line = await screen.findByText(
+      (_text, element) =>
+        element?.tagName === "SPAN" &&
+        (element.textContent ?? "").includes(`recorded ${formatInstant(run.createdAt)}`),
+    );
+    expect(line).toBeInTheDocument();
   });
 });

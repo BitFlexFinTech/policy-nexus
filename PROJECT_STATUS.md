@@ -3429,9 +3429,10 @@ item in it is now built.
   history is not rewritten.
 - **TESTED (real output, this session).** `npm run validate` → **PASS — all checks green** (the
   determinism check still passes with the one-file exemption) · `npm run typecheck` → **0** ·
-  `npm run lint` → **0 errors, 7 pre-existing warnings** · `npm test` → **502 passed (502) across 46
-  files** (was 500/45; the new `src/test/live-date.test.tsx` adds two — the clock advances under fake
-  timers, and a run's document carries the run's own recorded moment) · `npm run build` → **✓** ·
+  `npm run lint` → **0 errors, 7 pre-existing warnings** · `npm test` → **503 passed (503) across 46
+  files** (was 500/45; the new `src/test/live-date.test.tsx` adds three — the clock advances under fake
+  timers, a run's document carries the run's own recorded moment, and the workspace history line shows
+  that moment — and `journey.test.tsx` now pins the run page's recorded date) · `npm run build` → **✓** ·
   `npx playwright test` → **18 passed**, including the new assertion that the landing page shows the
   live "Today" date.
 - **RESULT: DONE.** Every item of the recorded plan is built and verified in this session.
@@ -3442,16 +3443,36 @@ item in it is now built.
   it at every width. Re-measured after a fresh build: **834 px of 844 px — passes.** The first re-run
   reported the old number because `dist/` was stale (the browser test serves the built bundle); recorded
   as a trap.
+- **More defects found here, and fixed at source in the same session (a second pass over the approved
+  plan's own file list).** (1) **Two screens the plan named still showed the frozen date** — the run
+  page's completion stamp (`SimulationRun.tsx` line 232) and the workspace history line
+  (`HistoryTable.tsx` lines 90–91). Both now show the run's own recorded moment; the history line shows
+  today's date in its no-run state. (2) **`assessmentService.run()` handed back a run built from the
+  REQUEST**, while every screen renders the run rebuilt from the recorded STORE — so the run a caller
+  received carried a different date from the one on screen. It now rebuilds from what was recorded.
+  (3) **Two dead imports** (`PHASE_ONE_DATE`, `PHASE_TWO_DATE`) in `policyDraft.ts`. (4) **The prompt
+  builder `draftingPromptFor` took its date from the fixed frame**; it now takes the run's recorded
+  moment, defaulting to the frame so a caller with no run (a preview, a test) is unchanged. **Every fix
+  carries a gate:** `live-date.test.tsx` gains a test that the workspace history line shows the run's
+  recorded moment, and `journey.test.tsx` now asserts the run page's recorded date. Found by re-reading
+  the plan's list of files instead of trusting the first pass — recorded so the next session checks the
+  plan, not the report.
+- **One deliberate boundary, stated so it is not mistaken for an oversight.** `PHASE_ONE_DATE` in
+  `matrices.ts` still reads `Phase 1 — from 24 September 2026`. It is the **data frame** the modelled
+  implementation plan is phased from — a date inside the policy's *content*, not the document's own
+  date — so it is left as the frame on purpose. The plan did not name it, and changing it would alter
+  what the policy says.
 - **Files touched this session:** `src/lib/clock.ts` (new) · `src/config/reference.ts` (unchanged) ·
   `src/services/assessment/types.ts`, `runStore.ts`, `scenario.ts` · `src/services/documents/policyInputStore.ts`,
   `draftStore.ts`, `docx.ts`, `documentExport.ts`, `drafting.ts` · `src/services/assessment/documents.ts`,
   `policyDraft.ts`, `implementationPack.ts` · `src/components/public/PublicPageShell.tsx` ·
-  `src/components/AgentFeed.tsx` · `src/components/HistoryTable.tsx` (unchanged) ·
+  `src/components/AgentFeed.tsx`, `HistoryTable.tsx` ·
   `src/components/assessment/AssessmentSections.tsx`, `DocumentActions.tsx` · `src/pages/Reference.tsx`,
-  `Simulations.tsx`, `Compare.tsx`, `AssessmentReport.tsx`, `ImplementationPack.tsx`, `PolicyDraft.tsx` ·
-  `src/test/live-date.test.tsx` (new), `docx.test.ts`, `policy-draft-persistence.test.tsx` ·
+  `Simulations.tsx`, `SimulationRun.tsx`, `Compare.tsx`, `AssessmentReport.tsx`, `ImplementationPack.tsx`,
+  `PolicyDraft.tsx` · `src/services/assessment/AssessmentService.ts` · `src/config/draftingPrompts.ts` ·
+  `src/test/live-date.test.tsx` (new), `docx.test.ts`, `policy-draft-persistence.test.tsx`, `journey.test.tsx` ·
   `e2e/journey.spec.ts` · `scripts/validate.mjs` · `.clinerules/01-minimal-context.md`,
-  `.clinerules/04-determinism-and-validation.md` · `PRODUCTION_READINESS.md` · this file.
+  `.clinerules/04-determinism-and-validation.md` · `PRODUCTION_READINESS.md`, `docs/PROPOSAL_PROMPT.md` · this file.
 
 **The owner's instruction, verbatim:** *"the date should be the live date and time not the date of
 deploy … for the documents it should be when the document was created."* On the one open choice the
@@ -3657,7 +3678,7 @@ session's two commits are **`e00fc87`** (the live date — built, tested and pub
 2. **The old frozen date is still there, and it now means something different.** "Reference date 24 September 2026" is the date the platform's figures are worked out FOR — the frame the numbers belong to. That is not "today", and it does not move. Both are on the page, each clearly labelled, so nothing that was there before has been lost or hidden.
 3. **Every run is now dated the moment you press Run Simulation**, and all four of its documents carry that same date, so they agree with each other. A run you made before this change keeps the date it was saved with — its history is not rewritten.
 4. **The engine itself is unchanged.** The same policy still gives exactly the same figures: only the date stamped on a run is real. One automatic check now allows the clock in one single file (`src/lib/clock.ts`) and still fails it anywhere else, so the "same policy, same result" promise is provably intact.
-5. **Everything was re-checked, and it is live.** All checks green (validate, types, lint, 502 tests, build, 18 browser tests). The live site at `https://nzwisiso.bitflex.app/` now serves exactly this build — proved by fingerprint (the served file's sha256 is identical to the build on this machine), and I read the page back in a real browser: it showed **Today 4 October 2026 · 04:04** at the top and in the footer, beside the unchanged reference frame.
+5. **Everything was re-checked, and it is live.** All checks green (validate, types, lint, 503 tests, build, 18 browser tests). The live site at `https://nzwisiso.bitflex.app/` now serves exactly this build — proved by fingerprint (the served file's sha256 is identical to the build on this machine), and I read the page back in a real browser: it showed **Today 4 October 2026 · 04:20** at the top and in the footer, beside the unchanged reference frame.
 6. **One small fault I found and fixed.** The new "Today" line made the top strip one line taller on a phone, which pushed the main button just below the screen edge. I fixed it, and the button is back above the fold on a phone (measured at a real 390-pixel width: 834 px of 844 px).
 
 **Previous session (2026-10-05 — the costed sheets, now in your own Google Drive).** In plain words:
@@ -3875,8 +3896,8 @@ confirm it.
   `scripts/validate.mjs`
   (**check 14**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-DMlh2vYA.js`
-  (`f43cfc4d9ab96ca031357505a99e4bd56885170e99288aeeefc0d4aa6ff1d1c3`)** — the **live-date build of
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-YLqNp4cB.js`
+  (`d0206e97578c1fd6c59c3c5553c1191d4be28599dbf359324536b380ac19c3b1`)** — the **live-date build of
   2026-10-04** on top of the **owner's five changes of
   2026-10-02** on top of the national policy-drafting build: the footer reads **"A Project by the Ministry
   of ICT"**; the indicator cards are **gone from the Overview** and every figure (with its named source)
@@ -4117,8 +4138,8 @@ confirm it.
   the **BLOCKER** that used to sit in *Known-red / open items* is gone. The agent has pushed nothing to
   `main` since; the feature branch carries all later work. Deployment is an FTP upload of `dist/`, not a
   git push.
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-DMlh2vYA.js`,
-  `f43cfc4d9ab96ca031357505a99e4bd56885170e99288aeeefc0d4aa6ff1d1c3`** — the live-date build of
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-YLqNp4cB.js`,
+  `d0206e97578c1fd6c59c3c5553c1191d4be28599dbf359324536b380ac19c3b1`** — the live-date build of
   2026-10-04 on top of the national policy-drafting
   build with the sourcing-statement fix and the owner's five changes of 2026-10-02, verified in the
   strongest form a local machine can:

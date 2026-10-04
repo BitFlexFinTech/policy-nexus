@@ -102,7 +102,7 @@ client is registered.
   bundle name and carry the hash, so the claim cannot go stale in silence.
 - **Status today (2026-10-04, after the live-date build was published — the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-DMlh2vYA.js` (`f43cfc4d9ab96ca031357505a99e4bd56885170e99288aeeefc0d4aa6ff1d1c3`) — fetched
+  `assets/index-YLqNp4cB.js` (`d0206e97578c1fd6c59c3c5553c1191d4be28599dbf359324536b380ac19c3b1`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
   explicit FTPS, **never `--delete`** — 13 files, 1,353,774 bytes — and the SSL validation token
