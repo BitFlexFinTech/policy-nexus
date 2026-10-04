@@ -986,7 +986,8 @@ widened** to name the Demographic and Health Survey. **Split: 79 published / 241
 - **`zida-*`** — no accessible annual report or statistic was found.
 
 **Still to do in the national sweep:** the remaining `psc-*`, `lg-*`, `env-*` and `zida-*` measures (where a
-publisher may exist), and — as the owner asked — **more stakeholder groups and more indicators**.
+publisher may exist). **The owner's later goal — recorded in PART 11 — is that real, published figures must
+outnumber the `Modelled` ones.**
 ### 10.11 Batch S7 — ZIMSTAT's environmental, settlement and agriculture statistics (2026-10-04)
 
 This batch finishes the conversion sweep. ZIMSTAT's three **Environmental Statistics reports 2023** were
@@ -1040,6 +1041,52 @@ figure is a department's **own operational return**, which no publisher states f
 - `agri-livestock-count` — no publisher states Zimbabwe's national cattle herd.
 - `env-wetlands` — the environment report shows a **wetland map**, not a protection percentage.
 
-**What remains for the owner's asked-for expansion:** **more stakeholder groups and more indicators, each on
-a real published figure** — this is a structural step (it changes how many figures a department shows and the
-platform total), so it needs a scope decision before it is built.
+**What remains:** the owner's **LOCKED goal** that **real, published figures outnumber the `Modelled` ones** — recorded in `PROJECT_STATUS.md`'s locked constraints and planned in **PART 11** below.
+## PART 11 — THE LOCKED GOAL: real data must outnumber modelled data (recorded 2026-10-04)
+
+**Why this part exists.** The owner's goal — *"we want to add more real data and have more real data than
+modelled data"* — was discussed in the chat but **was never written into any project file**. A search of the
+whole repository, the plan, `PRODUCTION_READINESS.md`, the rules and both global rules folders found it
+**nowhere**; the only trace was in the Cline chat logs. This is the exact failure the rule
+`data-must-be-real-sources.md` was created to stop (its own words: the earlier "We want REAL sources" decision
+*"lived only in chat … which is exactly why it kept being re-litigated across sessions"*). **The decision is now
+saved** in `PROJECT_STATUS.md`'s locked constraints, here, and in `PRODUCTION_READINESS.md` — so no future
+session can ask the owner for it again.
+
+**The goal (LOCKED).** The platform must end up carrying **more real, published figures than `Modelled` ones** —
+and the same for the stakeholder groups.
+
+**Where it stands today (2026-10-04).**
+
+| Set | Published (real) | `Modelled` | Goal |
+|---|---|---|---|
+| 320 reference indicators | **85** | **235** | real **>** modelled (so **161+** real of 320) |
+| 150 stakeholder groups | **20** | **130** | real **>** modelled (so **76+** real of 150) |
+
+**The arithmetic, stated honestly so the work is not underestimated.**
+- **Converting** a modelled measure to a real one lifts published and lowers modelled by one each, so it closes
+  the gap by two: **76 conversions** would reach a majority (e.g. 161 / 159).
+- **Adding** a brand-new real indicator lifts only published, so it closes the gap by one: about **151 additions**
+  would be needed.
+- The conversion sweep (§10.1–10.11) found the remaining modelled figures are the departments' **own operational
+  returns** — no publisher states them for Zimbabwe — so the practical route is **adding new indicators**, each
+  carrying a real, named, published figure.
+
+**The route (a numbered run of batches).**
+- **Sources already proven to hold Zimbabwe values:** the **World Bank** (thousands of series, `api.worldbank.org`),
+  **WHO**, **UNESCO UIS**, **ITU**, **FAO**, **UN Comtrade**, the **IMF** — and Zimbabwe's own **ZIMSTAT**
+  (census, DHS, external trade, mineral/electricity indices, environmental reports), **RBZ**, **ZIMRA**, the
+  **Treasury**, **TIMB**, the **EMA** and the **Agriculture Ministry**.
+- **Each new indicator** carries a unique id, a plain note, and a `basis` of `{ kind: "published" }` naming the
+  publisher, the publication and the period — the same shape every converted figure already uses.
+- **Batches are sized so each is independently tested and published**, and the running total (published vs
+  modelled) is stated after each, so progress toward the flip is visible.
+- **Where a measure genuinely has no publisher, it is not added** — the goal never authorises an invented figure.
+
+**The gate (added once the goal is reached).** A validator check that fails the build if the **published** count
+ever falls back **below** the **modelled** count — so the goal can never silently regress. It is added **with the
+work that reaches the goal**, never before, because it would fail today by design.
+
+**Not to be re-opened.** This goal is a **locked decision**. A future session must **read it here** and continue
+the batches — never ask the owner whether to expand, and never treat the old "Item 1 is complete" line (§9.7) as
+the end of the work; that line recorded the *indicator-count and group-count* targets, not this goal.

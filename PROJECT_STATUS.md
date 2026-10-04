@@ -4,7 +4,7 @@ Source of truth for project state. **Read this FIRST at every session.**
 Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE right now.
 `DONE` only appears where it was verified in the same session it was written.
 
-> **LAST TASK — 2026-10-04 (still latest): THE NATIONAL SOURCES — Batch S7 finishes the conversion sweep with ZIMSTAT's environmental, settlement and agriculture statistics.** **ZIMSTAT's Environmental Resources Statistics Report 2023** and its **Human Settlement and Environmental Health 2023** report (both read as part of the environment work) gave **two more** modelled figures a real published value — `agri-cotton` **63,627 t** (cotton production, 2023) and `lg-water-piped` **29.6 %** (households with piped water, 2022 Census). **Split 83 published / 237 modelled → 85 published / 235 modelled.** **The conversion sweep is now complete for every department that has a publisher:** the ~235 figures still `Modelled` are the departments' own operational returns (a ministry's appraisal rate, licence turnaround, council revenue, and the like), which no publisher states for Zimbabwe — the reason is recorded for each family in `docs/PLATFORM_ENRICHMENT_PLAN.md` §10.11. The build was published and **verified byte-identical on the live host** (`assets/index-CH7Fiv8N.js`, sha256 `ca6992353e89…`). **The `mfa` site remains down (`503`).** **Next: the owner's asked-for expansion — more stakeholder groups and more indicators, each on a real published figure — which needs a scope decision (the question posed in this session's report).**
+> **LAST TASK — 2026-10-04 (still latest): THE NATIONAL SOURCES — Batch S7 finishes the conversion sweep with ZIMSTAT's environmental, settlement and agriculture statistics.** **ZIMSTAT's Environmental Resources Statistics Report 2023** and its **Human Settlement and Environmental Health 2023** report (both read as part of the environment work) gave **two more** modelled figures a real published value — `agri-cotton` **63,627 t** (cotton production, 2023) and `lg-water-piped` **29.6 %** (households with piped water, 2022 Census). **Split 83 published / 237 modelled → 85 published / 235 modelled.** **The conversion sweep is now complete for every department that has a publisher:** the ~235 figures still `Modelled` are the departments' own operational returns (a ministry's appraisal rate, licence turnaround, council revenue, and the like), which no publisher states for Zimbabwe — the reason is recorded for each family in `docs/PLATFORM_ENRICHMENT_PLAN.md` §10.11. The build was published and **verified byte-identical on the live host** (`assets/index-CH7Fiv8N.js`, sha256 `ca6992353e89…`). **The `mfa` site remains down (`503`).** **The owner's goal — recorded this session after it was found to have lived only in the chat — is now a LOCKED constraint: real, published figures must OUTNUMBER the `Modelled` ones (today the platform is the reverse, 85 real to 235 `Modelled`). The route is adding new indicators, each on a real published figure, until that flips.**
 >
 > **EARLIER — 2026-10-04: THE NATIONAL SOURCES — Batch S6 reads ZIMSTAT's Demographic and Health Survey and the EMA's Annual Report.** The sweep went on to **Zimbabwe's own household survey and its environment agency**. **ZIMSTAT's Zimbabwe Demographic and Health Survey 2023-24** (615 pages) and the **Environmental Management Agency's Annual Report 2024** (64 pages) were read. **Four more modelled figures now carry a real published figure** — `health-deliveries` **84 %** (facility deliveries), `lg-sanitation-hh` **77 %** (households with improved sanitation), `env-eia` **1,180** (full impact assessments processed) and `env-licences` **11,432** (environmental licences issued) — and one already-published figure was **re-sourced** to the newer national survey (`health-anc` **71.2 %**, from the World Bank's 2019 series). **The EMA joined `NAMED_SOURCES`** and ZIMSTAT's entry was widened. **Split 79 published / 241 modelled → 83 published / 237 modelled.** The build was published and **verified byte-identical on the live host** (`assets/index-8qVuilsL.js`, sha256 `0dcf77be7b52…`). **The `mfa` site was retried and is still down (`503`)**, so that set stays `Modelled` and recorded. **Next: the remaining `psc-*`/`lg-*`/`env-*`/`zida-*` operational measures (no publisher states them) and, as the owner asked, more stakeholder groups and indicators.**
 >
@@ -41,6 +41,21 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
   inherently a projection and must be plainly labelled as simulated. **Evidence in = real; simulation out =
   labelled.** Written into the global rule **`data-must-be-real-sources.md`** (both global folders **and**
   this project's `.clinerules/`), so it can never be re-litigated.
+- **REAL DATA MUST OUTNUMBER MODELLED (the owner — a LOCKED decision; recorded here 2026-10-04 because it
+  had lived ONLY IN THE CHAT until this session; do NOT re-open, do NOT re-ask):** the platform must end up
+  carrying **more real, published figures than `Modelled` ones** — and the same for the stakeholder groups.
+  **Today it is the reverse:** **320 indicators — 85 published / 235 `Modelled`**; **150 groups — 20
+  published / 130 modelled**. The arithmetic, stated honestly so the work is not underestimated:
+  **converting** a modelled measure lifts published and lowers modelled by one each (so **76 conversions**
+  would reach a majority, e.g. 161 / 159), while **adding** a brand-new real indicator lifts only published
+  (so about **151 additions** would be needed). The conversion sweep found the remaining modelled figures are
+  the departments' **own operational returns**, which no publisher states for Zimbabwe, so the practical route
+  is **adding new indicators, each carrying a real, named, published figure**, drawn from the sources the
+  sweep already used (the World Bank, WHO, UNESCO, ITU, FAO, UN Comtrade, IMF, and Zimbabwe's ZIMSTAT, RBZ,
+  ZIMRA, Treasury, TIMB, EMA and the Agriculture Ministry). This is a **run of batches**, tracked in the
+  **NEXT PHASE** item and planned in `docs/PLATFORM_ENRICHMENT_PLAN.md` **PART 11**; the goal state is stated
+  in `PRODUCTION_READINESS.md`. **A gate that fails the build if real ever drops back below modelled is added
+  once the goal is reached** (it would fail today, by design, so it lands WITH the work, not before).
 - **ONE REVIEW ZIP, UPDATED IN PLACE (the owner, 2026-10-04 — LOCKED):** the review zip is a **single file**,
   `Review Zip/nzwisiso-policy-dashboard-review.zip`, **overwritten** at the end of every task. A new numbered
   zip per task is **forbidden** (it had accumulated **47** files). Written into the global rule
@@ -4106,14 +4121,14 @@ checked only six international data services and never Zimbabwe's own publishers
 ZIMRA's Annual Report 2024 and the RBZ Bank Supervision Annual Report 2025 were read (S1); then the Treasury,
 whose old `treasury.gov.zw` address **no longer resolves**, was read at **`zimtreasury.co.zw`** — its **2025
 Annual Budget Review** and **2024 Public Debt Report** — giving **four more** real figures and one resolved
-duplicate, and **the Treasury joined `NAMED_SOURCES`**. **Split: 85 published / 235 modelled.** **This session (S7) converted two more figures from ZIMSTAT's Environmental Resources Statistics Report 2023 and the 2022 Census, completing the conversion sweep for every department that has a publisher; the remaining modelled figures are the departments' own operational returns.** **The conversion sweep is now finished** — every remaining `Modelled` figure is a department's own operational return, and that is recorded. **What remains is the owner's asked-for expansion:** **more stakeholder groups and more indicators, each on a real published figure — this needs a scope decision.** **Batch C** (the
+duplicate, and **the Treasury joined `NAMED_SOURCES`**. **Split: 85 published / 235 modelled.** **This session (S7) converted two more figures from ZIMSTAT's Environmental Resources Statistics Report 2023 and the 2022 Census, completing the conversion sweep for every department that has a publisher; the remaining modelled figures are the departments' own operational returns.** **The conversion sweep is now finished** — every remaining `Modelled` figure is a department's own operational return, and that is recorded. **What remains — now recorded as a LOCKED goal — is that real, published figures must OUTNUMBER the modelled ones; today the platform is the reverse (85 real to 235 `Modelled`), so the work is to add new indicators, each on a real published figure, until it flips (see the locked constraints and PART 11 of the plan).** **Batch C** (the
 graph) still follows. *NEXT PHASE* **item 1** and **item 6** are **DONE**; items 2, 3, 4, 5 and 7 remain and
 **none has been dropped.**
 
 **Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and IN SYNC (proved by
 `npm run sync:check`, which reports all four checks PASS). **Tip:** run `git log --oneline -1`. **Next
-commands:** `git fetch` then `npm run sync:check`; then, once the owner has set the **expansion scope**, add more
-stakeholder groups and indicators, each on a real published figure.
+commands:** `git fetch` then `npm run sync:check`; then continue adding new indicators, each on a real
+published figure, until real published figures outnumber the modelled ones (the locked goal).
 
 **PLAIN SUMMARY (OWNER-FACING).**
 
@@ -4124,7 +4139,7 @@ stakeholder groups and indicators, each on a real published figure.
 4. **The search is now finished — and this is the honest position:** the 235 figures still marked "Modelled" are each a department's **own internal measures** (a ministry's own appraisal rate, a council's own revenue collection, a regulator's own licence turnaround). No official publisher states those for Zimbabwe, so they stay clearly labelled rather than being given a false source.
 5. **The Foreign Affairs ministry's website is still down**, so its figures stay labelled too.
 6. **Everything was re-checked, and it is live:** all checks green, and the public site serves exactly this build.
-7. **One decision is now needed from you** — see the question in this session's report about adding more stakeholder groups and indicators.
+7. **Your goal — "we want more real data than modelled data" — had never been written down, so it was lost when the chat ended. I have now saved it:** the platform must end up with **more real figures than "Modelled" ones**, and I will keep adding real published figures until that flips (today it is 85 real to 235 "Modelled").
 
 **Earlier this session (Zimbabwe's own health survey and environment agency). In plain words:**
 1. **I read Zimbabwe's big national health survey and its environment agency's report directly, and they had real numbers for four figures that were placeholders.** The **Zimbabwe Demographic and Health Survey 2023-24** is the country's own household survey of health; the **Environmental Management Agency** runs environmental licensing and enforcement.

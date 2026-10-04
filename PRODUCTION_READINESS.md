@@ -110,7 +110,10 @@ client is registered.
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
   expansion and the 2026-10-04 dataset-expansion batches 1–4 — **150** canonical stakeholder groups, every
   department modelling **40** of them, and **320** reference indicators (twenty per department, of which
-  **85 are published figures and 235 are `Modelled`**) — plus the recommended-step actions (*Open what answers this*,
+  **85 are published figures and 235 are `Modelled`**). **LOCKED GOAL (owner, recorded 2026-10-04): real,
+  published figures must OUTNUMBER the `Modelled` ones — at least 161 published of the 320 indicators, and at
+  least 76 published of the 150 groups; today the platform is the reverse, so this is active work, planned in
+  `docs/PLATFORM_ENRICHMENT_PLAN.md` PART 11.** It also carries the recommended-step actions (*Open what answers this*,
   *Download this part*) and the **Implementation pack** (generated, read-only). The form that used to ask
   an officer to fill the working matrices by hand is **gone** (the owner's instruction, 2026-10-02): those
   cells print the marked blank, and the department completes them in the copy it exports. It also carries
