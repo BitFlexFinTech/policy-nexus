@@ -796,3 +796,64 @@ published source**. So:
 The duplicate row (`ict-affordability`) is **gone**; `ict-data-cost` remains the department's single
 data-cost figure; the department still carries **twenty** indicators; and the freed slot now carries a
 **real** published figure. **Split: 67 published / 253 modelled.**
+
+### 10.8 Batch S1 continues — ZIMBABWE'S OWN TREASURY, at last (2026-10-04)
+
+The earlier S1 note said the Treasury's documents "were not read in this batch". **The reason is now known and
+differs from the one assumed: the address the plan used, `treasury.gov.zw`, no longer exists** — it returns
+`NXDOMAIN` to a resolver and to this session's lookup. The Treasury publishes at **`zimtreasury.co.zw`** (the
+Ministry of Finance, Economic Development and Investment Promotion) and its documents are reachable there.
+
+**The documents read:**
+
+| Publisher | Document read | Where it lives |
+|---|---|---|
+| **The Treasury** (Ministry of Finance, Economic Development and Investment Promotion) | **2025 Annual Budget Review** (146 pages) — the Economic and Fiscal Report for the year 2025 | `zimtreasury.co.zw` → Publications → Annual Budget Reviews (`…/2026/07/2025-Annual-Review.pdf`) |
+| **The Treasury** | **Public Debt Report 2024** (58 pages, tabled in Parliament 31 July 2025) | `zimtreasury.co.zw` → Public Debt Management → Public Debt Reports (`…/2025/09/Public-Debt-Report-to-Parliament-ZWE.pdf`) |
+
+**Four modelled Finance figures now carry a real published figure** (each value read from the document itself):
+
+| Department / indicator | Value now shown | Published figure, and where it is stated | Period |
+|---|---|---|---|
+| fin / **Public debt stock** (`fin-debt`) | **US$21.5 billion** | *Total public and publicly guaranteed debt stock* — US$21,524 million, **47.1 %** of a re-based GDP — Public Debt Report 2024, Stock of Total Debt | end December 2024 |
+| fin / **Revenue to GDP** (`fin-revenue-gdp`) | **15.7 %** | Revenue collections of **ZiG223 billion** — *15.7 % of GDP* — 2025 Annual Budget Review, Table 32 (2025 Government Accounts) | 2025 |
+| fin / **Expenditure execution** (`fin-expenditure`) | **79 %** | *Total Expenditure and Net Lending* utilisation **79 %** — ZiG217.2 billion against a voted ZiG276.4 billion — 2025 Annual Budget Review, Table 34 (2025 Budget Performance) | 2025 |
+| fin / **Capital budget execution** (`fin-capital`) | **186 %** | *Net Acquisition of Financial and Non-Financial Assets* utilisation **186 %** — ZiG50.1 billion against a voted ZiG27 billion — 2025 Annual Budget Review, Table 34 | 2025 |
+
+**The Treasury was added to `NAMED_SOURCES`** (id `treasury`). **Split: 67 published / 253 modelled → 71 published / 249 modelled** before the duplicate below is resolved.
+
+**A duplicate found in the same tables, resolved the way the owner resolved the ICT duplicate:**
+`fin-budget` (**"Budget execution" 88 %**) and `fin-expenditure` (**"Expenditure execution" 92 %**) were the
+**same question** — the share of the voted budget actually spent — and the Treasury publishes **one** figure for
+it (79 %). Converting both to 79 % would repeat the exact duplicate defect the owner had just resolved in the
+ICT department, so the owner's own decision pattern was applied (keep one figure, use the freed slot for a
+genuinely different measure with a real published source):
+
+| Department / indicator | Value now shown | Published figure | Period |
+|---|---|---|---|
+| fin / **Compensation of employees** (`fin-compensation`) | **47.3 %** of total expenditure | Compensation of employees as a share of total expenditure (47.3 %) — 2025 Annual Budget Review, Table 32 and Figure 59 | 2025 |
+
+The duplicate row (`fin-budget`) is **gone**; `fin-expenditure` remains the department's single "how much of
+the budget was spent" figure; the department still carries **twenty** indicators; and the freed slot now
+carries a **real** published figure. **Split: 71 published / 249 modelled → 72 published / 248 modelled.**
+
+**Checked and not converted — with the reason:**
+- `fin-taxbase` (**"Registered taxpayer growth" +6.8 % YoY**) — ZIMRA publishes the **level** of active
+  registered taxpayers (already the platform's `zimra-register`, 120,234), **not** a year-on-year growth rate;
+  a growth figure would be derived and would duplicate `zimra-register`.
+- `fin-sovereign` (**"Sovereign credit rating" B−**) — a sovereign rating is a **private rating-agency
+  opinion** (Fitch, Moody's, S&P), not a figure a public statistics publisher states, so no named public
+  source can be attached; it stays `Modelled`.
+- **The whole `mfa` set** (passports, diaspora register, consular cases, trade desks, new markets, visa
+  decisions, and the rest) — the ministry's own site, **`zimfa.gov.zw`, returns `503 Service Unavailable`**
+  ("Site will be available soon") this session, so no ministry statistic could be read. Its measured figures
+  therefore remain `Modelled` and are not guessed. **Retry `zimfa.gov.zw`**, or read the ministry's annual
+  report once published.
+- **`opc-budget`** (**"Budget execution" 88 %** in the **OPC** department) — the same *label* as the Finance
+  duplicate, but in a **different department**, where it may mean **that department's own budget** rather than
+  the national one (which is what the Treasury publishes). Left `Modelled` rather than re-attributed to a
+  national figure that may be a different question; **a future batch should confirm the intended meaning.**
+- **The Treasury's 2025 Annual Report** (the 2025 fiscal-year Annual Report) is published as a **PPTX
+  presentation and a summary speech** on its Budget Documents 2026 page; the **Annual Budget Review** read
+  above is the full report and carries every figure used here, so nothing further was taken from them.
+

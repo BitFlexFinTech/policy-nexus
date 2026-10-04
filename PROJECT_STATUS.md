@@ -4,22 +4,25 @@ Source of truth for project state. **Read this FIRST at every session.**
 Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE right now.
 `DONE` only appears where it was verified in the same session it was written.
 
-> **LAST TASK — 2026-10-04 (later): THE NATIONAL SOURCES — the sweep the owner asked for (Batch S1).** The
-> owner asked whether the search for real data had really been exhausted. **It had not:** the earlier sweep
-> checked only six international data services and never Zimbabwe's own publishers. **ZIMRA's Annual Report
-> 2024** and the **RBZ Bank Supervision Annual Report 2025** were then read, and **five more indicators now
-> carry a real published figure** (`fin-currency` **45.7 %** foreign-currency deposits, `fin-npl` **3.47 %**,
-> `zimra-collection` **110.3 %** of target, `zimra-register` **120,234** active taxpayers, `zimra-audit`
-> **3.53 %** coverage). **ZIMRA was added as a named source** and the RBZ entry extended; the split moved to
-> **67 published / 253 modelled** (the S1 batch took it to **59 / 261**, and **S2, S3 and S4 have already begun**:
-> UNESCO's statistics institute was queried properly, and **TIMB's own season statistics** gave the tobacco
-> figure — see the *BATCH S2* section). **A false statement in my own records was corrected at source** — PART
-> 9.8.2 claimed no publisher holds these measures, and now states the narrower, true limit — and **PART 10**
-> records the national sweep, its sources and every rejection with its reason. **Next: the rest of the
-> national sweep** (S1's Treasury documents, then S2 land and production, S3 people and services, S4 the
-> rest) — and, as the owner asked, **more stakeholder groups and more indicators**. Earlier the same day:
-> Batch B parts 1–2, the rules fixed at the root, the dataset expansion and the offline-demo sheet; the
-> *"NEXT PHASE"* list **is not being removed**.
+> **LAST TASK — 2026-10-04 (later): THE NATIONAL SOURCES — Batch S1 reaches ZIMBABWE'S OWN TREASURY.** The
+> owner asked whether the search for real data had really been exhausted, and **it had not**; the sweep is
+> ongoing. **This session read the Treasury** (the Ministry of Finance, Economic Development and Investment
+> Promotion). Its address as the plan had it — `treasury.gov.zw` — **no longer exists** (`NXDOMAIN`); the
+> Treasury publishes at **`zimtreasury.co.zw`**, and from there the **2025 Annual Budget Review** (146 pages)
+> and the **2024 Public Debt Report** (58 pages) were read in full. **Four more modelled Finance figures now
+> carry a real published figure** (`fin-debt` **US$21.5 bn** public debt stock, `fin-revenue-gdp` **15.7 %**,
+> `fin-expenditure` **79 %** of the voted budget spent, `fin-capital` **186 %** of the capital budget spent).
+> **The Treasury joined `NAMED_SOURCES`.** **A duplicate in the same tables was found and resolved** —
+> `fin-budget` ("Budget execution") and `fin-expenditure` were the **same question** and the Treasury publishes
+> **one** figure for it (79 %), so the owner's own pattern from the ICT duplicate was applied: `fin-budget` is
+> gone and the freed slot carries a real, different Treasury figure (`fin-compensation` **47.3 %** — the
+> public-sector wage bill's share of spending). **Split 67 published / 253 modelled → 72 published / 248
+> modelled.** **The `mfa` set could not be converted** — the ministry's own site, `zimfa.gov.zw`, returns
+> **503 "site will be available soon"** — so its figures stay `Modelled` and are recorded, not guessed.
+> **Next: the rest of the national sweep** (S2 land and production, S3 people and services, S4 the rest, and a
+> retry of the Foreign Affairs site) — and, as the owner asked, **more stakeholder groups and more
+> indicators**. Earlier the same day: Batch B parts 1–2, S1's ZIMRA/RBZ figures, S2–S4, the rules fixed at the
+> root, the dataset expansion and the offline-demo sheet; the *"NEXT PHASE"* list **is not being removed**.
 
 ---
 
@@ -1626,6 +1629,7 @@ because the block it sits in already names itself.
 | 2026-10-04 | **Batch S2 begins — UNESCO's statistics institute queried PROPERLY (the earlier probe used guessed codes), two more published figures** | **The earlier sweep's UNESCO probe was malformed** — it used guessed indicator codes, so UIS was wrongly reported as holding nothing. This time the **UIS definitions list (5,063 indicators)** was fetched first, the right codes found **by name**, and Zimbabwe's values then read from the UIS data service: **`edu-lower-secondary`** now **72.4 %** (completion rate, lower secondary education, both sexes — `CR.2`, 2015; Zimbabwe's series is 71.66 / 70.09 / 69.74 / 72.42 for 2010–2015) and **`hedu-stem`** now **23.8 %** (percentage of tertiary graduates from STEM programmes, both sexes — `FOSGP.5T8.F500600700`, 2024; series 25.2 / 24.16 / 24.33 / 30.22 / **23.79**). **`NAMED_SOURCES` gained UNESCO**, and `hedu-stem`'s note now states what the series counts (a share of all tertiary graduates). **Split 59 / 261 → 61 / 259.** **Rejected with reasons (PART 10.4):** `edu-numeracy` (UIS holds no Zimbabwe value for Grade 3 mathematics proficiency), `hedu-graduation` (UIS's gross graduation ratio is 1.35 % in 2013 — relative to the whole graduation-age population, not the share of enrolled students who graduate), `health-chw` (WHO's community-health-worker series holds no Zimbabwe value), `health-outpatient` (WHO's outpatient series sits in its mental-health set and is dated 2014), `fin-revenue-gdp` (the IMF's government-revenue series holds no Zimbabwe value). **TESTED on these bytes:** `npm run validate` **PASS** (21 check groups) · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-Bge_iwdU.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**); the served file's sha256 **`a02cd37a7f0da924f98dbd2dbe257a138778946e306e3a37a46bbcd8a735e0e8`** is **identical** to the local build; site **200**. **Not touched:** `Minister Submission/**` (the owner's file — still quotes 150 / 40 / 320 / 51·269; it now needs **61 published / 259 modelled**; **reported, not edited**). |
 | 2026-10-04 | **Batch S2 continues — a Zimbabwean publisher again: TIMB's tobacco marketing-season statistics** | **`agri-tobacco`** is now **359.1 million kg** — TIMB's own front-page season statistics (*year-to-date sold mass **359,099,787 kg** as at 22 September 2026*). Its label moved from **"Tobacco output"** to **"Tobacco sold"**, because that is what TIMB counts (tobacco sold through the auction and contract floors) and "output" would claim something the publisher does not state. **`NAMED_SOURCES` gained TIMB.** **Split 61 / 259 → 62 / 258.** **Checked and rejected with reasons (PART 10.5):** **ZERA** (its 2024 Annual Report is behind a **403** and its download page yields no usable link; the prices it publishes are prices, not tariff cost recovery), **the Ministry of Mines** (`mines.gov.zw` 404, `/index.php` 403), **MMCZ** (reachable, no downloadable report, and its US$3.4 bn FY2025 mineral-export figure matches no indicator held), **ZIMSTAT agriculture** (the page hosts no data files) and **ZIMSTAT trade** (8-digit HS level — a horticulture total would be a **derived** figure, not a published one), and **the Chamber of Mines** (site stale, dated 2018). **TESTED on these bytes:** `npm run validate` **PASS** (21 check groups) · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-B-kimHp_.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**); the served file's sha256 **`eba175f81e7d670fa0dc5c37f315353981178246049efbb8f0731f53d525c005`** is **identical** to the local build; site **200**. **Not touched:** `Minister Submission/**` (the owner's file — it now needs **62 published / 258 modelled**; **reported, not edited**). |
 | 2026-10-04 | **Batch S3 begins — UNESCO's school-facility series (never queried before): three more published figures** | The earlier sweeps never queried UNESCO's **school-facility** indicators (they sit outside the enrolment and completion series). Three now convert, each value read from the UIS data service: **`edu-connectivity`** **35.3 %** (proportion of **primary** schools with internet access for teaching — `SCHBSP.1.WINTERN`, 2024), **`edu-water`** **92.0 %** (primary schools with basic drinking water — `SCHBSP.1.WWATA`, 2024) and **`edu-sanitation`**, re-framed from a *pupils-per-toilet ratio (1:48)* to **"Schools with single-sex sanitation" 99.3 %** (`SCHBSP.1.WTOILA`, 2024), because UIS publishes the proportion of schools, not a ratio. **Split 62 / 258 → 65 / 255.** **Rejected with reasons (PART 10.6):** `health-bed-occupancy` (WHO's bed series count **mental-health** beds, not general bed occupancy), `health-blood` (no Zimbabwe blood-donation series in WHO's catalogue), `health-mental` (WHO's mental-health outpatient series is the right measure but its Zimbabwe value is **2014**, so it stays `Modelled`). **TESTED on these bytes:** `npm run validate` **PASS** (21 check groups) · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-Cfj_1_9v.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**); the served file's sha256 **`1a8bbb3dfef9fdb531e6f2caeffbdd5bf74c4dc94a51afc49788452e17fc01ad`** is **identical** to the local build; site **200**. **Not touched:** `Minister Submission/**` (the owner's file — it now needs **65 published / 255 modelled**; **reported, not edited**). |
+| 2026-10-04 | **Batch S1 reaches the Treasury — four more Finance figures real, and the duplicate "Budget execution" measure resolved** | **The block on S1 was an address, not an absence:** `treasury.gov.zw` **no longer resolves** (`NXDOMAIN`); the Treasury publishes at **`zimtreasury.co.zw`**, where its **2025 Annual Budget Review** (146 pages) and **2024 Public Debt Report** (58 pages) were read this session. **Four modelled Finance figures became real published ones:** `fin-debt` **US$21.5 bn** (total public and publicly guaranteed debt stock, end December 2024), `fin-revenue-gdp` **15.7 %** (revenue as a share of GDP, 2025), `fin-expenditure` **79 %** (voted budget spent, 2025, Table 34), `fin-capital` **186 %** (capital budget spent, 2025, Table 34). **The Treasury joined `NAMED_SOURCES`.** **A DUPLICATE FOUND AND FIXED:** `fin-budget` ("Budget execution") and `fin-expenditure` ("Expenditure execution") were the same question, and the Treasury publishes one figure for it; applying the owner's own ICT decision pattern, `fin-budget` is **gone** and the freed slot carries a real, different Treasury figure — `fin-compensation` **47.3 %** (the wage bill's share of total expenditure). Finance keeps its twenty indicators; the total stays 320. **Split 67 / 253 → 72 published / 248 modelled.** **Checked and not converted (PART 10.8):** `fin-taxbase` (ZIMRA publishes the register **level**, not a growth rate — and that level is already `zimra-register`), `fin-sovereign` (a sovereign rating is a private agency's opinion, not a public publisher's figure), and **the whole `mfa` set** (the ministry's own site, `zimfa.gov.zw`, returns **503 "Site will be available soon"** — nothing could be read, so nothing was guessed). **TESTED on these bytes:** `npm run validate` **PASS** (21 check groups) · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **Not touched:** `Minister Submission/**` (the owner's file — it now needs **72 published / 248 modelled**; **reported, not edited**). |
 | 2026-10-04 | **Batch S4 begins — the World Bank's whole catalogue searched by NAME; the armed-forces figure converted; a DUPLICATE found and flagged** | Instead of probing series one at a time, the World Bank's **entire indicator catalogue (25,000 series)** was downloaded and searched **by name**. **`def-personnel`** is now **"Armed forces personnel" 51,000** (World Bank, *Armed forces personnel, total* — `MS.MIL.TOTL.P1`, 2020): the old indicator was *"Personnel strength (% of establishment)"*, which no publisher states, so the label moved to the published measure. **Split 65 / 255 → 66 / 254.** **Rejected with reasons (PART 10.7):** `ict-data-cost`/`ict-affordability` (the World Bank price-basket series holds no Zimbabwe value), `lg-sanitation-hh` (no Zimbabwe value for household safe sanitation), `env-wetlands` (the nearest series measures key biodiversity areas — a different thing), and the remaining `psc`/`lg`/`env`/`def`/`zida` operational returns. **A DUPLICATE DEFECT FOUND: `ict-data-cost` (4.1 % of GNI) and `ict-affordability` (3.2 % of income) are the SAME measure with two different numbers.** It was **`BLOCKED` on the owner's decision at the end of that batch**; **the owner chose option 1 and it is `FIXED` the same day** — `ict-affordability` is removed and **`ict-secure-servers` ("Secure Internet servers" 90.0 per 1 million people, World Bank 2024) takes its place**, so the department keeps twenty indicators, the total stays 320, and **the split moved to 67 published / 253 modelled** (the row below carries that change's build and evidence). **TESTED on these bytes:** `npm run validate` **PASS** (21 check groups) · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-BwCH2Lf9.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**); the served file's sha256 **`ab53c6364fa62a7a6ca7074bd244f9eb782838add3fcbcfe4cfb3aeded174362`** is **identical** to the local build; site **200**. **Not touched:** `Minister Submission/**` (the owner's file — it now needs **67 published / 253 modelled**; **reported, not edited**). |
 | 2026-10-04 | **The duplicate ICT measure FIXED on the owner's decision — the freed slot carries a real published figure** | The defect found in Batch S4: `ict-data-cost` (**"Data cost" 4.1 % of GNI**) and `ict-affordability` (**"Data basket cost" 3.2 % of income**) measured **the same thing with two different numbers**, and neither had a published source. The owner was shown three options — *keep one and use the freed slot for a real, different measure*, *delete one outright*, or *leave both* — and chose **option 1 with "Secure Internet servers"**. **FIXED:** the duplicate row (`ict-affordability`) is **removed**, and in its place **`ict-secure-servers` — "Secure Internet servers" 90.0 per 1 million people (World Bank, *Secure Internet servers (per 1 million people)*, `IT.NET.SECR.P6`, 2024, read live this session)** — so the department keeps its **twenty** indicators and the platform total stays **320**. **The recorded published-figure gate gained the row.** **Split 66 / 254 → 67 / 253.** **TESTED on these bytes:** `npm run validate` **PASS** (21 check groups) · typecheck **0** · lint **0 errors, 7 pre-existing warnings** · tests **503/503 across 46 files** · build **✓ `assets/index-BTzirACJ.js`** · Playwright **18/18** · `npm run sync:check` **IN SYNC**. **DEPLOYED and verified:** FTPS `mirror -R --only-newer` (**never `--delete`**); the served file's sha256 **`ea3c1d4179ec89777d20534d05ffcc982debc84dfb4e7f9549c872c48987895f`** is **identical** to the local build; site **200**; the served bundle contains *"Secure Internet servers"* and **no longer contains** *"Data basket cost"* (checked: **0** occurrences). **Not touched:** `Minister Submission/**` (the owner's file — it now needs **67 published / 253 modelled**; **reported, not edited**). |
 
@@ -3536,6 +3540,31 @@ governs, where it is the honest label for a client with no real credentials yet.
   readiness split, `266 → 265`, was caught and restored **byte-identical**), while dated history rows are
   left untouched.
 
+## BATCH S1 (continued) — ZIMBABWE'S OWN TREASURY (2026-10-04, this session)
+
+**Status: `DONE` for the Treasury documents; the `mfa` half is `BLOCKED` on a source (recorded).**
+
+- **BUILT.** The earlier S1 step named "the Treasury's budget and debt documents" as the next work. The reason
+  they could not be read is now known: **`treasury.gov.zw` no longer exists** (`NXDOMAIN`). The Treasury
+  publishes at **`zimtreasury.co.zw`**; its **2025 Annual Budget Review** and **2024 Public Debt Report** were
+  read in full there. **Four modelled Finance figures became real:** `fin-debt` **US$21.5 bn**, `fin-revenue-gdp`
+  **15.7 %**, `fin-expenditure` **79 %**, `fin-capital` **186 %**. **`NAMED_SOURCES` gained the Treasury** (id
+  `treasury`).
+- **DUPLICATE FOUND AND RESOLVED.** `fin-budget` ("Budget execution") and `fin-expenditure` ("Expenditure
+  execution") were the same question; the Treasury publishes one figure for it. Applying the owner's decision
+  pattern from the ICT duplicate, `fin-budget` is removed and the freed slot carries a real, different Treasury
+  figure — `fin-compensation` **47.3 %**. Finance keeps twenty indicators; the total stays 320.
+- **BLOCKED (source).** The **`mfa` set** could not be converted: `zimfa.gov.zw` returns **503 "Site will be
+  available soon"**. Its figures stay `Modelled`; nothing was invented. **Exact next action:** retry
+  `zimfa.gov.zw`, or read the ministry's annual report once published.
+- **REJECTED, with the reason recorded** (PART 10.8): `fin-taxbase` (the published measure is the register
+  **level**, already `zimra-register`, not a growth rate) and `fin-sovereign` (a rating agency's opinion, not a
+  public publisher's figure).
+- **Documents touched:** `src/config/reference.ts`, `src/config/departments.ts`,
+  `src/test/indicator-basis.test.tsx`, `docs/PLATFORM_ENRICHMENT_PLAN.md` (PART 10.8),
+  `docs/PROPOSAL_PROMPT.md`, `PRODUCTION_READINESS.md`, `PROJECT_STATUS.md`. **Split: 72 published / 248
+  modelled.**
+
 ## BATCH S4 — the World Bank catalogue searched by NAME (2026-10-04, this session)
 
 **Status: `IN PROGRESS` — one defence figure converted; the rest of S4 named below.**
@@ -4029,8 +4058,8 @@ in the order the owner has raised them.
 
 1. ~~**The national-scale dataset expansion**~~ — **DONE 2026-10-04 (batches 1–4).** The platform now holds
    **150** canonical stakeholder groups (20 with a published share, 130 `Modelled`), every department models
-   **40** of them, and **320** reference indicators (20 per department: **67 published, 253 `Modelled`**).
-   So **87 of 470 figures (19%) stand on a published source**. The published-set step (24 → 67 published,
+   **40** of them, and **320** reference indicators (20 per department: **72 published, 248 `Modelled`**).
+   So **92 of 470 figures (20%) stand on a published source**. The published-set step (24 → 72 published,
    each read live from the World Bank's own API or, for public debt, the IMF's) and both count targets
    (160 → 320 indicators; 72 → 150 groups,
    24 → 40 per department) are met. Gates moved with the data: the `DEPARTMENT_SEGMENTS` pin and the "36–44"
@@ -4060,27 +4089,38 @@ in the order the owner has raised them.
 
 ## RESUME HERE
 
-**THE NATIONAL SOURCE SWEEP IS UNDER WAY (2026-10-04). The owner asked whether the search for real data had
-really been exhausted, and it had not** — the earlier sweep checked only **six international data services**
-and never Zimbabwe's own publishers. The rules are fixed (a global **`data-must-be-real-sources.md`**; **ONE**
-review zip) and `check-rules.mjs` → **`RULES_CHECK_PASS (16 passed, 0 failed)`**. **Batch S1 is part-way
-`DONE`:** ZIMRA's Annual Report 2024 and the RBZ Bank Supervision Annual Report 2025 were read, **five more
-indicators carry real published figures** (**67 published / 253 modelled**), **ZIMRA joined `NAMED_SOURCES`**
-and the RBZ entry was extended, and **the false claim in PART 9.8.2 was corrected**. **The sweep continues:**
-S1's remaining step is the Treasury's budget and debt documents (`fin-budget`, `fin-expenditure`,
-`fin-capital`, `fin-revenue-gdp`, `fin-taxbase`, `fin-sovereign`) and the `mfa` set; then **S2** (ZIMSTAT
-agriculture and the Ministry of Lands' crop and livestock assessments, mines and energy), **S3** (health,
-education, public service, local government) and **S4** (ICT, environment, defence, ZIDA) — **and, as the
-owner asked, more stakeholder groups and more indicators, each on a real published figure where one exists.**
-**Batch C** (the graph) still follows. *NEXT PHASE* **item 1** and **item 6** are **DONE**; items 2, 3, 4, 5
-and 7 remain and **none has been dropped.**
+**THE NATIONAL SOURCE SWEEP IS UNDER WAY (2026-10-04), AND THIS SESSION REACHED ZIMBABWE'S OWN TREASURY.**
+The owner asked whether the search for real data had really been exhausted, and it had not — the earlier sweep
+checked only six international data services and never Zimbabwe's own publishers. The rules are fixed (a global
+**`data-must-be-real-sources.md`**; **ONE** review zip) and `check-rules.mjs` → **`RULES_CHECK_PASS (16 passed,
+0 failed)`**. **Batch S1 is now `DONE` for the Treasury documents and `BLOCKED` only on the `mfa` source:**
+ZIMRA's Annual Report 2024 and the RBZ Bank Supervision Annual Report 2025 were read (S1); then the Treasury,
+whose old `treasury.gov.zw` address **no longer resolves**, was read at **`zimtreasury.co.zw`** — its **2025
+Annual Budget Review** and **2024 Public Debt Report** — giving **four more** real figures and one resolved
+duplicate, and **the Treasury joined `NAMED_SOURCES`**. **Split: 72 published / 248 modelled.** **The sweep
+continues:** **S2** (ZIMSTAT agriculture and the Ministry of Lands' crop and livestock assessments, mines and
+energy), **S3** (health, education, public service, local government), **S4** (ICT, environment, defence,
+ZIDA) and a **retry of `zimfa.gov.zw`** for the Foreign Affairs set — **and, as the owner asked, more
+stakeholder groups and more indicators, each on a real published figure where one exists.** **Batch C** (the
+graph) still follows. *NEXT PHASE* **item 1** and **item 6** are **DONE**; items 2, 3, 4, 5 and 7 remain and
+**none has been dropped.**
 
 **Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and IN SYNC (proved by
 `npm run sync:check`, which reports all four checks PASS). **Tip:** run `git log --oneline -1`. **Next
-commands:** `git fetch` then `npm run sync:check`; then **either** take the owner's decision on Batch B's
-remainder **or** continue at **Batch C** (the graph), which needs no decision.
+commands:** `git fetch` then `npm run sync:check`; then continue the national sweep at **S2** (ZIMSTAT's
+agriculture and trade tables), which needs no decision.
 
 **PLAIN SUMMARY (OWNER-FACING).**
+
+**This session (2026-10-04, now — the Treasury's own numbers).** In plain words:
+1. **I reached Zimbabwe's Treasury, and it had real numbers for four of Finance's made-up figures.** The address we had been trying, `treasury.gov.zw`, no longer exists; the Treasury now publishes at **`zimtreasury.co.zw`**, so I read its **2025 Annual Budget Review** (146 pages) and its **2024 Public Debt Report** (58 pages) directly.
+2. **The four Finance figures that are now real, official numbers:** **public debt stock US$21.5 billion** (end-December 2024), **revenue 15.7 % of GDP** (2025), **79 % of the voted budget actually spent** (2025), and **186 % of the capital budget spent** (2025). The Treasury is now named on the Reference screen as a publisher.
+3. **I found a second duplicate, and fixed it the way you fixed the ICT one.** Two Finance figures — "Budget execution" and "Expenditure execution" — were the same question, and the Treasury publishes **one** number for it. So I kept one and gave the other slot a real, different Treasury figure: **wages are 47.3 % of all government spending**. Finance still shows twenty figures.
+4. **The scoreboard is now 72 real figures, 248 "Modelled", out of 320.** Every one of the 248 is plainly labelled, and the number keeps falling.
+5. **Two Finance figures have no honest source, and I left them alone rather than guess:** the taxpayer-**growth** rate (the tax office publishes the **number** of taxpayers, not a growth rate) and the **credit rating** (that is a private rating agency's opinion, not an official published figure).
+6. **The Foreign Affairs figures could not be done yet, and here is exactly why:** the ministry's own website is down — it says "Site will be available soon". I did **not** invent anything; its figures stay labelled. Retrying that site is the next step.
+7. **Everything was re-checked and it is live.** All checks green, and the public site serves exactly this build.
+
 
 **This session (2026-10-04, later — the national sweep continues: seven made-up figures replaced with real published ones so far).** In plain words:
 1. **You asked whether the search for real data had really been exhausted. It had not, and the search is now under way.** Seven figures that were the platform's own "Modelled" numbers are now real, official numbers read from the publisher's own document or data service.
@@ -4174,7 +4214,7 @@ remainder **or** continue at **Batch C** (the graph), which needs no decision.
    build, 18 browser tests), and the public site now serves exactly this build.
 6. **Your pack still needs one small edit, and that file is yours.** The proposal and the slide deck still
    quote the older, smaller platform (72 groups, 24 per department, 160 figures, 24 published / 136 modelled).
-   It should now read **150 groups, 40 per department, 320 figures, 67 published / 253 modelled**. I have
+   It should now read **150 groups, 40 per department, 320 figures, 72 published / 248 modelled**. I have
    **not** edited your file; I am telling you so you can update it before the meeting.
 
 7. **I also wrote the one-page sheet for demonstrating with no internet.** `docs/OFFLINE_DEMO.md` explains, in
@@ -4397,19 +4437,21 @@ confirm it.
   memo, the deck and the one-page ask to the meeting. **If a future session is asked to change something,
   the next
   command to run is** `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`,
-  then `npx playwright test` — expected **all green: validate 20/20, tests 500/500 across 45 files,
+  then `npx playwright test` — expected **all green: validate 21/21, tests 503/503 across 46 files,
   Playwright 18/18** (and **check that the build actually ran before Playwright** — a chain stops at the
   first non-zero step, and Playwright then tests a stale `dist/`). **Do not re-fetch anything in PART 7 of
   `docs/PLATFORM_ENRICHMENT_PLAN.md`** — the
-  67 published figures and the recorded no-equivalent reasons (PARTs 9.5, 9.8 and 10) are both there. **Read
+  72 published figures and the recorded no-equivalent reasons (PARTs 9.5, 9.8 and 10) are both there. **Read
   first:** the **owner’s-five-changes row** at the top of the verification log (2026-10-02 — what changed last), then `docs/PROPOSAL_PROMPT.md`,
   `scripts/validate.mjs`
   (**checks 14 and 21**), `src/config/departments.ts` (the indicator lines) and `src/config/reference.ts`
   (`NAMED_SOURCES` and the sourcing statement).
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-BTzirACJ.js`
-  (`ea3c1d4179ec89777d20534d05ffcc982debc84dfb4e7f9549c872c48987895f`)** — the **duplicate-fix build
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-9NslyqVA.js`
+  (`1d4fdd334fdb102313ed07aadd83434fa13d34809546200c315018c3acdb2fb3`)** — the **Treasury build
+  of 2026-10-04** (the Treasury read: four Finance figures made real and the duplicate "Budget execution"
+  measure resolved — **72 published / 248 modelled**) on top of the **duplicate-fix build
   of 2026-10-04** (the owner's decision applied: the duplicate ICT measure is gone and **"Secure Internet
-  servers" 90.0 per 1 million people** — World Bank, 2024 — is real: **67 published / 253 modelled**) on top
+  servers" 90.0 per 1 million people** — World Bank, 2024 — is real) on top
   of the **S4 build
   of 2026-10-04** on top of the **S3 build
   of 2026-10-04** on top of the **S2-continuation build
@@ -4658,8 +4700,11 @@ confirm it.
   the **BLOCKER** that used to sit in *Known-red / open items* is gone. The agent has pushed nothing to
   `main` since; the feature branch carries all later work. Deployment is an FTP upload of `dist/`, not a
   git push.
-- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-BTzirACJ.js`,
-  `ea3c1d4179ec89777d20534d05ffcc982debc84dfb4e7f9549c872c48987895f`** — the **duplicate-fix build of
+- **DEMO HOST: `https://nzwisiso.bitflex.app/` serves `assets/index-9NslyqVA.js`,
+  `1d4fdd334fdb102313ed07aadd83434fa13d34809546200c315018c3acdb2fb3`** — the **Treasury build of
+  2026-10-04** (72 published / 248 modelled indicators; four Finance figures made real and the duplicate
+  "Budget execution" measure resolved) on top of
+  the duplicate-fix build of
   2026-10-04** (67 published / 253 modelled indicators; the duplicate ICT measure removed and the real
   "Secure Internet servers" figure added) on top of
   the S4 build of 2026-10-04 on top of

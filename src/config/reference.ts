@@ -59,6 +59,13 @@ export const NAMED_SOURCES = [
     publication: "ZIMRA Annual Report",
   },
   {
+    id: "treasury",
+    name: "Ministry of Finance, Economic Development and Investment Promotion (the Treasury)",
+    figures:
+      "The national budget's outturn — revenue collected against the annual target, expenditure and capital spending against their voted budgets, the public-sector wage bill, and the stock of public and publicly guaranteed debt",
+    publication: "Annual Budget Review and Public Debt Report",
+  },
+  {
     id: "worldbank",
     name: "World Bank Open Data",
     figures:

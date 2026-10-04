@@ -251,6 +251,11 @@ describe("department indicators — published with a named source, or plainly mo
       "fin/fin-debt-gdp": "imf",
       "fin/fin-currency": "rbz",
       "fin/fin-npl": "rbz",
+      "fin/fin-debt": "treasury",
+      "fin/fin-compensation": "treasury",
+      "fin/fin-revenue-gdp": "treasury",
+      "fin/fin-expenditure": "treasury",
+      "fin/fin-capital": "treasury",
       "zimra/zimra-audit": "zimra",
       "zimra/zimra-collection": "zimra",
       "zimra/zimra-register": "zimra",
@@ -378,6 +383,19 @@ describe("department indicators — published with a named source, or plainly mo
       // slot for a genuinely different measure with a real published source. The duplicate row is gone and
       // this real series sits in its place, so the department keeps its twenty indicators.
       ["ict/ict-secure-servers", "90.0", "World Development Indicators: Secure Internet servers (per 1 million people)", "2024"],
+      // 2026-10-04 — S1 continues with ZIMBABWE'S OWN TREASURY (zimtreasury.co.zw), which the earlier
+      // sweep could not reach because its old .gov.zw address no longer resolves. Four modelled figures
+      // became real ones, read from the 2025 Annual Budget Review and the Public Debt Report 2024, and the
+      // duplicate "Budget execution" measure found in the same tables was resolved (see the fifth row).
+      ["fin/fin-debt", "USD 21.5B", "Public Debt Report: total public and publicly guaranteed debt stock", "December 2024"],
+      ["fin/fin-revenue-gdp", "15.7", "2025 Annual Budget Review: revenue as a share of GDP", "2025"],
+      ["fin/fin-expenditure", "79", "2025 Annual Budget Review: expenditure utilisation against budget", "2025"],
+      ["fin/fin-capital", "186", "2025 Annual Budget Review: capital expenditure utilisation against budget", "2025"],
+      // The freed slot: `fin-budget` ("Budget execution") and `fin-expenditure` were the SAME question —
+      // the share of the voted budget actually spent — and the Treasury publishes ONE figure for it (79%).
+      // Following the owner's decision on the identical ICT duplicate, the duplicate row is gone and a
+      // genuinely different Treasury figure takes its place, so Finance keeps its twenty indicators.
+      ["fin/fin-compensation", "47.3", "2025 Annual Budget Review: compensation of employees as a share of total expenditure", "2025"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {
