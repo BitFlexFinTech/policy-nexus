@@ -265,6 +265,15 @@ describe("department indicators — published with a named source, or plainly mo
       "edu/edu-sanitation": "unesco",
       "edu/edu-connectivity": "unesco",
       "edu/edu-water": "unesco",
+      // 2026-10-04 — Batch S5: Zimbabwe's own ZIMSTAT (its quarterly mineral-production and
+      // electricity-generation indices) and the Agriculture Ministry's own winter-wheat update.
+      "mines/mines-gold": "zimstat",
+      "mines/mines-platinum": "zimstat",
+      "mines/mines-lithium": "zimstat",
+      "energy/energy-gen": "zimstat",
+      "energy/energy-ipp": "zimstat",
+      "energy/energy-imports": "zimstat",
+      "agri/agri-wheat": "agric",
     };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
@@ -396,6 +405,23 @@ describe("department indicators — published with a named source, or plainly mo
       // Following the owner's decision on the identical ICT duplicate, the duplicate row is gone and a
       // genuinely different Treasury figure takes its place, so Finance keeps its twenty indicators.
       ["fin/fin-compensation", "47.3", "2025 Annual Budget Review: compensation of employees as a share of total expenditure", "2025"],
+      // 2026-10-04 — Batch S5: the national sweep reaches ZIMBABWE'S OWN STATISTICS AGENCY again,
+      // this time its PRODUCTION and TRADE side. The quarterly Index of Mineral Production (built
+      // from the Ministry of Mines and Mining Development's returns) and Index of Electricity
+      // Generation (built from ZESA's returns) gave the physical volumes below, and the Agriculture
+      // Ministry's own winter-wheat update gave the planted-area figure. Each value was read from
+      // the publisher's own document this session. Four measures were re-framed to the published
+      // one: `mines-gold` (deliveries → output), `mines-lithium` (concentrate → output),
+      // `energy-gen` (installed capacity → electricity generated) and `energy-ipp` (MW produced →
+      // share of generation) — no publisher states the platform's old wording, so the label moved
+      // to what the publisher actually reports.
+      ["mines/mines-gold", "9,894", "Index of Mineral Production: physical volume of gold output", "March 2026"],
+      ["mines/mines-platinum", "3,807", "Index of Mineral Production: physical volume of platinum output", "March 2026"],
+      ["mines/mines-lithium", "551,050", "Index of Mineral Production: physical volume of lithium output", "March 2026"],
+      ["energy/energy-gen", "2,924", "Index of Electricity Generation: volume of electricity generated", "March 2026"],
+      ["energy/energy-ipp", "12.0", "Index of Electricity Generation: independent power producers' share of generation", "March 2026"],
+      ["energy/energy-imports", "371.4", "Index of Electricity Generation: volume of electricity imported", "March 2026"],
+      ["agri/agri-wheat", "130,316", "Winter wheat planting update", "August 2026"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {

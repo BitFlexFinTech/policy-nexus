@@ -39,9 +39,10 @@ export const NAMED_SOURCES = [
   {
     id: "zimstat",
     name: "Zimbabwe National Statistics Agency (ZIMSTAT)",
-    figures: "Population, household, labour, poverty and inflation figures",
+    figures:
+      "Population, household, labour, poverty and inflation figures; external trade; the quarterly index of mineral production and index of electricity generation",
     publication:
-      "2022 Population and Housing Census; Quarterly Labour Force Survey; monthly price statistics",
+      "2022 Population and Housing Census; Quarterly Labour Force Survey; monthly price statistics; monthly External Trade release; quarterly Index of Mineral Production and Index of Electricity Generation",
   },
   {
     id: "rbz",
@@ -64,6 +65,13 @@ export const NAMED_SOURCES = [
     figures:
       "The national budget's outturn — revenue collected against the annual target, expenditure and capital spending against their voted budgets, the public-sector wage bill, and the stock of public and publicly guaranteed debt",
     publication: "Annual Budget Review and Public Debt Report",
+  },
+  {
+    id: "agric",
+    name: "Ministry of Lands, Agriculture, Fisheries, Water and Rural Development",
+    figures:
+      "Winter-wheat planting and the national Strategic Grain Reserve, and the crop and livestock assessments",
+    publication: "Winter wheat planting update and crop and livestock assessments",
   },
   {
     id: "worldbank",

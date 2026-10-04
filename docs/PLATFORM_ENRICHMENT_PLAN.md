@@ -857,3 +857,82 @@ carries a **real** published figure. **Split: 71 published / 249 modelled → 72
   presentation and a summary speech** on its Budget Documents 2026 page; the **Annual Budget Review** read
   above is the full report and carries every figure used here, so nothing further was taken from them.
 
+### 10.9 Batch S5 — ZIMSTAT's production and trade side, and the Agriculture Ministry (2026-10-04)
+
+The S2 line said "ZIMSTAT's agriculture and trade tables (their file addresses are now known —
+`zimstat.co.zw/wp-content/uploads/Macro/…`), the Ministry of Lands' crop and livestock assessments, and
+the mines and energy publishers." This batch went to exactly those, with one correction: **ZIMSTAT
+publishes the mines and energy statistics too**, through its own quarterly indices, so both were read from
+the same agency.
+
+**The publishers read in this batch, and where the documents are:**
+
+| Publisher | Document read | Where it lives |
+|---|---|---|
+| **ZIMSTAT** | **Index of Mineral Production, 1st Quarter 2026** (18 pages, built from the *Ministry of Mines and Mining Development*'s returns) | `zimstat.co.zw/wp-content/uploads/production/Mining/2026/Q1/IMP_2026_Q1.pdf` |
+| **ZIMSTAT** | **Index of Electricity Generation, 1st Quarter 2026** (10 pages, built from *ZESA*'s returns) | `zimstat.co.zw/wp-content/uploads/production/Energy/2026/Q1/IEG_Q1_2026.pdf` |
+| **ZIMSTAT** | **July 2026 External Trade release and trade note** (monthly) | `zimstat.co.zw/wp-content/uploads/Macro/Trade/2026/07/…` |
+| **Ministry of Lands, Agriculture, Fisheries, Water and Rural Development** | **Winter-wheat planting update** (ministry release) | `agric.gov.zw` (home page news) |
+
+**Seven indicators now carry a real published figure** (each value read from the publisher's own document
+this session):
+
+| Department / indicator | Value now shown | Published figure, and where it is stated | Period |
+|---|---|---|---|
+| mines / Gold output (`mines-gold`) | **9,894** kg | *Gold* quarter output — Index of Mineral Production, 1st Quarter 2026 | Q1 2026 |
+| mines / Platinum output (`mines-platinum`) | **3,807** kg | *Platinum* quarter output — Index of Mineral Production, 1st Quarter 2026 | Q1 2026 |
+| mines / Lithium output (`mines-lithium`) | **551,050** t | *Lithium* quarter output — Index of Mineral Production, 1st Quarter 2026 | Q1 2026 |
+| energy / Electricity generated (`energy-gen`) | **2,924** GWh | Quarter volume of electricity generated (Appendix A, January–March 2026) — Index of Electricity Generation, 1st Quarter 2026 | Q1 2026 |
+| energy / IPP share of generation (`energy-ipp`) | **12.0** % | Independent power producers' share of the electricity generated — Index of Electricity Generation, 1st Quarter 2026 | Q1 2026 |
+| energy / Electricity imported (`energy-imports`) | **371.4** GWh | Volume of electricity imported — Index of Electricity Generation, 1st Quarter 2026 | Q1 2026 |
+| agri / Winter wheat planted area (`agri-wheat`) | **130,316** ha | *"Farmers planted 130,316 hectares of wheat this season, surpassing the national target of 125,000 hectares"* — Ministry winter-wheat planting update | 2026 season |
+**Four measures were re-framed to the published one**, because the old wording described something the
+publisher does not state (the same pattern as `fin-currency`, `def-personnel` and `zimra-audit` earlier):
+
+- `mines-gold` was **"Gold deliveries"** (34.6 tonnes); the mining index states **output** in kilograms, so
+  the indicator is now **"Gold output"** (9,894 kg for the quarter).
+- `mines-lithium` was **"Lithium concentrate"** (620,000 tonnes); the index states **lithium output**, so the
+  indicator is now **"Lithium output"** (551,050 t).
+- `energy-gen` was **"Installed capacity"** (2.5 GW); no publisher states installed capacity, but ZIMSTAT
+  states the electricity **actually generated**, so the indicator is now **"Electricity generated"**.
+- `energy-ipp` was **"Independent power produced"** (180 MW); ZIMSTAT states the independent producers'
+  **share of generation** (12.0 %), so the indicator is now **"IPP share of generation"**.
+- `energy-imports` was **"Imported power share"** (24 %); ZIMSTAT states the **volume imported**, so the
+  indicator is now **"Electricity imported"** (371.4 GWh).
+
+**`ZIMSTAT`'s entry in `NAMED_SOURCES` was widened** to name external trade and the two quarterly indices,
+and the **Ministry of Lands, Agriculture, Fisheries, Water and Rural Development** was **added** as a named
+source (`agric`).
+
+**Split: 72 published / 248 modelled → 79 published / 241 modelled** (seven conversions).
+
+**Checked in S5 and not converted — with the reason:**
+
+- **ZIMSTAT's agriculture page hosts no data files at all** — it is a descriptive page only (confirmed by
+  reading its raw HTML for every `wp-content/uploads` link: the only files are site logos). The crop and
+  livestock figures the platform would want are not published as downloads there, so `agri-wheat` was taken
+  from the ministry's own release instead.
+- **`mines-revenue`** (**"Mineral export earnings" USD 4.2B**) — the July 2026 trade release states total
+  exports (**USD 1.47 billion**) and imports (**USD 1.15 billion**), and that *semi-manufactured gold and
+  nickel mattes* are over **47 %** of export value, but it does **not** state a single mineral-earnings
+  total; a sum would be derived, so the indicator stays `Modelled`.
+- **`mines-employment`** (**58,000**) — neither the mineral-production index nor the trade release states
+  mining employment.
+- **`energy-supply`** (**"Unserved demand" 410 MW**), **`energy-outages`** (**9.4 hrs/month**),
+  **`energy-tariff`** (**"Tariff cost recovery" 68 %**), **`energy-collection`** (**88 %**),
+  **`energy-fuel`** (**"Fuel stock cover" 22 days**) — ZERA's own pages carry **current fuel prices and the
+  electricity tariff** (dated 17 September 2026: petrol US$2.06/litre, diesel US$2.08/litre, electricity
+  US$4.24 per first 50 units), but **not** a stock-cover, cost-recovery, collection or outage figure, so none
+  of these measures has a published source and they stay `Modelled`.
+- **The Chamber of Mines of Zimbabwe** — its public site is a **2017/2018 archive** and its production and
+  safety statistics sit behind a members-only login, so nothing current could be read.
+- **`agri-livestock-count`** (**"National cattle herd" 5.6M**), **`agri-cotton`**, **`agri-horticulture`**,
+  **`agri-irrigated-hectares`** and the rest of `agri-*` — the ministry's page states a **winter-wheat
+  planting** figure and the **Strategic Grain Reserve** holding (**269,603.30 tonnes of grain**, including
+  **67,895.61 tonnes of wheat**), but not a national herd, cotton or horticulture total, so those stay
+  `Modelled` rather than being replaced with a different question.
+- **The Foreign Affairs set (`mfa-*`)** — still not convertible: `zimfa.gov.zw` was **not** re-checked this
+  batch (the earlier `503` stands recorded); **retry it** in the next national batch.
+
+**Still to do in the national sweep:** the `mfa` retry, and the rest of `health-*`, `psc-*`, `lg-*` and
+`env-*` where a publisher may exist (recorded as rejected in 10.6–10.7 with reasons).
