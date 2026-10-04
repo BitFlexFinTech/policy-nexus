@@ -370,13 +370,13 @@ do not omit it to look authoritative.
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
 - **What the live site actually is today (re-checked 2026-10-04, after the dataset-expansion build was published).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-Cu96i1fm.js`
-  (`c1e65d6f776692ec44fe4f4d2a162ca254b063946b8174d9c8eac9474aec8507`), which is byte-identical to the
+  The host `nzwisiso.bitflex.app` serves `assets/index-8qVuilsL.js`
+  (`0dcf77be7b52a770f31067911b90a797fd619d4e309e69f739f6c1a8f7905eee`), which is byte-identical to the
   local build, so **the live site is the build published on 2026-10-04** — it shows the **live date and
-  time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (79 published / 241 modelled), and it carries the authority line, the modelled
+  time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (83 published / 237 modelled), and it carries the authority line, the modelled
   agent population, the named sources (with the corrected sentence naming both publishers the stakeholder
   shares stand on), the official Coat of Arms, the favicon set, the Nzwisiso.ai
-  positioning section, all 79 published figures, and the owner's items 1–11, including the *Re-run
+  positioning section, all 83 published figures, and the owner's items 1–11, including the *Re-run
   simulation* action, the drafting stage, the recommended-step actions that open or send the part of the
   policy that answers each step, the **Implementation pack** (generated and read-only — the form that asked
   an officer to hand-fill the working matrices was removed at the owner's instruction on 2026-10-02), and

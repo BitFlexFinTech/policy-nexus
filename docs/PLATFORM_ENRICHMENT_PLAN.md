@@ -936,3 +936,54 @@ source (`agric`).
 
 **Still to do in the national sweep:** the `mfa` retry, and the rest of `health-*`, `psc-*`, `lg-*` and
 `env-*` where a publisher may exist (recorded as rejected in 10.6–10.7 with reasons).
+### 10.10 Batch S6 — ZIMSTAT's Demographic and Health Survey, and the Environmental Management Agency (2026-10-04)
+
+The sweep went on to **Zimbabwe's own household survey** and its **environment agency**.
+
+**The publishers read in this batch, and where the documents are:**
+
+| Publisher | Document read | Where it lives |
+|---|---|---|
+| **ZIMSTAT** | **Zimbabwe Demographic and Health Survey 2023-24** (615 pages, the national household health survey) | `zimstat.co.zw/wp-content/uploads/demography/zdhs/zhds2023_24_report.pdf` |
+| **Environmental Management Agency (EMA)** | **Annual Report 2024** (64 pages) | `ema.co.zw` → Annual Reports (`?sdm_process_download=1&download_id=14412`) |
+
+**Four modelled indicators now carry a real published figure, and one already-published figure was re-sourced:**
+
+| Department / indicator | Value now shown | Published figure, and where it is stated | Period |
+|---|---|---|---|
+| health / Facility deliveries (`health-deliveries`) | **84** % | *"Eighty-four percent of all live births and/or stillbirths in the 2 years before the survey occurred in health facilities"* — ZDHS 2023-24, Table 9.7 | 2023-24 |
+| lg / Households with improved sanitation (`lg-sanitation-hh`) | **77** % | *"Seventy-seven percent of households have access to improved sanitation facilities"* — ZDHS 2023-24 | 2023-24 |
+| env / Full impact assessments processed (`env-eia`) | **1,180** | *"the … Impact Assessment (ESIA) portfolio grew … with 1 180 full assessments and 984 certificates being processed"* — EMA Annual Report 2024, Director General's report | 2024 |
+| env / Environmental licences issued (`env-licences`) | **11,432** | *"A total of 11 432 environmental licences were issued"* — EMA Annual Report 2024 | 2024 |
+| health / Antenatal visits (`health-anc`) — **re-sourced** | **71.2** % | *four-or-more antenatal visits* (Table 9.2) — ZDHS 2023-24 (was the World Bank's 2019 series at 71.5; the same measure, now from the newer national survey) | 2023-24 |
+
+**Three measures were re-framed to the published one:**
+- `lg-sanitation-hh` was **"Households with a latrine"** (61 %); the survey counts **households with an
+  improved sanitation facility** (77 %), so the label moved to that.
+- `env-licences` was **"Environmental licence turnaround"** (62 days); the agency publishes the **number of
+  licences issued** (11,432), not a turnaround, so the measure is now **"Environmental licences issued"**.
+- `env-eia` was **"Environmental assessments completed"** (128); the agency states the **full assessments
+  processed** (1,180), so the note now says "full … processed".
+
+**The Environmental Management Agency was added to `NAMED_SOURCES`** (id `ema`) and **ZIMSTAT's entry was
+widened** to name the Demographic and Health Survey. **Split: 79 published / 241 modelled → 83 published /
+237 modelled.**
+
+**Checked and not converted — with the reason:**
+- **The Foreign Affairs set (`mfa-*`).** The ministry's own site, **`zimfa.gov.zw`, was retried this session and
+  still returns `503 Service Unavailable`** — nothing could be read, so no figure was guessed.
+- **The operational `env-*` measures** — wetlands under protection %, waste diverted from landfill, poaching
+  incidents, air-quality stations, trees planted, wildlife trend, rivers in health, mine sites, awareness
+  reach, climate adaptation plans, rehabilitation, EIA-conditions-met. ZIMSTAT's three **Environmental
+  Statistics reports 2023** (Environmental Resources; Physical Conditions; Human Settlement and Environmental
+  Health) and the EMA report contain **mineral-production, energy, crop, fertiliser, land-cover, rainfall and
+  ambient-monitoring tables**, and the EMA report states **licence and inspection counts and compliance
+  rates** — but **not** the specific measures above, so those stay `Modelled`.
+- **The operational `psc-*` measures** (establishment filled, appraisals, grievances, training, etc.) — the
+  Public Service Commission publishes no such figures for Zimbabwe.
+- **The operational `lg-*` measures** (council revenue collected, roads maintained, waste collected, clean
+  audits, ward committees, etc.) — no publisher states them.
+- **`zida-*`** — no accessible annual report or statistic was found.
+
+**Still to do in the national sweep:** the remaining `psc-*`, `lg-*`, `env-*` and `zida-*` measures (where a
+publisher may exist), and — as the owner asked — **more stakeholder groups and more indicators**.

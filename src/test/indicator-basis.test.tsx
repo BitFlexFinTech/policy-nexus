@@ -274,6 +274,13 @@ describe("department indicators — published with a named source, or plainly mo
       "energy/energy-ipp": "zimstat",
       "energy/energy-imports": "zimstat",
       "agri/agri-wheat": "agric",
+      // 2026-10-04 — Batch S6: ZIMSTAT's own Demographic and Health Survey 2023-24 and the
+      // Environmental Management Agency's Annual Report 2024.
+      "health/health-deliveries": "zimstat",
+      "health/health-anc": "zimstat",
+      "lg/lg-sanitation-hh": "zimstat",
+      "env/env-eia": "ema",
+      "env/env-licences": "ema",
     };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
@@ -324,7 +331,7 @@ describe("department indicators — published with a named source, or plainly mo
       // of docs/PLATFORM_ENRICHMENT_PLAN.md) and stay Modelled.
       ["env/env-water", "40.0", "World Development Indicators: Annual freshwater withdrawals, total (% of internal resources)", "2022"],
       ["health/health-malaria", "11.4", "World Development Indicators: Incidence of malaria (per 1,000 population at risk)", "2024"],
-      ["health/health-anc", "71.5", "World Development Indicators: Pregnant women receiving prenatal care of at least four visits (% of pregnant women)", "2019"],
+      ["health/health-anc", "71.2", "Zimbabwe Demographic and Health Survey 2023-24: four or more antenatal care visits", "2024"],
       ["agri/agri-maize", "743.9", "World Development Indicators: Cereal yield (kg per hectare)", "2023"],
       // 2026-10-04 — Batch B (real evidence base). Twelve more modelled indicators were found to have a
       // real World Bank series that measures the same thing; each value was read live this session. Three
@@ -422,6 +429,20 @@ describe("department indicators — published with a named source, or plainly mo
       ["energy/energy-ipp", "12.0", "Index of Electricity Generation: independent power producers' share of generation", "March 2026"],
       ["energy/energy-imports", "371.4", "Index of Electricity Generation: volume of electricity imported", "March 2026"],
       ["agri/agri-wheat", "130,316", "Winter wheat planting update", "August 2026"],
+      // 2026-10-04 — Batch S6: ZIMSTAT's Demographic and Health Survey 2023-24 (the national
+      // household survey) and the Environmental Management Agency's Annual Report 2024. Four
+      // modelled measures became real: facility deliveries, the share of households with improved
+      // sanitation, the full impact assessments processed and the environmental licences issued.
+      // One already-published figure — antenatal visits — was re-sourced from the World Bank's
+      // 2019 series to the newer national survey (71.5 → 71.2, both the same "four or more visits"
+      // measure), so its row moved with it. Three measures were re-framed to the published one:
+      // `lg-sanitation-hh` (a latrine → an improved sanitation facility), `env-licences` (a licence
+      // turnaround → licences issued, which is what the agency counts) and `env-eia` (assessments
+      // completed → full assessments processed).
+      ["health/health-deliveries", "84", "Zimbabwe Demographic and Health Survey 2023-24: institutional deliveries", "2024"],
+      ["lg/lg-sanitation-hh", "77", "Zimbabwe Demographic and Health Survey 2023-24: households with improved sanitation", "2024"],
+      ["env/env-eia", "1,180", "Annual Report 2024: full environmental and social impact assessments processed", "2024"],
+      ["env/env-licences", "11,432", "Annual Report 2024: environmental licences issued", "2024"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {
