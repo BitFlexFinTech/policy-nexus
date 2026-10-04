@@ -1188,7 +1188,7 @@ const DEPARTMENT_DATA: Department[] = [
       { id: "def-civil-support", label: "Civil support operations", value: "37", score: 70, tone: "gold", note: "Civil support operations undertaken in the year.", basis: { kind: "modelled" } },
       { id: "def-training", label: "Training completed", value: "79", unit: "%", score: 79, tone: "success", note: "Personnel completing the annual training programme.", basis: { kind: "modelled" } },
       { id: "def-facilities", label: "Facilities maintained", value: "68", unit: "%", score: 68, tone: "gold", note: "Defence facilities maintained to standard.", basis: { kind: "modelled" } },
-      { id: "def-personnel", label: "Personnel strength", value: "92", unit: "% of establishment", score: 62, tone: "gold", note: "Serving personnel against the authorised establishment.", basis: { kind: "modelled" } },
+      { id: "def-personnel", label: "Armed forces personnel", value: "51,000", score: 62, tone: "gold", note: "Serving members of the armed forces.", basis: { kind: "published", sourceId: "worldbank", publication: "World Development Indicators: Armed forces personnel, total", asOf: "2020" } },
       { id: "def-air", label: "Aircraft serviceable", value: "64", unit: "%", score: 64, tone: "primary", note: "Aircraft serviceable on the reporting day.", basis: { kind: "modelled" } },
       { id: "def-vehicles", label: "Vehicles serviceable", value: "71", unit: "%", score: 71, tone: "gold", note: "Service vehicles fit for task.", basis: { kind: "modelled" } },
       { id: "def-medical", label: "Medical readiness", value: "78", unit: "%", score: 78, tone: "success", note: "Personnel medically fit for deployment.", basis: { kind: "modelled" } },

@@ -756,3 +756,36 @@ notes now say **primary** schools too, which is the level those series cover.
 - `health-mental` — WHO's mental-health outpatient series (`MH_20`, 572.8 per 100,000 in **2014**) is the
   right measure in principle, but the value is twelve years old and the indicator's unit is per 10,000; left
   `Modelled` rather than re-framed onto a 2014 figure.
+
+### 10.7 Batch S4 begins — the World Bank catalogue searched by NAME; the armed-forces figure (2026-10-04)
+
+Rather than probing series one at a time, the World Bank's **whole indicator catalogue (25,000 series)** was
+downloaded and searched **by name** for the measures the platform still holds as `Modelled`. One converted:
+
+| Department / indicator | Value now shown | Series | Period |
+|---|---|---|---|
+| defence / **"Armed forces personnel"** (`def-personnel`) | **51,000** | *Armed forces personnel, total* (`MS.MIL.TOTL.P1`) — World Bank, World Development Indicators | 2020 |
+
+**One measure was re-framed:** `def-personnel` was *"Personnel strength (% of establishment)"*, which no
+publisher states. The World Bank publishes the **total number** of armed forces personnel, so the label is
+now **"Armed forces personnel"** and the value is a headcount. **Split: 66 published / 254 modelled.**
+
+**Checked in S4 and rejected — with the reason:**
+- `ict-data-cost` / `ict-affordability` (the price of a mobile data basket) — the World Bank's price-basket
+  series (`IT.CEL.USEC.CD`, US$ per month) holds **no Zimbabwe value**, and the ITU series the platform's
+  "% of income" wording implies is not reachable through a queryable interface.
+- `lg-sanitation-hh` (**"Households with a latrine"**) — the World Bank's *household access to safe
+  sanitation* series (`HOU.STA.ACSN.ZS`) holds **no Zimbabwe value**.
+- `env-wetlands` — the only comparable series is *key biodiversity areas covered by protected areas*
+  (`CC.KBA.TERR.ZS`), which measures a **different** thing (KBAs, not wetlands) and holds no Zimbabwe value.
+- `psc-*`, the rest of `lg-*` (audit, revenue, roads, wards), the rest of `env-*` (trees, waste, carbon,
+  wildlife, rivers), the rest of `def-*` (readiness, vehicles, aircraft, logistics), and `zida-*` — these are
+  the **departments' own operational returns**; no publisher publishes them for Zimbabwe.
+
+**A duplicate found while searching — and it needs the owner's decision (BLOCKED, not fixed):**
+`ict-data-cost` (**"Data cost" 4.1 % of GNI**) and `ict-affordability` (**"Data basket cost" 3.2 % of
+income**) measure **the same thing** — the cost of a mobile data basket as a share of income — with two
+different numbers. Neither has a published source. Resolving it means **keeping one and removing the other,
+or changing one into a different measure**, which changes the platform's shape, so it is the owner's
+decision and is recorded as open work. **It is NOT fixed, and neither indicator may be presented as
+sourced.**

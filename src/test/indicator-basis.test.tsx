@@ -368,6 +368,10 @@ describe("department indicators — published with a named source, or plainly mo
       ["edu/edu-connectivity", "35.3", "UIS: proportion of primary schools with access to the internet for pedagogical purposes", "2024"],
       ["edu/edu-water", "92.0", "UIS: proportion of primary schools with access to basic drinking water", "2024"],
       ["edu/edu-sanitation", "99.3", "UIS: proportion of primary schools with single-sex basic sanitation facilities", "2024"],
+      // 2026-10-04 — S4's first conversion, from the World Bank catalogue (the armed-forces series). The
+      // platform's indicator was "Personnel strength (% of establishment)", which no publisher states; the
+      // published measure is the total number of armed forces personnel, so the label moved to match it.
+      ["def/def-personnel", "51,000", "World Development Indicators: Armed forces personnel, total", "2020"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {
