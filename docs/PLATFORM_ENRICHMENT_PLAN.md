@@ -1090,3 +1090,42 @@ work that reaches the goal**, never before, because it would fail today by desig
 **Not to be re-opened.** This goal is a **locked decision**. A future session must **read it here** and continue
 the batches — never ask the owner whether to expand, and never treat the old "Item 1 is complete" line (§9.7) as
 the end of the work; that line recorded the *indicator-count and group-count* targets, not this goal.
+### 11.1 Batch 1 — 19 new real indicators added (2026-10-04)
+
+**What was done.** 23 new indicators were drafted, each with a Zimbabwe value read from the **World Bank's own
+API** this session (`api.worldbank.org/v2/country/ZW/indicator/<series>`). **Four were withdrawn in the same
+session as duplicates** — `fin-inflation` repeated the existing `fin-inflation` (an id clash, caught by
+`departments.test.ts`), and `mines-imports` (ores and metals 33.8), `zimra-tax-gdp` (tax revenue 7.2) and
+`zida-fdi` (FDI) repeated measures the platform already held (`mines-share`, `fin-revenue`, `fin-investment`).
+**19 new real indicators stand:**
+
+| Department / indicator | Value | Series | Period |
+|---|---|---|---|
+| fin / GDP growth (`fin-growth`) | **8.1** % | `NY.GDP.MKTP.KD.ZG` | 2025 |
+| agri / Agricultural land (`agri-land-share`) | **41.8** % of land | `AG.LND.AGRI.ZS` | 2023 |
+| agri / Agriculture value added (`agri-gdp`) | **9.5** % of GDP | `NV.AGR.TOTL.ZS` | 2025 |
+| health / Under-5 mortality (`health-under5`) | **64.7** per 1,000 | `SH.DYN.MORT` | 2024 |
+| health / Health spending (`health-spend`) | **2.9** % of GDP | `SH.XPD.CHEX.GD.ZS` | 2023 |
+| edu / Trained primary teachers (`edu-trained-teachers`) | **97.9** % | `SE.PRM.TCAQ.ZS` | 2024 |
+| energy / Energy use per person (`energy-use`) | **472** kg of oil equivalent | `EG.USE.PCAP.KG.OE` | 2023 |
+| energy / Clean cooking access (`energy-cooking`) | **30.7** % | `EG.CFT.ACCS.ZS` | 2023 |
+| ict / Fixed telephone lines (`ict-fixed-lines`) | **1.8** per 100 | `IT.MLT.MAIN.P2` | 2024 |
+| lg / Urban population (`lg-urban`) | **40.5** % | `SP.URB.TOTL.IN.ZS` | 2025 |
+| lg / Safely managed drinking water (`lg-water-safe`) | **25.5** % | `SH.H2O.SMDW.ZS` | 2024 |
+| def / Military expenditure (`def-spending`) | **0.4** % of GDP | `MS.MIL.XPND.GD.ZS` | 2024 |
+| mfa / Development assistance (`mfa-oda`) | **2.2** % of GNI | `DT.ODA.ODAT.GN.ZS` | 2023 |
+| mfa / Merchandise trade (`mfa-merch-trade`) | **38.7** % of GDP | `TG.VAL.TOTL.GD.ZS` | 2025 |
+| env / CO2 emissions (`env-co2-total`) | **12.9** Mt CO2e | `EN.GHG.CO2.MT.CE.AR5` | 2024 |
+| env / Renewable freshwater per person (`env-freshwater`) | **763** m³ | `ER.H2O.INTR.PC` | 2022 |
+| psc / Wage and salaried workers (`psc-wage-workers`) | **29.2** % | `SL.EMP.WORK.ZS` | 2025 |
+| psc / Unemployment rate (`psc-unemployment`) | **9.3** % | `SL.UEM.TOTL.ZS` | 2025 |
+| hedu / Researchers in R&D (`hedu-researchers`) | **95.1** per million | `SP.POP.SCIE.RD.P6` | 2012 |
+
+**Counts: 320 indicators (85 published / 235 modelled) → 339 (104 published / 235 modelled).** The indicator
+test's length gate moved 320 → 339 and gained the 19 rows. **Distance to the flip: 235 − 104 = 131 more real
+figures needed** (each addition closes one; each conversion closes two).
+
+**DEFECTS FOUND AND FIXED (same session):** (1) the four duplicates above, removed at source (rule 07 — never
+mirror a defect); (2) **the goal itself was recorded nowhere** — the reason PART 11 exists.
+
+**Deployed and verified:** `assets/index-7_V6cxnW.js`, served sha256 `d17d6a38…` byte-identical to the local build.

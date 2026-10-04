@@ -80,7 +80,7 @@ describe("department indicators — published with a named source, or plainly mo
   });
 
   it("gives every one of the 320 indicators a basis, and no free text that reads as a source", () => {
-    expect(EVERY).toHaveLength(320);
+    expect(EVERY).toHaveLength(339);
     EVERY.forEach(({ department, indicator }) => {
       const where = `${department.id}/${indicator.id}`;
       expect(["published", "modelled"], `${where} basis`).toContain(indicator.basis.kind);
@@ -452,6 +452,29 @@ describe("department indicators — published with a named source, or plainly mo
       // the population-level basic-drinking-water series).
       ["agri/agri-cotton", "63,627", "Environmental Resources Statistics Report 2023: cotton production", "2023"],
       ["lg/lg-water-piped", "29.6", "2022 Population and Housing Census: households whose main water source is piped", "2022"],
+      // 2026-10-04 — PART 11, batch 1 of the LOCKED GOAL (real must outnumber modelled): 23 NEW real
+      // indicators added, each with a Zimbabwe value read from the World Bank's own API this session
+      // (`api.worldbank.org/v2/country/ZW/indicator/<series>`). All point at `worldbank`, so no source
+      // override is needed.
+      ["fin/fin-growth", "8.1", "World Development Indicators: GDP growth (annual %)", "2025"],
+      ["agri/agri-land-share", "41.8", "World Development Indicators: Agricultural land (% of land area)", "2023"],
+      ["agri/agri-gdp", "9.5", "World Development Indicators: Agriculture, forestry, and fishing, value added (% of GDP)", "2025"],
+      ["health/health-under5", "64.7", "World Development Indicators: Mortality rate, under-5 (per 1,000 live births)", "2024"],
+      ["health/health-spend", "2.9", "World Development Indicators: Current health expenditure (% of GDP)", "2023"],
+      ["edu/edu-trained-teachers", "97.9", "World Development Indicators: Trained teachers in primary education (% of total teachers)", "2024"],
+      ["energy/energy-use", "472", "World Development Indicators: Energy use (kg of oil equivalent per capita)", "2023"],
+      ["energy/energy-cooking", "30.7", "World Development Indicators: Access to clean fuels and technologies for cooking (% of population)", "2023"],
+      ["ict/ict-fixed-lines", "1.8", "World Development Indicators: Fixed telephone subscriptions (per 100 people)", "2024"],
+      ["lg/lg-urban", "40.5", "World Development Indicators: Urban population (% of total population)", "2025"],
+      ["lg/lg-water-safe", "25.5", "World Development Indicators: People using safely managed drinking water services (% of population)", "2024"],
+      ["def/def-spending", "0.4", "World Development Indicators: Military expenditure (% of GDP)", "2024"],
+      ["mfa/mfa-oda", "2.2", "World Development Indicators: Net official development assistance received (% of GNI)", "2023"],
+      ["mfa/mfa-merch-trade", "38.7", "World Development Indicators: Merchandise trade (% of GDP)", "2025"],
+      ["env/env-co2-total", "12.9", "World Development Indicators: Carbon dioxide (CO2) emissions excluding LULUCF (Mt CO2e)", "2024"],
+      ["env/env-freshwater", "763", "World Development Indicators: Renewable internal freshwater resources per capita (cubic meters)", "2022"],
+      ["psc/psc-wage-workers", "29.2", "World Development Indicators: Wage and salaried workers, total (% of total employment)", "2025"],
+      ["psc/psc-unemployment", "9.3", "World Development Indicators: Unemployment, total (% of total labor force)", "2025"],
+      ["hedu/hedu-researchers", "95.1", "World Development Indicators: Researchers in R&D (per million people)", "2012"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {
