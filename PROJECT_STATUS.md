@@ -4256,12 +4256,26 @@ build was published and **verified byte-identical on the live host** (`assets/in
 
 
 **Branch:** `feature/unified-platform` — never `main`. **Tree:** clean and IN SYNC (proved by
-`npm run sync:check`, which reports all four checks PASS). **Tip:** run `git log --oneline -1`. **Next
-commands:** `git fetch` then `npm run sync:check`. **The indicator goal (real > modelled) is now MET — 495
-indicators, 260 published / 235 modelled — locked by `scripts/validate.mjs` check 22. What remains: **(a)** the
-**group** goal (150 groups are 20 published / 130 modelled, so real group shares must also outnumber the modelled
-ones); and **(b)** a **new publisher** for the next batch (this session looked — the UN Statistics Division's SDG
-database returned no Zimbabwe row for the series tried — so the next new publisher was still to be found at that time), as the owner's strict rule requires the source list to keep expanding. **Batch 7 added three new publishers — Transparency International, Reporters Without Borders and the UNDP — so the named-source list now stands at 17 bodies.**
+`npm run sync:check`: the local files, GitHub and the website all carry the same commit `9e8cda2` and the same
+build `assets/index-BF1pCn3B.js`). **Tip:** `git log --oneline -1` (HEAD `9e8cda2`). **Next commands:**
+`git fetch` then `npm run sync:check`. **Where the work stands:** the **drafted-policy batches 1, 2a, 2b, 3 and 4
+are DONE and published**, so the next piece is **Batch 5 — use a department's own documents in the drafted
+policy** (a "Documents and data relied upon" annex), then Batch 6 (the Run-Simulation notification) → Batch 7 (the
+minister-facing line; the owner approves the exact wording first). **Batch 2c (grow REAL group data) is BLOCKED on
+the owner's decision** (see the group summary below). **The indicator goal (real > modelled) is MET — 510
+indicators, 275 published / 235 modelled — locked by `scripts/validate.mjs` check 22; the named-source list stands
+at 17 bodies.** The other half of the owner's goal is the **group** goal (150 groups are 20 published / 130
+modelled).
+
+**This session (2026-10-05, latest — a department's own Excel spreadsheet is now read in the browser). In plain words:**
+1. **Your departments keep most of their numbers in spreadsheets, and the platform could not open one before — it only wrote down the file's name.** Now it **really reads the spreadsheet**: the words and numbers inside it become material for the assessment, exactly as a Word file or a text file already did.
+2. **It happens entirely inside the browser.** Nothing is sent anywhere, nothing new was installed, and the same file always produces the same reading.
+3. **The screen tells the truth about every file.** A spreadsheet that really opened says so and shows how many characters will be used; one that could not be opened says plainly that it was not read and contributes nothing.
+4. **A safety check was added so this cannot quietly disappear.** If the reader or the "choose a spreadsheet" option is ever removed, the build fails — and I proved the check really does fail by breaking it on purpose, then putting it back byte-for-byte.
+5. **Everything was re-checked, and it is live:** all checks green (523 automatic tests and 19 browser tests), and the public site serves exactly this build.
+
+**Files touched this session (Batch 4):** `src/services/extraction/xlsxText.ts` (new — the spreadsheet reader) · `src/services/extraction/zipRead.ts` (+`listZipEntries`, +`readArchiveBytes`; the central-directory walk is now shared, not duplicated) · `src/services/extraction/docxText.ts` (imports the shared byte reader and exports its XML entity decoder) · `src/services/extraction/extractPolicyText.ts` (the `xlsx` kind + one real-reader branch shared with `docx`) · `src/components/PolicyInput.tsx` and `src/components/documents/DepartmentDocumentsPanel.tsx` (offer `.xlsx`) · `src/test/xlsx-read.test.ts` (new, 12 tests) · `src/test/extraction.test.ts` (xlsx assertions) · `e2e/journey.spec.ts` (the in-browser spreadsheet case) · `scripts/validate.mjs` (check 23, plus the header list which now names 21–23) · `PRODUCTION_READINESS.md`, `docs/NEXT_SESSION_PLAN.md`, `docs/PROPOSAL_PROMPT.md`, `PROJECT_STATUS.md` (the records). **No `package.json` dependency change; no `src/components/ui/**` edit; no colour, font or route change.**
+
 
 **Earlier (2026-10-05 — the flip: real figures first outnumbered "Modelled" ones, 245 to 235). In plain words:**
 1. **You set the goal that real, published figures must outnumber the ones I label "Modelled". That is now TRUE.** The scoreboard is **245 real figures and 235 "Modelled", out of 480** (it was 211 real and 235 "Modelled", out of 446). This is the first time the real side is bigger.
@@ -4284,7 +4298,7 @@ database returned no Zimbabwe row for the series tried — so the next new publi
 2. **Two screens were improved as you asked:** clicking a node in the relationship graph now opens its details in a **panel on the right with a Close button** (Escape also closes it), and the strip of buttons on a run (Back · This run · Executive summary · …) now sits on a **tinted surface so it clearly reads as clickable.**
 3. **Everything was re-checked, and it is live.**
 
-**This session (2026-10-05, latest — THREE brand-new sources added, and 15 more real figures). In plain words:**
+**Earlier (2026-10-05 — THREE brand-new sources added, and 15 more real figures). In plain words:**
 1. **The scoreboard is now 275 real figures and 235 "Modelled", out of 510** (last time it was 260 real, 235 "Modelled", out of 495). The build still **fails itself** if the real count ever drops back to or below the "Modelled" one.
 2. **Your rule worked — I DID add brand-new sources this time, three of them:** **Transparency International** (its Corruption Perceptions Index — Zimbabwe scores 22 out of 100), **Reporters Without Borders** (its World Press Freedom Index — Zimbabwe's score is 44.37), and the **United Nations Development Programme** (its Human Development Index — Zimbabwe stands at 0.598). The platform named none of these three bodies before, and each new figure shows its publisher, its publication and its period on the screen.
 3. **I also added 12 more real figures from the World Bank's published data** — for example mobile-phone subscriptions, pre-primary school enrolment, nurses and midwives per person, tobacco use by women and by men, diarrhoea treatment for children, the adolescent birth rate, HIV treatment coverage, the amount of broad money in the economy, the lending interest rate, carbon-dioxide emissions per person, and the homicide rate.
