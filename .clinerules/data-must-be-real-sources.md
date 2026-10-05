@@ -41,3 +41,34 @@ it.
 `PROJECT_STATUS.md` carries this as a **locked constraint**, and the platform's own validator fails if a
 figure lacks a named source. A "temporary" or "demo" figure is **not** an exception — it is the defect this
 rule exists to stop.
+
+## Finding a figure — try every door, never just one (added 2026-10-05)
+
+> **The defect this exists for:** a session reported that no new publisher could be found because
+> **FAOSTAT, UNCTAD, ITU, AfDB, UNAIDS and UNdata did not answer their API**, and it wrote each body off
+> after **one** method. That is not a search. When WHO's and UNESCO's own **OData/API** doors and the
+> **IMF DataMapper** were later tried they answered; and ZIMSTAT, POTRAZ and the regulators — reachable all
+> along — were never opened at all. Calling "no source exists" after one failed attempt is the same class of
+> error as inventing a figure.
+
+Before a publisher is called unavailable, **every door below must be tried, and the attempts recorded**:
+
+1. **JSON API** — a web address that returns numbers as text (e.g. the World Bank API).
+2. **OData / SDMX API** — a *different* data address the same body may run (e.g. the WHO Global Health
+   Observatory's OData host; the UNESCO UIS API with a country parameter).
+3. **Bulk download** — one ZIP/CSV of everything, instead of one indicator at a time.
+4. **The document itself** — read the body's own report, census table or statistical release (PDF/XLSX) and
+   take the figure; many national bodies publish this way and nothing else.
+5. **A registry or regulator list** — the body that *counts* the thing being measured (a telecoms regulator
+   for subscriber counts, an insurance-and-pensions regulator for pension funds, a companies registry for
+   business types).
+6. **An aggregator that names the origin** — a compiler such as Our World in Data or the IMF DataMapper may
+   be used to LOCATE a number, but the figure must be **cited to the original body it names**, never to the
+   compiler.
+
+**Not only online:** a figure held by another ministry, a published Act or a printed report counts too — the
+test is that it is real, named and citable, not that it came from a web address.
+
+**Only when all six have genuinely been tried** may a source be reported as unavailable — and the report
+must **list which doors were tried and what each said**, so the next session can tell a real dead end from an
+untried one. "I could not find it" is never acceptable after one attempt.
