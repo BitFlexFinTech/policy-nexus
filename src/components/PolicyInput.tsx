@@ -32,6 +32,8 @@ import {
   isPolicyInputStorePersistent,
   savePolicyInput,
 } from "@/services/documents/policyInputStore";
+import { hasSeenRunNotice, markRunNoticeSeen } from "@/services/assessment/runNoticeStore";
+import { RunSimulationNotice, RunSimulationNote } from "@/components/RunSimulationNotice";
 
 /**
  * Policy ingestion for the signed-in department. Presets come from the
@@ -71,6 +73,11 @@ export function PolicyInput() {
   // The lineage the loaded run had, so running the same wording again reproduces it rather
   // than silently becoming a first version of the policy.
   const [revisionOf, setRevisionOf] = useState<string | undefined>(undefined);
+  // Owner's item 5 — the "before you run" notice. It opens once per department (remembered in
+  // `runNoticeStore`), so the first run explains where the draft's data comes from. The request
+  // is held until the officer chooses to run, or to open the Document Library first.
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  const [pendingRequest, setPendingRequest] = useState<AssessmentRequest | null>(null);
 
   /**
    * Set one lever. The value is checked against the lever's own allowed values, so a
@@ -165,6 +172,29 @@ export function PolicyInput() {
     });
   }, [department, draft, templateId, levers, uploadedFiles]);
 
+  /**
+   * Carry out a run: hand the request to the seam and open the live run. This is the ONE place
+   * a run is performed, so the notice's "Run with the data I have" and an ordinary Run
+   * Simulation press do exactly the same thing.
+   */
+  const performRun = useCallback(
+    async (request: AssessmentRequest) => {
+      setIsRunning(true);
+      setRunError(null);
+      try {
+        const run = await assessmentService.run(request);
+        navigate(`/app/simulations/${encodeURIComponent(run.id)}`);
+      } catch (error) {
+        setRunError(
+          error instanceof Error ? error.message : "The assessment service could not be reached.",
+        );
+      } finally {
+        setIsRunning(false);
+      }
+    },
+    [navigate],
+  );
+
   const handleRunSimulation = useCallback(async () => {
     if (!department) return;
     const fileNames = uploadedFiles.map((file) => file.name);
@@ -209,19 +239,50 @@ export function PolicyInput() {
     // already resolved, so the officer waits for nothing — the run opens in the
     // same moment it does today. A live service takes as long as it takes, and a
     // failure is reported rather than swallowed.
-    setIsRunning(true);
-    setRunError(null);
-    try {
-      const run = await assessmentService.run(request);
-      navigate(`/app/simulations/${encodeURIComponent(run.id)}`);
-    } catch (error) {
-      setRunError(
-        error instanceof Error ? error.message : "The assessment service could not be reached.",
-      );
-    } finally {
-      setIsRunning(false);
+    // Owner's item 5 — the first run in a department shows the notice once, then remembers it,
+    // so the message informs rather than nags. It never blocks a run: the officer can run at
+    // once, or go to the Document Library first.
+    if (!hasSeenRunNotice(department.id)) {
+      setPendingRequest(request);
+      setNoticeOpen(true);
+      return;
     }
-  }, [department, draft, templateId, uploadedFiles, navigate, levers, revisionOf]);
+    await performRun(request);
+  }, [department, draft, templateId, uploadedFiles, levers, revisionOf, performRun]);
+
+  /**
+   * Owner's item 5 — the notice's two actions and its dismissal. All three remember the
+   * department, so the notice is shown once and never again; the permanent note stays on screen.
+   */
+  const rememberNotice = useCallback(() => {
+    if (department) markRunNoticeSeen(department.id);
+  }, [department]);
+
+  const runFromNotice = useCallback(() => {
+    rememberNotice();
+    setNoticeOpen(false);
+    const request = pendingRequest;
+    setPendingRequest(null);
+    if (request) void performRun(request);
+  }, [rememberNotice, pendingRequest, performRun]);
+
+  const openLibraryFromNotice = useCallback(() => {
+    rememberNotice();
+    setNoticeOpen(false);
+    setPendingRequest(null);
+    navigate("/app/documents");
+  }, [rememberNotice, navigate]);
+
+  const handleNoticeOpenChange = useCallback(
+    (open: boolean) => {
+      if (open) return;
+      // Closed by the X, Escape or a click outside: that is a dismissal, so it is remembered.
+      rememberNotice();
+      setNoticeOpen(false);
+      setPendingRequest(null);
+    },
+    [rememberNotice],
+  );
 
   /**
    * Read each accepted file through the extraction seam, one at a time, and show
@@ -274,6 +335,16 @@ export function PolicyInput() {
           Run Simulation
         </Button>
       </div>
+
+      {/* Owner's item 5 — the permanent note beside the button, and the one-time pop-up. */}
+      <RunSimulationNote departmentName={department.shortName} />
+      <RunSimulationNotice
+        open={noticeOpen}
+        departmentName={department.shortName}
+        onOpenChange={handleNoticeOpenChange}
+        onOpenLibrary={openLibraryFromNotice}
+        onRun={runFromNotice}
+      />
 
       {runError && (
         <p className="border-b bg-destructive/5 px-3 py-2 text-[10px] leading-relaxed text-destructive">

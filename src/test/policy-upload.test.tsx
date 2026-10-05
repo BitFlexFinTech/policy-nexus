@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import App from "@/App";
 import { clearSession, signInToDepartment } from "@/session/session";
+import { pressRunSimulation } from "@/test/support/runSimulation";
 
 const renderAt = (path: string) => {
   window.history.pushState({}, "", path);
@@ -47,7 +48,7 @@ describe("policy upload — what the screen says was read", () => {
     ]);
     await screen.findByText("Text extracted.");
 
-    fireEvent.click(screen.getByRole("button", { name: "Run Simulation" }));
+    pressRunSimulation();
 
     // The seam answers in a microtask, so the screen settles a moment after the
     // click: wait for the address to change, then assert on what is on screen.

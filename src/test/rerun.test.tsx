@@ -18,6 +18,7 @@ import {
   saveRunRequest,
 } from "@/services/assessment/runStore";
 import type { AssessmentRequest } from "@/services/assessment/types";
+import { pressRunSimulation } from "@/test/support/runSimulation";
 
 const renderAt = (path: string) => {
   window.history.pushState({}, "", path);
@@ -112,7 +113,7 @@ describe("item 6 — a recorded run's inputs load back into the policy input", (
     fireEvent.change(screen.getByPlaceholderText(/Draft the policy text/), {
       target: { value: wording },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Run Simulation" }));
+    pressRunSimulation();
     await waitFor(() => expect(window.location.pathname).toContain("/app/simulations/"));
 
     const recorded = listRunRequestsFor("fin");
@@ -123,7 +124,7 @@ describe("item 6 — a recorded run's inputs load back into the policy input", (
     cleanup();
     renderAt(rerunPathFor(runId));
     expect(screen.getByPlaceholderText(/Draft the policy text/)).toHaveValue(wording);
-    fireEvent.click(screen.getByRole("button", { name: "Run Simulation" }));
+    pressRunSimulation();
     await waitFor(() => expect(window.location.pathname).toContain("/app/simulations/"));
 
     const after = listRunRequestsFor("fin");

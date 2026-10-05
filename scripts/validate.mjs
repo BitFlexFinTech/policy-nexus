@@ -1112,6 +1112,70 @@ if (!existsSync(cssPath)) {
   check("a department's own documents are used in the drafted policy", problems);
 }
 
+// ---------------------------------------------------------------------------------------------
+// check 25 — THE RUN-SIMULATION NOTICE IS SHOWN ONCE PER DEPARTMENT (BATCH 6)
+// The owner asked for a notification on Run Simulation that says, honestly, that the drafted
+// policy rests on the real published data the engine holds for the department (which is limited),
+// and points the department at its Document Library. This gate fails the build if that capability
+// is dropped or silently narrowed: the store that remembers the notice must exist and expose the
+// two calls, the notice must link to the Document Library, and the policy input must consult and
+// remember it. It is proved able to fail by mutation (see PROJECT_STATUS.md).
+{
+  const problems = [];
+  const storePath = join(ROOT, "src/services/assessment/runNoticeStore.ts");
+  const noticePath = join(ROOT, "src/components/RunSimulationNotice.tsx");
+  const copyPath = join(ROOT, "src/config/runNotice.ts");
+  const inputPath = join(ROOT, "src/components/PolicyInput.tsx");
+
+  if (!existsSync(storePath)) {
+    problems.push("src/services/assessment/runNoticeStore.ts is missing — the notice can no longer be remembered");
+  } else {
+    const store = readFileSync(storePath, "utf8");
+    if (!/export const hasSeenRunNotice\s*=/.test(store)) {
+      problems.push("the notice store no longer exposes hasSeenRunNotice");
+    }
+    if (!/export const markRunNoticeSeen\s*=/.test(store)) {
+      problems.push("the notice store no longer exposes markRunNoticeSeen");
+    }
+  }
+
+  if (!existsSync(noticePath)) {
+    problems.push("src/components/RunSimulationNotice.tsx is missing — the Run-Simulation notice no longer exists");
+  }
+
+  if (!existsSync(copyPath)) {
+    problems.push("src/config/runNotice.ts is missing — the notice's wording has gone");
+  } else {
+    const copy = readFileSync(copyPath, "utf8");
+    if (!/Document Library/.test(copy)) {
+      problems.push("the notice no longer points the department at its Document Library");
+    }
+    if (!/\/app\/documents/.test(copy)) {
+      problems.push("the notice's link to the Document Library is gone");
+    }
+  }
+
+  if (!existsSync(inputPath)) {
+    problems.push("src/components/PolicyInput.tsx is missing");
+  } else {
+    const input = readFileSync(inputPath, "utf8");
+    if (!/hasSeenRunNotice/.test(input)) {
+      problems.push("the policy input no longer checks whether the notice has been seen");
+    }
+    if (!/markRunNoticeSeen/.test(input)) {
+      problems.push("the policy input no longer remembers the notice");
+    }
+    if (!/RunSimulationNotice/.test(input)) {
+      problems.push("the policy input no longer renders the Run-Simulation notice");
+    }
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the Run-Simulation notice is shown once per department and points at the Document Library (BATCH 6)");
+  }
+  check("the Run-Simulation notice is shown once per department", problems);
+}
+
 
 
 // summary

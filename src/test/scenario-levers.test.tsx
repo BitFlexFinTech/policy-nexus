@@ -4,6 +4,7 @@ import App from "@/App";
 import { LEVER_CONTROLS } from "@/services/assessment/levers";
 import { clearRuns, listRunRequestsFor } from "@/services/assessment/runStore";
 import { clearSession, signInToDepartment } from "@/session/session";
+import { pressRunSimulation } from "@/test/support/runSimulation";
 
 const renderAt = (path: string) => {
   window.history.pushState({}, "", path);
@@ -56,7 +57,7 @@ describe("scenario assumptions — the officer can set them, and they travel wit
     });
     fireEvent.click(screen.getByRole("button", { name: "Inside the current budget" }));
     fireEvent.click(screen.getByRole("button", { name: "6 months" }));
-    fireEvent.click(screen.getByRole("button", { name: "Run Simulation" }));
+    pressRunSimulation();
 
     const stored = listRunRequestsFor("fin");
     expect(stored).toHaveLength(1);

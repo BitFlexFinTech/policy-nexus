@@ -13,6 +13,7 @@ import { REFERENCE_DATE } from "@/config/reference";
 import { RUN_ROUND_TICK_MS } from "@/pages/SimulationRun";
 import { DOCUMENT_VIEWS } from "@/components/assessment/documentViews";
 import { RERUN_LABEL, rerunPathFor } from "@/services/assessment/rerun";
+import { pressRunSimulation } from "@/test/support/runSimulation";
 
 const renderAt = (path: string) => {
   window.history.pushState({}, "", path);
@@ -65,7 +66,7 @@ describe("journey — run a policy, then read its assessment", () => {
     const preset = findDepartment("fin")!.policyTemplates[0];
     renderAt("/app");
     fireEvent.click(screen.getByRole("button", { name: preset.title }));
-    fireEvent.click(screen.getByRole("button", { name: "Run Simulation" }));
+    pressRunSimulation();
 
     // The seam answers in a microtask, so the address changes a moment later.
     await waitFor(() => expect(window.location.pathname).toContain("/app/simulations/"));

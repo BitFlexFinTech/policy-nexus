@@ -118,6 +118,22 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await page.getByRole("button", { name: `Enter ${DEPARTMENT.shortName}` }).click();
     await expect(page).toHaveURL(/\/app$/);
   };
+  /**
+   * Press Run Simulation the way an officer does.
+   *
+   * The first run in a department shows the one-time "before you run" notice (owner's item 5),
+   * which must be answered before the run starts; this answers it by choosing to run. On every
+   * later run the notice is absent, so the press starts the run directly.
+   */
+  const runSimulation = async (page: Page) => {
+    await page.getByRole("button", { name: "Run Simulation" }).click();
+    const runAnyway = page.getByRole("button", { name: "Run with the data I have" });
+    const shown = await runAnyway
+      .waitFor({ state: "visible", timeout: 2000 })
+      .then(() => true)
+      .catch(() => false);
+    if (shown) await runAnyway.click();
+  };
 
   test("the landing page hands off to the chooser, which lists all 16 departments", async ({ page }) => {
     await page.goto("/");
@@ -645,7 +661,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
       .getByPlaceholder(/Draft the policy text/)
       .fill("A simulated policy draft used to verify the end-to-end journey in a real browser.");
 
-    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await runSimulation(page);
     await expect(page).toHaveURL(/\/app\/simulations\//);
     await expect(page.getByText(/\d+ \/ \d+ rounds/)).toBeVisible();
 
@@ -706,7 +722,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
       .getByPlaceholder(/Draft the policy text/)
       .fill("A draft used to watch the relationship graph build up during a run.");
 
-    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await runSimulation(page);
     await expect(page).toHaveURL(/\/app\/simulations\//);
 
     // The graph is a real part of the run view, named as the card it is.
@@ -809,7 +825,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
 
     await expect(page.getByText("national-policy.txt")).toBeVisible();
 
-    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await runSimulation(page);
     await expect(page).toHaveURL(/\/app\/simulations\//);
     // The source says `upload` plainly — it does not imply the file was parsed.
     await expect(page.getByText(/source upload/)).toBeVisible();
@@ -828,7 +844,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await page
       .getByPlaceholder(/Draft the policy text/)
       .fill("A simulated policy draft used to verify the long report and the drafted policy.");
-    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await runSimulation(page);
     await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
       timeout: 30_000,
     });
@@ -944,7 +960,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await page
       .getByPlaceholder(/Draft the policy text/)
       .fill("A draft used to check that the paper trail reaches the drafted policy.");
-    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await runSimulation(page);
     await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
       timeout: 30_000,
     });
@@ -992,7 +1008,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await page
       .getByPlaceholder(/Draft the policy text/)
       .fill("A draft run, used to check that the department's own documents are read.");
-    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await runSimulation(page);
     await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
       timeout: 30_000,
     });
@@ -1050,7 +1066,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await page
       .getByPlaceholder(/Draft the policy text/)
       .fill("A draft run, used to check that a spreadsheet is read into the examination.");
-    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await runSimulation(page);
     await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
       timeout: 30_000,
     });
@@ -1081,7 +1097,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await page
       .getByPlaceholder(/Draft the policy text/)
       .fill("A draft used to check that the department's own document reaches the policy.");
-    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await runSimulation(page);
     await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
       timeout: 30_000,
     });
@@ -1139,7 +1155,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
       .fill(
         "Each bank must register by 31 January. A transition period of twelve months applies before the register opens. The Treasury shall fund the register from the consolidated revenue fund.",
       );
-    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await runSimulation(page);
     await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
       timeout: 30_000,
     });
@@ -1185,7 +1201,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await page
       .getByPlaceholder(/Draft the policy text/)
       .fill("A draft used to check the one back control.");
-    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await runSimulation(page);
     await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
       timeout: 30_000,
     });
