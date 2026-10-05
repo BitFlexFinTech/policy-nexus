@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -208,6 +208,17 @@ export function RelationshipGraphCard({
     query.addEventListener?.("change", onChange);
     return () => query.removeEventListener?.("change", onChange);
   }, []);
+
+  // Escape closes the selected node's detail panel — the standard way out of a panel that
+  // pops open on the right of the graph. Home/End are left to the page.
+  useEffect(() => {
+    if (!selectedId || typeof window === "undefined") return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedId(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedId]);
 
   const visibleRounds = revealedRounds ?? Number.POSITIVE_INFINITY;
   /**
@@ -484,7 +495,10 @@ export function RelationshipGraphCard({
         </div>
       )}
 
-      <div className={cn("relative", compact ? "" : "p-3")}>
+      {/* The graph and the selected node's detail panel sit side by side. The panel is on the
+          RIGHT of the graph (the owner's instruction), and stacks under it on narrow screens. */}
+      <div className="flex flex-col lg:flex-row lg:items-stretch">
+      <div className={cn("relative min-w-0 flex-1", compact ? "" : "p-3")}>
         <div className="aspect-[4/3] w-full">
           <svg
             ref={svgRef}
@@ -717,6 +731,54 @@ export function RelationshipGraphCard({
         )}
       </div>
 
+      {!compact && selectedNode && (
+        <aside
+          aria-label="Selected node"
+          className="min-w-0 border-t px-4 py-3 lg:w-72 lg:shrink-0 lg:overflow-y-auto lg:border-l lg:border-t-0"
+        >
+          <div>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+              <p className="text-xs font-semibold text-foreground">{selectedNode.label}</p>
+              <span className="flex items-center gap-1">
+                <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                  {relationshipKindLabel(selectedNode.kind)}
+                </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                  onClick={() => setSelectedId(null)}
+                  aria-label="Close"
+                >
+                  <X className="h-3.5 w-3.5" aria-hidden="true" />
+                </Button>
+              </span>
+            </div>
+            <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+              {selectedNode.note}
+            </p>
+            <ul className="mt-2.5 space-y-1">
+              {relationships.map((entry) => (
+                <li
+                  key={entry.id}
+                  className="flex flex-wrap items-baseline gap-x-2 text-[11px] leading-relaxed"
+                >
+                  <span className="font-mono text-[10px] uppercase tracking-wide text-primary">
+                    {entry.relation}
+                  </span>
+                  <span className="text-foreground">{entry.other.label}</span>
+                  <span className="text-muted-foreground">
+                    · {relationshipKindLabel(entry.other.kind)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+      )}
+      </div>
+
       {/* The legend names the four kinds and draws each one AS ITS SHAPE, so the legend
           answers "what does a square mean" rather than "what does green mean" — colour
           alone is never the only channel. The trailing line states the division of labour
@@ -738,44 +800,15 @@ export function RelationshipGraphCard({
         </div>
       )}
 
-      {/* Selecting a node states its relationships as text — the same information
-          the picture carries, so the graph is never the only way to read it. */}
-      {!compact && (
+      {/* When nothing is selected, the hint sits under the graph. When a node IS selected its
+          relationships are stated in the right-hand panel above — the same information the
+          picture carries, so the graph is never the only way to read it. */}
+      {!compact && !selectedNode && (
         <div className="border-t px-4 py-3">
-          {selectedNode ? (
-            <>
-              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                <p className="text-xs font-semibold text-foreground">{selectedNode.label}</p>
-                <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  {relationshipKindLabel(selectedNode.kind)}
-                </span>
-              </div>
-              <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                {selectedNode.note}
-              </p>
-              <ul className="mt-2.5 space-y-1">
-                {relationships.map((entry) => (
-                  <li
-                    key={entry.id}
-                    className="flex flex-wrap items-baseline gap-x-2 text-[11px] leading-relaxed"
-                  >
-                    <span className="font-mono text-[10px] uppercase tracking-wide text-primary">
-                      {entry.relation}
-                    </span>
-                    <span className="text-foreground">{entry.other.label}</span>
-                    <span className="text-muted-foreground">
-                      · {relationshipKindLabel(entry.other.kind)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : (
-            <p className="text-[11px] leading-relaxed text-muted-foreground">
-              Select a node to read how it relates to the rest of the run. Drag any node to move it
-              through the network — the nodes around it part, then close again.
-            </p>
-          )}
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            Select a node to read how it relates to the rest of the run. Drag any node to move it
+            through the network — the nodes around it part, then close again.
+          </p>
         </div>
       )}
     </section>

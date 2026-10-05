@@ -28,7 +28,7 @@ export function DocumentNav({ runId }: { runId: string }) {
     <nav
       aria-label="Documents in this run"
       data-print="hide"
-      className="flex items-center gap-1 overflow-x-auto rounded-lg border bg-card px-2 py-1.5"
+      className="flex items-center gap-1 overflow-x-auto rounded-lg border border-primary/30 bg-primary-tint px-2 py-1.5"
     >
       {/* The owner's instruction (2026-10-02): one "← Back", always to the Overview. It sits
           in this strip so every screen of a run carries it, from one definition. */}

@@ -190,6 +190,30 @@ describe("relationship graph card — being read and used", () => {
     expect(within(panel).getAllByText(relationshipKindLabel(chosen.kind)).length).toBeGreaterThan(0);
   });
 
+  it("opens the chosen node's detail in a right-hand panel with a close control", () => {
+    const { graph, seed } = scenario("fin");
+    render(<RelationshipGraphCard graph={graph} seed={seed} />);
+    const chosen = graph.nodes.find((node) => node.kind === "stakeholder")!;
+    const open = () =>
+      fireEvent.click(screen.getByRole("button", { name: new RegExp(`^${chosen.label}, `) }));
+
+    // Clicking a node opens its detail in a labelled panel (an `<aside>` = role complementary),
+    // which carries a Close control — the owner's instruction, 2026-10-05.
+    open();
+    const aside = screen.getByRole("complementary", { name: "Selected node" });
+    expect(within(aside).getByRole("button", { name: "Close" })).toBeInTheDocument();
+
+    // The Close control closes it.
+    fireEvent.click(within(aside).getByRole("button", { name: "Close" }));
+    expect(screen.queryByRole("complementary", { name: "Selected node" })).toBeNull();
+
+    // Selecting again, then pressing Escape, also closes it.
+    open();
+    expect(screen.getByRole("complementary", { name: "Selected node" })).toBeInTheDocument();
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("complementary", { name: "Selected node" })).toBeNull();
+  });
+
   it("can be chosen from the keyboard", () => {
     const { graph, seed } = scenario("opc");
     render(<RelationshipGraphCard graph={graph} seed={seed} />);

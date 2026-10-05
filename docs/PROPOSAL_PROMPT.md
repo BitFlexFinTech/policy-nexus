@@ -369,9 +369,9 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
-- **What the live site actually is today (re-checked 2026-10-05, after the PART 11 batch-7 build — three new publishers — was published).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-DKrCA8nC.js`
-  (`9e65c7d7eaeabb63db58cbcca3d4ec938eaf16021e6a751ec1bbfbf58d3ac311`), which is byte-identical to the
+- **What the live site actually is today (re-checked 2026-10-05, after the drafted-policy Batch 2 build — the graph detail panel + tinted strip — was published).**
+  The host `nzwisiso.bitflex.app` serves `assets/index-y7GKz0bt.js`
+  (`6c95556b5a1a4827d6cdebe4c97290784fc5881923654259c9026e093fed0968`), which is byte-identical to the
   local build, so **the live site is the build published on 2026-10-05** — it shows the **live date and
   time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (275 published / 235 modelled), and it carries the authority line, the modelled
   agent population, the named sources (with the corrected sentence naming both publishers the stakeholder
