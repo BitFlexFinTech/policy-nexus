@@ -970,6 +970,27 @@ if (!existsSync(cssPath)) {
           `PROJECT_STATUS.md's RESUME HERE block does not state the current indicator split (${publishedIndicators} published / ${modelledIndicators} modelled)`,
         );
       }
+
+      // The block is the present-tense state by definition, so the bundle it names beside "IN SYNC"
+      // must be the one this working copy actually builds. (Found 2026-10-06: the line named a
+      // superseded bundle as "the same build `X`", which checks 12 and 19 — both keyed on the word
+      // "serves" — did not see, so a stale name sat in the present tense.) The block's historical
+      // batch notes are dated and phrased "on the live host (`X`)", so they are deliberately not
+      // matched here.
+      const distIndexHtml = join(ROOT, "dist/index.html");
+      const syncAt = block.indexOf("IN SYNC");
+      if (existsSync(distIndexHtml) && syncAt >= 0) {
+        const builtNow = (readFileSync(distIndexHtml, "utf8").match(/assets\/index-[A-Za-z0-9_-]+\.js/) || [])[0];
+        const close = block.indexOf(")", syncAt);
+        const stated = close < 0 ? block.slice(syncAt) : block.slice(syncAt, close);
+        for (const m of stated.matchAll(/assets\/index-[A-Za-z0-9_-]+\.js/g)) {
+          if (builtNow && m[0] !== builtNow) {
+            problems.push(
+              `PROJECT_STATUS.md's RESUME HERE block names ${m[0]} as the current build, but this working copy builds ${builtNow} — a superseded bundle must not be presented as the current one`,
+            );
+          }
+        }
+      }
     }
   }
 
