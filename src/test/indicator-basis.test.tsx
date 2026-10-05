@@ -79,8 +79,8 @@ describe("department indicators — published with a named source, or plainly mo
     clearSession();
   });
 
-  it("gives every one of the 446 indicators a basis, and no free text that reads as a source", () => {
-    expect(EVERY).toHaveLength(446);
+  it("gives every one of the 480 indicators a basis, and no free text that reads as a source", () => {
+    expect(EVERY).toHaveLength(480);
     EVERY.forEach(({ department, indicator }) => {
       const where = `${department.id}/${indicator.id}`;
       expect(["published", "modelled"], `${where} basis`).toContain(indicator.basis.kind);
@@ -615,6 +615,48 @@ describe("department indicators — published with a named source, or plainly mo
       ["env/env-birds", "22", "World Development Indicators: Bird species, threatened", "2022"],
       ["opc/opc-women-parliament", "30.1", "World Development Indicators: Proportion of seats held by women in national parliaments (%)", "2025"],
       ["zida/zida-tech-manufacturing", "9.6", "World Development Indicators: Medium and high-tech manufacturing value added (% manufacturing value added)", "2022"],
+      // 2026-10-05 — PART 11, batch 5: THE FLIP. 34 more real indicators were added, each with a
+      // Zimbabwe value read from the World Bank's own API this session
+      // (`api.worldbank.org/v2/country/ZW/indicator/<series>`), so real, published figures now
+      // OUTNUMBER the modelled ones (245 published / 235 modelled, 480 indicators). Two drafted
+      // figures — population aged 15-64 and total life expectancy — were withdrawn in the same
+      // session as duplicates of the existing `psc-working-age` and `health-life`. All the rows
+      // below are World Bank series, so no source override is needed.
+      ["lg/lg-income-share-low", "4.8", "World Development Indicators: Income share held by lowest 20%", "2019"],
+      ["lg/lg-income-share-high", "40.5", "World Development Indicators: Income share held by highest 10%", "2019"],
+      ["lg/lg-slum", "54.9", "World Development Indicators: Population living in slums (% of urban population)", "2022"],
+      ["psc/psc-self-employed", "70.8", "World Development Indicators: Self-employed, total (% of total employment) (modeled ILO estimate)", "2025"],
+      ["psc/psc-employers", "2.6", "World Development Indicators: Employers, total (% of total employment) (modeled ILO estimate)", "2025"],
+      ["psc/psc-youth-lfp", "48.2", "World Development Indicators: Labor force participation rate for ages 15-24, total (%) (modeled ILO estimate)", "2025"],
+      ["psc/psc-unemployment-male", "9.2", "World Development Indicators: Unemployment, male (% of male labor force) (modeled ILO estimate)", "2025"],
+      ["psc/psc-youth-unemployment-female", "16.2", "World Development Indicators: Unemployment, youth female (% of female labor force ages 15-24) (modeled ILO estimate)", "2025"],
+      ["psc/psc-lfp-male", "74.3", "World Development Indicators: Labor force participation rate, male (% of male population ages 15+) (modeled ILO estimate)", "2025"],
+      ["psc/psc-older-female", "4.1", "World Development Indicators: Population ages 65 and above, female (% of female population)", "2025"],
+      ["health/health-smoking", "11.0", "World Development Indicators: Prevalence of current tobacco use (% of adults)", "2024"],
+      ["health/health-wasting", "5.1", "World Development Indicators: Prevalence of wasting, weight for height (% of children under 5)", "2024"],
+      ["health/health-polio", "91", "World Development Indicators: Immunization, Pol3 (% of one-year-old children)", "2024"],
+      ["health/health-hiv-young-female", "3.7", "World Development Indicators: Prevalence of HIV, female (% ages 15-24)", "2024"],
+      ["health/health-tb-detection", "60", "World Development Indicators: Tuberculosis case detection rate (%, all forms)", "2024"],
+      ["health/health-malnutrition", "9.6", "World Development Indicators: Prevalence of malnutrition, weight for age (% of children under 5)", "2024"],
+      ["health/health-anaemia-pregnancy", "30.1", "World Development Indicators: Prevalence of anemia among pregnant women (%)", "2023"],
+      ["health/health-infant-mortality-female", "55.8", "World Development Indicators: Mortality rate, infant, female (per 1,000 live births)", "2024"],
+      ["health/health-infant-mortality-male", "68.6", "World Development Indicators: Mortality rate, infant, male (per 1,000 live births)", "2024"],
+      ["energy/energy-fuel-exports", "2.9", "World Development Indicators: Fuel exports (% of merchandise exports)", "2024"],
+      ["energy/energy-connection-days", "19.6", "World Development Indicators: Time required to get electricity (days)", "2025"],
+      ["zida/zida-manufactures-exports", "6.7", "World Development Indicators: Manufactures exports (% of merchandise exports)", "2024"],
+      ["zida/zida-new-business-density", "2.8", "World Development Indicators: New business density (new registrations per 1,000 people ages 15-64)", "2024"],
+      ["mfa/mfa-manufactures-imports", "58.3", "World Development Indicators: Manufactures imports (% of merchandise imports)", "2024"],
+      ["mfa/mfa-travel-services", "44.4", "World Development Indicators: Travel services (% of commercial service exports)", "2024"],
+      ["mfa/mfa-digital-services", "8.3", "World Development Indicators: Computer, communications and other services (% of commercial service exports)", "2024"],
+      ["fin/fin-reserves-usd", "USD 485M", "World Development Indicators: Total reserves (includes gold, current US$)", "2024"],
+      ["fin/fin-fdi-gdp", "1.1", "World Development Indicators: Foreign direct investment, net inflows (% of GDP)", "2024"],
+      ["edu/edu-female-teachers", "62.0", "World Development Indicators: Primary education, teachers (% female)", "2024"],
+      ["edu/edu-upper-secondary", "13.3", "World Development Indicators: Educational attainment, at least completed upper secondary, population 25+, total (%) (cumulative)", "2019"],
+      ["edu/edu-private-primary", "13.1", "World Development Indicators: School enrollment, primary, private (% of total primary)", "2020"],
+      ["edu/edu-upper-secondary-female", "10.6", "World Development Indicators: Educational attainment, at least completed upper secondary, population 25+, female (%) (cumulative)", "2019"],
+      ["edu/edu-trained-female-teachers", "98.0", "World Development Indicators: Trained teachers in primary education, female (% of female teachers)", "2024"],
+      ["hedu/hedu-masters", "0.2", "World Development Indicators: Educational attainment, at least completed master's or equivalent, population 25+ (%)", "2023"],
+
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {

@@ -965,6 +965,34 @@ if (!existsSync(cssPath)) {
 
   check("the live-site description states the configuration's current figures", problems);
 }
+// ---------------------------------------------------------------------------------------------
+// check 22 — real, published figures OUTNUMBER the modelled ones (the owner's locked goal)
+// The owner's locked goal (recorded 2026-10-04, PART 11 of docs/PLATFORM_ENRICHMENT_PLAN.md):
+// real, published figures must outnumber the platform's own modelled ones. The flip was reached
+// on 2026-10-05 (245 published / 235 modelled), and this gate landed with it. It fails the build
+// if the published count ever falls back to or below the modelled count, so the goal cannot be
+// silently undone by a later change. It is proved able to fail by mutation (see PROJECT_STATUS.md).
+{
+  const problems = [];
+  const deptText = readFileSync(join(ROOT, "src/config/departments.ts"), "utf8");
+  let published = 0;
+  let modelled = 0;
+  for (const line of deptText.split("\n")) {
+    if (!/\{ id: "[a-z0-9-]+", label: "/.test(line)) continue;
+    if (/basis: \{ kind: "published"/.test(line)) published += 1;
+    else if (/basis: \{ kind: "modelled"/.test(line)) modelled += 1;
+  }
+  if (published <= modelled) {
+    problems.push(
+      `the platform's real, published figures (${published}) no longer outnumber its own modelled ones (${modelled}) — the owner's locked goal (PART 11) requires published to EXCEED modelled`,
+    );
+  } else {
+    notes.push(`INFO  the owner's locked goal holds: ${published} published figures outnumber ${modelled} modelled`);
+  }
+  check("real, published figures outnumber the modelled ones (the owner's locked goal)", problems);
+}
+
+
 
 // summary
 console.log("\n" + "-".repeat(72));

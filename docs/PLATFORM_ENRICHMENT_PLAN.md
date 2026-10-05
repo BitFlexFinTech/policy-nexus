@@ -1083,13 +1083,57 @@ and the same for the stakeholder groups.
   modelled) is stated after each, so progress toward the flip is visible.
 - **Where a measure genuinely has no publisher, it is not added** — the goal never authorises an invented figure.
 
-**The gate (added once the goal is reached).** A validator check that fails the build if the **published** count
-ever falls back **below** the **modelled** count — so the goal can never silently regress. It is added **with the
-work that reaches the goal**, never before, because it would fail today by design.
+**The gate (ADDED 2026-10-05, with the flip — `scripts/validate.mjs` check 22).** A validator check that fails the
+build if the **published** count ever falls back **to or below** the **modelled** count — so the goal can never silently
+regress. It was added **with the work that reached the goal**, and was proved able to fail by mutation (one published
+row flipped to modelled → the check went red), then restored byte-identical.
 
 **Not to be re-opened.** This goal is a **locked decision**. A future session must **read it here** and continue
 the batches — never ask the owner whether to expand, and never treat the old "Item 1 is complete" line (§9.7) as
 the end of the work; that line recorded the *indicator-count and group-count* targets, not this goal.
+### 11.5 Batch 5 — THE FLIP: 34 more real indicators (2026-10-05)
+
+**Real, published figures now OUTNUMBER the modelled ones — the owner's locked goal is met for indicators.**
+
+**34 new real indicators**, every value read from the World Bank's own API this session
+(`api.worldbank.org/v2/country/ZW/indicator/<series>`). The publisher is `worldbank` for all of them, so no
+`NAMED_SOURCES` change was needed. Indicator → value → series → period:
+
+- Finance (2): `fin-reserves-usd` USD 485M (`FI.RES.TOTL.CD`, 2024) · `fin-fdi-gdp` 1.1% (`BX.KLT.DINV.WD.GD.ZS`, 2024).
+- Health (9): `health-smoking` 11.0% (`SH.PRV.SMOK`, 2024) · `health-wasting` 5.1% (`SH.STA.WAST.ZS`, 2024) ·
+  `health-polio` 91% (`SH.IMM.POL3`, 2024) · `health-hiv-young-female` 3.7% (`SH.HIV.1524.FE.ZS`, 2024) ·
+  `health-tb-detection` 60% (`SH.TBS.DTEC.ZS`, 2024) · `health-malnutrition` 9.6% (`SH.STA.MALN.ZS`, 2024) ·
+  `health-anaemia-pregnancy` 30.1% (`SH.PRG.ANEM`, 2023) · `health-infant-mortality-female` 55.8 (`SP.DYN.IMRT.FE.IN`, 2024) ·
+  `health-infant-mortality-male` 68.6 (`SP.DYN.IMRT.MA.IN`, 2024).
+- Education (5): `edu-female-teachers` 62.0% (`SE.PRM.TCHR.FE.ZS`, 2024) · `edu-upper-secondary` 13.3% (`SE.SEC.CUAT.UP.ZS`, 2019) ·
+  `edu-private-primary` 13.1% (`SE.PRM.PRIV.ZS`, 2020) · `edu-upper-secondary-female` 10.6% (`SE.SEC.CUAT.UP.FE.ZS`, 2019) ·
+  `edu-trained-female-teachers` 98.0% (`SE.PRM.TCAQ.FE.ZS`, 2024).
+- Higher Education (1): `hedu-masters` 0.2% (`SE.TER.CUAT.MS.ZS`, 2023).
+- Energy (2): `energy-fuel-exports` 2.9% (`TX.VAL.FUEL.ZS.UN`, 2024) · `energy-connection-days` 19.6 days (`IC.ELC.DURS`, 2025).
+- Public Service (7): `psc-self-employed` 70.8% (`SL.EMP.SELF.ZS`, 2025) · `psc-employers` 2.6% (`SL.EMP.MPYR.ZS`, 2025) ·
+  `psc-youth-lfp` 48.2% (`SL.TLF.ACTI.1524.ZS`, 2025) · `psc-unemployment-male` 9.2% (`SL.UEM.TOTL.MA.ZS`, 2025) ·
+  `psc-youth-unemployment-female` 16.2% (`SL.UEM.1524.FE.ZS`, 2025) · `psc-lfp-male` 74.3% (`SL.TLF.CACT.MA.ZS`, 2025) ·
+  `psc-older-female` 4.1% (`SP.POP.65UP.FE.ZS`, 2025).
+- Local Government (3): `lg-income-share-low` 4.8% (`SI.DST.FRST.20`, 2019) · `lg-income-share-high` 40.5% (`SI.DST.10TH.10`, 2019) ·
+  `lg-slum` 54.9% (`EN.POP.SLUM.UR.ZS`, 2022).
+- Foreign Affairs (3): `mfa-manufactures-imports` 58.3% (`TM.VAL.MANF.ZS.UN`, 2024) · `mfa-travel-services` 44.4% (`BX.GSR.TRVL.ZS`, 2024) ·
+  `mfa-digital-services` 8.3% (`BX.GSR.CMCP.ZS`, 2024).
+- Investment Promotion (2): `zida-manufactures-exports` 6.7% (`TX.VAL.MANF.ZS.UN`, 2024) · `zida-new-business-density` 2.8 (`IC.BUS.NDNS.ZS`, 2024).
+
+**Counts: 446 indicators (211 published / 235 modelled) → 480 (245 published / 235 modelled). The published count now
+EXCEEDS the modelled count — the locked goal is met for indicators.** The gate `src/test/indicator-basis.test.tsx` was
+raised 446 → 480 and gained the 34 recorded rows; `scripts/validate.mjs` gained **check 22** (fails if published ≤ modelled).
+
+**DEFECTS FOUND AND FIXED (same session):** two drafted figures were **withdrawn as duplicates** — the working-age
+population share (`SP.POP.1564.TO.ZS`, already the `psc-working-age` series) and total life expectancy (`SP.DYN.LE00.IN`,
+already `health-life`) — caught by reading the existing recorded set, and removed at source, so 36 were drafted and 34 stand.
+**New-publisher search (the owner's strict rule):** this session looked for a new publisher — the United Nations
+Statistics Division's SDG database API was queried but returned no Zimbabwe row for the series tried — so no new publisher
+was added this batch; finding one remains the next batch's job.
+
+**Still ahead:** the **group** half of the goal (150 groups are 20 published / 130 modelled).
+
+
 
 ### 11.4 Batch 4 — 32 more real indicators, and a new publisher (the ILO) (2026-10-05)
 
