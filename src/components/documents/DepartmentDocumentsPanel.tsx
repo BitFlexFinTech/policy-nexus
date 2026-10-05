@@ -4,16 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Department } from "@/config/departments";
 import { formatReferenceDate } from "@/config/reference";
+import { usePlatformConfig } from "@/config/usePlatformConfig";
 import { extractPolicyFile, isAcceptedPolicyFile } from "@/services/extraction/extractPolicyText";
 import {
-  addDepartmentDocument,
-  clearDepartmentDocuments,
   getDepartmentDocumentsServerSnapshot,
   getDepartmentDocumentsSnapshot,
   isDepartmentDocumentStorePersistent,
-  removeDepartmentDocument,
   subscribeToDepartmentDocuments,
 } from "@/services/documents/departmentDocuments";
+import { departmentDocumentStoreFor } from "@/services/documents/departmentDocumentStore";
 
 /**
  * A department's own documents (owner's item 3).
@@ -30,12 +29,15 @@ import {
  * read on an assessment only ever includes text that really exists.
  */
 export function DepartmentDocumentsPanel({ department }: { department: Department }) {
-  const stored = useSyncExternalStore(
+  const config = usePlatformConfig();
+  const store = departmentDocumentStoreFor(config);
+  // The subscription keeps this panel live; the seam reads the same browser copy it holds.
+  useSyncExternalStore(
     subscribeToDepartmentDocuments,
     getDepartmentDocumentsSnapshot,
     getDepartmentDocumentsServerSnapshot,
   );
-  const documents = stored.filter((document) => document.departmentId === department.id);
+  const documents = store.list(department.id);
 
   const [isReading, setIsReading] = useState(false);
   const [notices, setNotices] = useState<string[]>([]);
@@ -52,41 +54,67 @@ export function DepartmentDocumentsPanel({ department }: { department: Departmen
     const messages: string[] = [];
     for (const file of accepted) {
       const extracted = await extractPolicyFile(file);
-      addDepartmentDocument({
-        departmentId: department.id,
-        name: extracted.name,
-        sizeLabel: extracted.sizeLabel,
-        kind: extracted.kind,
-        // Only text that was really read is stored: a file recorded by name keeps an empty
-        // text, so no run can count it as material it read.
-        text: extracted.extracted ? extracted.text : "",
-        status: extracted.status,
-      });
-      messages.push(`${extracted.name} — ${extracted.status}`);
+      try {
+        await store.add({
+          departmentId: department.id,
+          name: extracted.name,
+          sizeLabel: extracted.sizeLabel,
+          kind: extracted.kind,
+          // Only text that was really read is stored: a file recorded by name keeps an empty
+          // text, so no run can count it as material it read.
+          text: extracted.extracted ? extracted.text : "",
+          status: extracted.status,
+        });
+        messages.push(`${extracted.name} — ${extracted.status}`);
+      } catch (error) {
+        // The browser copy was written; the server did not accept it. Say so rather than
+        // showing a document the department's other officers will never see.
+        messages.push(
+          `${extracted.name} — this browser kept it, but the shared library server did not accept it (${
+            error instanceof Error ? error.message : "unknown error"
+          }).`,
+        );
+      }
     }
     setNotices(messages);
     setIsReading(false);
   };
 
-  const addPasted = () => {
+  const addPasted = async () => {
     const title = pastedTitle.trim();
     const text = pastedText.trim();
     if (!title || !text) {
       setNotices(["A pasted document needs both a title and its text."]);
       return;
     }
-    addDepartmentDocument({
-      departmentId: department.id,
-      name: title,
-      sizeLabel: `${text.length} characters`,
-      kind: "text",
-      text,
-      status: "Text added directly — read in full.",
-    });
-    setPastedTitle("");
-    setPastedText("");
-    setNotices([`${title} — added and read in full.`]);
+    try {
+      await store.add({
+        departmentId: department.id,
+        name: title,
+        sizeLabel: `${text.length} characters`,
+        kind: "text",
+        text,
+        status: "Text added directly — read in full.",
+      });
+      setPastedTitle("");
+      setPastedText("");
+      setNotices([`${title} — added and read in full.`]);
+    } catch (error) {
+      setNotices([
+        `${title} — this browser kept it, but the shared library server did not accept it (${
+          error instanceof Error ? error.message : "unknown error"
+        }).`,
+      ]);
+    }
   };
+
+  /** The list changed in this browser, but the shared server refused the change. Say so. */
+  const reportLibraryFailure = (error: unknown) =>
+    setNotices([
+      `This browser updated the list, but the shared library server did not accept the change (${
+        error instanceof Error ? error.message : "unknown error"
+      }).`,
+    ]);
 
 
   return (
@@ -95,12 +123,16 @@ export function DepartmentDocumentsPanel({ department }: { department: Departmen
         This department's own documents
       </h3>
       <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-        Documents added here are read in this browser, kept for {department.shortName}, and handed to
-        every simulation the department runs — so the modelled position rests on your department's own
+        Documents added here are read by this browser and handed to every simulation{" "}
+        {department.shortName} runs — so the modelled position rests on your department's own
         material as well as on the submitted draft. {documents.length}{" "}
         {documents.length === 1 ? "document has" : "documents have"} been added.
+      </p>
+      <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">
+        <span className="font-medium text-foreground">Kept on: {store.label}.</span>{" "}
+        {store.limitation}
         {isDepartmentDocumentStorePersistent()
-          ? " They are kept in this browser, for this department."
+          ? ""
           : " This browser refused to keep data between visits, so they last only until this page is closed."}
       </p>
 
@@ -129,7 +161,7 @@ export function DepartmentDocumentsPanel({ department }: { department: Departmen
             size="sm"
             variant="ghost"
             className="h-6 text-[10px]"
-            onClick={() => clearDepartmentDocuments(department.id)}
+            onClick={() => void store.clear(department.id).catch(reportLibraryFailure)}
           >
             Remove all
           </Button>
@@ -157,7 +189,7 @@ export function DepartmentDocumentsPanel({ department }: { department: Departmen
             className="mt-1 h-8 text-xs"
           />
         </label>
-        <Button size="sm" variant="outline" className="h-8 text-xs" onClick={addPasted}>
+        <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => void addPasted()}>
           Add this document
         </Button>
       </div>
@@ -200,7 +232,7 @@ export function DepartmentDocumentsPanel({ department }: { department: Departmen
                 variant="ghost"
                 className="h-6 shrink-0 text-[10px]"
                 aria-label={`Remove ${document.name}`}
-                onClick={() => removeDepartmentDocument(document.id)}
+                onClick={() => void store.remove(document.id).catch(reportLibraryFailure)}
               >
                 <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                 Remove

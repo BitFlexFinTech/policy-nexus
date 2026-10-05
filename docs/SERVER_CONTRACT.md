@@ -138,10 +138,38 @@ The client is OIDC Authorization Code + PKCE (S256), no dependency
 The `redirect_uri` must be registered with the provider — that registration is
 outside this platform's reach.
 
-## 5. Wiring status (platform side)
+## 5. Document library service — `GET`/`POST`/`DELETE <library endpoint>`
 
-**DONE — the platform is fully wired.** The run path is asynchronous; all four capabilities —
-assessment, drafting, document text extraction and sign-in — are connected behind their seams; a
+Sent only when the library capability is live. Until one is configured, every department's
+documents stay in the browser they were added in, and the surface says so in plain words.
+
+The library is **department-scoped**: every call names the department it belongs to, so one
+department can never read another's documents.
+
+| Call | Meaning |
+|---|---|
+| `GET <endpoint>?department=<departmentId>` | **200** with `{ "documents": [ …record… ] }` — this department's documents, newest first. A non-2xx answer is shown as an empty list, never a fabricated one. |
+| `POST <endpoint>` | Body `{ "document": { departmentId, name, sizeLabel, kind, text, status } }`. **200** with `{ "document": { …record… } }`, or **204** — the id is a pure function of the department, the name and the text, so both ends derive the same one. |
+| `DELETE <endpoint>/<documentId>` | **204**. Removes one document. |
+| `DELETE <endpoint>?department=<departmentId>` | **204**. Removes every document this department added. |
+
+A record is:
+
+```json
+{ "id": "doc-…", "departmentId": "fin", "name": "draft.txt",
+  "sizeLabel": "1.2 KB", "kind": "text", "text": "…the text really read…",
+  "status": "Text extracted.", "addedAt": "2026-09-24" }
+```
+
+The platform reports a non-2xx answer as a failure on the surface — it never shows a
+document as saved when the server refused it — and it never sends a document the department
+could not really read (`text` is empty for a PDF in this build).
+
+## 6. Wiring status (platform side)
+
+**DONE — the platform is fully wired.** The run path is asynchronous; all five capabilities —
+assessment, drafting, document text extraction, the shared document library and sign-in — are
+connected behind their seams; a
 capability is only ever used when it is *completely* configured and switched on; and with nothing
 configured the platform stays simulated and makes **no request at all**. While simulated, the
 seams answer in the same render, so the screens look exactly as they always have — no spinners.

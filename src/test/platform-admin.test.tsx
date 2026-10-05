@@ -28,10 +28,10 @@ describe("platform administration screen", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "Platform administration" }),
     ).toBeInTheDocument();
-    ["Assessment service", "Drafting model", "Document text extraction", "Government sign-in (SSO)"].forEach(
+    ["Assessment service", "Drafting model", "Document text extraction", "Shared document library", "Government sign-in (SSO)"].forEach(
       (label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument(),
     );
-    expect(screen.getAllByText("simulated")).toHaveLength(4);
+    expect(screen.getAllByText("simulated")).toHaveLength(5);
     expect(screen.getByText(/Everything is simulated/)).toBeInTheDocument();
   });
 
@@ -55,7 +55,7 @@ describe("platform administration screen", () => {
     renderAt(ADMIN_ROUTE);
     fireEvent.click(screen.getByRole("switch", { name: "Assessment service runs live" }));
     expect(screen.getAllByText("misconfigured")).toHaveLength(1);
-    expect(screen.getAllByText("simulated")).toHaveLength(3);
+    expect(screen.getAllByText("simulated")).toHaveLength(4);
     expect(screen.queryAllByText("live")).toHaveLength(0);
   });
 

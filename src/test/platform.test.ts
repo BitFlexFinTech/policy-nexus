@@ -27,6 +27,7 @@ const complete = (): PlatformConfig => ({
   assessment: service(),
   drafting: service(),
   extraction: service(),
+  library: service(),
   sso: { mode: "live", issuer: IDP, clientId: "client-1", redirectUri: CALLBACK, departmentClaim: "department_id" },
 });
 
@@ -132,6 +133,25 @@ describe("platform configuration", () => {
     expect(isAbsoluteHttpUrl("")).toBe(false);
     expect(isAbsoluteHttpUrl("/assess")).toBe(false);
     expect(isAbsoluteHttpUrl("just words")).toBe(false);
+  });
+
+  it("keeps the shared document library off until it is completely configured", () => {
+    // Off by default: nothing is shared until an administrator configures a server.
+    expect(describeCapability(getConfig(), "library").state).toBe("simulated");
+    expect(describeCapability(getConfig(), "library").detail).toMatch(/this browser only/);
+
+    saveConfig({
+      ...DEFAULT_PLATFORM_CONFIG,
+      library: { mode: "live", endpoint: LOCAL, key: "", model: "" },
+    });
+    expect(describeCapability(getConfig(), "library").state).toBe("misconfigured");
+
+    saveConfig({
+      ...DEFAULT_PLATFORM_CONFIG,
+      library: { mode: "live", endpoint: LOCAL, key: "k", model: "" },
+    });
+    expect(describeCapability(getConfig(), "library").state).toBe("live");
+    expect(liveService("library")).toMatchObject({ endpoint: LOCAL, key: "k" });
   });
 
   it("defines the administration address in one place", () => {

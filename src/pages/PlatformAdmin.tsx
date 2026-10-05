@@ -17,7 +17,7 @@ import { platformConfigActions, usePlatformConfig } from "@/config/usePlatformCo
 import { clearRuns } from "@/services/assessment/runStore";
 import { clearSession } from "@/session/session";
 
-const SERVICE_CAPABILITIES = ["assessment", "drafting", "extraction"] as const;
+const SERVICE_CAPABILITIES = ["assessment", "drafting", "extraction", "library"] as const;
 
 /**
  * Platform administration — where capability credentials are entered.
@@ -136,6 +136,10 @@ export default function PlatformAdmin() {
             <li>
               Document text extraction for PDF and DOCX is server-side; a browser cannot read those
               formats.
+            </li>
+            <li>
+              A shared document library needs its own server. Until one is configured, a department's
+              documents stay in the browser they were added in and are shared with nobody.
             </li>
             <li>
               Sign-in needs an identity-provider registration — issuer, client ID and redirect

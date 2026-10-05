@@ -21,7 +21,7 @@
 
 import { createKeyValueStore } from "@/lib/browserStorage";
 
-export type CapabilityId = "assessment" | "drafting" | "extraction" | "sso";
+export type CapabilityId = "assessment" | "drafting" | "extraction" | "library" | "sso";
 export type CapabilityMode = "simulated" | "live";
 
 /** A service capability reached over HTTP. */
@@ -51,6 +51,8 @@ export interface PlatformConfig {
   assessment: CapabilityConfig;
   drafting: CapabilityConfig;
   extraction: CapabilityConfig;
+  /** The shared document-library server. Off by default: documents stay in the browser. */
+  library: CapabilityConfig;
   sso: SsoConfig;
 }
 
@@ -70,6 +72,7 @@ export const CAPABILITY_IDS: readonly CapabilityId[] = [
   "assessment",
   "drafting",
   "extraction",
+  "library",
   "sso",
 ];
 
@@ -77,6 +80,7 @@ export const CAPABILITY_LABELS: Record<CapabilityId, string> = {
   assessment: "Assessment service",
   drafting: "Drafting model",
   extraction: "Document text extraction",
+  library: "Shared document library",
   sso: "Government sign-in (SSO)",
 };
 
@@ -87,6 +91,7 @@ export const DEFAULT_PLATFORM_CONFIG: PlatformConfig = {
   assessment: { ...SIMULATED },
   drafting: { ...SIMULATED },
   extraction: { ...SIMULATED },
+  library: { ...SIMULATED },
   sso: { mode: "simulated", issuer: "", clientId: "", redirectUri: "", departmentClaim: "department_id" },
 };
 
@@ -129,6 +134,7 @@ export const normaliseConfig = (value: unknown): PlatformConfig => {
     assessment: normaliseService(record.assessment, DEFAULT_PLATFORM_CONFIG.assessment),
     drafting: normaliseService(record.drafting, DEFAULT_PLATFORM_CONFIG.drafting),
     extraction: normaliseService(record.extraction, DEFAULT_PLATFORM_CONFIG.extraction),
+    library: normaliseService(record.library, DEFAULT_PLATFORM_CONFIG.library),
     sso: {
       mode: asMode(sso.mode, "simulated"),
       issuer: asString(sso.issuer, ""),
@@ -254,7 +260,10 @@ export const describeCapability = (
     return {
       id,
       state: "simulated",
-      detail: "Simulated. Results are computed locally and labelled as simulated.",
+      detail:
+        id === "library"
+          ? "Off. Documents are kept in this browser only and are not shared with anyone else."
+          : "Simulated. Results are computed locally and labelled as simulated.",
     };
   }
   const missing: string[] = [];

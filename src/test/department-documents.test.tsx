@@ -171,6 +171,8 @@ describe("a department's own documents feed its runs (owner's item 3)", () => {
     expect(await screen.findByText("strategy.txt")).toBeInTheDocument();
     expect(await screen.findByText(/Text extracted\. \d+ characters will be read/)).toBeInTheDocument();
     expect(screen.getByText(/1 document has been added/)).toBeInTheDocument();
+    // The surface states plainly that it is the browser-only Local library (Batch 3).
+    expect(screen.getByText(/Kept on: This browser \(Local\)/)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Remove strategy.txt" }));
     expect(screen.queryByText("strategy.txt")).not.toBeInTheDocument();
