@@ -3166,12 +3166,12 @@ token with `truncate` and a `title` so a long Act title cannot widen the 56-unit
 `src/pages/Documents.tsx` — the same sort, and the caption reads `Prepared under <citation>`.
 `src/components/documents/RecordedDocumentDialog.tsx` — a `Prepared under` row is pushed into the dialog's
 own row list from the same derived label, so the rail and the detail can never disagree.
-`src/pages/Reference.tsx` — every one of the 36 groups now shows its share, its base and its source; a group
+`src/pages/Reference.tsx` — every one of the 150 groups now shows its share, its base and its source; a group
 with a published figure reads `Share: <n>% of <base> · <source>`, and one without reads
 `Share: Modelled — no official figure, so the modelling weight is not a published share`, built from the
 exported `MODELLED_SHARE_LABEL`; a one-line caption above the list explains the two kinds.
 **Tests:** `src/test/workspace.test.tsx` (29 → **32** gates: the rail and the dialog for every Finance
-document; the Documents screen for every Health document; and the Reference screen for **all 36** groups,
+document; the Documents screen for every Health document; and the Reference screen for **all 150** groups,
 asserting each published line exactly and the exact `Modelled` line for each modelled group), and
 `e2e/journey.spec.ts` (the registers journey now asserts the citation in the real rail and in the dialog).
 **Not changed, deliberately:** the emerald/gold palette, Inter + JetBrains Mono, `src/components/ui/**`,
@@ -4501,9 +4501,9 @@ confirm it.
   Everything is committed, so a cold session can start from this file alone.
 - **What to do next: the owner's ELEVEN-item list is now the authority — see the section of that name
   near the top of this file.** **All eleven are now done**, and item 11 is the one that had to be
-  corrected and rebuilt on 2026-09-30, then expanded again on 2026-10-02: every department now models **24**
-  groups drawn from a **72**-group national list (the indicator set rose to **160**, ten per department, then
-  to **320**, twenty per department, on 2026-10-04),
+  corrected and rebuilt on 2026-09-30, then expanded again on 2026-10-02: every department now models **40**
+  groups drawn from a **150**-group national list (the indicator set rose from 63 to 160, then 320, then to
+  **414** with the real-data batches of 2026-10-04 and 2026-10-05 — **179 published / 235 `Modelled`**),
   the dashboard and Reference labels were separated, and a browser gate reads the figure off the page.
   Item 5's strip carries labels the
   assistant chose rather than the owner's words; that is the only item whose *wording* is not the owner's.
