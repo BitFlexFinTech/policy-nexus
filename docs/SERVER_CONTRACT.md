@@ -100,7 +100,7 @@ what a draft is allowed to rest on. `prompt.citations` is the closed list a draf
 **The structure now follows the Zimbabwean reading order** (front matter · eleven numbered
 clauses · five annexes · closing note — see `POLICY_DRAFT_STRUCTURE` in
 `src/config/draftingPrompts.ts`), and a service must return **every** part: the local generator
-produces 5,770–6,491 words per department, and a document that is thinner than that is not the
+produces 8,191–12,477 words per department (measured 2026-10-05), and a document that is thinner than that is not the
 instrument this platform promises. A service that returns a shorter document is not refused —
 the platform renders what it is given — but the length and structure gates in
 `src/test/policy-document.test.ts` hold the *local* generator to it, so a regression there

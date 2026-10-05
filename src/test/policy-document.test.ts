@@ -65,12 +65,15 @@ const REQUIRED_ORDER = [
 ];
 
 /**
- * The floor the user set — "5 or 10 pages" is the minimum a policy may be — expressed in
- * words so a build can enforce it. Measured across all 16 departments when the Zimbabwean
- * structure landed (2026-09-29): 5,770 to 6,491 words each, so the floor sits just under
- * the smallest of them: any change that drops a clause, an annex or a matrix fails here.
+ * THE LENGTH FLOOR IS GROUNDED — set to what the platform ACTUALLY produces, measured, never to a
+ * target that would force padded or invented content (the owner's rule, 2026-10-05).
+ *
+ * Measured across all 16 departments on 2026-10-05 by running the generator: **8,191 to 12,477
+ * words each** (smallest `zimra`, largest `health`). The floor sits just under the smallest — 8,191 —
+ * so any change that drops a clause, an annex, a matrix or a department's indicators fails here. As
+ * more real data is added the floor rises WITH the measured minimum; it is never raised by hand.
  */
-const WORD_FLOOR = 5000;
+const WORD_FLOOR = 8000;
 
 const words = (text: string) => text.trim().split(/\s+/).length;
 
@@ -89,6 +92,26 @@ describe("the drafted policy — a Zimbabwean instrument, not a summary", () => 
     expect(counted, `${department.abbr} produced only ${counted} words`).toBeGreaterThanOrEqual(
       WORD_FLOOR,
     );
+  });
+
+  /**
+   * THE FLOOR IS GROUNDED, NOT ASPIRATIONAL. The owner's rule (2026-10-05): the minimum must be what
+   * the platform can honestly produce, so the floor may never exceed the smallest department's real
+   * output — a floor above reality could only be satisfied by padding. This measures every department
+   * afresh and fails if the floor is raised above what is really produced, or if a real regression
+   * drops a department below it.
+   */
+  it("keeps the floor grounded — never above the smallest department's real output", async () => {
+    const counts = await Promise.all(
+      DEPARTMENTS.map(async (department) =>
+        words(renderDocumentText(buildPolicyDraft(await runFor(department.id), department))),
+      ),
+    );
+    const smallest = Math.min(...counts);
+    expect(
+      WORD_FLOOR,
+      `the floor (${WORD_FLOOR}) must not exceed the smallest real output (${smallest}) — a floor above reality would force padding`,
+    ).toBeLessThanOrEqual(smallest);
   });
 
   it("lists every numbered clause and annex in its contents, and nothing else", async () => {
