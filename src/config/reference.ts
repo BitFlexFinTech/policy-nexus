@@ -135,6 +135,27 @@ export const NAMED_SOURCES = [
       "Labour-market estimates — the employment-to-population ratio, labour force participation and unemployment, by sex and age group",
     publication: "ILO modelled estimates (ILOSTAT), as compiled in the World Development Indicators",
   },
+  {
+    id: "transparency-intl",
+    name: "Transparency International",
+    figures:
+      "The Corruption Perceptions Index — independent experts' and business leaders' rating of corruption in the public sector, scored out of 100",
+    publication: "Corruption Perceptions Index",
+  },
+  {
+    id: "rsf",
+    name: "Reporters Without Borders (RSF)",
+    figures: "The World Press Freedom Index — the country's standing on press freedom, scored out of 100",
+    publication: "World Press Freedom Index",
+  },
+  {
+    id: "undp",
+    name: "United Nations Development Programme (UNDP)",
+    figures:
+      "The Human Development Index — a single measure combining life expectancy, education and income",
+    publication: "Human Development Report",
+  },
+
 ] as const;
 
 export type NamedSourceId = (typeof NAMED_SOURCES)[number]["id"];

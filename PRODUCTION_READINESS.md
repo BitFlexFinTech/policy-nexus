@@ -100,18 +100,18 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-05, after the PART 11 batch-6 build — the flip widened to 260 / 235 — was published; the host and the working copy are IN STEP).**
+- **Status today (2026-10-05, after the PART 11 batch-7 build — three new publishers, 275 / 235 — was published; the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-D9HMi4eq.js` (`af0ec92f10d0ee90477103c2b86de181cdf7366c693df9a37bf43f20c77a0ddf`) — fetched
+  `assets/index-DKrCA8nC.js` (`9e65c7d7eaeabb63db58cbcca3d4ec938eaf16021e6a751ec1bbfbf58d3ac311`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
   explicit FTPS, **never `--delete`** — 1 new file and 12 modified, 1,468,815 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
-  expansion and the 2026-10-04 dataset-expansion batches 1–4 and the PART 11 batches 1–5 (the last being the flip) — **150** canonical stakeholder groups, every
-  department modelling **40** of them, and **495** reference indicators (twenty or more per department, of which
-  **260 are published figures and 235 are `Modelled`**). **LOCKED GOAL MET (owner, recorded 2026-10-04; reached 2026-10-05): real,
-  published figures now OUTNUMBER the `Modelled` ones — **260 published to 235 modelled** (the group goal, 20 published /
+  expansion and the 2026-10-04 dataset-expansion batches 1–4 and the PART 11 batches 1–7 — **150** canonical stakeholder groups, every
+  department modelling **40** of them, and **510** reference indicators (twenty or more per department, of which
+  **275 are published figures and 235 are `Modelled`**). **LOCKED GOAL MET (owner, recorded 2026-10-04; reached 2026-10-05): real,
+  published figures now OUTNUMBER the `Modelled` ones — **275 published to 235 modelled** (the group goal, 20 published /
   130 modelled groups, is still ahead). `npm run validate` now fails the build if the published figure count ever falls
   back to or below the modelled count, so the goal cannot be silently undone; the batches are in `docs/PLATFORM_ENRICHMENT_PLAN.md` PART 11.** It also carries the recommended-step actions (*Open what answers this*,
   *Download this part*) and the **Implementation pack** (generated, read-only). The form that used to ask

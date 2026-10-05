@@ -1091,6 +1091,58 @@ row flipped to modelled → the check went red), then restored byte-identical.
 **Not to be re-opened.** This goal is a **locked decision**. A future session must **read it here** and continue
 the batches — never ask the owner whether to expand, and never treat the old "Item 1 is complete" line (§9.7) as
 the end of the work; that line recorded the *indicator-count and group-count* targets, not this goal.
+### 11.7 Batch 7 — THREE new publishers, and 15 more real indicators (2026-10-05)
+
+**The owner's strict rule is that the source list must keep expanding — never cap it — and, since batch 6, that a
+publisher is only written off after every sourcing door has been tried.** This batch **added three publishers the
+platform never used before**, each figure read from the publisher's own source this session:
+
+- **Transparency International** — the Corruption Perceptions Index: Zimbabwe **22** out of 100 (2025).
+- **Reporters Without Borders (RSF)** — the World Press Freedom Index: Zimbabwe **44.37** out of 100 (2026).
+- **United Nations Development Programme (UNDP)** — the Human Development Index: Zimbabwe **0.598** (2023). The
+  figure was located on Our World in Data, which names UNDP as its source, so it is cited to UNDP.
+
+**12 World Bank series** were also added, every value read from the World Bank's own API this session
+(`api.worldbank.org/v2/country/ZW/indicator/<series>`): `fin-broad-money` 11.2% (`FM.LBL.BMNY.GD.ZS`, 2023) ·
+`fin-lending-rate` 46.36% (`FR.INR.LEND`, 2025) · `health-nurses` 3.071 (`SH.MED.NUMW.P3`, 2022) ·
+`health-smoking-female` 1.0% (`SH.PRV.SMOK.FE`, 2024) · `health-smoking-male` 21.0% (`SH.PRV.SMOK.MA`, 2024) ·
+`health-ors-treatment` 45.6% (`SH.STA.ORCF.ZS`, 2019) · `health-adolescent-fertility` 95.5 (`SP.ADO.TFRT`, 2024) ·
+`health-art-coverage` 95% (`SH.HIV.ARTC.ZS`, 2024) · `edu-preprimary` 74.3% (`SE.PRE.ENRR`, 2021) ·
+`ict-mobile` 94.2 (`IT.CEL.SETS.P2`, 2024) · `env-co2-percapita` 0.77 t (`EN.GHG.CO2.PC.CE.AR5`, 2024) ·
+`opc-homicides` 6.76 (`VC.IHR.PSRC.P5`, 2022).
+
+**Counts: 495 indicators (260 published / 235 modelled) → 510 (275 published / 235 modelled) — the margin is now 40.**
+The gate `src/test/indicator-basis.test.tsx` was raised 495 → 510, gained the 15 recorded rows, and gained three
+source overrides (`opc-corruption-perceptions` → `transparency-intl`, `opc-press-freedom` → `rsf`, `opc-hdi` → `undp`).
+`scripts/validate.mjs` check 22 still passes. The named-source list now holds **17 bodies**.
+
+**Not yet converted:** the group half of the goal (150 groups — 20 published / 130 modelled) is unchanged and still
+awaits the owner's decision, because most modelled groups are niche segments no publisher counts.
+
+**DEFECT FOUND AND FIXED (same session):** a drafted figure — tuberculosis incidence (`SH.TBS.INCD`, 203) — was
+**withdrawn as a duplicate** of the existing `health-tb-incidence` (added in batch 2, same series and value), and
+replaced with **diarrhoea treatment** (children under five receiving oral rehydration, `SH.STA.ORCF.ZS`, 45.6 %,
+2019), so 15 additions stand and the duplicate is caught by the `departments.test.ts` unique-id gate.
+
+### 11.6 Batch 6 — 15 more real indicators (2026-10-05)
+
+**15 more real indicators**, every value read from the World Bank's own API this session
+(`api.worldbank.org/v2/country/ZW/indicator/<series>`): Finance (debt service) · Agriculture (total fisheries
+production) · Health (government health spending per person; iodised salt; vitamin A; survival to age 65 by sex) ·
+Education (youth literacy by sex) · Energy (urban electricity access) · Public Service (employment-to-population
+ratio by sex; young men's unemployment) · Local Government (poverty headcount at $8.30 a day) · Investment
+Promotion (high-technology exports). Every series is a World Bank one, so no `NAMED_SOURCES` change was needed.
+
+**Counts: 480 indicators (245 published / 235 modelled) → 495 (260 published / 235 modelled) — the margin is now 25.**
+The gate `src/test/indicator-basis.test.tsx` was raised 480 → 495 and gained the 15 recorded rows.
+
+**New-publisher search (the owner's strict rule):** this session looked for a new publisher but the doors tried
+answered poorly — FAOSTAT now requires a login; UNCTAD, ITU, the AfDB and UNAIDS returned 403/404; UNdata returned
+404; and the UN SDG database and UNICEF's SDMX had no usable Zimbabwe value for the series tried — **so no new
+publisher was added, and nothing was invented.** (This was the report that led the owner to strengthen the sourcing
+rule with the *try every door* method; batch 7, using that method, added three.)
+
+
 ### 11.5 Batch 5 — THE FLIP: 34 more real indicators (2026-10-05)
 
 **Real, published figures now OUTNUMBER the modelled ones — the owner's locked goal is met for indicators.**

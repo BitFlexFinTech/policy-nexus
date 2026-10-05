@@ -79,8 +79,8 @@ describe("department indicators — published with a named source, or plainly mo
     clearSession();
   });
 
-  it("gives every one of the 495 indicators a basis, and no free text that reads as a source", () => {
-    expect(EVERY).toHaveLength(495);
+  it("gives every one of the 510 indicators a basis, and no free text that reads as a source", () => {
+    expect(EVERY).toHaveLength(510);
     EVERY.forEach(({ department, indicator }) => {
       const where = `${department.id}/${indicator.id}`;
       expect(["published", "modelled"], `${where} basis`).toContain(indicator.basis.kind);
@@ -304,6 +304,13 @@ describe("department indicators — published with a named source, or plainly mo
       // sources; the employment-to-population ratio below is an ILO modelled estimate
       // (the WDI series states it is an ILO estimate) rather than a World Bank series.
       "psc/psc-emp-ratio": "ilo",
+      // 2026-10-05 — PART 11, batch 7: three new publishers join the named sources.
+      // Transparency International's Corruption Perceptions Index, Reporters Without
+      // Borders' World Press Freedom Index and the UNDP Human Development Index are not
+      // World Bank series, so each is attributed to the body that publishes it.
+      "opc/opc-corruption-perceptions": "transparency-intl",
+      "opc/opc-press-freedom": "rsf",
+      "opc/opc-hdi": "undp",
     };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
@@ -675,8 +682,27 @@ describe("department indicators — published with a named source, or plainly mo
       ["psc/psc-youth-unemployment-male", "15.0", "World Development Indicators: Unemployment, youth male (% of male labor force ages 15-24) (modeled ILO estimate)", "2025"],
       ["lg/lg-poverty-upper", "86.2", "World Development Indicators: Poverty headcount ratio at $8.30 a day (2021 PPP) (% of population)", "2019"],
       ["zida/zida-high-tech-exports", "2.8", "World Development Indicators: High-technology exports (% of manufactured exports)", "2024"],
-
-
+      // 2026-10-05 — PART 11, batch 7: 15 more real indicators. Twelve are World Bank
+      // series, each value read from the World Bank's own API this session; the last
+      // three are the platform's three NEW publishers — Transparency International's
+      // Corruption Perceptions Index, Reporters Without Borders' World Press Freedom
+      // Index (each publisher's own site), and the UNDP Human Development Index (whose
+      // value is pictured by Our World in Data, which names UNDP as its source).
+      ["fin/fin-broad-money", "11.2", "World Development Indicators: Broad money (% of GDP)", "2023"],
+      ["fin/fin-lending-rate", "46.36", "World Development Indicators: Lending interest rate (%)", "2025"],
+      ["health/health-nurses", "3.071", "World Development Indicators: Nurses and midwives (per 1,000 people)", "2022"],
+      ["health/health-smoking-female", "1.0", "World Development Indicators: Prevalence of current tobacco use, females (% of female adults)", "2024"],
+      ["health/health-smoking-male", "21.0", "World Development Indicators: Prevalence of current tobacco use, males (% of male adults)", "2024"],
+      ["health/health-ors-treatment", "45.6", "World Development Indicators: Diarrhea treatment (% of children under 5 receiving oral rehydration and continued feeding)", "2019"],
+      ["health/health-adolescent-fertility", "95.5", "World Development Indicators: Adolescent fertility rate (births per 1,000 women ages 15-19)", "2024"],
+      ["health/health-art-coverage", "95", "World Development Indicators: Antiretroviral therapy coverage (% of people living with HIV)", "2024"],
+      ["edu/edu-preprimary", "74.3", "World Development Indicators: School enrollment, preprimary (% gross)", "2021"],
+      ["ict/ict-mobile", "94.2", "World Development Indicators: Mobile cellular subscriptions (per 100 people)", "2024"],
+      ["env/env-co2-percapita", "0.77", "World Development Indicators: Carbon dioxide (CO2) emissions excluding LULUCF per capita (t CO2e/capita)", "2024"],
+      ["opc/opc-homicides", "6.76", "World Development Indicators: Intentional homicides (per 100,000 people)", "2022"],
+      ["opc/opc-corruption-perceptions", "22", "Corruption Perceptions Index (Transparency International)", "2025"],
+      ["opc/opc-press-freedom", "44.37", "World Press Freedom Index (Reporters Without Borders)", "2026"],
+      ["opc/opc-hdi", "0.598", "Human Development Report (United Nations Development Programme)", "2023"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {
