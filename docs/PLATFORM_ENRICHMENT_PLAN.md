@@ -1091,6 +1091,46 @@ work that reaches the goal**, never before, because it would fail today by desig
 the batches — never ask the owner whether to expand, and never treat the old "Item 1 is complete" line (§9.7) as
 the end of the work; that line recorded the *indicator-count and group-count* targets, not this goal.
 
+### 11.4 Batch 4 — 32 more real indicators, and a new publisher (the ILO) (2026-10-05)
+
+**The owner's strict rule (2026-10-05): the source list must keep expanding — never cap it.** Batch 4 **added a new
+publisher** and **32 new real indicators**. Every value was read from the World Bank's own API this session
+(`api.worldbank.org/v2/country/ZW/indicator/<series>`).
+
+**New publisher — the International Labour Organization** (`NAMED_SOURCES` gained `ilo`, name "International Labour
+Organization (ILO)"): `psc-emp-ratio` **61.4%** (employment-to-population ratio, 15+, 2025 — an ILO modelled estimate).
+
+**World Bank World Development Indicators — 31 figures** (indicator → value → series → period):
+- Finance (1): `fin-gni-capita` USD 2,660 (`NY.GNP.PCAP.CD`, 2025).
+- Agriculture (1): `agri-raw-exports` 0.9% of merchandise exports (`TX.VAL.AGRI.ZS.UN`, 2024).
+- Health (6): `health-hepb` 91% (`SH.IMM.HEPB`, 2024) · `health-life-female` 65.3 years (`SP.DYN.LE00.FE.IN`, 2024) ·
+  `health-life-male` 60.5 years (`SP.DYN.LE00.MA.IN`, 2024) · `health-undernourished` 19.7% (`SN.ITK.DEFC.ZS`, 2023) ·
+  `health-ncd-share` 38.3% (`SH.DTH.NCOM.ZS`, 2021) · `health-overweight` 4.3% (`SH.STA.OWGH.ZS`, 2024).
+- Education (4): `edu-spend-share` 17.9% (`SE.XPD.TOTL.GB.ZS`, 2025) · `edu-parity` 0.97 (`SE.ENR.PRSC.FM.ZS`, 2013) ·
+  `edu-private-secondary` 77.4% (`SE.SEC.PRIV.ZS`, 2012) · `edu-bachelors` 1.1% (`SE.TER.CUAT.BA.ZS`, 2023).
+- Higher Education (1): `hedu-patents` 8 (`IP.PAT.RESD`, 2016).
+- Energy (2): `energy-intensity` 14.8 (`EG.EGY.PRIM.PP.KD`, 2021) · `energy-alt-nuclear` 4.1% (`EG.USE.COMM.CL.ZS`, 2023).
+- Public Service (7): `psc-fertility` 3.67 (`SP.DYN.TFRT.IN`, 2024) · `psc-birth-rate` 29.9 (`SP.DYN.CBRT.IN`, 2024) ·
+  `psc-death-rate` 7.5 (`SP.DYN.CDRT.IN`, 2024) · `psc-pop-density` 42.2 (`EN.POP.DNST`, 2023) · `psc-older-share` 3.6%
+  (`SP.POP.65UP.TO.ZS`, 2025) · `psc-children-share` 40.3% (`SP.POP.0014.TO.ZS`, 2025) · `psc-unemployment-female` 9.4%
+  (`SL.UEM.TOTL.FE.ZS`, 2025).
+- Local Government (3): `lg-urban-population` 6,864,246 (`SP.URB.TOTL`, 2025) · `lg-gini` 50.3 (`SI.POV.GINI`, 2019) ·
+  `lg-poverty` 49.2% (`SI.POV.DDAY`, 2019).
+- Foreign Affairs (2): `mfa-tourism-share` 1.3% (`ST.INT.RCPT.XP.ZS`, 2020) · `mfa-imports-gdp` 23.4% (`NE.IMP.GNFS.ZS`, 2024).
+- Environment (2): `env-mammals` 10 (`EN.MAM.THRD.NO`, 2022) · `env-birds` 22 (`EN.BIR.THRD.NO`, 2022).
+- Office of the President and Cabinet (1): `opc-women-parliament` 30.1% (`SG.GEN.PARL.ZS`, 2025).
+- Investment Promotion (1): `zida-tech-manufacturing` 9.6% (`NV.MNF.TECH.ZS.UN`, 2022).
+
+**Counts: 414 indicators (179 published / 235 modelled) → 446 (211 published / 235 modelled).** The gate
+`src/test/indicator-basis.test.tsx` was raised 414 → 446 and gained the 32 recorded rows plus the `ilo` override; the
+reference gate gained the `ilo` source automatically (it iterates `NAMED_SOURCES`). **Distance to the flip: the gap is
+235 − 211 = 24, so 25 more additions (or 12 conversions) would take real past modelled.**
+
+**DEFECTS FOUND AND FIXED (same session):** (1) the drafted **fixed broadband** figure was **withdrawn as a duplicate**
+of the existing `ict-broadband` (same series, same value); (2) the drafted **primary completion** figure was
+**withdrawn as a duplicate** of the existing `edu-transition` (same series, same value). Both were caught by reading
+the existing recorded set before moving the data, and removed at source — so 34 were drafted and 32 stand.
+
 ### 11.3 Batch 3 — 52 more real indicators, and a new publisher (UN Comtrade) (2026-10-05)
 
 **The owner's strict rule (2026-10-05): the source list must keep expanding — never cap it; every round must look for

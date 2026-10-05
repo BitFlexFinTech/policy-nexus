@@ -79,8 +79,8 @@ describe("department indicators — published with a named source, or plainly mo
     clearSession();
   });
 
-  it("gives every one of the 414 indicators a basis, and no free text that reads as a source", () => {
-    expect(EVERY).toHaveLength(414);
+  it("gives every one of the 446 indicators a basis, and no free text that reads as a source", () => {
+    expect(EVERY).toHaveLength(446);
     EVERY.forEach(({ department, indicator }) => {
       const where = `${department.id}/${indicator.id}`;
       expect(["published", "modelled"], `${where} basis`).toContain(indicator.basis.kind);
@@ -300,6 +300,10 @@ describe("department indicators — published with a named source, or plainly mo
       // Nations by the national customs authority rather than being World Bank series.
       "mfa/mfa-goods-exports": "comtrade",
       "mfa/mfa-goods-imports": "comtrade",
+      // 2026-10-05 — PART 11, batch 4: the International Labour Organization joins the named
+      // sources; the employment-to-population ratio below is an ILO modelled estimate
+      // (the WDI series states it is an ILO estimate) rather than a World Bank series.
+      "psc/psc-emp-ratio": "ilo",
     };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
@@ -575,6 +579,42 @@ describe("department indicators — published with a named source, or plainly mo
       ["def/def-spending-budget", "1.3", "World Development Indicators: Military expenditure (% of central government expenditure)", "2024"],
       ["def/def-personnel-share", "0.88", "World Development Indicators: Armed forces personnel (% of total labor force)", "2020"],
       ["zida/zida-manufacturing", "14.9", "World Development Indicators: Manufacturing, value added (% of GDP)", "2025"],
+      // 2026-10-05 — PART 11, batch 4: 32 more real indicators, each read from the World Bank's
+      // own API this session (the employment-to-population ratio is an ILO series, named above).
+      // Two drafted figures — fixed broadband and primary completion — were withdrawn in the
+      // same session as duplicates of the existing ict-broadband and edu-transition.
+      ["fin/fin-gni-capita", "2,660", "World Development Indicators: GNI per capita, Atlas method (current US$)", "2025"],
+      ["agri/agri-raw-exports", "0.9", "World Development Indicators: Agricultural raw materials exports (% of merchandise exports)", "2024"],
+      ["health/health-hepb", "91", "World Development Indicators: Immunization, HepB3 (% of one-year-old children)", "2024"],
+      ["health/health-life-female", "65.3", "World Development Indicators: Life expectancy at birth, female (years)", "2024"],
+      ["health/health-life-male", "60.5", "World Development Indicators: Life expectancy at birth, male (years)", "2024"],
+      ["health/health-undernourished", "19.7", "World Development Indicators: Prevalence of undernourishment (% of population)", "2023"],
+      ["health/health-ncd-share", "38.3", "World Development Indicators: Cause of death, by non-communicable diseases (% of total)", "2021"],
+      ["health/health-overweight", "4.3", "World Development Indicators: Prevalence of overweight, weight for height (% of children under 5)", "2024"],
+      ["edu/edu-spend-share", "17.9", "World Development Indicators: Government expenditure on education, total (% of government expenditure)", "2025"],
+      ["edu/edu-parity", "0.97", "World Development Indicators: School enrollment, primary and secondary (gross), gender parity index (GPI)", "2013"],
+      ["edu/edu-private-secondary", "77.4", "World Development Indicators: School enrollment, secondary, private (% of total secondary)", "2012"],
+      ["edu/edu-bachelors", "1.1", "World Development Indicators: Educational attainment, at least Bachelor's or equivalent, population 25+, total (%)", "2023"],
+      ["hedu/hedu-patents", "8", "World Development Indicators: Patent applications, residents", "2016"],
+      ["energy/energy-intensity", "14.8", "World Development Indicators: Energy intensity level of primary energy (MJ/$2021 PPP GDP)", "2021"],
+      ["energy/energy-alt-nuclear", "4.1", "World Development Indicators: Alternative and nuclear energy (% of total energy use)", "2023"],
+      ["psc/psc-emp-ratio", "61.4", "ILO modelled estimates: Employment-to-population ratio, 15+, total", "2025"],
+      ["psc/psc-fertility", "3.67", "World Development Indicators: Fertility rate, total (births per woman)", "2024"],
+      ["psc/psc-birth-rate", "29.9", "World Development Indicators: Birth rate, crude (per 1,000 people)", "2024"],
+      ["psc/psc-death-rate", "7.5", "World Development Indicators: Death rate, crude (per 1,000 people)", "2024"],
+      ["psc/psc-pop-density", "42.2", "World Development Indicators: Population density (people per sq. km of land area)", "2023"],
+      ["psc/psc-older-share", "3.6", "World Development Indicators: Population ages 65 and above (% of total population)", "2025"],
+      ["psc/psc-children-share", "40.3", "World Development Indicators: Population ages 0-14 (% of total population)", "2025"],
+      ["psc/psc-unemployment-female", "9.4", "World Development Indicators: Unemployment, female (% of female labor force) (modeled ILO estimate)", "2025"],
+      ["lg/lg-urban-population", "6,864,246", "World Development Indicators: Urban population", "2025"],
+      ["lg/lg-gini", "50.3", "World Development Indicators: Gini index", "2019"],
+      ["lg/lg-poverty", "49.2", "World Development Indicators: Poverty headcount ratio at $3.00 a day (2021 PPP) (% of population)", "2019"],
+      ["mfa/mfa-tourism-share", "1.3", "World Development Indicators: International tourism, receipts (% of total exports)", "2020"],
+      ["mfa/mfa-imports-gdp", "23.4", "World Development Indicators: Imports of goods and services (% of GDP)", "2024"],
+      ["env/env-mammals", "10", "World Development Indicators: Mammal species, threatened", "2022"],
+      ["env/env-birds", "22", "World Development Indicators: Bird species, threatened", "2022"],
+      ["opc/opc-women-parliament", "30.1", "World Development Indicators: Proportion of seats held by women in national parliaments (%)", "2025"],
+      ["zida/zida-tech-manufacturing", "9.6", "World Development Indicators: Medium and high-tech manufacturing value added (% manufacturing value added)", "2022"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {

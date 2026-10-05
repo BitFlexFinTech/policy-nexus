@@ -128,6 +128,13 @@ export const NAMED_SOURCES = [
       "Merchandise trade reported to the United Nations by the national customs authority — total exports and imports, and the same broken down by commodity and trading partner",
     publication: "UN Comtrade Database — annual merchandise trade statistics",
   },
+  {
+    id: "ilo",
+    name: "International Labour Organization (ILO)",
+    figures:
+      "Labour-market estimates — the employment-to-population ratio, labour force participation and unemployment, by sex and age group",
+    publication: "ILO modelled estimates (ILOSTAT), as compiled in the World Development Indicators",
+  },
 ] as const;
 
 export type NamedSourceId = (typeof NAMED_SOURCES)[number]["id"];
