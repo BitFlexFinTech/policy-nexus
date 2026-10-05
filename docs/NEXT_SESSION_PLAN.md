@@ -97,8 +97,11 @@ served file byte-identical, `npm run sync:check`, refresh the review zip. Never 
   `scripts/validate.mjs` check 24 (mutation-proved). Tests: 529/529 (new `src/test/policy-documents.test.ts`) and
   Playwright 20/20. The length floor was re-measured and raised with reality to **8,250** (MIN now 8,341).
   **Deliberately NOT done:** the document text is not sent to the remote drafting grounding.
-- **Batch 6 — the Run-Simulation notification.** A dismissible pop-up (once per department, remembered) +
-  a small permanent note beside the button; honest wording; link to the Library.
+- **Batch 6 — the Run-Simulation notice. DONE 2026-10-05.** A dismissible pop-up shown **once per department**
+  (then remembered) + a small permanent note beside the button; honest wording; link to the Document Library.
+  It never blocks a run. Gate: `scripts/validate.mjs` check 25 (the store, the notice and the wiring).
+  Tests: 534/534 (new `src/test/run-notice.test.tsx`, 5) and Playwright 20/20. Published and verified
+  byte-identical (`assets/index-BVEy_RXC.js`).
 - **Batch 7 — the minister-facing line.** One honest sentence; **owner approves the exact wording first.**
 
 ## Resume instructions (cold session)
@@ -108,8 +111,8 @@ served file byte-identical, `npm run sync:check`, refresh the review zip. Never 
 - **Branch:** `feature/unified-platform` (never `main`); confirm the tip with `git log --oneline -1` and a
   clean, IN-SYNC tree before starting.
 - **Start with Batch 1**, then 2a, 2b, 2c, then 3 → 4 → 5 → 6 → 7.
-  **Batches 1, 2a, 2b, 3, 4 and 5 are DONE and published; Batch 2c is BLOCKED on the owner's decision — so a
-  cold session starts with Batch 6.**
+  **Batches 1, 2a, 2b, 3, 4, 5 and 6 are DONE and published; Batch 2c is BLOCKED on the owner's decision — so a
+  cold session starts with Batch 7 (the minister-facing line; the owner approves the exact wording first).**
 - **Never** raise the length floor with invented content; **never** claim team sharing before the server
   exists; **never** make a UI/UX decision the owner has not approved.
 
