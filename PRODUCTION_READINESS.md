@@ -101,9 +101,9 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-05, after the drafted-policy Batch 6 build — the Run-Simulation notice, shown once per department and pointing at the Document Library, on top of the department's own documents being used in the drafted policy — was published; the host and the working copy are IN STEP).**
+- **Status today (2026-10-06, after the drafted-policy Batch 7 build — the minister-facing line, one honest sentence on the public landing page, on top of the Run-Simulation notice — was published; the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-BVEy_RXC.js` (`c3459d543c39162ac1a14a5a4b0f9ffec7f157e5ec0f1273123d3138c8e9f9c1`) — fetched
+  `assets/index-Dn7j_QgE.js` (`151501f7bfb09db9e03c0ff4a334f836843a7553ca37cf054c72ef11b648a75e`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
   explicit FTPS, **never `--delete`** — 1 new file and 12 modified, 1,484,246 bytes — and the SSL validation token

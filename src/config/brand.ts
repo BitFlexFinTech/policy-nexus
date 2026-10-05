@@ -234,6 +234,21 @@ export const SOVEREIGNTY_STATEMENT =
   "No policy text or result leaves it.";
 
 /**
+ * THE MINISTER-FACING LINE — the owner's locked item 6.
+ *
+ * ONE honest sentence, shown on the public landing page where a Minister or senior leader first
+ * meets the platform: the assessment is only as good as the real information a department provides,
+ * and the department provides it through its Document Library (the place it keeps its own reports,
+ * spreadsheets and statistics for the engine to read). The owner approved this EXACT wording on
+ * 2026-10-06; changing the sentence needs the owner's approval again, like every public statement
+ * in this file.
+ */
+export const MINISTER_STATEMENT =
+  "These findings are only as reliable as the real information a department provides: its own " +
+  "reports, spreadsheets and statistics, kept in its Document Library, are what make its policy " +
+  "examination grounded.";
+
+/**
  * The governance position. The wording is fixed by the initiative's brief and must
  * not be softened: the platform supports human judgement and does not make
  * decisions. `humanJudgement` is asserted verbatim by the landing test, and no page

@@ -102,7 +102,11 @@ served file byte-identical, `npm run sync:check`, refresh the review zip. Never 
   It never blocks a run. Gate: `scripts/validate.mjs` check 25 (the store, the notice and the wiring).
   Tests: 534/534 (new `src/test/run-notice.test.tsx`, 5) and Playwright 20/20. Published and verified
   byte-identical (`assets/index-BVEy_RXC.js`).
-- **Batch 7 — the minister-facing line.** One honest sentence; **owner approves the exact wording first.**
+- **Batch 7 — the minister-facing line. DONE 2026-10-06.** The owner approved the exact wording (the first of
+  three drafts). One honest sentence is now on the **public landing page**, below the primary action, stated once
+  in `src/config/brand.ts` (`MINISTER_STATEMENT`). Gate: `scripts/validate.mjs` check 26 (mutation-proved) and
+  `src/test/landing.test.tsx`. Tests: 535/535 and Playwright 20/20. Published and verified byte-identical
+  (`assets/index-Dn7j_QgE.js`).
 
 ## Resume instructions (cold session)
 
@@ -111,8 +115,9 @@ served file byte-identical, `npm run sync:check`, refresh the review zip. Never 
 - **Branch:** `feature/unified-platform` (never `main`); confirm the tip with `git log --oneline -1` and a
   clean, IN-SYNC tree before starting.
 - **Start with Batch 1**, then 2a, 2b, 2c, then 3 → 4 → 5 → 6 → 7.
-  **Batches 1, 2a, 2b, 3, 4, 5 and 6 are DONE and published; Batch 2c is BLOCKED on the owner's decision — so a
-  cold session starts with Batch 7 (the minister-facing line; the owner approves the exact wording first).**
+  **Batches 1, 2a, 2b, 3, 4, 5, 6 and 7 are DONE and published — the drafted-policy series is complete.
+  Batch 2c is BLOCKED on the owner's decision; the next work is whatever the owner chooses (Batch 2c, or a
+  NEXT PHASE item such as the `/platform-admin` guard).**
 - **Never** raise the length floor with invented content; **never** claim team sharing before the server
   exists; **never** make a UI/UX decision the owner has not approved.
 

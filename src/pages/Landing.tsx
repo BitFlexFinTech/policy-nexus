@@ -4,7 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicPageShell } from "@/components/public/PublicPageShell";
 import { AgentPopulationDiagram, ProcessPipeline, SIMULATION_SCALE } from "@/components/public/SimulationVisuals";
-import { BRAND, DISCLAIMER, ENGINE_EXPLANATION, GOVERNANCE, PROCESS_LABEL, SERVICE_POSITION, SUPPORTED_INITIATIVE } from "@/config/brand";
+import { BRAND, DISCLAIMER, ENGINE_EXPLANATION, GOVERNANCE, MINISTER_STATEMENT, PROCESS_LABEL, SERVICE_POSITION, SUPPORTED_INITIATIVE } from "@/config/brand";
 import { COVERAGE } from "@/lib/coverage";
 import { contentText } from "@/config/content";
 import { useContent } from "@/config/useContent";
@@ -177,6 +177,15 @@ export default function Landing() {
           <p className="mt-5 max-w-xl text-xs leading-relaxed text-muted-foreground">
             {DISCLAIMER.short} You will choose the department you are preparing policy for on the next
             screen.
+          </p>
+
+          {/* THE MINISTER-FACING LINE — the owner's locked item 6, wording approved 2026-10-06.
+              One honest sentence: the assessment is only as good as the real information a department
+              provides, and it provides it through its Document Library. It sits BELOW the primary
+              action on purpose — the phone browser test measures the action's distance from the fold,
+              and anything added above it would push the action off the first screen. */}
+          <p className="mt-3 max-w-xl text-pretty text-xs leading-relaxed text-muted-foreground">
+            {MINISTER_STATEMENT}
           </p>
         </div>
 

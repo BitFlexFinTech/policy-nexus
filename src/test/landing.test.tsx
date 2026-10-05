@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import Landing from "@/pages/Landing";
 import { DEPARTMENT_COUNT, DEPARTMENTS } from "@/config/departments";
 import { STAKEHOLDER_SEGMENTS, REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR, REFERENCE_RATES } from "@/config/reference";
-import { BRAND, ENGINE_EXPLANATION, GOVERNANCE, PROCESS_LABEL, SOVEREIGNTY_STATEMENT } from "@/config/brand";
+import { BRAND, ENGINE_EXPLANATION, GOVERNANCE, MINISTER_STATEMENT, PROCESS_LABEL, SOVEREIGNTY_STATEMENT } from "@/config/brand";
 import {
   KNOWLEDGE_MAP_LINE,
   SIMULATED_AGENT_FIGURE,
@@ -41,6 +41,24 @@ describe("Landing — the approved API sentence is the only place the word appea
  * it introduces the platform and hands off to the chooser, and it must NOT carry
  * the department picker — that is asserted below as a real, failable guard.
  */
+/**
+ * THE MINISTER-FACING LINE — the owner's locked item 6, wording approved 2026-10-06.
+ *
+ * One honest sentence, on the public landing page, where a Minister or senior leader first meets
+ * the platform: the assessment is only as good as the real information a department provides, and
+ * the department provides it through its Document Library. This pins the sentence AND that it is
+ * actually rendered once — so it cannot be softened, duplicated or quietly dropped.
+ */
+describe("Landing — the minister-facing line", () => {
+  it("renders the owner-approved sentence, once, naming the Document Library", () => {
+    renderLanding();
+    const line = screen.getByText(MINISTER_STATEMENT);
+    expect(line.tagName).toBe("P");
+    expect(screen.getAllByText(MINISTER_STATEMENT)).toHaveLength(1);
+    expect(MINISTER_STATEMENT).toContain("Document Library");
+  });
+});
+
 describe("Landing — the pure public landing page", () => {
   it("leads with the initiative as the single level-one heading, the principle above it", () => {
     renderLanding();

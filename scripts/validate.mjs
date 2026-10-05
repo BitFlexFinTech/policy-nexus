@@ -39,6 +39,8 @@
  * 24. A department's own documents are USED in the drafted policy — the generator reads the run's
  *     own documents, lists the ones really read at Annex D, and quotes the department's own wording
  *     where it carries one of its stated priorities (BATCH 5)
+ * 26. The minister-facing line (the owner's locked item 6) is stated once in the identity file and
+ *     rendered on the public landing page (BATCH 7)
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -1176,6 +1178,42 @@ if (!existsSync(cssPath)) {
   check("the Run-Simulation notice is shown once per department", problems);
 }
 
+// ---------------------------------------------------------------------------------------------
+// check 26 — THE MINISTER-FACING LINE IS ON THE LANDING PAGE (BATCH 7)
+// The owner's locked item 6: ONE honest sentence, stating that the assessment is only as good as
+// the real information a department provides — and that the department provides it through its
+// Document Library — shown on the public landing page. This gate fails the build if the sentence
+// is dropped from the identity file, if it stops naming the Document Library (the point of the
+// line), or if the landing page stops rendering it. The wording was approved by the owner on
+// 2026-10-06 and must not change without that approval again.
+{
+  const problems = [];
+  const brandPath = join(ROOT, "src/config/brand.ts");
+  const landingPath = join(ROOT, "src/pages/Landing.tsx");
+
+  if (!existsSync(brandPath)) {
+    problems.push("src/config/brand.ts is missing — the minister-facing line has no home");
+  } else {
+    const brand = readFileSync(brandPath, "utf8");
+    if (!/export const MINISTER_STATEMENT\s*=/.test(brand)) {
+      problems.push("src/config/brand.ts no longer exports MINISTER_STATEMENT");
+    }
+    if (!/Document Library/.test(brand)) {
+      problems.push("the minister-facing line no longer names the Document Library");
+    }
+  }
+
+  if (!existsSync(landingPath)) {
+    problems.push("src/pages/Landing.tsx is missing");
+  } else if (!/MINISTER_STATEMENT/.test(readFileSync(landingPath, "utf8"))) {
+    problems.push("the landing page no longer renders the minister-facing line");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the minister-facing line is stated in the identity file and rendered on the public landing page (BATCH 7)");
+  }
+  check("the minister-facing line is on the public landing page", problems);
+}
 
 
 // summary
