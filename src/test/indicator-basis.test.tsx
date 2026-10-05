@@ -79,8 +79,8 @@ describe("department indicators — published with a named source, or plainly mo
     clearSession();
   });
 
-  it("gives every one of the 480 indicators a basis, and no free text that reads as a source", () => {
-    expect(EVERY).toHaveLength(480);
+  it("gives every one of the 495 indicators a basis, and no free text that reads as a source", () => {
+    expect(EVERY).toHaveLength(495);
     EVERY.forEach(({ department, indicator }) => {
       const where = `${department.id}/${indicator.id}`;
       expect(["published", "modelled"], `${where} basis`).toContain(indicator.basis.kind);
@@ -656,6 +656,26 @@ describe("department indicators — published with a named source, or plainly mo
       ["edu/edu-upper-secondary-female", "10.6", "World Development Indicators: Educational attainment, at least completed upper secondary, population 25+, female (%) (cumulative)", "2019"],
       ["edu/edu-trained-female-teachers", "98.0", "World Development Indicators: Trained teachers in primary education, female (% of female teachers)", "2024"],
       ["hedu/hedu-masters", "0.2", "World Development Indicators: Educational attainment, at least completed master's or equivalent, population 25+ (%)", "2023"],
+      // 2026-10-05 — PART 11, batch 6: 15 more real indicators, each read from the World Bank's own API
+      // this session, widening the margin by which published figures exceed modelled. All are World Bank
+      // series, so no source override is needed. (No new publisher was addable this session — FAOSTAT is
+      // now auth-walled, UNCTAD/ITU/AfDB/UNAIDS return 403/404, UNdata 404 and UNICEF SDMX had no data.)
+      ["fin/fin-debt-service", "19.5", "World Development Indicators: Total debt service (% of exports of goods, services and primary income)", "2023"],
+      ["agri/agri-fisheries", "113,130", "World Development Indicators: Total fisheries production (metric tons)", "2024"],
+      ["health/health-gov-health-spend", "USD 20.4", "World Development Indicators: Domestic general government health expenditure per capita (current US$)", "2023"],
+      ["health/health-iodised-salt", "83.8", "World Development Indicators: Consumption of iodized salt (% of households)", "2019"],
+      ["health/health-vitamin-a", "37", "World Development Indicators: Vitamin A supplementation coverage rate (% of children ages 6-59 months)", "2023"],
+      ["health/health-survival-65-female", "61.2", "World Development Indicators: Survival to age 65, female (% of cohort)", "2024"],
+      ["health/health-survival-65-male", "50.8", "World Development Indicators: Survival to age 65, male (% of cohort)", "2024"],
+      ["edu/edu-youth-literacy-female", "94.2", "World Development Indicators: Literacy rate, youth female (% of females ages 15-24)", "2019"],
+      ["edu/edu-youth-literacy-male", "90.8", "World Development Indicators: Literacy rate, youth male (% of males ages 15-24)", "2019"],
+      ["energy/energy-urban-access", "85.1", "World Development Indicators: Access to electricity, urban (% of urban population)", "2024"],
+      ["psc/psc-emp-ratio-female", "56.3", "World Development Indicators: Employment to population ratio, 15+, female (%) (modeled ILO estimate)", "2025"],
+      ["psc/psc-emp-ratio-male", "67.4", "World Development Indicators: Employment to population ratio, 15+, male (%) (modeled ILO estimate)", "2025"],
+      ["psc/psc-youth-unemployment-male", "15.0", "World Development Indicators: Unemployment, youth male (% of male labor force ages 15-24) (modeled ILO estimate)", "2025"],
+      ["lg/lg-poverty-upper", "86.2", "World Development Indicators: Poverty headcount ratio at $8.30 a day (2021 PPP) (% of population)", "2019"],
+      ["zida/zida-high-tech-exports", "2.8", "World Development Indicators: High-technology exports (% of manufactured exports)", "2024"],
+
 
     ];
 
