@@ -45,6 +45,7 @@ const REQUIRED_ORDER = [
   "situation-analysis",
   "situation-groups",
   "situation-priorities",
+  "situation-documents",
   "vision",
   "principles",
   "legal",
@@ -59,8 +60,9 @@ const REQUIRED_ORDER = [
   "annex-a",
   "annex-b",
   "citations",
-  "annex-d",
-  "annex-e",
+  "annex-documents",
+  "annex-run-inputs",
+  "annex-method",
   "note",
 ];
 
@@ -68,12 +70,13 @@ const REQUIRED_ORDER = [
  * THE LENGTH FLOOR IS GROUNDED — set to what the platform ACTUALLY produces, measured, never to a
  * target that would force padded or invented content (the owner's rule, 2026-10-05).
  *
- * Measured across all 16 departments on 2026-10-05 by running the generator: **8,191 to 12,477
- * words each** (smallest `zimra`, largest `health`). The floor sits just under the smallest — 8,191 —
- * so any change that drops a clause, an annex, a matrix or a department's indicators fails here. As
- * more real data is added the floor rises WITH the measured minimum; it is never raised by hand.
+ * Measured across all 16 departments on 2026-10-05 by running the generator: **8,341 to 12,627
+ * words each** (smallest `zimra`, largest `health`) after Batch 5 added the departmental-material
+ * clause and the documents annex. The floor sits just under the smallest — 8,341 — so any change
+ * that drops a clause, an annex, a matrix or a department's indicators fails here. As more real
+ * data is added the floor rises WITH the measured minimum; it is never raised by hand.
  */
-const WORD_FLOOR = 8000;
+const WORD_FLOOR = 8250;
 
 const words = (text: string) => text.trim().split(/\s+/).length;
 

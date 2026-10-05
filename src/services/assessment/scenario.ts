@@ -793,11 +793,18 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
     // Absent when none were supplied, so runs made before this existed are unchanged.
     documents:
       request.documents && request.documents.length > 0
-        ? request.documents.map((document) => ({
-            id: document.id,
-            name: document.name,
-            characters: document.text.trim().length,
-          }))
+        ? request.documents.map((document) => {
+            // The real text is carried on the run so the drafted policy can rest on the
+            // department's own material (Batch 5). Only text that was really read is kept:
+            // a file recorded by name keeps an empty string, so nothing implies it was read.
+            const text = document.text.trim();
+            return {
+              id: document.id,
+              name: document.name,
+              characters: text.length,
+              text,
+            };
+          })
         : undefined,
     fileNames: request.fileNames ?? [],
     createdAt: request.recordedAt ?? REFERENCE_DATE,

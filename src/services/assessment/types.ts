@@ -100,6 +100,14 @@ export interface RunDocumentRecord {
   name: string;
   /** Characters of real text read from this document. 0 when it could only be recorded. */
   characters: number;
+  /**
+   * The real text read from this document, so the drafted policy can rest on the department's
+   * own material and not merely on its filename. Empty when the file could only be recorded by
+   * name (a PDF in this build), and absent on a run that came from a service rather than from
+   * this build — which is why every reader treats it as optional and contributes nothing when
+   * it is missing.
+   */
+  text?: string;
 }
 
 export interface SimulationRound {

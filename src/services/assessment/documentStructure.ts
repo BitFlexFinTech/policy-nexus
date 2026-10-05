@@ -29,8 +29,9 @@ export const ANNEX = {
   implementationMatrix: "Annex A",
   stakeholderAnalysis: "Annex B",
   instruments: "Annex C",
-  runInputs: "Annex D",
-  method: "Annex E",
+  documents: "Annex D",
+  runInputs: "Annex E",
+  method: "Annex F",
 } as const;
 
 /** The annex that lists the instruments a draft relies on. */

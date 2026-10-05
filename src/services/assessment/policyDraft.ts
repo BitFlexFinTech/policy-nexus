@@ -115,6 +115,130 @@ const listOf = (labels: readonly string[]): string =>
       : `${labels.slice(0, -1).join(", ")} and ${labels[labels.length - 1]}`;
 
 /* ------------------------------------------------------------------------- */
+/* The department's own material (Batch 5)                                     */
+/* ------------------------------------------------------------------------- */
+
+/**
+ * One departmental document as the drafted policy reads it. `text` is the real text that was
+ * read in the browser; it is empty when the file could only be recorded by name, and such a
+ * document contributes nothing — no count, no quote, no claim.
+ */
+interface MaterialDocument {
+  name: string;
+  characters: number;
+  text: string;
+}
+
+/** One of the department's stated priorities, and the sentence of the material that carries it. */
+interface MaterialEvidence {
+  priorityLabel: string;
+  documentName: string;
+  quote: string;
+}
+
+interface MaterialReading {
+  /** Every document the run was given, in a stable order. */
+  documents: MaterialDocument[];
+  /** Only those whose real text was read. */
+  read: MaterialDocument[];
+  /** Characters of real text read across all of them. */
+  characters: number;
+  /** The priorities the material's own wording carries, with the sentence that carries it. */
+  carried: MaterialEvidence[];
+}
+
+/**
+ * The words in a priority's label that are distinctive enough to search the department's own
+ * material for. Words that appear in almost any Government paper are dropped, so a match means
+ * the material really speaks to that priority rather than merely being about policy in general.
+ * Kept as one list so the match can be read and reviewed rather than guessed at.
+ */
+const GENERIC_PRIORITY_WORDS = new Set([
+  "policy",
+  "national",
+  "public",
+  "sector",
+  "system",
+  "systems",
+  "service",
+  "services",
+  "development",
+  "government",
+  "support",
+  "framework",
+  "programme",
+  "program",
+  "management",
+  "access",
+  "quality",
+  "delivery",
+  "planning",
+]);
+
+const priorityTerms = (label: string): string[] =>
+  label
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((word) => word.length >= 5 && !GENERIC_PRIORITY_WORDS.has(word));
+
+/** Exported so a gate can check that every priority the draft claims is really in the material. */
+export { priorityTerms };
+
+/** How much of a document's own sentence is quoted, so an annex cannot reprint a whole report. */
+const MAX_QUOTE = 240;
+
+/**
+ * The sentence of a document that carries one of a priority's words, trimmed to a readable
+ * length at a word boundary. `null` when no sentence carries it, so a claim is never made
+ * without the sentence that proves it.
+ */
+const quoteAround = (text: string, term: string): string | null => {
+  const sentence = sentencesOf(text).find((entry) => entry.toLowerCase().includes(term));
+  if (!sentence) return null;
+  const clean = sentence.replace(/\s+/g, " ").trim();
+  if (clean.length <= MAX_QUOTE) return clean;
+  const cut = clean.slice(0, MAX_QUOTE);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > 80 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+};
+
+/**
+ * Read the run's own documents: the counts, and which of the department's stated priorities
+ * the material's wording carries. Sorted by name so the result is stable whatever order the
+ * documents were added in, and pure — no clock, no randomness — so the draft stays
+ * byte-identical for the same run.
+ */
+const readMaterial = (run: AssessmentRun, department: Department): MaterialReading => {
+  const documents: MaterialDocument[] = [...(run.documents ?? [])]
+    .map((document) => ({
+      name: document.name,
+      characters: document.characters,
+      text: (document.text ?? "").trim(),
+    }))
+    .sort((left, right) => left.name.localeCompare(right.name));
+
+  const read = documents.filter((document) => document.text.length > 0);
+  const characters = read.reduce((total, document) => total + document.text.length, 0);
+
+  const carried: MaterialEvidence[] = [];
+  for (const priority of department.priorities) {
+    const terms = priorityTerms(priority.label);
+    if (terms.length === 0) continue;
+    for (const document of read) {
+      const haystack = document.text.toLowerCase();
+      const term = terms.find((candidate) => haystack.includes(candidate));
+      if (!term) continue;
+      const quote = quoteAround(document.text, term);
+      if (!quote) continue;
+      carried.push({ priorityLabel: priority.label, documentName: document.name, quote });
+      break; // one document is enough to show the wording
+    }
+  }
+
+  return { documents, read, characters, carried };
+};
+
+/* ------------------------------------------------------------------------- */
 /* The document                                                                */
 /* ------------------------------------------------------------------------- */
 
@@ -130,6 +254,8 @@ export const buildPolicyDraft = (
   const reactive = run.reactions.filter((reaction) => reaction.sentiment === "supportive");
   const conditional = run.reactions.filter((reaction) => reaction.sentiment === "mixed");
   const reluctant = run.reactions.filter((reaction) => reaction.sentiment === "resistant");
+  // Batch 5 — the department's own material, read from the run's own documents.
+  const material = readMaterial(run, department);
 
   const frontMatter: GeneratedSection[] = [];
   const numbered: GeneratedSection[] = [];
@@ -173,7 +299,7 @@ export const buildPolicyDraft = (
     heading: "Acknowledgements",
     paragraphs: [
       "This draft was prepared from the department's own stated priorities, its reference indicators and its cited-instrument register, together with the policy text submitted for examination.",
-      `The examination was carried out with the ${VOCABULARY.simulationCore}, which is deterministic: the same inputs always produce the same result, and the result can be reproduced from the inputs recorded at Annex D.`,
+      `The examination was carried out with the ${VOCABULARY.simulationCore}, which is deterministic: the same inputs always produce the same result, and the result can be reproduced from the inputs recorded at ${ANNEX.runInputs}.`,
       `Contributions to be acknowledged, and the offices that must be consulted before submission, are recorded by the department: ${BLANK}.`,
     ],
   });
@@ -186,8 +312,8 @@ export const buildPolicyDraft = (
     paragraphs: [
       `This policy carries the submitted draft, "${run.policyTitle}", into effect while answering the pressures the examination identified. It is directed at the stated priorities of ${department.shortName} and is to be monitored against the department's own reference indicators.`,
       `The examination modelled ${run.reactions.length} stakeholder groups. ${listOf(reactive.map((reaction) => reaction.label))} are modelled as receptive; ${conditional.length > 0 ? listOf(conditional.map((reaction) => reaction.label)) : "no group is modelled as conditional"} as conditional; and ${reluctant.length === 0 ? "no group is modelled as resistant" : `${listOf(reluctant.map((reaction) => reaction.label))} as resistant`}. The run records a confidence of ${run.confidence} out of 100, which describes the firmness of the modelled range and not the certainty of any outcome.`,
-      `The examination raised ${run.risks.length} risks, each of which the policy meets with a provision in clause ${CLAUSE.risk}, and produced ${run.recommendations.length} recommended steps. Those steps appear as measures in clause ${CLAUSE.measures}, as an implementation matrix at Annex A, and as provisions in clauses ${CLAUSE.risk}, ${CLAUSE.engagement} and ${CLAUSE.transitional}.`,
-      "What this policy does not claim: it is a structured and reproducible scenario analysis, not a forecast of public opinion or of administrative results. Its figures are indicative and must be read with the method and limitations note at Annex E.",
+      `The examination raised ${run.risks.length} risks, each of which the policy meets with a provision in clause ${CLAUSE.risk}, and produced ${run.recommendations.length} recommended steps. Those steps appear as measures in clause ${CLAUSE.measures}, as an implementation matrix at ${ANNEX.implementationMatrix}, and as provisions in clauses ${CLAUSE.risk}, ${CLAUSE.engagement} and ${CLAUSE.transitional}.`,
+      `What this policy does not claim: it is a structured and reproducible scenario analysis, not a forecast of public opinion or of administrative results. Its figures are indicative and must be read with the method and limitations note at ${ANNEX.method}.`,
     ],
     table: {
       caption: "Table 1 — The modelled position this policy answers",
@@ -206,7 +332,7 @@ export const buildPolicyDraft = (
       `This policy addresses "${run.policyTitle}". The draft was developed for a ${run.horizonLabel.toLowerCase()} horizon and reached the examination as ${run.source === "upload" ? "an uploaded document" : run.source === "preset" ? "one of the department's own prepared drafts" : "policy text entered directly by the responsible officer"}.`,
       "The problem it addresses: policies are implemented without a structured way of examining the likely responses of those they affect, so the cost of a provision that is not understood is discovered after implementation rather than before it. This policy answers that problem in two ways — its measures state who does what, and its monitoring provisions state what will be published so that the position can be read from evidence rather than from opinion.",
       `The policy applies to ${department.shortName} and to the offices and agencies through which it implements policy, and it is intended to reach the stakeholder groups modelled at clause ${CLAUSE.situation}.`,
-      `It was examined by controlled simulation before adoption. The examination is recorded at Annex D so that any reader can reproduce it from the recorded inputs and check that the same result follows.`,
+      `It was examined by controlled simulation before adoption. The examination is recorded at ${ANNEX.runInputs} so that any reader can reproduce it from the recorded inputs and check that the same result follows.`,
       `A reader in a meeting can work from the clause numbers alone: clause ${CLAUSE.measures} states the measures, clause ${CLAUSE.implementation} states who carries them out, clause ${CLAUSE.monitoring} states how their effect will be read, and the annexes carry the matrices.`,
     ],
   });
@@ -256,10 +382,44 @@ export const buildPolicyDraft = (
     heading: `${CLAUSE.situation}.3 Stated priorities the policy is directed at`,
     paragraphs: [
       "The policy is directed at the department's own stated priorities, and the effect of its measures on each of them is to be reported against them.",
-      `The modelled effect of the draft on these priorities is recorded in the examination at Annex D; where a priority is modelled as moving against the draft, the policy answers it in clause ${CLAUSE.measures} and clause ${CLAUSE.risk}.`,
+      `The modelled effect of the draft on these priorities is recorded in the examination at ${ANNEX.runInputs}; where a priority is modelled as moving against the draft, the policy answers it in clause ${CLAUSE.measures} and clause ${CLAUSE.risk}.`,
     ],
     bullets: department.priorities.map((priority) => `${priority.label} — ${priority.note}`),
     listStyle: "clauses",
+  });
+
+  /* --- 2.4 The department's own material (Batch 5) ------------------------ */
+
+  // The bullets quote the department's OWN wording where it carries one of its stated
+  // priorities. A priority is claimed only when a distinctive word of its label really appears
+  // in the material and the sentence that carries it can be quoted — so no claim is ever made
+  // without the sentence that proves it.
+  const materialBullets =
+    material.read.length === 0
+      ? undefined
+      : material.carried.length > 0
+        ? material.carried.map(
+            (entry) => `${entry.priorityLabel} — "${entry.quote}" (${entry.documentName})`,
+          )
+        : [
+            "No sentence of the supplied material repeats the wording of any of the department's stated priorities, so none is claimed here.",
+          ];
+
+  numbered.push({
+    id: "situation-documents",
+    heading: `${CLAUSE.situation}.4 Departmental material the examination read`,
+    paragraphs:
+      material.read.length > 0
+        ? [
+            `The department supplied ${material.documents.length} of its own ${material.documents.length === 1 ? "document" : "documents"} through its Document Library, and the examination read ${material.read.length} of them — ${material.characters} characters of the department's own material. Each is listed at ${ANNEX.documents}, with what was and was not read.`,
+            "That material is the department's own record, not the platform's. Where it repeats one of the department's stated priorities, the sentence carrying that wording is quoted below, so a reader sees the department's own words rather than a summary of them.",
+          ]
+        : [
+            "The department supplied no document of its own for this examination, so the position recorded in this clause rests on the submitted draft and the department's own reference figures alone.",
+            `A department can add its reports, spreadsheets and statistics through its Document Library, and every run it makes afterwards reads them and records them at ${ANNEX.documents}. Nothing is inferred from a document that was not read.`,
+          ],
+    bullets: materialBullets,
+    listStyle: "bullets",
   });
 
   /* --- 3. Vision, mission, objectives and guiding principles -------------- */
@@ -288,7 +448,7 @@ export const buildPolicyDraft = (
     bullets: [
       "Decision support, not decision-making: the platform informs, and a human decides.",
       `Every figure is either published with its source stated, or labelled ${MODELLED_SHARE_LABEL}.`,
-      "The draft was examined before adoption, and the examination is reproducible from the inputs recorded at Annex D.",
+      `The draft was examined before adoption, and the examination is reproducible from the inputs recorded at ${ANNEX.runInputs}.`,
       `No policy text and no result leaves the responsible officer's own machine. ${SOVEREIGNTY_STATEMENT}`,
     ],
     listStyle: "clauses",
@@ -452,7 +612,7 @@ export const buildPolicyDraft = (
 
   annexes.push({
     id: "annex-a",
-    heading: "Annex A — Implementation matrix for the steps the examination recommended",
+    heading: `${ANNEX.implementationMatrix} — Implementation matrix for the steps the examination recommended`,
     paragraphs: [
       `The ${run.recommendations.length} steps recommended by the examination, each with what it requires, who carries it, and when it is due. The office and the calendar date are the department's to state.`,
     ],
@@ -461,7 +621,7 @@ export const buildPolicyDraft = (
 
   annexes.push({
     id: "annex-b",
-    heading: "Annex B — Stakeholder analysis",
+    heading: `${ANNEX.stakeholderAnalysis} — Stakeholder analysis`,
     paragraphs: [
       "Each modelled group, the published share it stands on where one exists, its modelled position, and the engagement this policy provides for it.",
     ],
@@ -477,8 +637,39 @@ export const buildPolicyDraft = (
   });
 
   annexes.push({
-    id: "annex-d",
-    heading: "Annex D — Run inputs and reproducibility",
+    id: "annex-documents",
+    heading: `${ANNEX.documents} — Documents and data relied upon`,
+    paragraphs:
+      material.documents.length > 0
+        ? [
+            `The department supplied ${material.documents.length} ${material.documents.length === 1 ? "document" : "documents"} of its own through its Document Library. The examination read ${material.read.length} of them — ${material.characters} characters — and a document that could not be read is listed below as recorded by name and contributes nothing, to this policy or to the examination.`,
+            "Only text that was really read is counted or quoted, and only a sentence that carries one of the department's stated priorities is shown beside it. Quoted wording is the department's own, recorded as it was supplied: the platform does not present it as a published figure, and nothing in this policy is inferred from a filename.",
+          ]
+        : [
+            "The department supplied no document of its own for this examination, so nothing in this policy rests on departmental material beyond the submitted draft, and nothing is inferred from a document that was not read.",
+            "A department adds its own reports, spreadsheets and statistics through its Document Library, and every run it makes afterwards reads them and records them here.",
+          ],
+    table:
+      material.documents.length > 0
+        ? {
+            caption: "Table 7 — The department's own documents this draft relied upon",
+            columns: ["Document", "Read", "Characters", "Priority wording it carries"],
+            rows: material.documents.map((document) => [
+              document.name,
+              document.text.length > 0 ? "Read" : "Not read — recorded by name",
+              String(document.characters),
+              material.carried
+                .filter((entry) => entry.documentName === document.name)
+                .map((entry) => entry.priorityLabel)
+                .join("; ") || "—",
+            ]),
+          }
+        : undefined,
+  });
+
+  annexes.push({
+    id: "annex-run-inputs",
+    heading: `${ANNEX.runInputs} — Run inputs and reproducibility`,
     paragraphs: [
       "This annex records the exact inputs the examination was derived from, so that any reader can reproduce it and check that the same result follows. A run is reproducible when the department, the policy text, the horizon and the assumptions are the same.",
     ],
@@ -500,8 +691,8 @@ export const buildPolicyDraft = (
   });
 
   annexes.push({
-    id: "annex-e",
-    heading: "Annex E — Method and limitations",
+    id: "annex-method",
+    heading: `${ANNEX.method} — Method and limitations`,
     paragraphs: [
       DISCLAIMER.long,
       `The ${VOCABULARY.simulationCore} derived this examination from the submitted policy text, the department's reference indicators and its modelled stakeholder groups, using a seeded deterministic process. The same inputs always produce the same result.`,

@@ -36,6 +36,9 @@
  * 22. Real, published figures outnumber the modelled ones (the owner's locked goal, PART 11)
  * 23. An Excel `.xlsx` upload is READ in the browser, not recorded by name — the reader exists
  *     and is wired into the extraction seam, and every upload surface offers the type (BATCH 4)
+ * 24. A department's own documents are USED in the drafted policy — the generator reads the run's
+ *     own documents, lists the ones really read at Annex D, and quotes the department's own wording
+ *     where it carries one of its stated priorities (BATCH 5)
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -1055,6 +1058,60 @@ if (!existsSync(cssPath)) {
   }
   check("an Excel .xlsx upload is read, not recorded by name", problems);
 }
+
+// ---------------------------------------------------------------------------------------------
+// check 24 — A DEPARTMENT'S OWN DOCUMENTS ARE USED IN THE DRAFTED POLICY (BATCH 5)
+// The defect this exists for: a department could add its own reports, spreadsheets and statistics
+// to its Document Library, and the run counted them and changed the seed — but the drafted policy
+// itself never used them, so a department's own material could not make the instrument longer or
+// better grounded. The generator now reads the run's own documents: it lists the ones really read
+// at Annex D and quotes the department's own wording where it carries one of its stated priorities.
+// This gate fails the build if that capability is dropped or silently narrowed.
+{
+  const problems = [];
+  const generatorPath = join(ROOT, "src/services/assessment/policyDraft.ts");
+  const structurePath = join(ROOT, "src/services/assessment/documentStructure.ts");
+  const promptsPath = join(ROOT, "src/config/draftingPrompts.ts");
+
+  if (!existsSync(generatorPath)) {
+    problems.push("src/services/assessment/policyDraft.ts is missing");
+  } else {
+    const generator = readFileSync(generatorPath, "utf8");
+    if (!/annex-documents/.test(generator)) {
+      problems.push("the drafted policy no longer carries the documents annex (annex-documents)");
+    }
+    if (!/ANNEX\.documents/.test(generator)) {
+      problems.push("the drafted policy no longer labels the documents annex from the one ANNEX list");
+    }
+    if (!/run\.documents/.test(generator)) {
+      problems.push("the drafted policy no longer reads the run's own documents — the department's material would be ignored again");
+    }
+    if (!/document\.text/.test(generator)) {
+      problems.push("the drafted policy no longer uses the text really read from a document");
+    }
+    if (!/situation-documents/.test(generator)) {
+      problems.push("the situation analysis no longer carries the departmental-material clause");
+    }
+  }
+
+  if (!existsSync(structurePath)) {
+    problems.push("src/services/assessment/documentStructure.ts is missing");
+  } else if (!/documents:\s*"Annex D"/.test(readFileSync(structurePath, "utf8"))) {
+    problems.push("the ANNEX list no longer names the documents annex (Annex D)");
+  }
+
+  if (!existsSync(promptsPath)) {
+    problems.push("src/config/draftingPrompts.ts is missing");
+  } else if (!/Annex D — Documents and data relied upon/.test(readFileSync(promptsPath, "utf8"))) {
+    problems.push("the policy structure no longer asks for the documents annex — the local generator and a configured service would disagree");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the drafted policy reads a department's own documents and quotes them where they carry its priorities (BATCH 5)");
+  }
+  check("a department's own documents are used in the drafted policy", problems);
+}
+
 
 
 // summary

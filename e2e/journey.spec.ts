@@ -1060,6 +1060,47 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     expectCleanRuntime();
   });
 
+  test("a department's own document is quoted in the drafted policy (Batch 5)", async ({ page }) => {
+    await page.goto("/");
+    await enterWorkspace(page);
+
+    // The department adds a document whose own wording carries one of its stated priorities.
+    await page.getByRole("link", { name: "Documents" }).click();
+    await expect(page.getByRole("heading", { name: "Document Library" })).toBeVisible();
+    await page.setInputFiles('input[type="file"]', {
+      name: "fiscal-notes.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from(
+        "The fiscal consolidation path holds the deficit within the framework agreed with creditors.",
+      ),
+    });
+    await expect(page.getByText("fiscal-notes.txt", { exact: true })).toBeVisible();
+
+    // A run made afterwards, and the drafted policy it produces.
+    await page.getByRole("link", { name: "Overview" }).click();
+    await page
+      .getByPlaceholder(/Draft the policy text/)
+      .fill("A draft used to check that the department's own document reaches the policy.");
+    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
+      timeout: 30_000,
+    });
+    await page.getByRole("link", { name: "Draft the policy" }).first().click();
+    await expect(page.getByRole("heading", { name: "Drafted policy", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Show the policy now" }).click();
+
+    // The document is listed, and its own sentence is quoted against the priority it carries.
+    await expect(
+      page.getByRole("heading", { name: "Annex D — Documents and data relied upon" }),
+    ).toBeVisible();
+    await expect(page.getByText("fiscal-notes.txt").first()).toBeVisible();
+    await expect(
+      page.getByText(/Fiscal consolidation — "The fiscal consolidation path holds the deficit/),
+    ).toBeVisible();
+
+    expectCleanRuntime();
+  });
+
   test("the dashboard states this department's own group count, not a stale one (item 11)", async ({
     page,
   }) => {

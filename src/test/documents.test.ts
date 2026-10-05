@@ -155,7 +155,7 @@ describe("generated documents — the drafted policy", () => {
       "implementation",
       "monitoring",
       "citations",
-      "annex-e",
+      "annex-method",
       "note",
     ].forEach((id) => expect(ids).toContain(id));
     expect(renderDocumentText(draft).length).toBeGreaterThan(20000);

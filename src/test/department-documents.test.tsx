@@ -96,12 +96,14 @@ describe("a department's own documents feed its runs (owner's item 3)", () => {
     };
     const runWith = buildSimulatedRun(withDocuments);
 
-    // What the run recorded about the material it was given.
+    // What the run recorded about the material it was given. Batch 5 added the real text, so the
+    // drafted policy can rest on the department's own material and not on a count alone.
     expect(runWith.documents).toEqual([
       {
         id: withDocuments.documents![0].id,
         name: "Finance Bill notes",
         characters: "The Bill sets the tax bands and the duty on exports.".length,
+        text: "The Bill sets the tax bands and the duty on exports.",
       },
     ]);
     expect(runWithout.documents).toBeUndefined();

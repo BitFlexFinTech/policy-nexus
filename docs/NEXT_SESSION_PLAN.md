@@ -41,22 +41,27 @@ produce, measured — never a number that forces fabrication.**
 6. **A minister-facing line** — one honest sentence stating the platform's output is only as good as the
    real data each department feeds it, and that they feed it through the Document Library. **The owner
    must approve the exact wording before it is published.**
-## Measured facts (2026-10-05 — produced by running the generator, not assumed)
+## Measured facts
 
-- **Drafted-policy length per department:** MIN **8,191 words** (zimra) · MAX **12,477** (health) ·
-  AVG **9,368** · every department is **27 parts**.
-- **Length is driven by the data:** `words ≈ 6,400 (fixed) + ~88 × (number of real indicators)`.
-- **The build's floor is too low:** `WORD_FLOOR = 5000` in `src/test/policy-document.test.ts` — BELOW the
-  real minimum (8,191), so it never fires.
-- **Uploading documents adds ~0 policy length today:** fin 10,301 words with no documents → 10,172 with
-  five long documents. Documents change the run's seed and its `metric-documents` count, but the drafted
-  policy does **not** yet use their text. **This is why Batch 5 exists.**
-- **Formats today:** `.txt` REAL · `.docx` REAL (browser) · `.pdf` **Mock** (recorded by name, not read,
-  labelled) · `.xlsx` **unsupported**.
+**As they were when this plan was written (2026-10-05), kept so the starting point is on record:** drafted-policy
+length MIN **8,191 words** (zimra) · MAX **12,477** (health) · **27 parts**; `WORD_FLOOR = 5000`, below the real
+minimum so it never fired; uploading documents added **~0** policy length; formats `.txt` REAL · `.docx` REAL ·
+`.pdf` Mock · `.xlsx` unsupported; department documents browser-only.
+
+**Measured now (after Batches 1–5, 2026-10-05 — produced by running the generator, not assumed):**
+
+- **Drafted-policy length per department:** MIN **8,341 words** (zimra) · MAX **12,627** (health) · every
+  department is **28 parts** — Batch 5 added the `2.4 Departmental material the examination read` clause and
+  **Annex D — Documents and data relied upon**.
+- **The floor is grounded:** `WORD_FLOOR = 8250`, just under the real minimum (8,341), and a gate fails the build
+  if the floor is ever raised above the smallest real output (which could only be satisfied by padding).
+- **Uploading documents now shapes the policy:** the run carries the text really read, the situation analysis
+  quotes the department's own wording where it carries one of its stated priorities, and Annex D lists every
+  document with what was and was not read. A file that could not be read contributes nothing.
+- **Formats today:** `.txt` REAL · `.docx` REAL (browser) · `.xlsx` REAL (browser, Batch 4) · `.pdf` **Mock**
+  (recorded by name, not read, labelled).
 - **Department documents are browser-only:** `localStorage["nzwisiso.department-documents.v1"]`, keyed by
   department; every run of that department receives them. **No server → no cross-machine sharing.**
-- **A stale record to fix:** `PRODUCTION_READINESS.md` and the policy test still say "5,770–6,491 words";
-  the truth is **8,191–12,477**.
 
 ## The batches — each ends with the full suite, a deploy and a status update
 
@@ -83,8 +88,15 @@ served file byte-identical, `npm run sync:check`, refresh the review zip. Never 
   `listZipEntries` + `readArchiveBytes` (shared with the Word reader). No new dependency, no network. Gate:
   `scripts/validate.mjs` check 23 (mutation-proved). Tests: 523/523 (new `src/test/xlsx-read.test.ts`) and
   Playwright 19/19 (a real workbook uploaded in a real browser). Published and verified byte-identical.
-- **Batch 5 — documents used in the policy.** Add a **"Documents and data relied upon"** annex (documents
-  really read) and use them in the situation analysis — real content, not padding.
+- **Batch 5 — documents used in the policy. DONE 2026-10-05.** The run now carries the **text really read** from
+  each document (`RunDocumentRecord.text`). The drafted policy gained the **`2.4 Departmental material the
+  examination read`** clause, which quotes the department's OWN sentence where it carries one of its stated
+  priorities (a priority is claimed only when a distinctive word really appears and the sentence can be quoted),
+  and a new **Annex D — Documents and data relied upon** (Table 7) listing every document with Read / Not-read and
+  characters. Annexes D–E became **E–F**; every annex cross-reference now reads the ONE `ANNEX` list. Gate:
+  `scripts/validate.mjs` check 24 (mutation-proved). Tests: 529/529 (new `src/test/policy-documents.test.ts`) and
+  Playwright 20/20. The length floor was re-measured and raised with reality to **8,250** (MIN now 8,341).
+  **Deliberately NOT done:** the document text is not sent to the remote drafting grounding.
 - **Batch 6 — the Run-Simulation notification.** A dismissible pop-up (once per department, remembered) +
   a small permanent note beside the button; honest wording; link to the Library.
 - **Batch 7 — the minister-facing line.** One honest sentence; **owner approves the exact wording first.**
@@ -96,8 +108,8 @@ served file byte-identical, `npm run sync:check`, refresh the review zip. Never 
 - **Branch:** `feature/unified-platform` (never `main`); confirm the tip with `git log --oneline -1` and a
   clean, IN-SYNC tree before starting.
 - **Start with Batch 1**, then 2a, 2b, 2c, then 3 → 4 → 5 → 6 → 7.
-  **Batches 1, 2a, 2b, 3 and 4 are DONE and published; Batch 2c is BLOCKED on the owner's decision — so a
-  cold session starts with Batch 5.**
+  **Batches 1, 2a, 2b, 3, 4 and 5 are DONE and published; Batch 2c is BLOCKED on the owner's decision — so a
+  cold session starts with Batch 6.**
 - **Never** raise the length floor with invented content; **never** claim team sharing before the server
   exists; **never** make a UI/UX decision the owner has not approved.
 

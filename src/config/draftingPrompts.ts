@@ -42,6 +42,7 @@ export const POLICY_DRAFT_STRUCTURE: readonly string[] = [
   "2. Situation analysis",
   "2.2 Modelled stakeholder position",
   "2.3 Stated priorities the policy is directed at",
+  "2.4 Departmental material the examination read",
   "3. Vision, mission, objectives and guiding principles",
   "3.2 Guiding principles applied in preparing this draft",
   "4. Legal and institutional framework",
@@ -56,8 +57,9 @@ export const POLICY_DRAFT_STRUCTURE: readonly string[] = [
   "Annex A — Implementation matrix for the steps the examination recommended",
   "Annex B — Stakeholder analysis",
   "Annex C — Instruments relied on",
-  "Annex D — Run inputs and reproducibility",
-  "Annex E — Method and limitations",
+  "Annex D — Documents and data relied upon",
+  "Annex E — Run inputs and reproducibility",
+  "Annex F — Method and limitations",
   "Note on this draft",
 ];
 
