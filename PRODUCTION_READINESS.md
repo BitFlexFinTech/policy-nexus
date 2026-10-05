@@ -100,17 +100,17 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-05, after the PART 11 batch-2 build was published — the host and the working copy are IN STEP).**
+- **Status today (2026-10-05, after the PART 11 batch-3 build was published — the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-C3L7Q_LQ.js` (`2a67ae3851c1e3145246b67ade26d498e247515e3f0da433d760354887730848`) — fetched
+  `assets/index-nVsIkh0u.js` (`6f82891341d68489ffb1c9c8d4c3696a54db45ba0bd636149d15f399b11165fe`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
   explicit FTPS, **never `--delete`** — 13 files, 1,400,957 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
   expansion and the 2026-10-04 dataset-expansion batches 1–4 — **150** canonical stakeholder groups, every
-  department modelling **40** of them, and **339** reference indicators (twenty or more per department, of which
-  **127 are published figures and 235 are `Modelled`**). **LOCKED GOAL (owner, recorded 2026-10-04): real,
+  department modelling **40** of them, and **414** reference indicators (twenty or more per department, of which
+  **179 are published figures and 235 are `Modelled`**). **LOCKED GOAL (owner, recorded 2026-10-04): real,
   published figures must OUTNUMBER the `Modelled` ones — i.e. **more than the modelled count (currently 235)**, and
   more than the modelled group count (currently 130); today the platform is the reverse, so this is active work,
   planned in `docs/PLATFORM_ENRICHMENT_PLAN.md` PART 11.** It also carries the recommended-step actions (*Open what answers this*,

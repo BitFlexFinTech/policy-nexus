@@ -121,6 +121,13 @@ export const NAMED_SOURCES = [
       "Global health estimates and country statistics — life expectancy and healthy life expectancy, mortality by cause and age, maternal and child health, the health workforce, and non-communicable disease and injury indicators",
     publication: "WHO Global Health Observatory",
   },
+  {
+    id: "comtrade",
+    name: "United Nations Comtrade Database (UN Comtrade)",
+    figures:
+      "Merchandise trade reported to the United Nations by the national customs authority — total exports and imports, and the same broken down by commodity and trading partner",
+    publication: "UN Comtrade Database — annual merchandise trade statistics",
+  },
 ] as const;
 
 export type NamedSourceId = (typeof NAMED_SOURCES)[number]["id"];

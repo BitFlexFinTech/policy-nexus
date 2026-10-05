@@ -1091,6 +1091,52 @@ work that reaches the goal**, never before, because it would fail today by desig
 the batches — never ask the owner whether to expand, and never treat the old "Item 1 is complete" line (§9.7) as
 the end of the work; that line recorded the *indicator-count and group-count* targets, not this goal.
 
+### 11.3 Batch 3 — 52 more real indicators, and a new publisher (UN Comtrade) (2026-10-05)
+
+**The owner's strict rule (2026-10-05): the source list must keep expanding — never cap it; every round must look for
+new publishers.** Batch 3 **added a new publisher** and **52 new real indicators**. Every value was read from the
+publisher's own API this session (`api.worldbank.org`, and `comtradeapi.un.org` for the trade figures).
+
+**New publisher — UN Comtrade** (`NAMED_SOURCES` gained `comtrade`, name "United Nations Comtrade Database
+(UN Comtrade)"): `mfa-goods-exports` **USD 7.43B** and `mfa-goods-imports` **USD 9.53B** (merchandise trade, total,
+2024; reporter Zimbabwe).
+
+**New publication — the World Bank's Worldwide Governance Indicators** (same publisher, a new publication), four
+figures for the Office of the President and Cabinet: `opc-gov-effectiveness` **−0.89**, `opc-control-corruption`
+**−1.29**, `opc-rule-of-law` **−1.22**, `opc-regulatory-quality` **−1.28** (governance estimates, −2.5 to +2.5, 2025).
+
+**World Bank World Development Indicators — 46 figures** (indicator → value → series → period):
+- Finance (8): `fin-gdp-percapita` USD 3,021 · `fin-gdp` USD 51.2B · `fin-investment-gdp` 8.8% · `fin-consumption` 84.4%
+  · `fin-gov-consumption` 12.2% · `fin-credit-private` 6.5% · `fin-current-account` 1.2% · `fin-trade-openness` 41.5%.
+- Agriculture (4): `agri-food-index` 121.7 · `agri-crop-index` 123.5 · `agri-arable` 10.4% · `agri-cereal-area` 1,569,913 ha.
+- Health (8): `health-spend-capita` USD 62.9 · `health-out-of-pocket` 10.6% · `health-infant` 62.4 · `health-neonatal`
+  33.7 · `health-measles` 90% · `health-hiv-prevalence` 9.8% · `health-contraception` 66.8% · `health-teen-births` 95.5.
+- Education (5): `edu-spend-gdp` 0.4% · `edu-ratio-secondary` 22.5 · `edu-out-of-school` 332,314 · `edu-youth-literacy`
+  92.5% · `edu-net-enrolment` 94.6%.
+- ICT (2): `ict-ict-exports` 0.02% · `ict-ict-services` 3.3%.
+- Energy (3): `energy-electricity-pc` 504 kWh · `energy-renewable-share` 82.4% · `energy-imports-net` 17.0%.
+- Public Service (6): `psc-employment-agri` 54.3% · `psc-employment-industry` 11.5% · `psc-employment-services` 34.2% ·
+  `psc-vulnerable` 68.2% · `psc-working-age` 56.2% · `psc-dependency` 78.1%.
+- Local Government (2): `lg-urban-growth` 3.4% · `lg-rural-share` 59.5%.
+- Foreign Affairs (3): `mfa-tourist-arrivals` 639,000 · `mfa-tourism-receipts` USD 66M · `mfa-export-share` 18.1%.
+- Environment (2): `env-pm25` 15.0 · `env-air-mortality` 189.6.
+- Defence (2): `def-spending-budget` 1.3% · `def-personnel-share` 0.88%.
+- Investment Promotion (1): `zida-manufacturing` 14.9%.
+
+**Counts: 362 indicators (127 published / 235 modelled) → 414 (179 published / 235 modelled).** The gate
+`src/test/indicator-basis.test.tsx` was raised 362 → 414 and gained the 52 recorded rows; the reference gate gained
+the new `comtrade` source automatically (it iterates `NAMED_SOURCES`). **Distance to the flip: the gap is
+235 − 179 = 56, so 57 more additions (or 29 conversions) would take real past modelled.**
+
+**DEFECTS FOUND AND FIXED (same session):** (1) the drafted **armed-forces personnel total** was **withdrawn as a
+duplicate** of the existing `def-personnel` (added in Batch S4) — caught by `departments.test.ts`, removed at source,
+so 53 were drafted and 52 stand; (2) `PRODUCTION_READINESS.md` stated **339** reference indicators beside a split
+that summed to **362** — a stale total, corrected to **414**; (3) the `indicator-basis` test's own title still said
+"320 indicators" — corrected to the real count.
+
+**Deployed and verified:** `assets/index-nVsIkh0u.js`, served sha256
+`6f82891341d68489ffb1c9c8d4c3696a54db45ba0bd636149d15f399b11165fe`, byte-identical to the local build.
+
 ### 11.2 Batch 2 — 23 more real indicators, and the source list widens (2026-10-05)
 
 **The owner's strict rule (2026-10-05): the source list must keep expanding — never cap it; every round must look

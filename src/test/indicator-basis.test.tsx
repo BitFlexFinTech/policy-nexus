@@ -79,8 +79,8 @@ describe("department indicators — published with a named source, or plainly mo
     clearSession();
   });
 
-  it("gives every one of the 320 indicators a basis, and no free text that reads as a source", () => {
-    expect(EVERY).toHaveLength(362);
+  it("gives every one of the 414 indicators a basis, and no free text that reads as a source", () => {
+    expect(EVERY).toHaveLength(414);
     EVERY.forEach(({ department, indicator }) => {
       const where = `${department.id}/${indicator.id}`;
       expect(["published", "modelled"], `${where} basis`).toContain(indicator.basis.kind);
@@ -295,6 +295,11 @@ describe("department indicators — published with a named source, or plainly mo
       "health/health-obesity": "who",
       "health/health-alcohol": "who",
       "health/health-hwf": "who",
+      // 2026-10-05 — PART 11, batch 3: the United Nations Comtrade Database joins the
+      // named sources; the two goods-trade figures below are reported to the United
+      // Nations by the national customs authority rather than being World Bank series.
+      "mfa/mfa-goods-exports": "comtrade",
+      "mfa/mfa-goods-imports": "comtrade",
     };
     const RECORDED: ReadonlyArray<[string, string, string, string]> = [
       ["fin/fin-deficit", "3.6", "World Development Indicators: Net lending (+) / net borrowing (-) (% of GDP)", "2018"],
@@ -512,6 +517,64 @@ describe("department indicators — published with a named source, or plainly mo
       ["psc/psc-labour-force", "6,854,692", "World Development Indicators: Labor force, total", "2025"],
       ["lg/lg-population", "16,950,795", "World Development Indicators: Population, total", "2025"],
       ["lg/lg-pop-growth", "1.88", "World Development Indicators: Population growth (annual %)", "2025"],
+      // 2026-10-05 — PART 11, batch 3: 52 more real indicators (53 were drafted; the armed-forces
+      // personnel total was withdrawn as a duplicate of the existing `def-personnel` figure added
+      // in Batch S4). Every value below was read from the publisher's own API this session (the
+      // World Bank's World Development Indicators and Worldwide Governance Indicators, and the
+      // United Nations Comtrade Database). UN Comtrade is a new named source, so its two rows are
+      // attributed to it in SOURCE_OVERRIDES above.
+      ["opc/opc-gov-effectiveness", "-0.89", "Worldwide Governance Indicators: Government effectiveness (estimate)", "2025"],
+      ["opc/opc-control-corruption", "-1.29", "Worldwide Governance Indicators: Control of corruption (estimate)", "2025"],
+      ["opc/opc-rule-of-law", "-1.22", "Worldwide Governance Indicators: Rule of law (estimate)", "2025"],
+      ["opc/opc-regulatory-quality", "-1.28", "Worldwide Governance Indicators: Regulatory quality (estimate)", "2025"],
+      ["fin/fin-gdp-percapita", "USD 3,021", "World Development Indicators: GDP per capita (current US$)", "2025"],
+      ["fin/fin-gdp", "USD 51.2B", "World Development Indicators: GDP (current US$)", "2025"],
+      ["fin/fin-investment-gdp", "8.8", "World Development Indicators: Gross capital formation (% of GDP)", "2024"],
+      ["fin/fin-consumption", "84.4", "World Development Indicators: Household final consumption expenditure (% of GDP)", "2024"],
+      ["fin/fin-gov-consumption", "12.2", "World Development Indicators: General government final consumption expenditure (% of GDP)", "2024"],
+      ["fin/fin-credit-private", "6.5", "World Development Indicators: Domestic credit to private sector (% of GDP)", "2023"],
+      ["fin/fin-current-account", "1.2", "World Development Indicators: Current account balance (% of GDP)", "2024"],
+      ["fin/fin-trade-openness", "41.5", "World Development Indicators: Trade (% of GDP)", "2024"],
+      ["agri/agri-food-index", "121.7", "World Development Indicators: Food production index (2014-2016 = 100)", "2022"],
+      ["agri/agri-crop-index", "123.5", "World Development Indicators: Crop production index (2014-2016 = 100)", "2022"],
+      ["agri/agri-arable", "10.4", "World Development Indicators: Arable land (% of land area)", "2023"],
+      ["agri/agri-cereal-area", "1,569,913", "World Development Indicators: Land under cereal production (hectares)", "2023"],
+      ["health/health-spend-capita", "USD 62.9", "World Development Indicators: Current health expenditure per capita (current US$)", "2023"],
+      ["health/health-out-of-pocket", "10.6", "World Development Indicators: Out-of-pocket expenditure (% of current health expenditure)", "2023"],
+      ["health/health-infant", "62.4", "World Development Indicators: Mortality rate, infant (per 1,000 live births)", "2024"],
+      ["health/health-neonatal", "33.7", "World Development Indicators: Mortality rate, neonatal (per 1,000 live births)", "2024"],
+      ["health/health-measles", "90", "World Development Indicators: Immunization, measles (% of children ages 12-23 months)", "2024"],
+      ["health/health-hiv-prevalence", "9.8", "World Development Indicators: Prevalence of HIV, total (% of population ages 15-49)", "2024"],
+      ["health/health-contraception", "66.8", "World Development Indicators: Contraceptive prevalence, any method (% of married women ages 15-49)", "2015"],
+      ["health/health-teen-births", "95.5", "World Development Indicators: Adolescent fertility rate (births per 1,000 women ages 15-19)", "2024"],
+      ["edu/edu-spend-gdp", "0.4", "World Development Indicators: Government expenditure on education, total (% of GDP)", "2023"],
+      ["edu/edu-ratio-secondary", "22.5", "World Development Indicators: Pupil-teacher ratio, secondary", "2013"],
+      ["edu/edu-out-of-school", "332,314", "World Development Indicators: Children out of school, primary", "2024"],
+      ["edu/edu-youth-literacy", "92.5", "World Development Indicators: Literacy rate, youth total (% of people ages 15-24)", "2019"],
+      ["edu/edu-net-enrolment", "94.6", "World Development Indicators: Adjusted net enrollment rate, primary (% of primary school age children)", "2013"],
+      ["ict/ict-ict-exports", "0.02", "World Development Indicators: ICT goods exports (% of total goods exports)", "2024"],
+      ["ict/ict-ict-services", "3.3", "World Development Indicators: ICT service exports (% of service exports, BoP)", "2024"],
+      ["energy/energy-electricity-pc", "504", "World Development Indicators: Electric power consumption (kWh per capita)", "2023"],
+      ["energy/energy-renewable-share", "82.4", "World Development Indicators: Renewable energy consumption (% of total final energy consumption)", "2021"],
+      ["energy/energy-imports-net", "17.0", "World Development Indicators: Energy imports, net (% of energy use)", "2022"],
+      ["psc/psc-employment-agri", "54.3", "World Development Indicators: Employment in agriculture (% of total employment) (modeled ILO estimate)", "2025"],
+      ["psc/psc-employment-industry", "11.5", "World Development Indicators: Employment in industry (% of total employment) (modeled ILO estimate)", "2025"],
+      ["psc/psc-employment-services", "34.2", "World Development Indicators: Employment in services (% of total employment) (modeled ILO estimate)", "2025"],
+      ["psc/psc-vulnerable", "68.2", "World Development Indicators: Vulnerable employment, total (% of total employment) (modeled ILO estimate)", "2025"],
+      ["psc/psc-working-age", "56.2", "World Development Indicators: Population ages 15-64 (% of total population)", "2025"],
+      ["psc/psc-dependency", "78.1", "World Development Indicators: Age dependency ratio (% of working-age population)", "2025"],
+      ["lg/lg-urban-growth", "3.4", "World Development Indicators: Urban population growth (annual %)", "2025"],
+      ["lg/lg-rural-share", "59.5", "World Development Indicators: Rural population (% of total population)", "2025"],
+      ["mfa/mfa-goods-exports", "USD 7.43B", "UN Comtrade Database: merchandise exports, total", "2024"],
+      ["mfa/mfa-goods-imports", "USD 9.53B", "UN Comtrade Database: merchandise imports, total", "2024"],
+      ["mfa/mfa-tourist-arrivals", "639,000", "World Development Indicators: International tourism, number of arrivals", "2020"],
+      ["mfa/mfa-tourism-receipts", "USD 66M", "World Development Indicators: International tourism, receipts (current US$)", "2020"],
+      ["mfa/mfa-export-share", "18.1", "World Development Indicators: Exports of goods and services (% of GDP)", "2024"],
+      ["env/env-pm25", "15.0", "World Development Indicators: PM2.5 air pollution, mean annual exposure (micrograms per cubic meter)", "2023"],
+      ["env/env-air-mortality", "189.6", "World Development Indicators: Mortality rate attributed to household and ambient air pollution (per 100,000 population)", "2019"],
+      ["def/def-spending-budget", "1.3", "World Development Indicators: Military expenditure (% of central government expenditure)", "2024"],
+      ["def/def-personnel-share", "0.88", "World Development Indicators: Armed forces personnel (% of total labor force)", "2020"],
+      ["zida/zida-manufacturing", "14.9", "World Development Indicators: Manufacturing, value added (% of GDP)", "2025"],
     ];
 
     RECORDED.forEach(([where, value, publication, asOf]) => {
