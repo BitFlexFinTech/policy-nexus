@@ -23,10 +23,10 @@ import { departmentDocumentStoreFor } from "@/services/documents/departmentDocum
  * simulation the department runs — so the modelled position rests on the department's own
  * material as well as on the submitted draft.
  *
- * It says plainly what happened to each file. A `.txt` or `.docx` is read for real; a `.pdf`
- * is recorded by name and the entry says it was not read, because this build has no PDF
- * reader. A file that was not read contributes nothing to a run — the count of documents
- * read on an assessment only ever includes text that really exists.
+ * It says plainly what happened to each file. A `.txt`, `.docx` or `.xlsx` is read for
+ * real; a `.pdf` is recorded by name and the entry says it was not read, because this
+ * build has no PDF reader. A file that was not read contributes nothing to a run — the
+ * count of documents read on an assessment only ever includes text that really exists.
  */
 export function DepartmentDocumentsPanel({ department }: { department: Department }) {
   const config = usePlatformConfig();
@@ -47,7 +47,7 @@ export function DepartmentDocumentsPanel({ department }: { department: Departmen
   const readFiles = async (files: File[]) => {
     const accepted = files.filter((file) => isAcceptedPolicyFile(file.name, file.type));
     if (accepted.length === 0) {
-      setNotices(["No readable file was chosen. This build reads .txt and .docx files."]);
+      setNotices(["No readable file was chosen. This build reads .txt, .docx and .xlsx files."]);
       return;
     }
     setIsReading(true);
@@ -143,7 +143,7 @@ export function DepartmentDocumentsPanel({ department }: { department: Departmen
           <input
             type="file"
             multiple
-            accept=".txt,.docx,.pdf"
+            accept=".txt,.docx,.xlsx,.pdf"
             className="hidden"
             disabled={isReading}
             onChange={(event) => {
@@ -154,7 +154,7 @@ export function DepartmentDocumentsPanel({ department }: { department: Departmen
           />
         </label>
         <span className="text-[10px] text-muted-foreground">
-          .txt and .docx are read in full; .pdf is recorded by name and not read in this build.
+          .txt, .docx and .xlsx are read in full; .pdf is recorded by name and not read in this build.
         </span>
         {documents.length > 0 && (
           <Button

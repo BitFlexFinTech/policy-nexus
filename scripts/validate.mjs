@@ -31,6 +31,11 @@
  * 19. No superseded bundle is presented as the live one — every deployment claim the records make is
  *     checked against the bundle this working copy actually builds
  * 20. The promoter is always named in full — "Oreida Pvt Ltd", never "Oreida" alone
+ * 21. The live-site description states the figures the configuration actually holds — the
+ *     published / modelled split, derived from the data, never a superseded hand-typed number
+ * 22. Real, published figures outnumber the modelled ones (the owner's locked goal, PART 11)
+ * 23. An Excel `.xlsx` upload is READ in the browser, not recorded by name — the reader exists
+ *     and is wired into the extraction seam, and every upload surface offers the type (BATCH 4)
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -992,6 +997,64 @@ if (!existsSync(cssPath)) {
   check("real, published figures outnumber the modelled ones (the owner's locked goal)", problems);
 }
 
+// ---------------------------------------------------------------------------------------------
+// check 23 — an Excel .xlsx upload is READ, not recorded by name (BATCH 4)
+// The defect this exists for: the upload zone accepted `.txt`, `.docx` and `.pdf` and reported a
+// spreadsheet as an unsupported type, so a department's return or statistics table — the most
+// common shape of the data these departments actually hold — contributed nothing to a run. The
+// reader is real and dependency-free (the same zip container the Word reader uses), so this gate
+// fails the build if the capability is dropped or silently narrowed: the reader must exist and be
+// wired into the extraction seam, and every upload surface must offer the type.
+{
+  const problems = [];
+  const readerPath = join(ROOT, "src/services/extraction/xlsxText.ts");
+  const extractorPath = join(ROOT, "src/services/extraction/extractPolicyText.ts");
+  const surfaces = [
+    join(ROOT, "src/components/PolicyInput.tsx"),
+    join(ROOT, "src/components/documents/DepartmentDocumentsPanel.tsx"),
+  ];
+
+  if (!existsSync(readerPath)) {
+    problems.push("src/services/extraction/xlsxText.ts is missing — a spreadsheet can no longer be read");
+  } else {
+    const reader = readFileSync(readerPath, "utf8");
+    if (!/export const readXlsxText\s*=/.test(reader)) {
+      problems.push("src/services/extraction/xlsxText.ts no longer exports readXlsxText");
+    }
+  }
+
+  if (!existsSync(extractorPath)) {
+    problems.push("src/services/extraction/extractPolicyText.ts is missing");
+  } else {
+    const extractor = readFileSync(extractorPath, "utf8");
+    if (!/"xlsx"/.test(extractor)) {
+      problems.push("the extraction seam no longer knows the xlsx kind");
+    }
+    if (!/readXlsxText/.test(extractor)) {
+      problems.push(
+        "the extraction seam no longer calls readXlsxText — a spreadsheet would be recorded by name again",
+      );
+    }
+    if (!/\.xlsx/.test(extractor)) {
+      problems.push("the extraction seam no longer classifies a .xlsx file");
+    }
+  }
+
+  for (const surface of surfaces) {
+    if (!existsSync(surface)) {
+      problems.push(`${rel(surface)} is missing`);
+      continue;
+    }
+    if (!/accept="[^"]*\.xlsx/.test(readFileSync(surface, "utf8"))) {
+      problems.push(`${rel(surface)} no longer offers .xlsx in its file input`);
+    }
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  an Excel .xlsx is read in the browser and offered on every upload surface (BATCH 4)");
+  }
+  check("an Excel .xlsx upload is read, not recorded by name", problems);
+}
 
 
 // summary

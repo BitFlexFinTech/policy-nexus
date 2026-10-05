@@ -5,6 +5,7 @@ import { DEPARTMENTS, DEPARTMENT_COUNT, findDepartment } from "../src/config/dep
 import { BRAND } from "../src/config/brand";
 import { ADMIN_ROUTE } from "../src/config/platform";
 import { citedInstrumentLabel } from "../src/config/instruments";
+import { createStoredZip } from "../src/services/documents/zip";
 
 /**
  * Phase H — the real in-browser end-to-end journey.
@@ -1002,6 +1003,59 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     // And the run's own record states what was supplied and what was read.
     await page.getByRole("link", { name: "Full assessment", exact: true }).click();
     await expect(page.getByText("1 supplied · 1 read")).toBeVisible();
+
+    expectCleanRuntime();
+  });
+
+  test("a department's own Excel spreadsheet is read into its runs (Batch 4)", async ({ page }) => {
+    await page.goto("/");
+    await enterWorkspace(page);
+
+    // A real workbook, in the shape Excel writes one: the words live in a shared table and
+    // each cell that holds one carries its index. Built with the platform's own ZIP writer.
+    const encoder = new TextEncoder();
+    const workbook = createStoredZip([
+      {
+        name: "xl/sharedStrings.xml",
+        data: encoder.encode(
+          "<sst><si><t>Indicator</t></si><si><t>Revenue collected</t></si><si><t>ZWG 116.47 billion</t></si></sst>",
+        ),
+      },
+      {
+        name: "xl/worksheets/sheet1.xml",
+        data: encoder.encode(
+          '<worksheet><sheetData><row r="1"><c r="A1" t="s"><v>0</v></c></row><row r="2"><c r="A2" t="s"><v>1</v></c><c r="B2" t="s"><v>2</v></c></row></sheetData></worksheet>',
+        ),
+      },
+    ]);
+
+    // The department adds a spreadsheet — the commonest shape of the data it holds.
+    await page.getByRole("link", { name: "Documents" }).click();
+    await expect(page.getByRole("heading", { name: "Document Library" })).toBeVisible();
+    await page.setInputFiles('input[type="file"]', {
+      name: "finance-return.xlsx",
+      mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      buffer: Buffer.from(workbook),
+    });
+
+    // The words really taken out of the spreadsheet are what the panel reports — never a filename.
+    await expect(page.getByText("finance-return.xlsx", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText(/Text extracted from the spreadsheet in this browser/).first(),
+    ).toBeVisible();
+    await expect(page.getByText(/characters will be read into every run/)).toBeVisible();
+
+    // A run made afterwards reads it, and the assessment says so.
+    await page.getByRole("link", { name: "Overview" }).click();
+    await page
+      .getByPlaceholder(/Draft the policy text/)
+      .fill("A draft run, used to check that a spreadsheet is read into the examination.");
+    await page.getByRole("button", { name: "Run Simulation" }).click();
+    await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({
+      timeout: 30_000,
+    });
+    await page.getByRole("link", { name: "Open executive summary" }).first().click();
+    await expect(page.getByText(/1 of the department's own document/)).toBeVisible();
 
     expectCleanRuntime();
   });

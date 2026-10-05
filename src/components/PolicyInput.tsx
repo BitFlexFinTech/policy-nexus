@@ -353,13 +353,13 @@ export function PolicyInput() {
             isDragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25 bg-muted/30"
           }`}
         >
-          <span className="mb-1 text-xs text-muted-foreground">Drag & Drop PDF, DOCX, or TXT files</span>
+          <span className="mb-1 text-xs text-muted-foreground">Drag & Drop PDF, DOCX, XLSX, or TXT files</span>
           <label className="cursor-pointer text-xs font-medium text-primary hover:underline">
             or browse files
             <input
               type="file"
               className="hidden"
-              accept=".pdf,.docx,.txt"
+              accept=".pdf,.docx,.xlsx,.txt"
               multiple
               onChange={(e) => {
                 void handleFileUpload(e.target.files);

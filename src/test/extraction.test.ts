@@ -31,13 +31,21 @@ describe("policy file extraction", () => {
     expect(classifyPolicyFile("DRAFT.TXT", "text/plain")).toBe("text");
     expect(classifyPolicyFile("brief.pdf", "application/pdf")).toBe("pdf");
     expect(classifyPolicyFile("brief.docx")).toBe("docx");
+    expect(classifyPolicyFile("return.xlsx")).toBe("xlsx");
+    expect(
+      classifyPolicyFile(
+        "return.xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      ),
+    ).toBe("xlsx");
     expect(classifyPolicyFile("notes.md")).toBe("unsupported");
   });
 
-  it("accepts only the three documented upload types", () => {
+  it("accepts only the four documented upload types", () => {
     expect(isAcceptedPolicyFile("a.txt")).toBe(true);
     expect(isAcceptedPolicyFile("a.pdf", "application/pdf")).toBe(true);
     expect(isAcceptedPolicyFile("a.docx")).toBe(true);
+    expect(isAcceptedPolicyFile("a.xlsx")).toBe(true);
     expect(isAcceptedPolicyFile("a.png", "image/png")).toBe(false);
   });
 
@@ -88,6 +96,7 @@ describe("policy file extraction", () => {
     await extractPolicyFile(makeFile("a.txt", "text", "text/plain"));
     await extractPolicyFile(makeFile("a.pdf", "x", "application/pdf"));
     await extractPolicyFile(makeFile("a.docx", "x"));
+    await extractPolicyFile(makeFile("a.xlsx", "x"));
     if (fetchSpy) expect(fetchSpy).not.toHaveBeenCalled();
   });
 

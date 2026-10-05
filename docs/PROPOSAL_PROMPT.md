@@ -369,14 +369,15 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister or to
   Cabinet**. The document for that room is **Part 1 — the funding memo**.
-- **What the live site actually is today (re-checked 2026-10-05, after the drafted-policy Batch 3 build — the mock-first `library` seam — was published).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-_GE52mzy.js`
-  (`4ac71d14e6cffea61a63a1f240af854329aa4bb8535a7d28ab28904821cd17e8`), which is byte-identical to the
+- **What the live site actually is today (re-checked 2026-10-05, after the drafted-policy Batch 4 build — reading Excel `.xlsx` files in the browser — was published).**
+  The host `nzwisiso.bitflex.app` serves `assets/index-BF1pCn3B.js`
+  (`3f4767ed960ab1f44aea87518f657b4facef9a0e0990d23ea0e81dee6ef661fc`), which is byte-identical to the
   local build, so **the live site is the build published on 2026-10-05** — it shows the **live date and
   time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (275 published / 235 modelled), and it carries the authority line, the modelled
   agent population, the named sources (with the corrected sentence naming both publishers the stakeholder
   shares stand on), the official Coat of Arms, the favicon set, the Nzwisiso.ai
-  positioning section, all 275 published figures, and the owner's items 1–11, including the *Re-run
+  positioning section, all 275 published figures, and the owner's items 1–11, including reading a
+  department's own `.txt`, `.docx` and `.xlsx` documents in the browser, the *Re-run
   simulation* action, the drafting stage, the recommended-step actions that open or send the part of the
   policy that answers each step, the **Implementation pack** (generated and read-only — the form that asked
   an officer to hand-fill the working matrices was removed at the owner's instruction on 2026-10-02), and

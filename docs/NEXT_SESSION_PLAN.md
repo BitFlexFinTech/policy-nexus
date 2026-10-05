@@ -76,8 +76,13 @@ served file byte-identical, `npm run sync:check`, refresh the review zip. Never 
   client (today) and a **Shared** HTTP client, plus a chooser reading a new **`library` capability** in
   `src/config/platform.ts`; record the server contract in `docs/SERVER_CONTRACT.md`; label Local
   unmistakably.
-- **Batch 4 — Excel reading.** Read `.xlsx` in-browser via the existing unpack approach (sharedStrings +
-  sheet XML). No new dependency, no network.
+- **Batch 4 — Excel reading. DONE 2026-10-05.** `.xlsx` is now read **in-browser** via the existing unpack
+  approach: `src/services/extraction/xlsxText.ts` reads `xl/sharedStrings.xml` (the shared word table) plus
+  every `xl/worksheets/sheet*.xml` (the grid), giving one tab-separated line per row, worksheets separated by
+  a blank line, numbers/booleans/in-cell words included and a skipped cell kept as a gap. `zipRead.ts` gained
+  `listZipEntries` + `readArchiveBytes` (shared with the Word reader). No new dependency, no network. Gate:
+  `scripts/validate.mjs` check 23 (mutation-proved). Tests: 523/523 (new `src/test/xlsx-read.test.ts`) and
+  Playwright 19/19 (a real workbook uploaded in a real browser). Published and verified byte-identical.
 - **Batch 5 — documents used in the policy.** Add a **"Documents and data relied upon"** annex (documents
   really read) and use them in the situation analysis — real content, not padding.
 - **Batch 6 — the Run-Simulation notification.** A dismissible pop-up (once per department, remembered) +
@@ -91,6 +96,8 @@ served file byte-identical, `npm run sync:check`, refresh the review zip. Never 
 - **Branch:** `feature/unified-platform` (never `main`); confirm the tip with `git log --oneline -1` and a
   clean, IN-SYNC tree before starting.
 - **Start with Batch 1**, then 2a, 2b, 2c, then 3 → 4 → 5 → 6 → 7.
+  **Batches 1, 2a, 2b, 3 and 4 are DONE and published; Batch 2c is BLOCKED on the owner's decision — so a
+  cold session starts with Batch 5.**
 - **Never** raise the length floor with invented content; **never** claim team sharing before the server
   exists; **never** make a UI/UX decision the owner has not approved.
 

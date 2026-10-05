@@ -17,7 +17,7 @@
  * DETERMINISM: pure text work. The same file always yields the same text.
  */
 
-import { readZipEntry } from "./zipRead";
+import { readArchiveBytes, readZipEntry } from "./zipRead";
 
 /** The part of a `.docx` that holds the document body. */
 const DOCUMENT_PART = "word/document.xml";
@@ -31,7 +31,12 @@ const ENTITIES: Record<string, string> = {
   "&apos;": "'",
 };
 
-const decodeXml = (value: string): string =>
+/**
+ * Decode the entities XML encodes, so a reader gets the characters the document
+ * actually holds. Shared with the spreadsheet reader (`./xlsxText`), which meets the
+ * same entities in a workbook's stored text.
+ */
+export const decodeXml = (value: string): string =>
   value
     .replace(/&#(\d+);/g, (_match, code: string) => String.fromCodePoint(Number(code)))
     .replace(/&#x([0-9a-f]+);/gi, (_match, code: string) => String.fromCodePoint(parseInt(code, 16)))
@@ -67,28 +72,6 @@ export const textFromDocumentXml = (xml: string): string => {
   );
   return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 };
-
-/**
- * Read a file's bytes. `File.arrayBuffer` is not available in every environment this
- * code runs in (older browsers, and the test environment), so the FileReader route is
- * the fallback rather than a failure.
- */
-const readArchiveBytes = (file: File): Promise<ArrayBuffer> =>
-  new Promise((resolve, reject) => {
-    if (typeof file.arrayBuffer === "function") {
-      file.arrayBuffer().then(resolve, reject);
-      return;
-    }
-    if (typeof FileReader === "undefined") {
-      reject(new Error("This browser cannot read the file."));
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () =>
-      resolve(reader.result instanceof ArrayBuffer ? reader.result : new ArrayBuffer(0));
-    reader.onerror = () => reject(reader.error ?? new Error("The file could not be read."));
-    reader.readAsArrayBuffer(file);
-  });
 
 /**
  * Read a `.docx` file's text. Throws with a plain-language reason when the file

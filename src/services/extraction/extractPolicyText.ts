@@ -8,6 +8,10 @@
  * its own paragraphs become the policy text of the run. No server, no dependency,
  * no network call.
  *
+ * REAL for Excel: an `.xlsx` file is unpacked in the browser (see `./xlsxText`) and its
+ * own cells become the policy text of the run — the same no-server, no-dependency,
+ * no-network path as the Word file.
+ *
  * NOT EXTRACTED: `.pdf`. Reading a PDF needs a parser or a server, and neither
  * exists in this build, so the file is recorded by name and the screen says plainly
  * that it was not read — rather than showing a progress bar that implies it was.
@@ -18,9 +22,10 @@
 
 import { liveService } from "@/config/platform";
 import { readDocxText } from "./docxText";
+import { readXlsxText } from "./xlsxText";
 import { requestTextExtraction } from "./httpExtractionClient";
 
-export type ExtractionKind = "text" | "pdf" | "docx" | "unsupported";
+export type ExtractionKind = "text" | "pdf" | "docx" | "xlsx" | "unsupported";
 
 export interface ExtractedPolicyFile {
   name: string;
@@ -53,6 +58,12 @@ export const classifyPolicyFile = (name: string, type?: string): ExtractionKind 
     lower.endsWith(".docx")
   ) {
     return "docx";
+  }
+  if (
+    type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    lower.endsWith(".xlsx")
+  ) {
+    return "xlsx";
   }
   return "unsupported";
 };
@@ -133,26 +144,29 @@ export const extractPolicyFile = async (file: File): Promise<ExtractedPolicyFile
     return { ...base, kind, extracted: true, text, status: "Text extracted." };
   }
 
-  if (kind === "docx") {
+  if (kind === "docx" || kind === "xlsx") {
     // REAL PATH — unpacked in the browser, with no server and no dependency. Tried
     // before the configured service, because it needs nothing configured to work.
+    const label = kind === "docx" ? "Word document" : "spreadsheet";
     try {
-      const text = normalisePolicyText(await readDocxText(file));
+      const text = normalisePolicyText(
+        kind === "docx" ? await readDocxText(file) : await readXlsxText(file),
+      );
       if (text) {
         return {
           ...base,
           kind,
           extracted: true,
           text,
-          status: "Text extracted from the Word document in this browser.",
+          status: `Text extracted from the ${label} in this browser.`,
         };
       }
     } catch (error) {
       // A genuine failure is reported in plain words, then the service is offered a
       // chance below — never disguised as "not read".
-      const reason = error instanceof Error ? error.message : "The Word document could not be opened.";
-      const live = liveService("extraction");
-      if (!live) {
+      const reason =
+        error instanceof Error ? error.message : `The ${label} could not be opened.`;
+      if (!liveService("extraction")) {
         return {
           ...base,
           kind,
@@ -164,11 +178,11 @@ export const extractPolicyFile = async (file: File): Promise<ExtractedPolicyFile
     }
   }
 
-  if (kind === "pdf" || kind === "docx") {
+  if (kind === "pdf" || kind === "docx" || kind === "xlsx") {
     // LIVE PATH: only reachable when an administrator has completed the
-    // extraction capability in platform administration, or when the local Word
-    // reader above could not open the file. Otherwise the file is recorded by name
-    // and the screen says so.
+    // extraction capability in platform administration, or when the local Word or
+    // spreadsheet reader above could not open the file. Otherwise the file is recorded
+    // by name and the screen says so.
     const live = liveService("extraction");
     if (live) {
       const label = kind.toUpperCase();
@@ -211,7 +225,9 @@ export const extractPolicyFile = async (file: File): Promise<ExtractedPolicyFile
       status:
         kind === "docx"
           ? "Not read — the Word document held no readable text in its body."
-          : "Text extraction (Mock) — recorded by name; PDF text is not read in this build.",
+          : kind === "xlsx"
+            ? "Not read — the spreadsheet held no readable cells."
+            : "Text extraction (Mock) — recorded by name; PDF text is not read in this build.",
     };
   }
 

@@ -12,6 +12,10 @@
  * `DecompressionStream`, which is why no dependency is needed. Where the browser
  * cannot provide one, it fails with a plain reason instead of returning nothing.
  *
+ * It also LISTS an archive's parts and reads a file's bytes, because the spreadsheet
+ * reader (`./xlsxText`) needs both: an `.xlsx` holds one worksheet part per sheet, so
+ * it must discover which parts exist rather than open one name it already knows.
+ *
  * DETERMINISM: pure byte work. The same archive always yields the same bytes.
  */
 
@@ -58,6 +62,50 @@ const inflateRaw = async (bytes: Uint8Array<ArrayBuffer>): Promise<Uint8Array> =
   return out;
 };
 
+/** One entry in the archive's central directory — the index the ZIP format defines. */
+interface ZipDirectoryEntry {
+  name: string;
+  method: number;
+  compressedSize: number;
+  localOffset: number;
+}
+
+/**
+ * Walk the archive's central directory. Returns an empty list for bytes that are not a
+ * zip at all — an honest "nothing here", never a guess at offsets.
+ */
+const readCentralDirectory = (archive: ArrayBuffer): ZipDirectoryEntry[] => {
+  const view = new DataView(archive);
+  const eocd = findEndOfCentralDirectory(view);
+  if (eocd < 0) return [];
+
+  const entries = view.getUint16(eocd + 10, true);
+  let cursor = view.getUint32(eocd + 16, true);
+  const bytes = new Uint8Array(archive);
+  const decoder = new TextDecoder();
+  const found: ZipDirectoryEntry[] = [];
+
+  for (let index = 0; index < entries; index += 1) {
+    if (cursor + 46 > view.byteLength || view.getUint32(cursor, true) !== 0x02014b50) break;
+    const nameLength = view.getUint16(cursor + 28, true);
+    const extraLength = view.getUint16(cursor + 30, true);
+    const commentLength = view.getUint16(cursor + 32, true);
+    found.push({
+      name: decoder.decode(bytes.subarray(cursor + 46, cursor + 46 + nameLength)),
+      method: view.getUint16(cursor + 10, true),
+      compressedSize: view.getUint32(cursor + 20, true),
+      localOffset: view.getUint32(cursor + 42, true),
+    });
+    cursor += 46 + nameLength + extraLength + commentLength;
+  }
+
+  return found;
+};
+
+/** Every part name inside a zip archive, in the order the archive lists them. */
+export const listZipEntries = (archive: ArrayBuffer): string[] =>
+  readCentralDirectory(archive).map((entry) => entry.name);
+
 /**
  * Read one entry out of a zip archive. Returns `null` when the archive does not
  * hold that entry — an honest "not there", never an empty file pretending to be
@@ -67,40 +115,44 @@ export const readZipEntry = async (
   archive: ArrayBuffer,
   wanted: string,
 ): Promise<Uint8Array | null> => {
+  const entry = readCentralDirectory(archive).find((candidate) => candidate.name === wanted);
+  if (!entry) return null;
+
   const view = new DataView(archive);
-  const eocd = findEndOfCentralDirectory(view);
-  if (eocd < 0) return null;
-
-  const entries = view.getUint16(eocd + 10, true);
-  let cursor = view.getUint32(eocd + 16, true);
-  const bytes = new Uint8Array(archive);
-  const decoder = new TextDecoder();
-
-  for (let index = 0; index < entries; index += 1) {
-    if (cursor + 46 > view.byteLength || view.getUint32(cursor, true) !== 0x02014b50) return null;
-    const method = view.getUint16(cursor + 10, true);
-    const compressedSize = view.getUint32(cursor + 20, true);
-    const nameLength = view.getUint16(cursor + 28, true);
-    const extraLength = view.getUint16(cursor + 30, true);
-    const commentLength = view.getUint16(cursor + 32, true);
-    const localOffset = view.getUint32(cursor + 42, true);
-    const name = decoder.decode(bytes.subarray(cursor + 46, cursor + 46 + nameLength));
-
-    if (name === wanted) {
-      if (localOffset + 30 > view.byteLength || view.getUint32(localOffset, true) !== 0x04034b50) {
-        return null;
-      }
-      const localNameLength = view.getUint16(localOffset + 26, true);
-      const localExtraLength = view.getUint16(localOffset + 28, true);
-      const start = localOffset + 30 + localNameLength + localExtraLength;
-      const stored = bytes.subarray(start, start + compressedSize);
-      if (method === 0) return stored;
-      if (method === 8) return inflateRaw(stored);
-      throw new Error("This Word file uses a compression method this platform cannot open.");
-    }
-
-    cursor += 46 + nameLength + extraLength + commentLength;
+  if (
+    entry.localOffset + 30 > view.byteLength ||
+    view.getUint32(entry.localOffset, true) !== 0x04034b50
+  ) {
+    return null;
   }
-
-  return null;
+  const localNameLength = view.getUint16(entry.localOffset + 26, true);
+  const localExtraLength = view.getUint16(entry.localOffset + 28, true);
+  const start = entry.localOffset + 30 + localNameLength + localExtraLength;
+  const bytes = new Uint8Array(archive);
+  const stored = bytes.subarray(start, start + entry.compressedSize);
+  if (entry.method === 0) return stored;
+  if (entry.method === 8) return inflateRaw(stored);
+  throw new Error("This file uses a compression method this platform cannot open.");
 };
+
+/**
+ * Read a file's bytes. `File.arrayBuffer` is not available in every environment this
+ * code runs in (older browsers, and the test environment), so the FileReader route is
+ * the fallback rather than a failure.
+ */
+export const readArchiveBytes = (file: File): Promise<ArrayBuffer> =>
+  new Promise((resolve, reject) => {
+    if (typeof file.arrayBuffer === "function") {
+      file.arrayBuffer().then(resolve, reject);
+      return;
+    }
+    if (typeof FileReader === "undefined") {
+      reject(new Error("This browser cannot read the file."));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () =>
+      resolve(reader.result instanceof ArrayBuffer ? reader.result : new ArrayBuffer(0));
+    reader.onerror = () => reject(reader.error ?? new Error("The file could not be read."));
+    reader.readAsArrayBuffer(file);
+  });
