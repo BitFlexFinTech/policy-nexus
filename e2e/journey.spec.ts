@@ -1280,4 +1280,30 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
 
     expectCleanRuntime();
   });
+
+  test("an officer opens a support case, and the administrator delegates it (the simulated support desk)", async ({
+    page,
+  }) => {
+    // The footer carries one link to the administration screen (owner's instruction).
+    await page.goto("/");
+    await expect(page.getByRole("link", { name: "Platform administration" })).toBeVisible();
+
+    // The officer opens a case from the Support screen in the workspace.
+    await enterWorkspace(page);
+    await page.getByRole("link", { name: "Support" }).click();
+    await expect(page).toHaveURL(/\/app\/support$/);
+    await page.getByLabel("Subject").fill("Assessment report is blank");
+    await page.getByRole("button", { name: "Open a case" }).click();
+    await expect(page.getByText("CASE-0001", { exact: true })).toBeVisible();
+
+    // The administrator sees the case and delegates it to a support representative.
+    await page.goto(ADMIN_ROUTE);
+    await page.getByRole("button", { name: "Yes, I am the administrator" }).click();
+    await expect(page.getByRole("heading", { name: "Support inbox (1)" })).toBeVisible();
+    await page.getByLabel("Assign CASE-0001").fill("Rudo Support");
+    await page.getByLabel("Assign CASE-0001").press("Enter");
+    await expect(page.getByText(/delegated to Rudo Support/)).toBeVisible();
+
+    expectCleanRuntime();
+  });
 });

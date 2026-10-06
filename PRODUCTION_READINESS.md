@@ -101,12 +101,12 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-06, after the administrator gate was added to the platform administration screen — it asks "Are you the administrator?" before showing the settings, honestly labelled as not real security — on top of the OpenRouter drafting connection and the operative offline drafted policy; the host and the working copy are IN STEP).**
+- **Status today (2026-10-06, after the admin dashboard and the simulated support desk were added — an officer opens a case from `/app/support`, the administrator sets its state and delegates it, and the admin screen now leads with a Platform overview — on top of the administrator gate, the OpenRouter drafting connection and the operative offline drafted policy; the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-Cp3G8BpB.js` (`0eb23e59e3cee37e27db72308bf4435065b46192be20b33691d665ca9815cc76`) — fetched
+  `assets/index-CLawCYoP.js` (`37e16b41f321b446d090e92fd260a049e1f1575a44a7dbf4803b935a4456b56f`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
-  explicit FTPS, **never `--delete`** — 13 files, 1,493,072 bytes — and the SSL validation token
+  explicit FTPS, **never `--delete`** — 13 files, 1,526,597 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
   expansion and the 2026-10-04 dataset-expansion batches 1–4 and the PART 11 batches 1–7 — **150** canonical stakeholder groups, every

@@ -25,7 +25,7 @@ export function AdminGate({ children }: { children: ReactNode }) {
       <section className="w-full max-w-lg space-y-4 rounded-lg border bg-card p-6">
         <header className="space-y-1 border-b pb-3">
           <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Internal · not linked from any officer screen
+            Internal · protected by the administrator gate
           </span>
           <h1 className="text-lg font-semibold tracking-tight text-foreground">
             Administrator access

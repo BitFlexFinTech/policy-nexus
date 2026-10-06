@@ -71,8 +71,8 @@ describe("workspace — all 16 departments, department-aware panels", () => {
     signInToDepartment("fin");
     renderAt("/app");
     const nav = screen.getByRole("navigation", { name: /workspace sections/i });
-    expect(within(nav).getAllByRole("link")).toHaveLength(5);
-    ["Overview", "Policy Register", "Simulation Register", "Documents", "Reference"].forEach((label) => {
+    expect(within(nav).getAllByRole("link")).toHaveLength(6);
+    ["Overview", "Policy Register", "Simulation Register", "Documents", "Support", "Reference"].forEach((label) => {
       expect(within(nav).getByRole("link", { name: label })).toBeInTheDocument();
     });
   });

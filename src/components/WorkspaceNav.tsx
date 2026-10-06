@@ -11,6 +11,7 @@ const LINKS: ReadonlyArray<{ to: string; label: string; end?: boolean }> = [
   { to: "/app/policies", label: "Policy Register" },
   { to: "/app/simulations", label: "Simulation Register" },
   { to: "/app/documents", label: "Documents" },
+  { to: "/app/support", label: "Support" },
   { to: "/app/reference", label: "Reference" },
 ];
 

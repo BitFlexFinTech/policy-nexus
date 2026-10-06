@@ -41,12 +41,11 @@ describe("platform administration screen", () => {
     expect(screen.getByText(/Everything is simulated/)).toBeInTheDocument();
   });
 
-  it("is not linked from any officer-facing screen", () => {
-    for (const path of ["/", "/start", "/app"]) {
-      if (path === "/app") signInToDepartment("fin");
+  it("is linked from the public footer so an administrator can find it (owner's instruction)", () => {
+    for (const path of ["/", "/start"]) {
       const view = renderAt(path);
       const hrefs = Array.from(document.querySelectorAll("a")).map((a) => a.getAttribute("href"));
-      expect(hrefs, path).not.toContain(ADMIN_ROUTE);
+      expect(hrefs, path).toContain(ADMIN_ROUTE);
       view.unmount();
     }
   });

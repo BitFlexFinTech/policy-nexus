@@ -8,6 +8,7 @@ import Home from "./pages/Landing.tsx";
 import ChooseDepartment from "./pages/ChooseDepartment.tsx";
 import Index from "./pages/Index.tsx";
 import Documents from "./pages/Documents.tsx";
+import Support from "./pages/Support.tsx";
 import Policies from "./pages/Policies.tsx";
 import Reference from "./pages/Reference.tsx";
 import Simulations from "./pages/Simulations.tsx";
@@ -77,6 +78,7 @@ const App = () => (
               <Route path="/app/assessments/:id/implementation-pack" element={<ImplementationPack />} />
               <Route path="/app/compare/:a/:b" element={<Compare />} />
               <Route path="/app/documents" element={<Documents />} />
+              <Route path="/app/support" element={<Support />} />
               <Route path="/app/reference" element={<Reference />} />
             </Route>
           </Route>

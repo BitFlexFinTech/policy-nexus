@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CapabilityEditor } from "@/components/admin/CapabilityEditor";
 import { ContentEditor } from "@/components/admin/ContentEditor";
+import { PlatformOverview } from "@/components/admin/PlatformOverview";
 import { SsoEditor } from "@/components/admin/SsoEditor";
+import { SupportInbox } from "@/components/admin/SupportInbox";
 import { BRAND } from "@/config/brand";
 import {
   ADMIN_ROUTE,
@@ -13,6 +15,7 @@ import {
   isConfigPersistent,
   type PlatformConfig,
 } from "@/config/platform";
+import { SUPPORT_DESK_LIMITATION } from "@/config/support";
 import { platformConfigActions, usePlatformConfig } from "@/config/usePlatformConfig";
 import { clearRuns } from "@/services/assessment/runStore";
 import { adminAccessActions } from "@/session/useAdminAccess";
@@ -23,9 +26,10 @@ const SERVICE_CAPABILITIES = ["assessment", "drafting", "extraction", "library"]
 /**
  * Platform administration — where capability credentials are entered.
  *
- * HIDDEN BY DESIGN: this screen is not linked from the landing page, the
- * workspace navigation, the header or the footer. It is reached only by typing
- * its address, and its address is defined once in `src/config/platform.ts` so it
+ * REACHED FROM THE FOOTER, PROTECTED BY THE GATE: the public footer carries one discreet
+ * link here (owner's instruction, 2026-10-06 — an administrator must be able to find their
+ * own screen), and the route sits behind `AdminGate`, which asks "Are you the administrator?"
+ * before showing the settings. The address is defined once in `src/config/platform.ts`, so it
  * can be re-homed behind a different URL without touching any other file.
  *
  * It changes nothing until an administrator saves a complete configuration: every
@@ -62,7 +66,7 @@ export default function PlatformAdmin() {
       <div className="mx-auto max-w-5xl space-y-4 p-6">
         <header className="space-y-1 border-b pb-3">
           <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Internal · not linked from any officer screen
+            Internal · reached from the site footer, protected by the administrator gate
           </span>
           <h1 className="text-lg font-semibold tracking-tight text-foreground">
             Platform administration
@@ -70,8 +74,9 @@ export default function PlatformAdmin() {
           <p className="max-w-3xl text-xs text-muted-foreground">
             {BRAND.productName} · {BRAND.entityCustodian}. Capability credentials are entered here
             and read by the platform's service seams, and the public landing page's wording, mark
-            and tab icon are edited further down. This page is reached only by typing{" "}
-            <span className="font-mono text-foreground">{ADMIN_ROUTE}</span>; nothing links to it.
+            and tab icon are edited further down. It is reached from the site footer (and by typing{" "}
+            <span className="font-mono text-foreground">{ADMIN_ROUTE}</span>), and the administrator
+            gate asks one question before it will show these settings.
           </p>
         </header>
 
@@ -86,6 +91,8 @@ export default function PlatformAdmin() {
             </span>
           )}
         </section>
+
+        <PlatformOverview />
 
         <section className="rounded-lg border bg-card p-3 text-xs leading-relaxed">
           <strong className="font-semibold">
@@ -103,6 +110,8 @@ export default function PlatformAdmin() {
         <SsoEditor config={draft} onChange={setDraft} />
 
         <ContentEditor />
+
+        <SupportInbox limitation={SUPPORT_DESK_LIMITATION} />
 
         <section className="flex flex-wrap items-center gap-2 rounded-lg border bg-card p-3">
           <Button size="sm" className="h-8 text-xs" onClick={save} disabled={!dirty}>

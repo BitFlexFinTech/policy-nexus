@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { BRAND, PROMOTER, SOVEREIGNTY_STATEMENT, WORDMARK } from "@/config/brand";
 import { REFERENCE_FISCAL_YEAR } from "@/config/reference";
+import { ADMIN_ROUTE } from "@/config/platform";
 import { formatClock, useNow } from "@/lib/clock";
 import { COVERAGE } from "@/lib/coverage";
 import { logoSrc } from "@/config/content";
@@ -202,6 +203,12 @@ function OfficialFooter() {
             <p className="text-xs leading-relaxed text-primary-foreground/75">
               Methodology and limitations are published in the workspace reference section.
             </p>
+            <Link
+              to={ADMIN_ROUTE}
+              className="text-xs text-primary-foreground/85 underline-offset-4 hover:underline"
+            >
+              Platform administration
+            </Link>
           </div>
         </div>
 

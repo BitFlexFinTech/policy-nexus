@@ -43,6 +43,11 @@
  *     rendered on the public landing page (BATCH 7)
  * 27. The platform administration screen sits behind the administrator gate — the gate exists, the
  *     route is wrapped by it, and the gate states plainly that it is NOT real security
+ * 28. The platform administration screen is reachable from the public footer (the owner's
+ *     instruction: an administrator must be able to find their own screen), while the workspace
+ *     chrome deliberately carries no link to it
+ * 29. The simulated support desk exists and is honestly labelled — the store, the officer's
+ *     open-a-case form, the administrator's inbox, and the "kept in this browser only" statement
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -1285,6 +1290,80 @@ if (!existsSync(cssPath)) {
     notes.push("INFO  the platform administration screen sits behind the administrator gate, which states it is not real security");
   }
   check("the administrator gate protects the platform administration screen", problems);
+}
+
+// ---------------------------------------------------------------------------------------------
+// check 28 — THE ADMINISTRATION SCREEN IS REACHABLE FROM THE PUBLIC FOOTER
+// The owner's instruction (2026-10-06): an administrator must be able to find their own screen.
+// It is linked once from the public footer, and deliberately NOT from the workspace navigation,
+// which is where an ordinary officer would look. This fails the build if the footer link
+// disappears (the owner could not reach their own admin page) or if a workspace link is added.
+{
+  const problems = [];
+  const shellPath = join(ROOT, "src/components/public/PublicPageShell.tsx");
+  if (!existsSync(shellPath)) {
+    problems.push("src/components/public/PublicPageShell.tsx is missing");
+  } else if (!/ADMIN_ROUTE/.test(readFileSync(shellPath, "utf8"))) {
+    problems.push("the public footer no longer links to the administration screen — the owner must be able to find it");
+  }
+  const navPath = join(ROOT, "src/components/WorkspaceNav.tsx");
+  if (existsSync(navPath) && /ADMIN_ROUTE/.test(readFileSync(navPath, "utf8"))) {
+    problems.push("the workspace navigation links to the administration screen — it must not");
+  }
+  if (problems.length === 0) {
+    notes.push("INFO  the administration screen is reachable from the public footer, and not from the workspace navigation");
+  }
+  check("the administration screen is reachable from the public footer", problems);
+}
+
+// ---------------------------------------------------------------------------------------------
+// check 29 — THE SIMULATED SUPPORT DESK EXISTS AND IS HONESTLY LABELLED
+// The owner's requirement: an officer opens a case (a support ticket), the administrator sees it,
+// and it can be delegated to a support representative. It is built mock-first, so the screens must
+// say plainly that a case is kept in this browser only until the support server exists. This fails
+// the build if the store, the officer's form, the administrator's inbox, the workspace route, or
+// the honest statement is removed.
+{
+  const problems = [];
+  const configPath = join(ROOT, "src/config/support.ts");
+  const storePath = join(ROOT, "src/services/support/supportStore.ts");
+  const formPath = join(ROOT, "src/components/support/OpenCaseForm.tsx");
+  const inboxPath = join(ROOT, "src/components/admin/SupportInbox.tsx");
+  const pagePath = join(ROOT, "src/pages/Support.tsx");
+
+  for (const path of [configPath, storePath, formPath, inboxPath, pagePath]) {
+    if (!existsSync(path)) {
+      problems.push(`the simulated support desk is incomplete — ${rel(path)} is missing`);
+    }
+  }
+
+  if (existsSync(configPath)) {
+    const config = readFileSync(configPath, "utf8");
+    if (!/export const SUPPORT_DESK_LIMITATION\s*=/.test(config)) {
+      problems.push("src/config/support.ts no longer exports the honest desk statement");
+    }
+    if (!/kept in THIS browser only/.test(config)) {
+      problems.push("the support desk statement no longer says a case is kept in this browser only");
+    }
+  }
+  if (existsSync(storePath)) {
+    const store = readFileSync(storePath, "utf8");
+    if (!/export const openSupportCase\s*=/.test(store)) {
+      problems.push("the support store no longer opens a case");
+    }
+    if (!/export const assignSupportCase\s*=/.test(store)) {
+      problems.push("the support store no longer delegates a case to a representative");
+    }
+  }
+  const appPath = join(ROOT, "src/App.tsx");
+  if (existsSync(appPath) && !/\/app\/support/.test(readFileSync(appPath, "utf8"))) {
+    problems.push("src/App.tsx no longer mounts the /app/support route — an officer cannot open a case");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the simulated support desk exists and is honestly labelled (officer form, administrator inbox, kept in this browser only)");
+  }
+  check("the simulated support desk exists and is honestly labelled", problems);
 }
 
 
