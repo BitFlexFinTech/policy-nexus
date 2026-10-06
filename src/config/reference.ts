@@ -1,17 +1,21 @@
 /**
- * SINGLE SOURCE OF TRUTH — reference date, reference rates, and stakeholder
- * segments.
+ * SINGLE SOURCE OF TRUTH — the platform reference rates and stakeholder segments,
+ * and the one fixed date the scenario build stamps on a record that needs one.
  *
- * DETERMINISM: every date shown anywhere in the app derives from REFERENCE_DATE.
- * No component may call `new Date()`, `Date.now()`, or `Math.random()`.
+ * DETERMINISM: no component may call `new Date()`, `Date.now()`, or `Math.random()`.
+ * The only place the real clock is read is `src/lib/clock.ts`.
  * (see .clinerules/04-determinism-and-validation.md)
  */
 
-/** The fixed reference date for the entire build. All dates derive from this. */
-export const REFERENCE_DATE = "2026-09-24";
-
-/** Human-readable form of REFERENCE_DATE, e.g. "24 September 2026". */
-export const REFERENCE_DATE_LABEL = "24 September 2026";
+/**
+ * A fixed date the scenario build stamps on a record that needs a date of its own when no
+ * real moment is supplied — a run built by a test or offline, with no recorded instant.
+ * It keeps those records reproducible without reading the clock.
+ *
+ * It is NOT "today", and it is NOT the date any figure is computed for: every rate and
+ * indicator carries its own period. It is never shown to a user.
+ */
+export const SCENARIO_ANCHOR_DATE = "2026-09-24";
 
 /** The fiscal year the department indicators are stated for. */
 export const REFERENCE_FISCAL_YEAR = "2026";

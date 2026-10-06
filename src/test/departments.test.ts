@@ -8,7 +8,7 @@ import {
   getDepartment,
   isDepartmentId,
 } from "@/config/departments";
-import { STAKEHOLDER_SEGMENTS, TIME_HORIZONS, REFERENCE_DATE, getNamedSource } from "@/config/reference";
+import { STAKEHOLDER_SEGMENTS, TIME_HORIZONS, SCENARIO_ANCHOR_DATE, getNamedSource } from "@/config/reference";
 import {
   CITED_INSTRUMENTS,
   UNIVERSAL_INSTRUMENTS,
@@ -250,10 +250,10 @@ describe("department config (src/config/departments.ts)", () => {
     }
   });
 
-  it("keeps every document date on or before REFERENCE_DATE (determinism)", () => {
+  it("keeps every document date on or before SCENARIO_ANCHOR_DATE (determinism)", () => {
     for (const d of DEPARTMENTS) {
       for (const doc of d.documents) {
-        expect(doc.date <= REFERENCE_DATE, `${doc.id} ${doc.date} is after REFERENCE_DATE`).toBe(true);
+        expect(doc.date <= SCENARIO_ANCHOR_DATE, `${doc.id} ${doc.date} is after SCENARIO_ANCHOR_DATE`).toBe(true);
       }
     }
   });

@@ -16,7 +16,7 @@
  */
 
 import { BRAND } from "@/config/brand";
-import { REFERENCE_DATE } from "@/config/reference";
+import { SCENARIO_ANCHOR_DATE } from "@/config/reference";
 import { createStoredZip, type ZipEntry } from "./zip";
 import appTemplate from "./ooxml-parts/app.xml?raw";
 import contentTypes from "./ooxml-parts/content-types.xml?raw";
@@ -38,7 +38,7 @@ export interface DocxInput {
   /**
    * The moment the document was recorded (ISO), carried into the file's own created date so a
    * Word file is dated when it was made. Omitted for a document with no run behind it, in which
-   * case the platform's reference date is used.
+   * case the scenario anchor date is used.
    */
   createdAt?: string;
 }
@@ -89,10 +89,10 @@ const subst = (template: string, values: Record<string, string>): string =>
 export const buildDocxParts = ({ title, body, createdAt }: DocxInput): ZipEntry[] => {
   const encoder = new TextEncoder();
   // The document's own date: the run's recorded moment when there is one, otherwise the
-  // platform's reference date. It is a fixed value handed in, never the clock read here, so
+  // scenario anchor date. It is a fixed value handed in, never the clock read here, so
   // the same document always produces the same bytes.
   const docDate =
-    createdAt && createdAt.includes("T") ? createdAt : `${createdAt ?? REFERENCE_DATE}T00:00:00Z`;
+    createdAt && createdAt.includes("T") ? createdAt : `${createdAt ?? SCENARIO_ANCHOR_DATE}T00:00:00Z`;
   const identity = {
     TITLE: escapeXml(title),
     CREATOR: escapeXml(`${BRAND.productName} (${BRAND.entityCustodian})`),

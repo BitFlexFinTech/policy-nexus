@@ -59,9 +59,10 @@ import { cn } from "@/lib/utils";
  * and the animation costs nothing extra per mark.
  *
  * HOW IT MOVES: a hand-written force model (`@/lib/graph/swarm`) holds the
- * structure together and makes the nodes school together; a node that is dragged
- * — or the pointer, as it crosses the surface — pushes its neighbours apart, and
- * the school closes up again when the push stops.
+ * structure together and makes the nodes school together; a node that is DRAGGED
+ * pushes its neighbours apart, and the school closes up again when the push
+ * stops. A pointer that merely passes over the surface never moves a node — a
+ * target that dodges the cursor is a target nobody can click.
  *
  * WHY THE FIRST PAINT IS ALREADY ARRANGED: the settled layout is computed
  * synchronously, so the graph renders complete without an animation frame. The
@@ -77,12 +78,15 @@ import { cn } from "@/lib/utils";
 /** The virtual space the layout is computed in; the SVG scales it to the card. */
 const VIEW_BOX = `0 0 ${SWARM_WIDTH} ${SWARM_HEIGHT}`;
 
-/** How hard the pointer and a dragged node shove the surrounding nodes, and how
- *  far that reach extends, in virtual units. */
+/** How hard a DRAGGED node shoves the surrounding nodes, and how far that reach
+ *  extends, in virtual units. A pointer that merely hovers never moves a node: a
+ *  target that dodges the cursor is a target nobody can click. */
 const DRAG_REACH = 300;
 const DRAG_PUSH = 9;
-const POINTER_REACH = 190;
-const POINTER_PUSH = 1.6;
+
+/** How far beyond its drawn mark a node still counts as the target, so a small
+ *  mark is an easy thing to aim at and choose. */
+const HIT_PADDING = 16;
 
 /** Labels are shortened rather than wrapped: a graph is not a paragraph. */
 const shortLabel = (label: string, limit = 26): string =>
@@ -408,29 +412,20 @@ export function RelationshipGraphCard({
     setSelectedId(nodeId);
   };
 
+  // Moving the pointer now does exactly one thing: carry a DRAGGED node. A pointer
+  // that is merely passing over the surface never pushes the school — a node that
+  // flees the cursor is a node nobody can click, and clickability wins over the effect.
   const handlePointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
-    const point = toVirtual(event.clientX, event.clientY);
     const drag = dragRef.current;
-    if (drag) {
-      const node = index.get(drag.id);
-      if (node) {
-        node.x = point.x;
-        node.y = point.y;
-        drag.moved = true;
-        push(point, DRAG_REACH, DRAG_PUSH);
-        paint();
-      }
-      return;
-    }
-    // The pointer itself parts the school as it crosses the surface — but not
-    // when it is already over a node. Aiming at a node is not passing through
-    // it, and a target that dodges the cursor is a target nobody can click.
-    if (reducedMotion) return;
-    const aimingAtNode = layout.nodes.some(
-      (node) => Math.hypot(node.x - point.x, node.y - point.y) < node.radius + 30,
-    );
-    if (aimingAtNode) return;
-    push(point, POINTER_REACH, POINTER_PUSH);
+    if (!drag) return;
+    const point = toVirtual(event.clientX, event.clientY);
+    const node = index.get(drag.id);
+    if (!node) return;
+    node.x = point.x;
+    node.y = point.y;
+    drag.moved = true;
+    push(point, DRAG_REACH, DRAG_PUSH);
+    paint();
   };
 
   const endDrag = () => {
@@ -623,6 +618,16 @@ export function RelationshipGraphCard({
                     onFocus={() => setFocusedId(node.id)}
                     onBlur={() => setFocusedId(null)}
                   >
+                    {/* A generous invisible hit area, so a small mark is still an easy
+                        thing to aim at and choose. It is drawn FIRST — behind the mark
+                        and its label — so it never hides what the eye reads, yet the
+                        whole disc is the click target for that node. */}
+                    <circle
+                      r={radius + HIT_PADDING * visualScale}
+                      fill="transparent"
+                      className="graph-hit"
+                      aria-hidden="true"
+                    />
                     {/* The agents this group stands for, drawn AROUND it and BEHIND
                         it: the group's own mark and its label stay on top, so the
                         field thickens the picture without ever obscuring what the

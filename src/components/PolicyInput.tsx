@@ -32,7 +32,6 @@ import {
   isPolicyInputStorePersistent,
   savePolicyInput,
 } from "@/services/documents/policyInputStore";
-import { hasSeenRunNotice, markRunNoticeSeen } from "@/services/assessment/runNoticeStore";
 import { RunSimulationNotice, RunSimulationNote } from "@/components/RunSimulationNotice";
 
 /**
@@ -73,8 +72,7 @@ export function PolicyInput() {
   // The lineage the loaded run had, so running the same wording again reproduces it rather
   // than silently becoming a first version of the policy.
   const [revisionOf, setRevisionOf] = useState<string | undefined>(undefined);
-  // Owner's item 5 — the "before you run" notice. It opens once per department (remembered in
-  // `runNoticeStore`), so the first run explains where the draft's data comes from. The request
+  // Owner's item 5 — the "before you run" notice. It opens before EVERY run (the owner made this a strict rule), so the officer always sees where the draft's data comes from. The request
   // is held until the officer chooses to run, or to open the Document Library first.
   const [noticeOpen, setNoticeOpen] = useState(false);
   const [pendingRequest, setPendingRequest] = useState<AssessmentRequest | null>(null);
@@ -239,50 +237,36 @@ export function PolicyInput() {
     // already resolved, so the officer waits for nothing — the run opens in the
     // same moment it does today. A live service takes as long as it takes, and a
     // failure is reported rather than swallowed.
-    // Owner's item 5 — the first run in a department shows the notice once, then remembers it,
-    // so the message informs rather than nags. It never blocks a run: the officer can run at
-    // once, or go to the Document Library first.
-    if (!hasSeenRunNotice(department.id)) {
-      setPendingRequest(request);
-      setNoticeOpen(true);
-      return;
-    }
-    await performRun(request);
-  }, [department, draft, templateId, uploadedFiles, levers, revisionOf, performRun]);
+    // Owner's item 5 — the notice is shown before EVERY run, not once (the owner made this a strict rule). It never
+    // blocks a run: "Run with the data I have" starts it, or the officer can open the Document
+    // Library first.
+    setPendingRequest(request);
+    setNoticeOpen(true);
+  }, [department, draft, templateId, uploadedFiles, levers, revisionOf]);
 
   /**
-   * Owner's item 5 — the notice's two actions and its dismissal. All three remember the
-   * department, so the notice is shown once and never again; the permanent note stays on screen.
+   * Owner's item 5 — the notice's two actions and its dismissal. None of them remembers anything, because the notice is shown before every run; the permanent
+   * note stays on screen regardless.
    */
-  const rememberNotice = useCallback(() => {
-    if (department) markRunNoticeSeen(department.id);
-  }, [department]);
-
   const runFromNotice = useCallback(() => {
-    rememberNotice();
     setNoticeOpen(false);
     const request = pendingRequest;
     setPendingRequest(null);
     if (request) void performRun(request);
-  }, [rememberNotice, pendingRequest, performRun]);
+  }, [pendingRequest, performRun]);
 
   const openLibraryFromNotice = useCallback(() => {
-    rememberNotice();
     setNoticeOpen(false);
     setPendingRequest(null);
     navigate("/app/documents");
-  }, [rememberNotice, navigate]);
+  }, [navigate]);
 
-  const handleNoticeOpenChange = useCallback(
-    (open: boolean) => {
-      if (open) return;
-      // Closed by the X, Escape or a click outside: that is a dismissal, so it is remembered.
-      rememberNotice();
-      setNoticeOpen(false);
-      setPendingRequest(null);
-    },
-    [rememberNotice],
-  );
+  const handleNoticeOpenChange = useCallback((open: boolean) => {
+    if (open) return;
+    // Closed by the X, Escape or a click outside: the run is simply abandoned.
+    setNoticeOpen(false);
+    setPendingRequest(null);
+  }, []);
 
   /**
    * Read each accepted file through the extraction seam, one at a time, and show
@@ -336,7 +320,7 @@ export function PolicyInput() {
         </Button>
       </div>
 
-      {/* Owner's item 5 — the permanent note beside the button, and the one-time pop-up. */}
+      {/* Owner's item 5 — the permanent note beside the button, and the pop-up shown before each run. */}
       <RunSimulationNote departmentName={department.shortName} />
       <RunSimulationNotice
         open={noticeOpen}

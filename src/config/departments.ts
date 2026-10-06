@@ -154,7 +154,7 @@ export interface DepartmentDocument {
   name: string;
   kind: "pdf" | "docx" | "txt";
   sizeLabel: string;
-  /** ISO date, always on or before REFERENCE_DATE. */
+  /** ISO date, always on or before SCENARIO_ANCHOR_DATE. */
   date: string;
   note: string;
   /**

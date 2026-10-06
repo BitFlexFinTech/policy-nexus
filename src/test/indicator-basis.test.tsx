@@ -15,7 +15,7 @@ import {
   MODELLED_SHARE_LABEL,
   NAMED_SOURCES,
   NAMED_SOURCE_STATEMENT,
-  REFERENCE_DATE_LABEL,
+  SCENARIO_ANCHOR_DATE,
   type NamedSourceId,
 } from "@/config/reference";
 import { assessmentService } from "@/services/assessment/AssessmentService";
@@ -32,7 +32,7 @@ const renderAt = (path: string) => {
  * The month names in order, and the reference month's position, read out of
  * `formatReferenceDate` itself — never a second hand-written month list.
  */
-const [, REFERENCE_MONTH, REFERENCE_YEAR] = REFERENCE_DATE_LABEL.split(" ");
+const [, REFERENCE_MONTH, REFERENCE_YEAR] = formatReferenceDate(SCENARIO_ANCHOR_DATE).split(" ");
 const MONTHS_IN_ORDER = Array.from({ length: 12 }, (_, index) =>
   formatReferenceDate(`${REFERENCE_YEAR}-${String(index + 1).padStart(2, "0")}-01`).split(" ")[1],
 );

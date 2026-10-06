@@ -6,10 +6,9 @@
  * written to local storage. The real identity provider replaces this module
  * behind the same functions — see PRODUCTION_READINESS.md §2.
  *
- * DETERMINISM: `signedInAt` is the fixed REFERENCE_DATE, never the system clock.
+ * DETERMINISM: nothing here reads the system clock.
  */
 
-import { REFERENCE_DATE } from "@/config/reference";
 import { cleanOfficer, type OfficerIdentity } from "@/config/officer";
 import { findDepartment, isDepartmentId, type DepartmentId } from "@/config/departments";
 import { createKeyValueStore } from "@/lib/browserStorage";
@@ -26,8 +25,6 @@ export type SessionMode = "oneclick" | "sso";
 export interface Session {
   departmentId: DepartmentId;
   mode: SessionMode;
-  /** ISO date the session began. Always REFERENCE_DATE in scenario mode. */
-  signedInAt: string;
   /** The identity the provider returned. Present only for an SSO session. */
   subject?: string;
   /**
@@ -69,7 +66,6 @@ const parseSession = (raw: string | null): Session | null => {
       // Anything unrecognised falls back to the simulated entry, so a corrupt or
       // older stored session can never be read as a real sign-in.
       mode: value.mode === "sso" ? "sso" : "oneclick",
-      signedInAt: typeof value.signedInAt === "string" ? value.signedInAt : REFERENCE_DATE,
       subject: typeof value.subject === "string" ? value.subject : undefined,
       // A stored identity is re-cleaned on read, so a hand-edited or half-written record
       // can never present itself as a name the officer did not give.
@@ -115,7 +111,6 @@ export const signInToDepartment = (departmentId: string): Session | null => {
   const session: Session = {
     departmentId,
     mode: "oneclick",
-    signedInAt: REFERENCE_DATE,
     // Changing department does not change who is working, so a recorded preparer is
     // carried over rather than silently dropped.
     officer: getSession()?.officer,
@@ -169,7 +164,6 @@ export const signInWithSso = (departmentId: string, subject: string): Session | 
   const session: Session = {
     departmentId,
     mode: "sso",
-    signedInAt: REFERENCE_DATE,
     subject,
     // A provider answer establishes WHO signed in, not who is preparing the policy, so any
     // recorded preparer is carried over unchanged — its `source` still says where it came

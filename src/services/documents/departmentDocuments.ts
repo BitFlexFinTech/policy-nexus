@@ -10,12 +10,12 @@
  * name with an empty text, and the run counts it as *not read* — the platform never implies
  * it read something it could not.
  *
- * Determinism: the record carries REFERENCE_DATE, never a clock, and a document's id is a
+ * Determinism: the record carries the real moment it was added, read through `src/lib/clock.ts`, and a document's id is a
  * pure function of the department, its name and its text, so adding the same file twice
  * replaces its entry instead of duplicating it.
  */
 
-import { REFERENCE_DATE } from "@/config/reference";
+import { nowIso } from "@/lib/clock";
 import { isDepartmentId, type DepartmentId } from "@/config/departments";
 import { createKeyValueStore } from "@/lib/browserStorage";
 import { hashString, toSeedHex } from "@/lib/prng";
@@ -130,7 +130,7 @@ export const addDepartmentDocument = (
   const record: DepartmentDocumentRecord = {
     ...document,
     id: departmentDocumentId(document.departmentId, document.name, document.text),
-    addedAt: REFERENCE_DATE,
+    addedAt: nowIso(),
   };
   const existing = getDepartmentDocumentsSnapshot().filter((entry) => entry.id !== record.id);
   write([record, ...existing].slice(0, 40));

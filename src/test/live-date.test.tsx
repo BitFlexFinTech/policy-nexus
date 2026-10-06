@@ -15,7 +15,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { cleanup, render, screen, act } from "@testing-library/react";
 import App from "@/App";
 import { CLOCK_TICK_MS, formatInstant, useNow } from "@/lib/clock";
-import { REFERENCE_DATE } from "@/config/reference";
+import { SCENARIO_ANCHOR_DATE } from "@/config/reference";
 import { findDepartment } from "@/config/departments";
 import { clearSession, signInToDepartment } from "@/session/session";
 import { clearRuns, getRunRequest, saveRunRequest } from "@/services/assessment/runStore";
@@ -70,7 +70,7 @@ describe("a run's own date", () => {
 
     // The run carries a real recorded moment, not the platform's fixed reference date.
     expect(stored!.recordedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-    expect(stored!.recordedAt).not.toBe(REFERENCE_DATE);
+    expect(stored!.recordedAt).not.toBe(SCENARIO_ANCHOR_DATE);
 
     // The run built from it reads that same moment, so the run and its documents agree.
     const run = buildSimulatedRun(stored!);
@@ -81,7 +81,7 @@ describe("a run's own date", () => {
     // The document is dated with the run's own recorded moment...
     expect(text).toContain(formatInstant(run.createdAt));
     // ...which is a real moment, never the fixed reference date.
-    expect(formatInstant(run.createdAt)).not.toBe(formatInstant(REFERENCE_DATE));
+    expect(formatInstant(run.createdAt)).not.toBe(formatInstant(SCENARIO_ANCHOR_DATE));
   });
 
   it("shows a run's own recorded moment on the workspace history line, not a frozen date", async () => {
@@ -93,7 +93,7 @@ describe("a run's own date", () => {
     });
     // The run handed back carries the moment it was recorded, so the value the page renders and
     // the value a caller sees are the same one.
-    expect(run.createdAt).not.toBe(REFERENCE_DATE);
+    expect(run.createdAt).not.toBe(SCENARIO_ANCHOR_DATE);
 
     window.history.pushState({}, "", "/app");
     render(<App />);

@@ -14,7 +14,7 @@
 
 import { findDepartment, type Department } from "@/config/departments";
 import {
-  REFERENCE_DATE,
+  SCENARIO_ANCHOR_DATE,
   getStakeholderSegment,
   getTimeHorizon,
   segmentWeight,
@@ -807,7 +807,7 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
           })
         : undefined,
     fileNames: request.fileNames ?? [],
-    createdAt: request.recordedAt ?? REFERENCE_DATE,
+    createdAt: request.recordedAt ?? SCENARIO_ANCHOR_DATE,
     seed,
     timeHorizon,
     horizonLabel,

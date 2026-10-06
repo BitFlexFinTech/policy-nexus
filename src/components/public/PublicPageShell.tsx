@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { BRAND, PROMOTER, SOVEREIGNTY_STATEMENT, WORDMARK } from "@/config/brand";
-import { REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR } from "@/config/reference";
+import { REFERENCE_FISCAL_YEAR } from "@/config/reference";
 import { formatClock, useNow } from "@/lib/clock";
 import { COVERAGE } from "@/lib/coverage";
 import { logoSrc } from "@/config/content";
@@ -107,9 +107,6 @@ function OfficialNoticeStrip() {
             Today <span className="font-semibold text-foreground">{formatClock(now)}</span>
           </span>
           <span>
-            Reference date <span className="font-semibold text-foreground">{REFERENCE_DATE_LABEL}</span>
-          </span>
-          <span>
             Fiscal year <span className="font-semibold text-foreground">{REFERENCE_FISCAL_YEAR}</span>
           </span>
         </span>
@@ -189,9 +186,6 @@ function OfficialFooter() {
             </p>
             <p className="text-xs leading-relaxed text-primary-foreground/85">
               Fiscal year {REFERENCE_FISCAL_YEAR}
-            </p>
-            <p className="text-xs leading-relaxed text-primary-foreground/85">
-              Prepared against the {REFERENCE_DATE_LABEL} reference date.
             </p>
             <p className="text-xs leading-relaxed text-primary-foreground/85">
               {COVERAGE.departments} departments · {COVERAGE.groups} stakeholder groups

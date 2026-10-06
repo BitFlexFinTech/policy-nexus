@@ -121,9 +121,8 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
   /**
    * Press Run Simulation the way an officer does.
    *
-   * The first run in a department shows the one-time "before you run" notice (owner's item 5),
-   * which must be answered before the run starts; this answers it by choosing to run. On every
-   * later run the notice is absent, so the press starts the run directly.
+   * Every run now shows the "before you run" notice (owner's item 5),
+   * which must be answered before the run starts; this answers it by choosing to run.
    */
   const runSimulation = async (page: Page) => {
     await page.getByRole("button", { name: "Run Simulation" }).click();
@@ -349,9 +348,8 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
 
     // The hero card carries the three assessment steps and closes on the principle.
     // The full six-step workspace journey is not listed here any more — it made the
-    // page read as an economic-modelling pipeline — but the reference frame a run is
-    // read against is still on the page, in the notice strip above the hero, so no
-    // figure is left unreadable against its own frame.
+    // page read as an economic-modelling pipeline — but the live date and the fiscal
+    // year are still on the page, in the notice strip above the hero.
     const assessment = page.locator("aside[aria-labelledby='landing-assessment-heading']");
     await expect(
       assessment.getByRole("heading", {
@@ -363,7 +361,6 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await expect(assessment.getByText("Add your policy", { exact: true })).toBeVisible();
     await expect(assessment.getByText("Review assessment", { exact: true })).toBeVisible();
     await expect(assessment.getByText("Understanding before action.", { exact: true })).toBeVisible();
-    await expect(page.getByText(/Reference date\s+24 September 2026/).first()).toBeVisible();
     // The platform also shows the LIVE date now, so a reader can see when they are looking.
     // The day itself is read from the page rather than frozen, because it really is today.
     await expect(page.getByText(/Today\s+\d{1,2} \w+ \d{4}/).first()).toBeVisible();
@@ -759,6 +756,14 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
       ((await group.getAttribute("aria-label")) ?? "").match(/(\d+) relationships/)?.[1] ?? -1,
     );
     expect(declared).toBeGreaterThan(0);
+
+    // Hovering must not move the mark: a target that flees the pointer can never be
+    // clicked. This is the gate for a real defect the owner reported — the graph
+    // used to shove nodes away from a pointer that merely crossed the surface.
+    const stableBefore = await group.getAttribute("transform");
+    await group.hover();
+    await page.waitForTimeout(600);
+    expect(await group.getAttribute("transform")).toBe(stableBefore);
 
     await group.click();
     const rows = graphCard.getByRole("listitem");

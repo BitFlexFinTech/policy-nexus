@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { DOCX_MIME_TYPE, buildDocxParts, createDocxBlob, createDocxBytes } from "@/services/documents/docx";
 import { crc32 } from "@/services/documents/zip";
-import { REFERENCE_DATE } from "@/config/reference";
+import { SCENARIO_ANCHOR_DATE } from "@/config/reference";
 
 const REQUIRED_PARTS = [
   "[Content_Types].xml",
@@ -138,7 +138,7 @@ describe("OOXML (.docx) writer", () => {
   it("dates the file with its own recorded moment, and falls back to the reference date", () => {
     // A document with no run behind it keeps the platform's reference date.
     const fallback = asText(readArchive(createDocxBytes(input)).get("docProps/core.xml")!.data);
-    expect(fallback).toContain(`${REFERENCE_DATE}T00:00:00Z`);
+    expect(fallback).toContain(`${SCENARIO_ANCHOR_DATE}T00:00:00Z`);
 
     // A document that knows the moment it was recorded carries that exact moment instead,
     // so a Word file is dated when it was made — never the fixed reference date.
@@ -147,6 +147,6 @@ describe("OOXML (.docx) writer", () => {
       readArchive(createDocxBytes({ ...input, createdAt: recorded })).get("docProps/core.xml")!.data,
     );
     expect(core).toContain(recorded);
-    expect(core).not.toContain(`${REFERENCE_DATE}T00:00:00Z`);
+    expect(core).not.toContain(`${SCENARIO_ANCHOR_DATE}T00:00:00Z`);
   });
 });

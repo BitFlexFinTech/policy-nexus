@@ -4,8 +4,8 @@
  * The owner asked for a notification on Run Simulation that says, honestly, that the drafted
  * policy is built from the real, published data the engine holds for the department — which is
  * currently limited — and that a department can make its policy longer and better grounded by
- * adding its own reports, spreadsheets and statistics to its Document Library. It is shown once
- * per department and then remembered (see `src/services/assessment/runNoticeStore.ts`), and a
+ * adding its own reports, spreadsheets and statistics to its Document Library. It is shown before
+ * EVERY run (the owner made this a strict rule, revised 2026-10-06), and a
  * small permanent note stays beside the Run Simulation button so the message is never lost.
  *
  * The wording is defined ONCE here and used by both the pop-up and the note, so the two cannot

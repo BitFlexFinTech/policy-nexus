@@ -4,7 +4,7 @@ import { VOCABULARY } from "@/config/brand";
 import { RevisionBadge } from "@/components/assessment/RevisionBadge";
 import { ReRunSimulationLink } from "@/components/assessment/ReRunSimulationLink";
 import { BackToOverview } from "@/components/assessment/BackToOverview";
-import { REFERENCE_DATE_LABEL, getTimeHorizon } from "@/config/reference";
+import { getTimeHorizon } from "@/config/reference";
 import { formatClock, useNow } from "@/lib/clock";
 import { useSession } from "@/session/useSession";
 import { useAssessmentRuns } from "@/services/assessment/useAssessmentRuns";
@@ -152,7 +152,6 @@ export default function Simulations() {
       </div>
 
       <p className="text-[10px] text-muted-foreground">
-        Reference date {REFERENCE_DATE_LABEL}.{" "}
         <Link to="/app/policies" className="font-medium text-primary hover:underline">
           Review the policy register →
         </Link>

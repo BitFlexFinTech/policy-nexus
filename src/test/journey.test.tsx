@@ -9,7 +9,7 @@ import { buildSimulatedRun, peekRun } from "@/services/assessment/AssessmentServ
 import { clearRuns, listRunRequests, saveRunRequest } from "@/services/assessment/runStore";
 import type { AssessmentRequest } from "@/services/assessment/types";
 import { formatInstant } from "@/lib/clock";
-import { REFERENCE_DATE } from "@/config/reference";
+import { SCENARIO_ANCHOR_DATE } from "@/config/reference";
 import { RUN_ROUND_TICK_MS } from "@/pages/SimulationRun";
 import { DOCUMENT_VIEWS } from "@/components/assessment/documentViews";
 import { RERUN_LABEL, rerunPathFor } from "@/services/assessment/rerun";
@@ -102,7 +102,7 @@ describe("journey — run a policy, then read its assessment", () => {
     // pressed), never a date frozen into the build. `peekRun` re-reads the stored run, so this is
     // exactly the value the page rendered.
     const recorded = peekRun(run.id)!;
-    expect(recorded.createdAt).not.toBe(REFERENCE_DATE);
+    expect(recorded.createdAt).not.toBe(SCENARIO_ANCHOR_DATE);
     expect(screen.getByText(`Recorded ${formatInstant(recorded.createdAt)}`)).toBeInTheDocument();
     // The owner's instruction (2026-10-02): the five actions appear at the TOP of the run page
     // as well as at the bottom. Two matches is the proof that both rows render.

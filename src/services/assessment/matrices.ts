@@ -13,7 +13,7 @@
  */
 
 import { indicatorBasisLabel, type Department } from "@/config/departments";
-import { MODELLED_SHARE_LABEL, REFERENCE_DATE_LABEL, STAKEHOLDER_SEGMENTS } from "@/config/reference";
+import { MODELLED_SHARE_LABEL, REFERENCE_FISCAL_YEAR, STAKEHOLDER_SEGMENTS } from "@/config/reference";
 import { CLAUSE } from "./documentStructure";
 import type { AssessmentRun, GeneratedSection, StakeholderReaction } from "./types";
 
@@ -24,7 +24,7 @@ export const BLANK = "[TO BE CONFIRMED BY THE DEPARTMENT]";
 export type DocumentTable = NonNullable<GeneratedSection["table"]>;
 
 /** The policy's own phasing, as the drafted policy has always printed it. */
-export const PHASE_ONE_DATE = `Phase 1 — from ${REFERENCE_DATE_LABEL}`;
+export const PHASE_ONE_DATE = `Phase 1 — from the start of fiscal year ${REFERENCE_FISCAL_YEAR}`;
 export const PHASE_TWO_DATE = `Phase ${CLAUSE.engagement} engagement complete`;
 
 /** A modelled sentiment as a reader's word. */

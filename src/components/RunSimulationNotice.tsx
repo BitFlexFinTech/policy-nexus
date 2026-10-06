@@ -22,8 +22,8 @@ import {
  * The owner asked for a notification on Run Simulation that says, honestly, that the drafted
  * policy is built from the real, published data the engine holds for the department — which is
  * currently limited — and that a department can make its policy longer and better grounded by
- * adding its own reports, spreadsheets and statistics to its Document Library. It is shown once
- * per department and then remembered (see `runNoticeStore.ts`), and a small permanent note stays
+ * adding its own reports, spreadsheets and statistics to its Document Library. It is shown before
+ * EVERY run (the owner made this a strict rule, revised 2026-10-06), and a small permanent note stays
  * beside the Run Simulation button so the message is never lost.
  *
  * The wording lives in `src/config/runNotice.ts`, so this file exports only components and the
@@ -31,8 +31,8 @@ import {
  */
 
 /**
- * The dismissible pop-up. It opens the first time an officer runs a simulation for a
- * department, and never again once it has been dismissed. It never blocks a run: "Run with the
+ * The dismissible pop-up. It opens before EVERY run an officer makes (the owner made this a
+ * strict rule, revised 2026-10-06). It never blocks a run: "Run with the
  * data I have" starts the run exactly as before, and "Open the Document Library" takes the
  * officer to where the department adds its own documents.
  */

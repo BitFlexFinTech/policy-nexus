@@ -17,7 +17,7 @@
 
 import type { Department, DepartmentId } from "./departments";
 import { citedInstrumentLabel } from "./instruments";
-import { getStakeholderSegment, MODELLED_SHARE_LABEL, REFERENCE_DATE_LABEL } from "./reference";
+import { getStakeholderSegment, MODELLED_SHARE_LABEL, formatReferenceDate, SCENARIO_ANCHOR_DATE } from "./reference";
 
 /**
  * The sections every drafted policy must carry, in order. `services/assessment/policyDraft.ts`
@@ -97,11 +97,11 @@ const groupForPrompt = (id: Department["segments"][number]): string => {
 /** The department's prompt, assembled from its own configuration. Pure and deterministic.
  *
  *  `referenceDate` is the moment the run was recorded, so a draft produced from this prompt is
- *  dated like the rest of the run; it defaults to the platform's reference frame so a caller
+ *  dated like the rest of the run; it defaults to the scenario anchor so a caller
  *  with no run (a preview, a test) still gets a complete, stable prompt. */
 export const draftingPromptFor = (
   department: Department,
-  referenceDate: string = REFERENCE_DATE_LABEL,
+  referenceDate: string = formatReferenceDate(SCENARIO_ANCHOR_DATE),
 ): DraftingPrompt => {
   const citations = department.instruments.map((id) => citedInstrumentLabel(id));
   const instructions = [

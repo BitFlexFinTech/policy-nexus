@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import App from "@/App";
 import { findDepartment } from "@/config/departments";
-import { REFERENCE_DATE } from "@/config/reference";
+import { SCENARIO_ANCHOR_DATE } from "@/config/reference";
 import { clearSession, signInToDepartment } from "@/session/session";
 import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
 import { clearRuns, saveRunRequest } from "@/services/assessment/runStore";
@@ -130,7 +130,7 @@ describe("the officer's working copy of a drafted policy survives leaving the sc
     const stored = listDrafts()["fin-abc"];
     expect(Object.keys(listDrafts())).toEqual(["fin-abc"]);
     expect(stored.text).toBe("Second attempt.");
-    expect(stored.savedAt).not.toBe(REFERENCE_DATE);
+    expect(stored.savedAt).not.toBe(SCENARIO_ANCHOR_DATE);
     expect(stored.savedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
   });
 });

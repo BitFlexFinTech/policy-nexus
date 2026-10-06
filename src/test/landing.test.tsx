@@ -3,7 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Landing from "@/pages/Landing";
 import { DEPARTMENT_COUNT, DEPARTMENTS } from "@/config/departments";
-import { STAKEHOLDER_SEGMENTS, REFERENCE_DATE_LABEL, REFERENCE_FISCAL_YEAR, REFERENCE_RATES } from "@/config/reference";
+import { STAKEHOLDER_SEGMENTS, REFERENCE_FISCAL_YEAR, REFERENCE_RATES } from "@/config/reference";
 import { BRAND, ENGINE_EXPLANATION, GOVERNANCE, MINISTER_STATEMENT, PROCESS_LABEL, SOVEREIGNTY_STATEMENT } from "@/config/brand";
 import {
   KNOWLEDGE_MAP_LINE,
@@ -181,13 +181,19 @@ describe("Landing — the pure public landing page", () => {
     });
   });
 
-  it("still states the reference frame on the page, read from configuration", () => {
+  it("still states the fiscal year on the page, read from configuration", () => {
     renderLanding();
-    // Removing the rates must not remove the frame: a simulated figure is only
-    // meaningful against the reference date and fiscal year it was computed in, and
-    // those are still stated in the notice strip above the hero.
-    expect(screen.getByText(REFERENCE_DATE_LABEL)).toBeInTheDocument();
+    // The fixed reference date is no longer shown; the fiscal year the figures are stated
+    // for still is, in the notice strip above the hero.
     expect(screen.getByText(REFERENCE_FISCAL_YEAR)).toBeInTheDocument();
+  });
+
+  it("no longer shows a fixed reference date anywhere on the public page", () => {
+    renderLanding();
+    // The owner instruction (2026-10-06): the fixed reference date had no purpose for a
+    // reader and sat confusingly beside the live date, so it is gone from the public page.
+    expect(screen.queryByText(/24 September 2026/)).toBeNull();
+    expect(screen.queryByText(/reference date/i)).toBeNull();
   });
 
   it("offers ONE primary action — the secondary link is gone", () => {

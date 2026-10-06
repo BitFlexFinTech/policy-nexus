@@ -12,7 +12,7 @@
  *     exactly one file, `src/lib/clock.ts`, and nowhere else (see the check below)
  *  6. Runtime network URLs in app source or index.html
  *  7. 16 departments with the exact stable IDs
- *  8. REFERENCE_DATE pinned to 2026-09-24
+ *  8. the scenario anchor date is pinned, and no reference date is exported
  *  9. Decision-support disclaimer present
  * 10. The served HTML description matches the brand description
  * 11. @media print rules present
@@ -187,13 +187,20 @@ if (!existsSync(deptFile)) {
   if (!missing.length) notes.push(`INFO  all ${DEPT_IDS.length} department ids present in src/config/departments.ts`);
 }
 
-// 7 — reference date pinned
+// 7 — the scenario anchor date is pinned, and the reference-date concept is gone
 const refFile = join(ROOT, "src/config/reference.ts");
 if (!existsSync(refFile)) {
-  console.log("SKIP  REFERENCE_DATE — src/config/reference.ts not created yet");
+  console.log("SKIP  scenario anchor date — src/config/reference.ts not created yet");
 } else {
   const text = readFileSync(refFile, "utf8");
-  check("REFERENCE_DATE pinned to 2026-09-24", /2026-09-24/.test(text) ? [] : ["src/config/reference.ts does not contain 2026-09-24"]);
+  const problems = [];
+  if (!/export const SCENARIO_ANCHOR_DATE = "2026-09-24"/.test(text)) {
+    problems.push("src/config/reference.ts does not pin SCENARIO_ANCHOR_DATE to 2026-09-24");
+  }
+  if (/REFERENCE_DATE/.test(text)) {
+    problems.push("src/config/reference.ts still names a REFERENCE_DATE — the reference-date concept was removed");
+  }
+  check("scenario anchor date pinned; no reference date exported", problems);
 }
 
 // 8 — decision-support disclaimer present once assessment/brand files exist
@@ -1136,30 +1143,25 @@ if (!existsSync(cssPath)) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// check 25 — THE RUN-SIMULATION NOTICE IS SHOWN ONCE PER DEPARTMENT (BATCH 6)
+// check 25 — THE RUN-SIMULATION NOTICE IS SHOWN BEFORE EVERY RUN (BATCH 6; revised 2026-10-06)
 // The owner asked for a notification on Run Simulation that says, honestly, that the drafted
 // policy rests on the real published data the engine holds for the department (which is limited),
-// and points the department at its Document Library. This gate fails the build if that capability
-// is dropped or silently narrowed: the store that remembers the notice must exist and expose the
-// two calls, the notice must link to the Document Library, and the policy input must consult and
-// remember it. It is proved able to fail by mutation (see PROJECT_STATUS.md).
+// and points the department at its Document Library. The owner then made it a strict rule that
+// it is shown before EVERY run (not once per department), so the store that once remembered it
+// was removed. This gate fails the build if that capability is dropped or the "remembered"
+// behaviour creeps back: the copy must point at the Document Library, the notice must exist, the
+// policy input must render it and must NOT consult a store, and no runNoticeStore file may exist.
 {
   const problems = [];
-  const storePath = join(ROOT, "src/services/assessment/runNoticeStore.ts");
   const noticePath = join(ROOT, "src/components/RunSimulationNotice.tsx");
   const copyPath = join(ROOT, "src/config/runNotice.ts");
   const inputPath = join(ROOT, "src/components/PolicyInput.tsx");
+  const storePath = join(ROOT, "src/services/assessment/runNoticeStore.ts");
 
-  if (!existsSync(storePath)) {
-    problems.push("src/services/assessment/runNoticeStore.ts is missing — the notice can no longer be remembered");
-  } else {
-    const store = readFileSync(storePath, "utf8");
-    if (!/export const hasSeenRunNotice\s*=/.test(store)) {
-      problems.push("the notice store no longer exposes hasSeenRunNotice");
-    }
-    if (!/export const markRunNoticeSeen\s*=/.test(store)) {
-      problems.push("the notice store no longer exposes markRunNoticeSeen");
-    }
+  // The "shown once, then remembered" behaviour is gone on the owner instruction, so the
+  // store must not come back.
+  if (existsSync(storePath)) {
+    problems.push("src/services/assessment/runNoticeStore.ts exists — the notice is shown before every run, so it must not be remembered again");
   }
 
   if (!existsSync(noticePath)) {
@@ -1167,14 +1169,14 @@ if (!existsSync(cssPath)) {
   }
 
   if (!existsSync(copyPath)) {
-    problems.push("src/config/runNotice.ts is missing — the notice's wording has gone");
+    problems.push("src/config/runNotice.ts is missing — the notice wording has gone");
   } else {
     const copy = readFileSync(copyPath, "utf8");
     if (!/Document Library/.test(copy)) {
       problems.push("the notice no longer points the department at its Document Library");
     }
     if (!/\/app\/documents/.test(copy)) {
-      problems.push("the notice's link to the Document Library is gone");
+      problems.push("the notice link to the Document Library is gone");
     }
   }
 
@@ -1182,21 +1184,19 @@ if (!existsSync(cssPath)) {
     problems.push("src/components/PolicyInput.tsx is missing");
   } else {
     const input = readFileSync(inputPath, "utf8");
-    if (!/hasSeenRunNotice/.test(input)) {
-      problems.push("the policy input no longer checks whether the notice has been seen");
-    }
-    if (!/markRunNoticeSeen/.test(input)) {
-      problems.push("the policy input no longer remembers the notice");
-    }
     if (!/RunSimulationNotice/.test(input)) {
       problems.push("the policy input no longer renders the Run-Simulation notice");
+    }
+    if (/hasSeenRunNotice|markRunNoticeSeen/.test(input)) {
+      problems.push("the policy input still consults the removed notice store — the notice must be shown before every run");
     }
   }
 
   if (problems.length === 0) {
-    notes.push("INFO  the Run-Simulation notice is shown once per department and points at the Document Library (BATCH 6)");
+    notes.push("INFO  the Run-Simulation notice is shown before every run and points at the Document Library (BATCH 6, revised 2026-10-06)");
   }
-  check("the Run-Simulation notice is shown once per department", problems);
+  check("the Run-Simulation notice is shown before every run", problems);
+
 }
 
 // ---------------------------------------------------------------------------------------------

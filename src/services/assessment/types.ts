@@ -76,8 +76,8 @@ export interface AssessmentRequest {
    * The moment this run was recorded, in ISO form. The run store sets it the instant the
    * officer presses Run Simulation, so the run and every document it produces carry one
    * date. Absent on a request that was built but never recorded — and on every run stored
-   * before the platform kept a real date — in which case a run falls back to the platform's
-   * reference date, so an older run is never rewritten.
+   * before the platform kept a real date — in which case a run falls back to the scenario anchor
+   * date (a fixed stamp, `SCENARIO_ANCHOR_DATE` in src/config/reference.ts), so an older run is never rewritten.
    */
   recordedAt?: string;
 }

@@ -5,7 +5,6 @@ import {
   MODELLED_SHARE_LABEL,
   NAMED_SOURCES,
   NAMED_SOURCE_STATEMENT,
-  REFERENCE_DATE_LABEL,
   REFERENCE_FISCAL_YEAR,
   REFERENCE_RATES,
   STAKEHOLDER_SEGMENTS,
@@ -30,7 +29,7 @@ export default function Reference() {
       <header>
         <h2 className="text-sm font-semibold tracking-tight text-foreground">Methodology and Limitations</h2>
         <p className="text-xs text-muted-foreground">
-          {BRAND.productName} · today {formatClock(now)} · reference date {REFERENCE_DATE_LABEL} · fiscal year {REFERENCE_FISCAL_YEAR}
+          {BRAND.productName} · today {formatClock(now)} · fiscal year {REFERENCE_FISCAL_YEAR}
         </p>
       </header>
 
