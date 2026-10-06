@@ -13,6 +13,7 @@
  */
 
 import { nowIso } from "@/lib/clock";
+import { SCENARIO_ANCHOR_DATE } from "@/config/reference";
 import { isDepartmentId } from "@/config/departments";
 import { createKeyValueStore } from "@/lib/browserStorage";
 import { runIdFor } from "./seed";
@@ -57,16 +58,27 @@ const parseRuns = (raw: string | null): readonly StoredRun[] => {
   try {
     const value = JSON.parse(raw) as unknown;
     if (!Array.isArray(value)) return EMPTY;
-    const runs = value.filter((entry): entry is StoredRun => {
-      if (!entry || typeof entry !== "object") return false;
-      const candidate = entry as Partial<StoredRun>;
-      return (
-        typeof candidate.id === "string" &&
-        typeof candidate.policyText === "string" &&
-        typeof candidate.departmentId === "string" &&
-        isDepartmentId(candidate.departmentId)
-      );
-    });
+    const runs = value
+      .filter((entry): entry is StoredRun => {
+        if (!entry || typeof entry !== "object") return false;
+        const candidate = entry as Partial<StoredRun>;
+        return (
+          typeof candidate.id === "string" &&
+          typeof candidate.policyText === "string" &&
+          typeof candidate.departmentId === "string" &&
+          isDepartmentId(candidate.departmentId)
+        );
+      })
+      // A run stored before the platform kept a real date carries none. It is given the scenario
+      // anchor date HERE, in one place, so every screen that shows a run's date is safe — the
+      // defect this guards against was an administration page that blanked on an older run.
+      .map((entry) => ({
+        ...entry,
+        recordedAt:
+          typeof entry.recordedAt === "string" && entry.recordedAt
+            ? entry.recordedAt
+            : SCENARIO_ANCHOR_DATE,
+      }));
     return runs.length ? runs : EMPTY;
   } catch {
     return EMPTY;

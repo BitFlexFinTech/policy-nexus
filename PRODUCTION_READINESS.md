@@ -101,12 +101,12 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-06, after the admin dashboard was rebuilt with real charts, the OpenRouter setup simplified to a key plus a model picker, and the platform given ONE Simulated ⇄ Live switch — on top of the footer admin link, the administrator gate, the simulated support desk, the OpenRouter drafting connection and the operative offline drafted policy; the host and the working copy are IN STEP).**
+- **Status today (2026-10-06, after the administration screen's blank-page defect was fixed at source and an app-wide ErrorBoundary was added — on top of the rebuilt dashboard, the simplified OpenRouter setup, the ONE Simulated ⇄ Live switch, the footer admin link, the administrator gate, the simulated support desk and the operative offline drafted policy; the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-DfNgGfQq.js` (`294ef498e42c098ab66da6557e83e0b9f909c8b7d02d5a8d3fc21e12191b2d5d`) — fetched
+  `assets/index-DnPHwsvH.js` (`1acd99241035ffa216ccb8ca07502c4c389f515dd28249a0406fae3978107726`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
-  explicit FTPS, **never `--delete`** — 13 files, 1,965,748 bytes — and the SSL validation token
+  explicit FTPS, **never `--delete`** — 13 files, 1,966,994 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
   expansion and the 2026-10-04 dataset-expansion batches 1–4 and the PART 11 batches 1–7 — **150** canonical stakeholder groups, every

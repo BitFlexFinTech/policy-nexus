@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound.tsx";
 import PlatformAdmin from "./pages/PlatformAdmin.tsx";
 import AuthCallback from "./pages/AuthCallback.tsx";
 import { AdminGate } from "./components/admin/AdminGate.tsx";
+import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
 import { ADMIN_ROUTE } from "@/config/platform";
 import { faviconOverride } from "@/config/content";
 import { useContent } from "@/config/useContent";
@@ -53,7 +54,8 @@ function BrandIconOverride() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -103,9 +105,10 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

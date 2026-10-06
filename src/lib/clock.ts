@@ -45,13 +45,21 @@ export const formatClock = (date: Date): string =>
   `${formatReferenceDate(localDateIso(date))} · ${localTime(date)}`;
 
 /**
- * Format a stored moment (an ISO string, either a plain date or a full instant) the
- * same way. A plain date — a run recorded before this change, or a run built in a
- * test with no recorded moment — prints exactly as it always did, so nothing about
- * an older run is rewritten. A full instant prints in the reader's own local time.
+ * Format a stored moment (an ISO string, either a plain date or a full instant) the same way. A
+ * plain date — a run recorded before this change, or a run built in a test with no recorded
+ * moment — prints exactly as it always did, so nothing about an older run is rewritten. A full
+ * instant prints in the reader's own local time.
+ *
+ * DEFENSIVE: a value can be absent (an older stored record that predates the field) or malformed.
+ * This returns a plain note instead of throwing, because a screen must never crash on stored data
+ * written by an earlier version — the defect this guards against was a blank administration page.
  */
-export const formatInstant = (iso: string): string =>
-  iso.length <= 10 ? formatReferenceDate(iso) : formatClock(new Date(iso));
+export const formatInstant = (iso: string | null | undefined): string => {
+  if (!iso) return "date not recorded";
+  if (iso.length <= 10) return formatReferenceDate(iso);
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime()) ? "date not recorded" : formatClock(date);
+};
 
 /**
  * The current moment, refreshing on a timer so the display keeps moving while the

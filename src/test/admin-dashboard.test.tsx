@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import App from "@/App";
 import { ADMIN_ROUTE, clearConfig } from "@/config/platform";
 import { clearSession } from "@/session/session";
-import { clearRuns } from "@/services/assessment/runStore";
+import { RUNS_STORAGE_KEY, clearRuns } from "@/services/assessment/runStore";
 import { clearSupportCases, openSupportCase } from "@/services/support/supportStore";
 
 const renderAdmin = () => {
@@ -47,5 +47,18 @@ describe("the platform administration dashboard", () => {
     openSupportCase({ departmentId: "agri", subject: "Two", category: "Data", description: "" });
     renderAdmin();
     expect(screen.getByRole("heading", { name: "Support inbox (2)" })).toBeInTheDocument();
+  });
+
+  it("does not blank when an older stored run carries no recorded date (regression)", () => {
+    window.localStorage.setItem(
+      RUNS_STORAGE_KEY,
+      JSON.stringify([
+        { id: "OLD-1", departmentId: "fin", policyText: "An older stored run", source: "paste" },
+      ]),
+    );
+    renderAdmin();
+    expect(screen.getByRole("heading", { name: "Platform overview" })).toBeInTheDocument();
+    expect(screen.getByText("Recent runs")).toBeInTheDocument();
+    expect(screen.getByText(/An older stored run/)).toBeInTheDocument();
   });
 });
