@@ -106,7 +106,7 @@ client is registered.
   `assets/index-Cp3G8BpB.js` (`0eb23e59e3cee37e27db72308bf4435065b46192be20b33691d665ca9815cc76`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
-  explicit FTPS, **never `--delete`** — 1 new file and 12 modified, 1,490,345 bytes — and the SSL validation token
+  explicit FTPS, **never `--delete`** — 13 files, 1,493,072 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
   expansion and the 2026-10-04 dataset-expansion batches 1–4 and the PART 11 batches 1–7 — **150** canonical stakeholder groups, every
