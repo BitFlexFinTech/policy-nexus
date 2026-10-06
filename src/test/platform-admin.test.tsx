@@ -16,15 +16,21 @@ const renderAt = (path: string) => {
   return render(<App />);
 };
 
+/** Pass the administrator gate so the settings screen itself is what is under test. */
+const enterAdmin = () =>
+  fireEvent.click(screen.getByRole("button", { name: "Yes, I am the administrator" }));
+
 describe("platform administration screen", () => {
   beforeEach(() => {
     window.localStorage.clear();
+    window.sessionStorage.clear();
     clearConfig();
     clearSession();
   });
 
   it("renders at its own address with every capability simulated", () => {
     renderAt(ADMIN_ROUTE);
+    enterAdmin();
     expect(
       screen.getByRole("heading", { level: 1, name: "Platform administration" }),
     ).toBeInTheDocument();
@@ -53,6 +59,7 @@ describe("platform administration screen", () => {
 
   it("reports a capability as misconfigured when Live is switched on without its details", () => {
     renderAt(ADMIN_ROUTE);
+    enterAdmin();
     fireEvent.click(screen.getByRole("switch", { name: "Assessment service runs live" }));
     expect(screen.getAllByText("misconfigured")).toHaveLength(1);
     expect(screen.getAllByText("simulated")).toHaveLength(4);
@@ -61,6 +68,7 @@ describe("platform administration screen", () => {
 
   it("reports a capability as live only once it is complete, and persists on save", () => {
     renderAt(ADMIN_ROUTE);
+    enterAdmin();
 
     // Only the drafting capability carries a model field.
     expect(screen.getAllByLabelText("Model (OpenRouter)")).toHaveLength(1);
@@ -85,6 +93,7 @@ describe("platform administration screen", () => {
     const hasFetch = typeof globalThis.fetch === "function";
     const fetchSpy = hasFetch ? vi.spyOn(globalThis, "fetch") : null;
     renderAt(ADMIN_ROUTE);
+    enterAdmin();
     if (fetchSpy) expect(fetchSpy).not.toHaveBeenCalled();
   });
 });

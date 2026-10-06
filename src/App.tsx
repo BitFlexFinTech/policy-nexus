@@ -21,6 +21,7 @@ import Compare from "./pages/Compare.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import PlatformAdmin from "./pages/PlatformAdmin.tsx";
 import AuthCallback from "./pages/AuthCallback.tsx";
+import { AdminGate } from "./components/admin/AdminGate.tsx";
 import { ADMIN_ROUTE } from "@/config/platform";
 import { faviconOverride } from "@/config/content";
 import { useContent } from "@/config/useContent";
@@ -85,8 +86,18 @@ const App = () => (
           {/* Platform administration. HIDDEN BY DESIGN: not linked from the landing
               page, the workspace navigation, the header or the footer, and not
               behind the department session — it is reached only by its address,
-              which lives in one constant so it can be re-homed for production. */}
-          <Route path={ADMIN_ROUTE} element={<PlatformAdmin />} />
+              which lives in one constant so it can be re-homed for production.
+              It sits behind `AdminGate`, which asks one plain question before it
+              will show the settings; the gate states plainly that this is not
+              real security (see src/session/adminAccess.ts). */}
+          <Route
+            path={ADMIN_ROUTE}
+            element={
+              <AdminGate>
+                <PlatformAdmin />
+              </AdminGate>
+            }
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

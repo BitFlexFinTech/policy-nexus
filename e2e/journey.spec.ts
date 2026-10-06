@@ -1262,8 +1262,10 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { name: "How it works" })).toBeVisible();
 
-    // An administrator rewrites one section heading and saves it.
+    // The screen sits behind the administrator gate: it asks one plain question first.
     await page.goto(ADMIN_ROUTE);
+    await expect(page.getByRole("heading", { name: "Administrator access" })).toBeVisible();
+    await page.getByRole("button", { name: "Yes, I am the administrator" }).click();
     await expect(page.getByRole("heading", { name: "Landing page content" })).toBeVisible();
     await page.locator('[id="content-how.heading"]').fill("How the platform works");
     await page.getByRole("button", { name: "Save content" }).click();

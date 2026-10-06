@@ -41,6 +41,8 @@
  *     where it carries one of its stated priorities (BATCH 5)
  * 26. The minister-facing line (the owner's locked item 6) is stated once in the identity file and
  *     rendered on the public landing page (BATCH 7)
+ * 27. The platform administration screen sits behind the administrator gate — the gate exists, the
+ *     route is wrapped by it, and the gate states plainly that it is NOT real security
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -1237,6 +1239,52 @@ if (!existsSync(cssPath)) {
     notes.push("INFO  the minister-facing line is stated in the identity file and rendered on the public landing page (BATCH 7)");
   }
   check("the minister-facing line is on the public landing page", problems);
+}
+
+// ---------------------------------------------------------------------------------------------
+// check 27 — THE PLATFORM ADMINISTRATION SCREEN SITS BEHIND THE ADMINISTRATOR GATE
+// The screen holds the platform's connection settings, so it now asks one plain question before it
+// will show them. This gate fails the build if the gate module, the gate component or the route
+// wrapping is removed, or if the gate stops saying plainly that it is not real security. The
+// confirmation is honest about its limit because the whole platform runs in the browser; the funded
+// server is what makes real authorisation possible (NEXT PHASE item 3).
+{
+  const problems = [];
+  const accessPath = join(ROOT, "src/session/adminAccess.ts");
+  const gatePath = join(ROOT, "src/components/admin/AdminGate.tsx");
+  const appPath = join(ROOT, "src/App.tsx");
+
+  if (!existsSync(accessPath)) {
+    problems.push("src/session/adminAccess.ts is missing — the guard has no home");
+  } else {
+    const access = readFileSync(accessPath, "utf8");
+    if (!/export const ADMIN_GUARD_STATEMENT\s*=/.test(access)) {
+      problems.push("src/session/adminAccess.ts no longer exports the guard's honest statement");
+    }
+    if (!/not real protection/.test(access)) {
+      problems.push("the guard's statement no longer says it is not real protection");
+    }
+    if (!/export const isAdminAcknowledged\s*=/.test(access)) {
+      problems.push("src/session/adminAccess.ts no longer exports isAdminAcknowledged");
+    }
+  }
+
+  if (!existsSync(gatePath)) {
+    problems.push("src/components/admin/AdminGate.tsx is missing — nothing gates the screen");
+  } else if (!/ADMIN_GUARD_STATEMENT/.test(readFileSync(gatePath, "utf8"))) {
+    problems.push("the gate no longer renders the guard's honest statement");
+  }
+
+  if (!existsSync(appPath)) {
+    problems.push("src/App.tsx is missing");
+  } else if (!/AdminGate/.test(readFileSync(appPath, "utf8"))) {
+    problems.push("the platform administration route is no longer wrapped by AdminGate");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the platform administration screen sits behind the administrator gate, which states it is not real security");
+  }
+  check("the administrator gate protects the platform administration screen", problems);
 }
 
 

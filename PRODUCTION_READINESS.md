@@ -101,9 +101,9 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-06, after the OpenRouter drafting connection was added — the administrator enters the OpenRouter key and model and the platform drafts with it — and the offline drafted policy became operative; the host and the working copy are IN STEP).**
+- **Status today (2026-10-06, after the administrator gate was added to the platform administration screen — it asks "Are you the administrator?" before showing the settings, honestly labelled as not real security — on top of the OpenRouter drafting connection and the operative offline drafted policy; the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-_12UHyS3.js` (`2cbd746a65e4bc51b209eb0c6f41d8e8d16cbb04aa767bcbdbdc7d8e8a35fc47`) — fetched
+  `assets/index-Cp3G8BpB.js` (`0eb23e59e3cee37e27db72308bf4435065b46192be20b33691d665ca9815cc76`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
   explicit FTPS, **never `--delete`** — 1 new file and 12 modified, 1,490,345 bytes — and the SSL validation token
@@ -395,6 +395,16 @@ defaults to simulated; nothing is constructed, fetched or called while a capabil
 
 **Stated in the screen, not hidden from it:** credentials are held in this browser's local
 storage and are readable through developer tools. Production requires a server-side proxy.
+
+**The administrator gate (2026-10-06).** The screen sits behind a gate that asks one plain question
+— *"Are you the administrator?"* — before it will show the settings, and remembers the answer for the
+browser tab only (`src/session/adminAccess.ts`; the route is wrapped in `src/App.tsx`; held by
+`scripts/validate.mjs` check 27). **It is honestly labelled as NOT real security:** because the whole
+platform runs in the browser, the note on the screen says plainly that anyone who reaches the address
+can confirm the same question too. It stops a casual visitor; it does not stop a determined one. **Real
+authorisation needs the funded server and sign-in (§ the funded build steps)** — and when that exists,
+the gate is replaced by changing the one module, with no other file touched (the same mock-first seam
+the sign-in and document-library connections use).
 ### 9b. Landing page content and brand marks (item 9 — Batch C, 2026-09-30)
 
 The same screen, reached the same way, carries **Landing page content**: the public landing page's

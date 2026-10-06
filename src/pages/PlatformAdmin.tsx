@@ -15,6 +15,7 @@ import {
 } from "@/config/platform";
 import { platformConfigActions, usePlatformConfig } from "@/config/usePlatformConfig";
 import { clearRuns } from "@/services/assessment/runStore";
+import { adminAccessActions } from "@/session/useAdminAccess";
 import { clearSession } from "@/session/session";
 
 const SERVICE_CAPABILITIES = ["assessment", "drafting", "extraction", "library"] as const;
@@ -118,6 +119,14 @@ export default function PlatformAdmin() {
           </Button>
           <Button size="sm" variant="outline" className="h-8 text-xs" onClick={clearLocalData}>
             Clear local data
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 text-xs"
+            onClick={adminAccessActions.lockAdminScreen}
+          >
+            Lock this screen
           </Button>
           {dirty && (
             <span className="text-[10px] text-warning">

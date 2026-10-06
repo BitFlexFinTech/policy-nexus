@@ -10,9 +10,15 @@ const renderAt = (path: string) => {
   return render(<App />);
 };
 
+/** Pass the administrator gate so the content editor is what is under test. */
+const enterAdmin = () =>
+  fireEvent.click(screen.getByRole("button", { name: "Yes, I am the administrator" }));
+
 beforeEach(() => {
   cleanup();
   clearContent();
+  // The confirmation is remembered per browser tab, so clearing it is what a new tab does.
+  window.sessionStorage.clear();
 });
 
 /**
@@ -23,6 +29,7 @@ beforeEach(() => {
 describe("platform administration — landing page content", () => {
   it("renders the editor with the fixed wording present and read-only", () => {
     renderAt(ADMIN_ROUTE);
+    enterAdmin();
     expect(screen.getByRole("heading", { name: "Landing page content" })).toBeInTheDocument();
 
     const locked = document.getElementById("content-locked.governance") as HTMLTextAreaElement | null;
@@ -33,6 +40,7 @@ describe("platform administration — landing page content", () => {
 
   it("saves a change from the screen, and the landing page shows it", () => {
     renderAt(ADMIN_ROUTE);
+    enterAdmin();
 
     const input = document.getElementById("content-how.heading") as HTMLInputElement | null;
     expect(input).not.toBeNull();
