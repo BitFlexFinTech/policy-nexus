@@ -103,10 +103,12 @@ describe("generated documents — the drafted policy", () => {
 
     expect(draft.kind).toBe("policy-draft");
 
-    // The substance of the submitted draft is embedded, sentence by sentence.
+    // The measures are drafted as operative obligations from the policy's own objectives and
+    // the groups the examination shows under pressure, and the submitted draft is also carried in.
     const measures = draft.sections.find((section) => section.id === "measures")!;
     expect(measures.bullets && measures.bullets.length).toBeGreaterThan(0);
-    measures.bullets!.forEach((clause) => expect(flat(run.policyText)).toContain(clause));
+    expect(measures.bullets!.some((clause) => clause.startsWith("The Department shall"))).toBe(true);
+    expect(measures.bullets!.some((clause) => flat(run.policyText).includes(clause))).toBe(true);
 
     // ...and the simulation's findings become provisions.
     run.risks.forEach((risk) => expect(text).toContain(risk.label));

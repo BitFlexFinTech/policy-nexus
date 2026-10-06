@@ -101,12 +101,12 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-06, after the fixed "reference date" was removed from the platform and the relationship graph and the Run-Simulation notice were fixed; the host and the working copy are IN STEP).**
+- **Status today (2026-10-06, after the OpenRouter drafting connection was added — the administrator enters the OpenRouter key and model and the platform drafts with it — and the offline drafted policy became operative; the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-Djg7qENq.js` (`094ab72730a1567e0a3b5fee6f4c2b361bfa398dff4a6c8b225e11971542ce27`) — fetched
+  `assets/index-_12UHyS3.js` (`2cbd746a65e4bc51b209eb0c6f41d8e8d16cbb04aa767bcbdbdc7d8e8a35fc47`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
-  explicit FTPS, **never `--delete`** — 1 new file and 12 modified, 1,486,433 bytes — and the SSL validation token
+  explicit FTPS, **never `--delete`** — 1 new file and 12 modified, 1,490,345 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
   expansion and the 2026-10-04 dataset-expansion batches 1–4 and the PART 11 batches 1–7 — **150** canonical stakeholder groups, every
@@ -377,7 +377,7 @@ so it can be re-homed behind a production URL by changing one line.
 | Capability | Where it is entered | Simulated today | Live means | Client wiring |
 |---|---|---|---|---|
 | Assessment service | `/platform-admin` | scenario engine, `Scenario (Mock)` labels | `POST <endpoint>` returning a complete `AssessmentRun` | **BUILT AND CONNECTED (Phase Z)** — the run path now waits; the register, the run view and every assessment screen use it. While simulated the engine answers in the same render, so nothing appears to wait |
-| Drafting model | `/platform-admin` (key + model name) | deterministic local generators, driven by the department's own prompt library | `POST <endpoint>` returning a complete `GeneratedDocument` | **BUILT AND CONNECTED (Phase Z; AB-4)** — `useGeneratedDocument`; the request now also carries the department's **prompt and grounding** (`src/config/draftingPrompts.ts`, `buildDraftingGrounding`), so a service is asked for exactly what the local generator produces. The report and drafted-policy screens wait only when the capability is live, and **the citations are verified before the draft is shown, whoever produced it** |
+| Drafting model (OpenRouter) | `/platform-admin` — the **OpenRouter address** (prefilled), the **OpenRouter key**, and the **model** (any OpenRouter model id) | the platform's own deterministic generator (`src/services/assessment/policyDraft.ts`), driven by the department's own prompt library — so the workspace drafts with **no network at all** | an OpenRouter **chat-completions** call: `POST {model, messages}` → `choices[0].message.content` | **BUILT AND CONNECTED (2026-10-06)** — `useGeneratedDocument` calls `remoteDraftingClient`, which now speaks OpenRouter: it builds the prompt from `buildDraftingGrounding`, sends it, and turns the model's JSON answer into the document, **rejecting a malformed answer**. With nothing configured the local generator runs. The report and drafted-policy screens wait only when the capability is live, and **the citations are verified before the draft is shown, whoever produced it** |
 | Document text extraction | `/platform-admin` | `.txt` read in the browser; PDF/DOCX recorded by name | `POST <endpoint>` returning `{ text }` | **BUILT AND CONNECTED (Phase Y)** — `httpExtractionClient.ts`, reached only when the capability is live and complete |
 | Government sign-in (SSO) | `/platform-admin` (issuer, client ID, redirect address, department claim) | one-click entry, `Entry: one-click (Mock)` | OIDC Authorization Code + PKCE against `<issuer>/authorize` and `<issuer>/token` | **BUILT AND CONNECTED (Phase Z)** — `/auth/callback` completes the exchange and reads the configured department claim. **A browser cannot verify the provider's signature**; a server must do that before real use, and the screen says so |
 

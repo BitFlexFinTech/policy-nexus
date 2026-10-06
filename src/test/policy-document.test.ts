@@ -216,9 +216,10 @@ describe("the drafted policy — a Zimbabwean instrument, not a summary", () => 
     expect(renderDocumentText(buildPolicyDraft(await runFor("lg"), other))).not.toBe(once);
   });
 
-  it("phrases the single-measure and the no-resistance cases correctly", async () => {
-    // The two defects measured in the old draft: "Measures 1 to 1 restate the substance…"
-    // and a sentence reading as though groups did require provisions when none is resistant.
+  it("drafts the policy's own operative measures", async () => {
+    // The drafted policy's measures are obligations on the Department, written from its own
+    // objectives — not a restatement of whatever was submitted. The submitted draft is still
+    // carried into effect as a further set of provisions.
     const department = findDepartment("psc")!;
     const single = await assessmentService.buildRun({
       ...requestFor("psc"),
@@ -226,8 +227,7 @@ describe("the drafted policy — a Zimbabwean instrument, not a summary", () => 
     });
     const text = renderDocumentText(buildPolicyDraft(single, department));
 
+    expect(text).toContain("The Department shall");
     expect(text).not.toContain("Measures 1 to 1");
-    expect(text).toContain("The single measure below gives effect to the submitted draft");
-    expect(text).not.toMatch(/no group is modelled as resistant and require/i);
   });
 });

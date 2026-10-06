@@ -114,6 +114,10 @@ const listOf = (labels: readonly string[]): string =>
       ? labels[0]
       : `${labels.slice(0, -1).join(", ")} and ${labels[labels.length - 1]}`;
 
+/** The first letter lower-cased, so a priority's own note can be carried into a sentence. */
+const lowerFirst = (text: string): string =>
+  text.length ? text.charAt(0).toLowerCase() + text.slice(1) : text;
+
 /* ------------------------------------------------------------------------- */
 /* The department's own material (Batch 5)                                     */
 /* ------------------------------------------------------------------------- */
@@ -426,15 +430,14 @@ export const buildPolicyDraft = (
 
   numbered.push({
     id: "vision",
-    heading: `${CLAUSE.vision}. Vision, mission, objectives and guiding principles`,
+    heading: `${CLAUSE.vision}. Policy goal and objectives`,
     paragraphs: [
-      "The department's own vision and mission statements are not held in this platform, and the platform does not invent them. They are recorded here for completion by the department.",
-      `Vision: ${BLANK}.`,
-      `Mission: ${BLANK}.`,
-      "The objectives below are the department's own stated priorities, which this policy is directed at.",
+      `Goal: to give effect to the mandate of ${department.name} by acting on the pressures this examination identified, so that its stated priorities are advanced and the groups this policy reaches are brought into the implementation.`,
+      `The objectives below are the operative objectives of this policy. Each is carried into at least one measure at clause ${CLAUSE.measures}, and each is monitored against the department's own indicators at clause ${CLAUSE.monitoring}.`,
     ],
     bullets: department.priorities.map(
-      (priority) => `To advance ${priority.label.toLowerCase()} — ${priority.note}`,
+      (priority, index) =>
+        `Objective ${index + 1}: to advance ${priority.label.toLowerCase()} — ${priority.note}.`,
     ),
     listStyle: "clauses",
   });
@@ -474,11 +477,20 @@ export const buildPolicyDraft = (
     id: "measures",
     heading: `${CLAUSE.measures}. Policy measures`,
     paragraphs: [
-      submittedMeasures.length === 1
-        ? "The single measure below gives effect to the submitted draft. It restates the substance of that draft as an operative provision, so that the text the department examined is the text the department adopts."
-        : `The ${submittedMeasures.length} measures below give effect to the submitted draft. Measures 1 to ${submittedMeasures.length} restate the substance of that draft as operative provisions, so that the text the department examined is the text the department adopts.`,
+      `This clause states the measures that give effect to the objectives at clause ${CLAUSE.vision}. Each is an obligation on the Department, so that the policy does not rest on intention alone.`,
+      `The measures are drawn from the policy's own objectives and from the groups the examination shows as conditional or resistant; the draft submitted for examination is then carried into effect as a further set of provisions.`,
     ],
-    bullets: submittedMeasures,
+    bullets: [
+      ...department.priorities.map(
+        (priority) =>
+          `The Department shall, in order to advance ${priority.label.toLowerCase()}, ${lowerFirst(priority.note)}`,
+      ),
+      ...[...conditional, ...reluctant].map(
+        (reaction) =>
+          `The Department shall, before the obligations of this policy take effect, settle the implementation questions raised by ${reaction.label} through the engagement provided at clause ${CLAUSE.engagement}.`,
+      ),
+      ...submittedMeasures,
+    ],
     listStyle: "clauses",
   });
 

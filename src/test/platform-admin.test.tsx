@@ -28,7 +28,7 @@ describe("platform administration screen", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "Platform administration" }),
     ).toBeInTheDocument();
-    ["Assessment service", "Drafting model", "Document text extraction", "Shared document library", "Government sign-in (SSO)"].forEach(
+    ["Assessment service", "Drafting model (OpenRouter)", "Document text extraction", "Shared document library", "Government sign-in (SSO)"].forEach(
       (label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument(),
     );
     expect(screen.getAllByText("simulated")).toHaveLength(5);
@@ -63,7 +63,7 @@ describe("platform administration screen", () => {
     renderAt(ADMIN_ROUTE);
 
     // Only the drafting capability carries a model field.
-    expect(screen.getAllByLabelText("Model or route name")).toHaveLength(1);
+    expect(screen.getAllByLabelText("Model (OpenRouter)")).toHaveLength(1);
 
     fireEvent.click(screen.getByRole("switch", { name: "Assessment service runs live" }));
     fireEvent.change(screen.getAllByLabelText("Service address")[0], {

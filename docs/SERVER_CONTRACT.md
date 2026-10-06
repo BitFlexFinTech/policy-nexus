@@ -62,60 +62,57 @@ Also required by the same client:
 | `GET <endpoint>/<runId>` | One recorded run. **404** is treated as "no such run" (the platform shows its own not-found screen). |
 | `GET <endpoint>?department=<departmentId>` | The department's runs, newest first. A non-2xx answer is shown as an empty register, not as a fabricated one. |
 
-## 2. Drafting service — `POST <drafting endpoint>`
+## 2. Drafting — the OpenRouter connection
+
+The drafting capability at `/platform-admin` ("Drafting model (OpenRouter)") is reached through
+**OpenRouter**, which speaks the standard chat-completions shape. The administrator enters the
+**OpenRouter address** (prefilled with `https://openrouter.ai/api/v1/chat/completions`), the
+**OpenRouter key**, and the **model** (any OpenRouter model id).
+
+The platform sends:
 
 ```json
 {
-  "kind": "report" | "policy-draft",
-  "model": "…",
-  "run": { …the completed AssessmentRun… },
-  "grounding": {
-    "departmentId": "fin",
-    "departmentName": "…",
-    "reference": "FIN-02",
-    "seed": "…",
-    "referenceDate": "24 September 2026",
-    "policyTitle": "…",
-    "policyText": "…",
-    "horizonLabel": "Medium term",
-    "indicators": [ { "label": "…", "value": 0, "unit": "…", "source": "…" } ],
-    "groups": [ { "id": "…", "label": "…", "share": "38.6% of …", "source": "…" } ],
-    "instruments": [ { "id": "banking-act", "citation": "Banking Act [Chapter 24:20]", "source": "…" } ],
-    "prompt": {
-      "departmentId": "fin",
-      "instructions": "…the department's own prompt…",
-      "citations": [ "Banking Act [Chapter 24:20]", "…" ],
-      "structure": [ "Republic of Zimbabwe", "Table of contents", "Foreword", "…", "11. Transitional provisions", "Annex C — Instruments relied on", "Note on this draft" ]
-    }
-  }
+  "model": "<the administrator's model id>",
+  "messages": [
+    { "role": "system", "content": "<who is drafting, the department's own prompt, the required section list, and the JSON shape>" },
+    { "role": "user",   "content": "<the submitted draft, the modelled groups, and the instruments available to cite>" }
+  ]
 }
 ```
 
-`grounding` is the department's own evidence, assembled from the platform's configuration
-(`src/config/draftingPrompts.ts`, `departments.ts`, `reference.ts`, `instruments.ts`) and
-handed to the local generator and to this service alike — so swapping the two cannot change
-what a draft is allowed to rest on. `prompt.citations` is the closed list a draft may cite;
-`prompt.structure` is the section list it must produce.
+with `Authorization: Bearer <the OpenRouter key>`. The department's own prompt and its allowed
+citations (from `src/config/draftingPrompts.ts`, `buildDraftingGrounding`) form the system
+message, exactly as the local generator uses them, so the model is asked for exactly what the
+generator produces.
 
-**The structure now follows the Zimbabwean reading order** (front matter · eleven numbered
-clauses · six annexes · closing note — see `POLICY_DRAFT_STRUCTURE` in
-`src/config/draftingPrompts.ts`), and a service must return **every** part: the local generator
-produces 8,341–12,627 words per department (measured 2026-10-05, after Batch 5 added the
-departmental-material clause and the documents annex), and a document that is thinner than that is not the
-instrument this platform promises. A service that returns a shorter document is not refused —
-the platform renders what it is given — but the length and structure gates in
-`src/test/policy-document.test.ts` hold the *local* generator to it, so a regression there
-fails the build.
+**The model must answer with a single JSON object** of the platform's document shape:
 
-Expected: **200** with a complete `GeneratedDocument`
-(`src/services/assessment/types.ts`): `kind`, `title`, `subtitle`, `fileStem`, and a
-non-empty `sections` array whose entries each carry `id`, `heading` and
-`paragraphs` (optionally `bullets`, `listStyle`).
+```json
+{
+  "title": "…", "subtitle": "…",
+  "sections": [
+    { "id": "…", "heading": "…", "paragraphs": ["…"], "bullets": ["…"], "table": { "caption": "…", "columns": ["…"], "rows": [["…"]] } }
+  ]
+}
+```
 
-The platform rejects a document with no sections rather than rendering an empty
-instrument, **and verifies every citation before the draft is shown**: any instrument
-that is not in `prompt.citations`, any `[Chapter …]` marker no listed citation carries,
-and any title belonging to another department's register is reported and the document is
+The section headings must be the structure the prompt names, in order — **the Zimbabwean reading
+order** (front matter · eleven numbered clauses · six annexes · closing note, see
+`POLICY_DRAFT_STRUCTURE` in `src/config/draftingPrompts.ts`). The platform reads
+`choices[0].message.content`, parses the JSON, and **rejects an answer that is not a complete
+document** rather than rendering a malformed instrument; a failure is reported on the screen,
+never replaced by the offline text dressed up as the model's answer. `prompt.citations` remains
+the closed list a draft may cite.
+
+With **nothing configured**, the platform uses its own deterministic generator
+(`src/services/assessment/policyDraft.ts`) — the offline path, which works with no network at
+all. The length and structure gates in `src/test/policy-document.test.ts` hold that generator to
+the full instrument (a policy goal, objectives, and operative "The Department shall …" measures).
+
+The platform verifies every citation before the draft is shown, **whoever produced it**: any
+instrument that is not in `prompt.citations`, any `[Chapter …]` marker no listed citation
+carries, and any title belonging to another department's register is reported and the document is
 refused rather than presented as verified.
 
 ## 3. Document text extraction — `POST <extraction endpoint>`

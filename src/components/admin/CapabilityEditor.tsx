@@ -6,6 +6,8 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import {
   CAPABILITY_LABELS,
+  OPENROUTER_CHAT_ENDPOINT,
+  OPENROUTER_MODEL_SUGGESTIONS,
   describeCapability,
   type CapabilityConfig,
   type CapabilityId,
@@ -99,20 +101,29 @@ export function CapabilityEditor({
       <div className="mt-3 grid gap-3 md:grid-cols-2">
         <div className="space-y-1">
           <Label htmlFor={`cap-${id}-endpoint`} className={FIELD_LABEL}>
-            Service address
+            {id === "drafting" ? "OpenRouter address" : "Service address"}
           </Label>
           <Input
             id={`cap-${id}-endpoint`}
             value={capability.endpoint}
-            placeholder="Absolute address of the service"
+            placeholder={id === "drafting" ? OPENROUTER_CHAT_ENDPOINT : "Absolute address of the service"}
             onChange={(event) => update({ endpoint: event.target.value })}
             className="h-8 text-xs"
           />
+          {id === "drafting" && (
+            <button
+              type="button"
+              className="text-[10px] font-medium text-primary hover:underline"
+              onClick={() => update({ endpoint: OPENROUTER_CHAT_ENDPOINT })}
+            >
+              Use the OpenRouter address
+            </button>
+          )}
         </div>
 
         <div className="space-y-1">
           <Label htmlFor={`cap-${id}-key`} className={FIELD_LABEL}>
-            Key
+            {id === "drafting" ? "OpenRouter key" : "Key"}
           </Label>
           <div className="flex gap-2">
             <Input
@@ -139,15 +150,25 @@ export function CapabilityEditor({
         {id === "drafting" && (
           <div className="space-y-1">
             <Label htmlFor={`cap-${id}-model`} className={FIELD_LABEL}>
-              Model or route name
+              Model (OpenRouter)
             </Label>
             <Input
               id={`cap-${id}-model`}
               value={capability.model}
               onChange={(event) => update({ model: event.target.value })}
+              placeholder="Choose a model, or type any OpenRouter model id"
               className="h-8 text-xs"
               autoComplete="off"
+              list={`cap-${id}-model-options`}
             />
+            <datalist id={`cap-${id}-model-options`}>
+              {OPENROUTER_MODEL_SUGGESTIONS.map((model) => (
+                <option key={model} value={model} />
+              ))}
+            </datalist>
+            <p className="text-[10px] leading-relaxed text-muted-foreground">
+              Type any model id OpenRouter offers. The list is a suggestion, not a limit.
+            </p>
           </div>
         )}
       </div>

@@ -78,11 +78,33 @@ export const CAPABILITY_IDS: readonly CapabilityId[] = [
 
 export const CAPABILITY_LABELS: Record<CapabilityId, string> = {
   assessment: "Assessment service",
-  drafting: "Drafting model",
+  drafting: "Drafting model (OpenRouter)",
   extraction: "Document text extraction",
   library: "Shared document library",
   sso: "Government sign-in (SSO)",
 };
+
+/**
+ * The drafting model is reached through OpenRouter, which speaks the standard
+ * chat-completions shape. This is the DEFAULT address shown to the administrator for
+ * the drafting capability; it is data, not a request the shipped build makes — the
+ * platform contacts nothing until the administrator switches the capability on.
+ */
+export const OPENROUTER_CHAT_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
+
+/**
+ * Suggested OpenRouter model ids for the drafting selector. Any id OpenRouter carries may
+ * be typed instead — the field is a suggestion, never a closed list, so the platform never
+ * hardcodes a model that may not exist.
+ */
+export const OPENROUTER_MODEL_SUGGESTIONS: readonly string[] = [
+  "deepseek/deepseek-chat",
+  "deepseek/deepseek-reasoner",
+  "deepseek/deepseek-chat-v3.1",
+  "deepseek/deepseek-v3.1:free",
+  "google/gemini-2.0-flash-001",
+  "anthropic/claude-3.5-sonnet",
+];
 
 const SIMULATED: CapabilityConfig = { mode: "simulated", endpoint: "", key: "", model: "" };
 

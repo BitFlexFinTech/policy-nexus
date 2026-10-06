@@ -43,7 +43,7 @@ export const POLICY_DRAFT_STRUCTURE: readonly string[] = [
   "2.2 Modelled stakeholder position",
   "2.3 Stated priorities the policy is directed at",
   "2.4 Departmental material the examination read",
-  "3. Vision, mission, objectives and guiding principles",
+  "3. Policy goal and objectives",
   "3.2 Guiding principles applied in preparing this draft",
   "4. Legal and institutional framework",
   "5. Policy measures",
