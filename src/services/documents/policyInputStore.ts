@@ -196,3 +196,10 @@ export const clearPolicyInput = (departmentId: string): void => {
   delete next[departmentId];
   write(next);
 };
+
+/** Forget every department's working input at once. Used by the administration screen's reset. */
+export const clearAllPolicyInput = (): void => {
+  storage.remove(POLICY_INPUT_KEY);
+  cachedRaw = undefined;
+  cachedInputs = EMPTY;
+};

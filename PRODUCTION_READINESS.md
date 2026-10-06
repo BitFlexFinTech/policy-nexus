@@ -101,9 +101,9 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-06, after the administration screen's blank-page defect was fixed at source and an app-wide ErrorBoundary was added — on top of the rebuilt dashboard, the simplified OpenRouter setup, the ONE Simulated ⇄ Live switch, the footer admin link, the administrator gate, the simulated support desk and the operative offline drafted policy; the host and the working copy are IN STEP).**
+- **Status today (2026-10-06, after the administration screen gained a one-click "Clear this browser's saved data" control — on top of the blank-page defect fixed at source with an app-wide ErrorBoundary, the rebuilt dashboard, the simplified OpenRouter setup, the ONE Simulated ⇄ Live switch, the footer admin link, the administrator gate, the simulated support desk and the operative offline drafted policy; the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-DnPHwsvH.js` (`1acd99241035ffa216ccb8ca07502c4c389f515dd28249a0406fae3978107726`) — fetched
+  `assets/index-BtZDV6qn.js` (`67c56a93e862cce3441aa1ebf8fb97e8572d426a60d6e36ebfdf2ab129ba1568`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
   explicit FTPS, **never `--delete`** — 13 files, 1,966,994 bytes — and the SSL validation token

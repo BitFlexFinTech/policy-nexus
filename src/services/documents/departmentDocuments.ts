@@ -151,6 +151,14 @@ export const clearDepartmentDocuments = (departmentId: string): void => {
   if (next.length !== existing.length) write(next);
 };
 
+/** Remove every department's added documents at once. Used by the administration screen's reset. */
+export const clearAllDepartmentDocuments = (): void => {
+  storage.remove(DEPARTMENT_DOCUMENTS_KEY);
+  cachedRaw = undefined;
+  cachedDocuments = EMPTY;
+  emit();
+};
+
 /**
  * The documents as a run receives them: an id, a name and the text that was really read. The
  * engine receives exactly this, so nothing else about a stored document can reach a run.

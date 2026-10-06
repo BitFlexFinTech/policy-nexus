@@ -100,6 +100,20 @@ export const beginSignIn = async (): Promise<boolean> => {
   return true;
 };
 
+/**
+ * Forget a sign-in attempt that was left half-finished — the state and the PKCE verifier it wrote
+ * to session storage. Used by the administration screen's one-click reset, so a reset returns the
+ * browser to the state it was in before anyone used the platform.
+ */
+export const clearSsoAttempt = (): void => {
+  try {
+    window.sessionStorage.removeItem(STATE_KEY);
+    window.sessionStorage.removeItem(VERIFIER_KEY);
+  } catch {
+    // Refused session storage: there was nothing stored to forget.
+  }
+};
+
 const fromBase64Url = (value: string): string => {
   const normalised = value.split("-").join("+").split("_").join("/");
   const padded = normalised + "=".repeat((4 - (normalised.length % 4)) % 4);

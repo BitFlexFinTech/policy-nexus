@@ -18,9 +18,8 @@ import {
 } from "@/config/platform";
 import { SUPPORT_DESK_LIMITATION } from "@/config/support";
 import { platformConfigActions, usePlatformConfig } from "@/config/usePlatformConfig";
-import { clearRuns } from "@/services/assessment/runStore";
+import { clearAllBrowserData } from "@/lib/browserData";
 import { adminAccessActions } from "@/session/useAdminAccess";
-import { clearSession } from "@/session/session";
 
 const SERVICE_CAPABILITIES = ["assessment", "drafting", "extraction", "library"] as const;
 
@@ -71,12 +70,20 @@ export default function PlatformAdmin() {
     setNotice("Unsaved changes discarded.");
   };
 
-  const clearLocalData = () => {
-    platformConfigActions.clearConfig();
-    clearRuns();
-    clearSession();
+  /**
+   * Forgets everything this browser saved for the platform, in one click. The owner's instruction
+   * (2026-10-06): if legacy data ever causes trouble, the administrator can reset the browser
+   * themselves rather than being stranded. The one place that composes the reset is
+   * `src/lib/browserData.ts`, so this handler cannot fall out of step with the stores.
+   */
+  const clearBrowserData = () => {
+    clearAllBrowserData();
     setDraft(DEFAULT_PLATFORM_CONFIG);
-    setNotice("Cleared: saved credentials, every recorded run, and the department session.");
+    setNotice(
+      "Cleared this browser's saved data: credentials, the department session, every recorded run, " +
+        "every added document, every saved draft and note, and every support case. The page is back " +
+        "to how it ships.",
+    );
   };
 
   return (
@@ -159,9 +166,20 @@ export default function PlatformAdmin() {
           >
             Discard changes
           </Button>
-          <Button size="sm" variant="outline" className="h-8 text-xs" onClick={clearLocalData}>
-            Clear local data
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 text-xs"
+            onClick={clearBrowserData}
+            title="Forgets everything this browser saved for the platform, in one click."
+          >
+            Clear this browser's saved data
           </Button>
+          <span className="w-full text-[10px] leading-snug text-muted-foreground">
+            One click. Forgets every credential, run, document, draft and support case this browser
+            holds, and signs the department out — so data left behind by an earlier build cannot
+            cause trouble. This screen's own administrator answer for the tab is kept.
+          </span>
           <Button
             size="sm"
             variant="outline"

@@ -144,3 +144,11 @@ export const clearDraftText = (runId: string): void => {
   delete next[runId];
   write(next);
 };
+
+/** Forget every working copy at once. Used by the administration screen's one-click reset. */
+export const clearAllDrafts = (): void => {
+  storage.remove(DRAFTS_STORAGE_KEY);
+  cachedRaw = undefined;
+  cachedDrafts = EMPTY;
+  emit();
+};

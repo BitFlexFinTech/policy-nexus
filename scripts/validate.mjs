@@ -51,6 +51,9 @@
  * 30. There is ONE platform-mode master switch (owner's rule, 2026-10-06): `simulated` runs the
  *     scenario engine and shows its results; `live` uses only real services and shows nothing where
  *     one is missing. The administration screen carries the single control and the banner reads it.
+ * 31. The administration screen clears this browser's saved data in one click (owner's instruction,
+ *     2026-10-06) — the reset is composed in ONE place, forgets every store through its own seam, and
+ *     sweeps the platform's shared key prefix so a store added later is cleared too.
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -1407,6 +1410,58 @@ if (!existsSync(cssPath)) {
     notes.push("INFO  the platform has ONE mode master switch (simulated / live), read by the banner");
   }
   check("the platform has one mode master switch", problems);
+}
+
+
+// ---------------------------------------------------------------------------------------------
+// check 31 — THE ADMINISTRATION SCREEN CLEARS THIS BROWSER'S SAVED DATA IN ONE CLICK
+// The owner's instruction (2026-10-06): a "Clear this browser's saved data" control on the
+// administration screen, so data left behind by an earlier build can be reset by the administrator
+// themselves. The clear is composed in ONE place (`src/lib/browserData.ts`), which asks each store
+// to forget through that store's OWN seam and then sweeps the platform's shared key prefix — so a
+// store added later is cleared too. This fails the build if the control, the composer, or any
+// store's forget-seam is removed.
+{
+  const problems = [];
+  const dataPath = join(ROOT, "src/lib/browserData.ts");
+  const adminPath = join(ROOT, "src/pages/PlatformAdmin.tsx");
+
+  if (!existsSync(dataPath)) {
+    problems.push("src/lib/browserData.ts is missing — the one place that clears the browser's data");
+  } else {
+    const data = readFileSync(dataPath, "utf8");
+    for (const symbol of [
+      "clearAllBrowserData",
+      "BROWSER_DATA_PREFIX",
+      "clearConfig",
+      "clearContent",
+      "clearRuns",
+      "clearSupportCases",
+      "clearAllDepartmentDocuments",
+      "clearAllDrafts",
+      "clearAllPolicyInput",
+      "clearSession",
+      "clearSsoAttempt",
+    ]) {
+      if (!new RegExp(`\\b${symbol}\\b`).test(data)) {
+        problems.push(`the browser-data reset no longer forgets every store (${symbol} missing)`);
+      }
+    }
+  }
+
+  if (!existsSync(adminPath)) {
+    problems.push("src/pages/PlatformAdmin.tsx is missing");
+  } else {
+    const admin = readFileSync(adminPath, "utf8");
+    if (!/Clear this browser's saved data/.test(admin) || !/clearAllBrowserData/.test(admin)) {
+      problems.push("the administration screen no longer offers the one-click reset");
+    }
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the administration screen clears this browser's saved data in one click");
+  }
+  check("the administration screen clears this browser's saved data", problems);
 }
 
 
