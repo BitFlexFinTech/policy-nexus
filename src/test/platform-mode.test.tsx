@@ -46,9 +46,9 @@ describe("the platform mode — the one master switch", () => {
     fireEvent.click(platformSwitch);
     expect(isPlatformLive()).toBe(true);
 
-    // Every capability switch now reads live too — one control, not six.
-    const capabilitySwitches = screen.getAllByRole("switch", { name: /runs live$/ });
-    expect(capabilitySwitches).toHaveLength(5);
-    capabilitySwitches.forEach((entry) => expect(entry).toBeChecked());
+    // Flipping the ONE control takes every capability live at once.
+    CAPABILITY_IDS.forEach((id) => expect(getConfig()[id].mode, id).toBe("live"));
+    // The one per-card switch that remains (sign-in, deliberately left as it is) reads live too.
+    expect(screen.getByRole("switch", { name: "Government sign-in runs live" })).toBeChecked();
   });
 });

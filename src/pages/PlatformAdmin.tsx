@@ -21,7 +21,15 @@ import { platformConfigActions, usePlatformConfig } from "@/config/usePlatformCo
 import { clearAllBrowserData } from "@/lib/browserData";
 import { adminAccessActions } from "@/session/useAdminAccess";
 
-const SERVICE_CAPABILITIES = ["assessment", "drafting", "extraction", "library"] as const;
+/**
+ * The only capability card kept on this screen (owner's instruction, demo).
+ *
+ * The drafting card stays because its OpenRouter key is typed in by hand and is the one real
+ * service usable now. The other service cards are removed: their addresses are fixed and live in
+ * configuration, and the ONE platform-mode control governs every service at once. Government
+ * sign-in is deliberately left as it is.
+ */
+const SERVICE_CAPABILITIES = ["drafting"] as const;
 
 /**
  * Platform administration — where capability credentials are entered.
@@ -119,7 +127,12 @@ export default function PlatformAdmin() {
 
         <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-4">
           <div>
-            <h2 className="text-sm font-semibold tracking-tight text-foreground">Platform mode</h2>
+            <h2 className="flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground">
+              Platform mode
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-foreground">
+                {live ? "Live" : "Simulated"}
+              </span>
+            </h2>
             <p className="mt-0.5 max-w-2xl text-[10px] leading-relaxed text-muted-foreground">
               {live
                 ? "Live: the platform uses only real services. Nothing is simulated, and any service that is not connected shows nothing rather than an invented result."

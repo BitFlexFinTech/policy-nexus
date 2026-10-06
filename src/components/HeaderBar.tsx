@@ -5,6 +5,8 @@ import { findDepartment } from "@/config/departments";
 import { VOCABULARY, WORDMARK } from "@/config/brand";
 import { logoSrc } from "@/config/content";
 import { useContent } from "@/config/useContent";
+import { isPlatformLive } from "@/config/platform";
+import { usePlatformConfig } from "@/config/usePlatformConfig";
 import { getReferenceRate } from "@/config/reference";
 import { sessionActions, useSession } from "@/session/useSession";
 import coatOfArms from "@/assets/zimbabwe-coat-of-arms.png";
@@ -20,6 +22,7 @@ export function HeaderBar() {
   const session = useSession();
   const navigate = useNavigate();
   const content = useContent();
+  const platformConfig = usePlatformConfig();
   const department = findDepartment(session?.departmentId);
   const zigRate = getReferenceRate("zig-usd");
 
@@ -54,6 +57,14 @@ export function HeaderBar() {
       </div>
       <div className="flex items-center gap-2">
         <StatusPill label={VOCABULARY.scenarioEngine} status="idle" value="Scenario mode" />
+        {/* The platform mode is shown HERE, permanently, in both modes. It used to be visible
+            only when Live (the mode banner hides itself while Simulated), which is why the mode
+            was not apparent — the owner's instruction is that it must always be readable. */}
+        <StatusPill
+          label="Platform mode"
+          status={isPlatformLive(platformConfig) ? "warning" : "idle"}
+          value={isPlatformLive(platformConfig) ? "Live" : "Simulated"}
+        />
         <StatusPill label={zigRate.label} status="warning" value={`${zigRate.value}/USD`} />
         {department && (
           <>

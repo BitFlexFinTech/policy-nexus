@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import App from "@/App";
-import { OFFICER_SELF_DECLARED_NOTE, officerDisplayName, officerRecordLine } from "@/config/officer";
+import { DEMO_OFFICER, OFFICER_SELF_DECLARED_NOTE, officerDisplayName, officerRecordLine } from "@/config/officer";
 import { findDepartment } from "@/config/departments";
 import { getSession, clearSession, setOfficer, signInToDepartment } from "@/session/session";
 import { buildSimulatedRun } from "@/services/assessment/AssessmentService";
@@ -108,21 +108,16 @@ describe("who prepared a policy (item 1 — the paper trail)", () => {
     expect(runIdFor(withOfficer)).not.toBe(runIdFor(other));
   });
 
-  it("records the name typed BEFORE entering, on the way in", () => {
+  it("records the fixed demo name on the way in — no typing required", () => {
     renderAt("/start");
     const group = screen.getByRole("group", { name: /Select a department/ });
-    fireEvent.change(screen.getByLabelText("First name"), { target: { value: "Tendai" } });
-    fireEvent.change(screen.getByLabelText("Surname"), { target: { value: "Moyo" } });
-    fireEvent.change(screen.getByLabelText("Position"), {
-      target: { value: "Director, Policy Development" },
-    });
     fireEvent.click(within(group).getAllByRole("button")[0]);
     // Selecting a department then entering the workspace is the two-step entry the chooser
-    // has always used; the name must be recorded by then.
+    // has always used; the demo name must be recorded by then, without anyone typing anything.
     fireEvent.click(screen.getByRole("button", { name: /^Enter / }));
 
     expect(getSession()?.departmentId).toBe("opc");
-    expect(getSession()?.officer).toEqual({ ...MOYO, source: "self-declared" });
+    expect(getSession()?.officer).toEqual({ ...DEMO_OFFICER });
   });
 
   it("names the preparer on the drafted policy, and says how honest the name is", () => {

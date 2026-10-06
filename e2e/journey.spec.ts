@@ -102,15 +102,11 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
   };
 
   /**
-   * The same entry, with the officer's own name and post recorded (item 1). The fields sit
-   * on the chooser and are filled BEFORE the department is entered, which is the case the
-   * paper trail has to survive.
+   * The same entry. The paper-trail name is now fixed for the demonstration (owner's
+   * instruction) and is not editable, so entering a department records it with nothing typed.
    */
   const enterWorkspaceWithPreparer = async (page: Page) => {
     await openChooser(page);
-    await page.getByLabel("First name").fill("Tendai");
-    await page.getByLabel("Surname").fill("Moyo");
-    await page.getByLabel("Position").fill("Director, Policy Development");
     await departmentGroup(page)
       .getByRole("button", { name: new RegExp(escapeRegex(DEPARTMENT.shortName)) })
       .first()
@@ -366,7 +362,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     await expect(page.getByText(/Today\s+\d{1,2} \w+ \d{4}/).first()).toBeVisible();
     await expect(page.getByText(/Fiscal year\s+2026/).first()).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Ready to test a policy draft?", exact: true }),
+      page.getByRole("heading", { name: "Begin a policy assessment", exact: true }),
     ).toBeVisible();
     // The landing page must NOT hold the picker — that is the chooser's job.
     await expect(departmentGroup(page)).toHaveCount(0);
@@ -760,10 +756,13 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     // Hovering must not move the mark: a target that flees the pointer can never be
     // clicked. This is the gate for a real defect the owner reported — the graph
     // used to shove nodes away from a pointer that merely crossed the surface.
-    const stableBefore = await group.getAttribute("transform");
+    // The graph now drifts VERY slowly when at rest (owner's instruction), but a hovered
+    // mark is exempt from the drift, so it must hold perfectly still once the pointer is on it.
     await group.hover();
+    await page.waitForTimeout(200);
+    const stableHovered = await group.getAttribute("transform");
     await page.waitForTimeout(600);
-    expect(await group.getAttribute("transform")).toBe(stableBefore);
+    expect(await group.getAttribute("transform")).toBe(stableHovered);
 
     await group.click();
     const rows = graphCard.getByRole("listitem");
@@ -977,15 +976,15 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     // The instrument itself names the preparer, the panel shows the same person and post,
     // and the screen says plainly where the name came from.
     await expect(
-      page.getByText(/Prepared by: Tendai Moyo, Director, Policy Development/),
+      page.getByText(/Prepared by: Hon\. Tatenda A Mavetera, Minister of ICT/),
     ).toBeVisible();
-    await expect(page.getByText("Tendai Moyo — Director, Policy Development").first()).toBeVisible();
+    await expect(page.getByText("Hon. Tatenda A Mavetera — Minister of ICT").first()).toBeVisible();
     await expect(page.getByText(/Names in this build are self-declared at entry/)).toBeVisible();
 
     // The run's own record carries the same name, so the trail is on the record as well.
     await page.getByRole("link", { name: "Full assessment" }).click();
     await expect(page.getByRole("heading", { name: "Full Assessment" })).toBeVisible();
-    await expect(page.getByText("Tendai Moyo — Director, Policy Development").first()).toBeVisible();
+    await expect(page.getByText("Hon. Tatenda A Mavetera — Minister of ICT").first()).toBeVisible();
     await expect(page.getByText("Self-declared at entry (sign-in not enabled)")).toBeVisible();
 
     expectCleanRuntime();

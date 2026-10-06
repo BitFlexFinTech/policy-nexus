@@ -51,7 +51,7 @@ describe("content registry", () => {
     expect(contentDefault("capabilities.card1.body")).toBe("Upload or enter the proposed policy.");
     expect(contentDefault("capabilities.card2.lead")).toBe("Thousands of simulated agents.");
     expect(contentDefault("how.heading")).toBe("How it works");
-    expect(contentDefault("closing.heading")).toBe("Ready to test a policy draft?");
+    expect(contentDefault("closing.heading")).toBe("Begin a policy assessment");
     // The card that names the platform must compose it, never type it out.
     expect(contentText(DEFAULT_CONTENT, "capabilities.card2.body")).toContain(BRAND.name);
   });

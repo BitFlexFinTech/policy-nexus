@@ -84,6 +84,18 @@ const VIEW_BOX = `0 0 ${SWARM_WIDTH} ${SWARM_HEIGHT}`;
 const DRAG_REACH = 300;
 const DRAG_PUSH = 9;
 
+/**
+ * The ALWAYS-ON AMBIENT DRIFT (owner's instruction, demo): the school is never perfectly still —
+ * the nodes stay quietly alive, moving EXTREMELY slowly. It is a handful of virtual units over
+ * roughly half a minute, applied ONLY in the drawing step (never in the physics), so the settled
+ * layout and every test of it are untouched. It is frame-based (no clock is read), so the same run
+ * draws the same motion. Reduced motion stops it entirely, and a dragged or hovered node is exempt,
+ * so a target the reader is touching never drifts out from under the pointer.
+ */
+const DRIFT_X = 6;
+const DRIFT_Y = 5;
+const DRIFT_SPEED = 0.004;
+
 /** How far beyond its drawn mark a node still counts as the target, so a small
  *  mark is an easy thing to aim at and choose. */
 const HIT_PADDING = 16;
@@ -188,8 +200,18 @@ export function RelationshipGraphCard({
   const edgeLabelEls = useRef(new Map<string, SVGTextElement>());
   const svgRef = useRef<SVGSVGElement>(null);
   const dragRef = useRef<{ id: string; moved: boolean } | null>(null);
+  /** The node under the pointer — it is exempt from the ambient drift, so a target the reader is
+   *  aiming at holds still. A ref, not state, so hover never restarts the drift loop. */
+  const hoveredRef = useRef<string | null>(null);
+  /** A frame counter for the ambient drift. Frame-based, so no clock is read (determinism). */
+  const driftPhase = useRef(0);
 
   const index = useMemo(() => new Map(layout.nodes.map((node) => [node.id, node])), [layout]);
+  /** A stable per-node number, so each node drifts on its own slow phase. */
+  const driftOrder = useMemo(
+    () => new Map(layout.nodes.map((node, position) => [node.id, position])),
+    [layout],
+  );
   const nodeById = useMemo(() => new Map(graph.nodes.map((node) => [node.id, node])), [graph]);
   const edgeById = useMemo(() => new Map(graph.edges.map((edge) => [edge.id, edge])), [graph]);
 
@@ -263,15 +285,27 @@ export function RelationshipGraphCard({
    * this every frame instead of setting state, so no frame costs a render.
    */
   const paint = useCallback(() => {
+    const phase = driftPhase.current;
+    // The drawn position of each node: its settled position, plus a tiny, slow ambient drift —
+    // unless it is being dragged or is under the pointer, in which case it stays exactly put.
+    const drawn = new Map<string, { x: number; y: number }>();
     layout.nodes.forEach((node) => {
+      let x = node.x;
+      let y = node.y;
+      if (!node.pinned && node.id !== hoveredRef.current) {
+        const order = driftOrder.get(node.id) ?? 0;
+        x += DRIFT_X * Math.sin(phase * DRIFT_SPEED + order * 1.7);
+        y += DRIFT_Y * Math.sin(phase * DRIFT_SPEED * 0.8 + order * 2.3);
+      }
+      drawn.set(node.id, { x, y });
       const element = nodeEls.current.get(node.id);
-      if (element) element.setAttribute("transform", `translate(${node.x.toFixed(2)} ${node.y.toFixed(2)})`);
+      if (element) element.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)})`);
     });
     layout.edges.forEach((edge) => {
       const element = edgeEls.current.get(edge.id);
       if (!element) return;
-      const source = index.get(edge.source);
-      const target = index.get(edge.target);
+      const source = drawn.get(edge.source);
+      const target = drawn.get(edge.target);
       if (!source || !target) return;
       element.setAttribute("x1", source.x.toFixed(2));
       element.setAttribute("y1", source.y.toFixed(2));
@@ -281,17 +315,20 @@ export function RelationshipGraphCard({
     edgeLabelEls.current.forEach((element, edgeId) => {
       const edge = edgeById.get(edgeId);
       if (!edge) return;
-      const source = index.get(edge.source);
-      const target = index.get(edge.target);
+      const source = drawn.get(edge.source);
+      const target = drawn.get(edge.target);
       if (!source || !target) return;
       const midX = (source.x + target.x) / 2;
       const midY = (source.y + target.y) / 2;
       element.setAttribute("transform", `translate(${midX.toFixed(2)} ${(midY - 9 * visualScale).toFixed(2)})`);
     });
-  }, [edgeById, index, layout, visualScale]);
+  }, [edgeById, layout, visualScale, driftOrder]);
 
-  // The loop is an enhancement: without requestAnimationFrame (or with reduced
-  // motion) the settled layout simply stands, and the graph stays usable.
+  // The ambient drift is ALWAYS ON (owner's instruction): the loop runs for as long as the card
+  // is on screen, so the nodes stay quietly alive. The physics is stepped only while the school is
+  // moving; the drift itself is a few units over roughly half a minute, applied at the drawing
+  // step. Without requestAnimationFrame, or under reduced motion, the settled layout simply
+  // stands — still readable, just perfectly still.
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") return;
     if (reducedMotion) return;
@@ -301,13 +338,9 @@ export function RelationshipGraphCard({
 
     const tick = () => {
       if (!running) return;
-      // Step only while the school is moving. When it rests the model stops
-      // itself, the surface holds perfectly still, and the loop costs nothing
-      // until the next touch wakes it.
-      if (isSwarmAwake(layout)) {
-        stepSwarm(layout, 1 / 60);
-        paint();
-      }
+      if (isSwarmAwake(layout)) stepSwarm(layout, 1 / 60);
+      driftPhase.current += 1;
+      paint();
       frame = window.requestAnimationFrame(tick);
     };
 
@@ -613,8 +646,14 @@ export function RelationshipGraphCard({
                       }
                     }}
                     onPointerDown={(event) => handlePointerDown(event, node.id)}
-                    onPointerEnter={() => setHoveredId(node.id)}
-                    onPointerLeave={() => setHoveredId(null)}
+                    onPointerEnter={() => {
+                      setHoveredId(node.id);
+                      hoveredRef.current = node.id;
+                    }}
+                    onPointerLeave={() => {
+                      setHoveredId(null);
+                      hoveredRef.current = null;
+                    }}
                     onFocus={() => setFocusedId(node.id)}
                     onBlur={() => setFocusedId(null)}
                   >

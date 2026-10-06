@@ -8,9 +8,6 @@ import {
 } from "@/config/platform";
 import { clearSession, signInToDepartment } from "@/session/session";
 
-/** A local address, so the file carries no reachable remote address at all. */
-const LOCAL = "http://localhost:8787/assess";
-
 const renderAt = (path: string) => {
   window.history.pushState({}, "", path);
   return render(<App />);
@@ -28,16 +25,23 @@ describe("platform administration screen", () => {
     clearSession();
   });
 
-  it("renders at its own address with every capability simulated", () => {
+  it("keeps only the drafting card and the sign-in card, and shows the mode plainly", () => {
     renderAt(ADMIN_ROUTE);
     enterAdmin();
     expect(
       screen.getByRole("heading", { level: 1, name: "Platform administration" }),
     ).toBeInTheDocument();
-    ["Assessment service", "Drafting model (OpenRouter)", "Document text extraction", "Shared document library", "Government sign-in (SSO)"].forEach(
-      (label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument(),
+    // The service cards the owner asked to remove are gone; the drafting card (the OpenRouter
+    // key) and the sign-in card remain.
+    ["Drafting model (OpenRouter)", "Government sign-in (SSO)"].forEach((label) =>
+      expect(screen.getByRole("heading", { name: label })).toBeInTheDocument(),
     );
-    expect(screen.getAllByText("simulated")).toHaveLength(5);
+    ["Assessment service", "Document text extraction", "Shared document library"].forEach((label) =>
+      expect(screen.queryByRole("heading", { name: label })).toBeNull(),
+    );
+    expect(screen.getAllByText("simulated")).toHaveLength(2);
+    // The mode is shown plainly, in the platform-mode badge.
+    expect(screen.getAllByText("Simulated").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Everything is simulated/)).toBeInTheDocument();
   });
 
@@ -56,36 +60,36 @@ describe("platform administration screen", () => {
     expect(screen.queryByRole("link", { name: /administration/i })).toBeNull();
   });
 
-  it("reports a capability as misconfigured when Live is switched on without its details", () => {
+  it("reports capabilities as misconfigured when the platform is switched Live with nothing configured", () => {
     renderAt(ADMIN_ROUTE);
     enterAdmin();
-    fireEvent.click(screen.getByRole("switch", { name: "Assessment service runs live" }));
-    expect(screen.getAllByText("misconfigured")).toHaveLength(1);
-    expect(screen.getAllByText("simulated")).toHaveLength(4);
+    // The one platform-mode control switches the whole platform Live.
+    fireEvent.click(screen.getByRole("switch", { name: "Platform mode is live" }));
+    // The platform is Live, but nothing is connected, so no capability is live.
     expect(screen.queryAllByText("live")).toHaveLength(0);
+    expect(screen.getAllByText("misconfigured").length).toBeGreaterThan(0);
   });
 
-  it("reports a capability as live only once it is complete, and persists on save", () => {
+  it("goes live once the OpenRouter key is entered, and persists on save", () => {
     renderAt(ADMIN_ROUTE);
     enterAdmin();
 
     // Only the drafting capability carries a model field.
     expect(screen.getAllByLabelText("Model")).toHaveLength(1);
 
-    fireEvent.click(screen.getByRole("switch", { name: "Assessment service runs live" }));
-    fireEvent.change(screen.getAllByLabelText("Service address")[0], {
-      target: { value: LOCAL },
-    });
-
-    // Live, but not yet complete: it must not be treated as live.
+    // The one platform-mode control switches the platform Live; with no key nothing is live.
+    fireEvent.click(screen.getByRole("switch", { name: "Platform mode is live" }));
     expect(screen.queryAllByText("live")).toHaveLength(0);
 
-    fireEvent.change(screen.getAllByLabelText("Key")[0], { target: { value: "test-key" } });
-    expect(screen.getAllByText("live")).toHaveLength(1);
+    // Entering the OpenRouter key completes drafting — its address and default model are filled
+    // in automatically — so drafting becomes live.
+    fireEvent.change(screen.getAllByLabelText("OpenRouter key")[0], {
+      target: { value: "test-key" },
+    });
+    expect(screen.getAllByText("live").length).toBeGreaterThanOrEqual(1);
 
     fireEvent.click(screen.getByRole("button", { name: "Save configuration" }));
-    expect(screen.getAllByText("live")).toHaveLength(1);
-    expect(window.localStorage.getItem(PLATFORM_CONFIG_STORAGE_KEY)).toContain(LOCAL);
+    expect(window.localStorage.getItem(PLATFORM_CONFIG_STORAGE_KEY)).toContain("live");
   });
 
   it("makes no network request while rendering the screen", () => {

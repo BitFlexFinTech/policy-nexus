@@ -102,8 +102,8 @@ export const CONTENT_FIELDS: readonly ContentField[] = [
   { id: "coverage.note", group: "Platform coverage", label: "Note under the figures", default: "Counts are read directly from the department reference configuration, so this page cannot claim more coverage than the platform holds.", multiline: true },
 
   // --- Closing call to action ------------------------------------------------
-  { id: "closing.heading", group: "Closing call to action", label: "Heading", default: "Ready to test a policy draft?" },
-  { id: "closing.body", group: "Closing call to action", label: "Text", default: "Choose the department you are preparing policy for, and the workspace loads its indicators, prepared drafts and reference documents.", multiline: true },
+  { id: "closing.heading", group: "Closing call to action", label: "Heading", default: "Begin a policy assessment" },
+  { id: "closing.body", group: "Closing call to action", label: "Text", default: "Select the department you are preparing policy for. Its indicators, prepared drafts and reference documents load into the workspace.", multiline: true },
 
   // --- Read-only: shown with the reason it cannot be changed -----------------
   { id: "locked.principle", group: "Fixed wording (read-only)", label: "Service principle above the heading", default: BRAND.eyebrow, locked: true },

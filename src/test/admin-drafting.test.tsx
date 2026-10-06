@@ -29,9 +29,11 @@ describe("the OpenRouter drafting setup", () => {
     expect(within(section as HTMLElement).queryByLabelText("Service address")).toBeNull();
   });
 
-  it("fills the default model when the drafting model is switched on", () => {
+  it("fills the default model once the drafting key is entered", () => {
     enterAdmin();
-    fireEvent.click(screen.getByRole("switch", { name: "Drafting model (OpenRouter) runs live" }));
+    // The drafting card no longer carries its own mode switch: the address and the default model
+    // are filled in as soon as the key is typed, and the ONE platform-mode control sets the mode.
+    fireEvent.change(screen.getByLabelText("OpenRouter key"), { target: { value: "test-key" } });
     expect(screen.getByLabelText("Model")).toHaveTextContent(DEFAULT_DRAFTING_MODEL);
   });
 

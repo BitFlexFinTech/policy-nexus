@@ -32,6 +32,21 @@ export interface OfficerIdentity {
 export const OFFICER_SELF_DECLARED_NOTE =
   "Names in this build are self-declared at entry: Government sign-in is not enabled yet, so the platform records who prepared a document but cannot verify it.";
 
+/**
+ * The DEMO identity shown on the paper-trail card and recorded on every document.
+ *
+ * The owner's instruction (demo): the platform shows this name by default and it is NOT
+ * editable — this is a demonstration, so every drafted policy is attributed to the Minister.
+ * It carries the same shape as any officer identity, so the screen and every document name the
+ * same person in the same way (`officerDisplayName` / `officerRecordLine`).
+ */
+export const DEMO_OFFICER: OfficerIdentity = {
+  firstName: "Hon. Tatenda A",
+  surname: "Mavetera",
+  position: "Minister of ICT",
+  source: "self-declared",
+};
+
 /** The name as a person writes it. The ONLY place first and surname are joined. */
 export const officerDisplayName = (officer: OfficerIdentity): string =>
   [officer.firstName, officer.surname].map((part) => part.trim()).filter(Boolean).join(" ");

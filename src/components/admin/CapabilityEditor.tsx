@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { ModelCombobox } from "@/components/admin/ModelCombobox";
 import {
@@ -62,6 +61,14 @@ export function CapabilityEditor({
 
   const update = (patch: Partial<CapabilityConfig>) => {
     const next = { ...capability, ...patch };
+    // The drafting capability is reached through OpenRouter, whose address is fixed and known:
+    // fill it (and the default model) automatically, so the key the administrator types is the
+    // only thing they must supply. The capability's mode is NOT set here — the ONE platform-mode
+    // control governs every capability at once (owner's instruction).
+    if (id === "drafting") {
+      next.endpoint = next.endpoint.trim() || OPENROUTER_CHAT_ENDPOINT;
+      next.model = next.model.trim() || DEFAULT_DRAFTING_MODEL;
+    }
     onChange({
       ...config,
       assessment: id === "assessment" ? next : config.assessment,
@@ -77,27 +84,6 @@ export function CapabilityEditor({
     setProbing(false);
   };
 
-  /**
-   * Switch the capability between live and simulated. For the drafting model, switching it on
-   * fills in the two values an administrator should not have to type — OpenRouter's address and
-   * the default model — so going live is simply "paste your key, and it works".
-   */
-  const toggleMode = (checked: boolean) => {
-    if (!checked) {
-      update({ mode: "simulated" });
-      return;
-    }
-    if (id === "drafting") {
-      update({
-        mode: "live",
-        endpoint: capability.endpoint.trim() || OPENROUTER_CHAT_ENDPOINT,
-        model: capability.model.trim() || DEFAULT_DRAFTING_MODEL,
-      });
-      return;
-    }
-    update({ mode: "live" });
-  };
-
   return (
     <section className="rounded-lg border bg-card p-4">
       <header className="flex flex-wrap items-start justify-between gap-2">
@@ -107,17 +93,7 @@ export function CapabilityEditor({
           </h3>
           <p className="text-[10px] text-muted-foreground">{status.detail}</p>
         </div>
-        <div className="flex items-center gap-3">
-          <CapabilityStateBadge status={status} />
-          <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-            <Switch
-              checked={capability.mode === "live"}
-              onCheckedChange={toggleMode}
-              aria-label={`${CAPABILITY_LABELS[id]} runs live`}
-            />
-            Live
-          </span>
-        </div>
+        <CapabilityStateBadge status={status} />
       </header>
 
       <div className="mt-3 grid gap-3 md:grid-cols-2">
