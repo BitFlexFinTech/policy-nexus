@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { CapabilityEditor } from "@/components/admin/CapabilityEditor";
 import { ContentEditor } from "@/components/admin/ContentEditor";
 import { PlatformOverview } from "@/components/admin/PlatformOverview";
@@ -42,6 +43,23 @@ export default function PlatformAdmin() {
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(stored);
   const anyLive = isAnyCapabilityLive(draft);
+  const live = draft.platformMode === "live";
+
+  /**
+   * The ONE master switch (owner's rule, 2026-10-06). It sets the whole platform — every
+   * capability at once — and takes effect immediately, so there is no hunting across five
+   * separate switches. Simulated runs the scenario engine and shows its results; Live uses only
+   * real services and shows nothing (a clear "not connected" state) where one is missing.
+   */
+  const setMode = (nextLive: boolean) => {
+    const next = platformConfigActions.setPlatformMode(nextLive ? "live" : "simulated");
+    setDraft(next);
+    setNotice(
+      nextLive
+        ? "Platform mode: Live. Nothing is simulated; a service that is not connected shows nothing."
+        : "Platform mode: Simulated. The platform runs on its own scenario engine.",
+    );
+  };
 
   const save = () => {
     platformConfigActions.saveConfig(draft);
@@ -90,6 +108,21 @@ export default function PlatformAdmin() {
               This browser refused persistent storage, so these settings last only for this visit.
             </span>
           )}
+        </section>
+
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-4">
+          <div>
+            <h2 className="text-sm font-semibold tracking-tight text-foreground">Platform mode</h2>
+            <p className="mt-0.5 max-w-2xl text-[10px] leading-relaxed text-muted-foreground">
+              {live
+                ? "Live: the platform uses only real services. Nothing is simulated, and any service that is not connected shows nothing rather than an invented result."
+                : "Simulated: the platform runs its own scenario engine and shows its results, plainly labelled as simulated."}
+            </p>
+          </div>
+          <span className="flex items-center gap-2 text-xs text-foreground">
+            <Switch checked={live} onCheckedChange={setMode} aria-label="Platform mode is live" />
+            {live ? "Live" : "Simulated"}
+          </span>
         </section>
 
         <PlatformOverview />

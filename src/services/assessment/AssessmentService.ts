@@ -15,7 +15,7 @@
  */
 
 import type { DepartmentId } from "@/config/departments";
-import { liveService, type CapabilityConfig } from "@/config/platform";
+import { liveService, platformModeOf, type CapabilityConfig } from "@/config/platform";
 import { buildScenarioRun } from "./scenario";
 import {
   getRunRequest,
@@ -76,10 +76,26 @@ const createScenarioAssessmentService = (): AssessmentService => ({
 const createLiveAssessmentService = (config: CapabilityConfig): AssessmentService =>
   createRemoteAssessmentClient(config);
 
+/**
+ * Live mode with no assessment service connected: the platform shows NOTHING rather than a
+ * simulated result dressed up as real (owner's rule, 2026-10-06). A call reports the missing
+ * service as a failure; the registers render their own empty state.
+ */
+const createNotConnectedAssessmentService = (): AssessmentService => {
+  const detail = "Live mode: no assessment service is connected.";
+  return {
+    buildRun: () => Promise.reject(new Error(detail)),
+    run: () => Promise.reject(new Error(detail)),
+    getRun: () => Promise.resolve(undefined),
+    listRuns: () => Promise.resolve([]),
+  };
+};
+
 /** Which engine serves this call, decided at the moment of the call. */
 const selectClient = (): AssessmentService => {
+  if (platformModeOf() === "simulated") return createScenarioAssessmentService();
   const config = liveService("assessment");
-  return config ? createLiveAssessmentService(config) : createScenarioAssessmentService();
+  return config ? createLiveAssessmentService(config) : createNotConnectedAssessmentService();
 };
 
 /**
@@ -113,13 +129,13 @@ export const buildSimulatedRun = (request: AssessmentRequest): AssessmentRun =>
   buildScenarioRun(request);
 
 export const peekRun = (runId: string): AssessmentRun | undefined => {
-  if (liveService("assessment")) return undefined;
+  if (platformModeOf() !== "simulated" || liveService("assessment")) return undefined;
   const stored = getRunRequest(runId);
   return stored ? buildScenarioRun(stored) : undefined;
 };
 
 export const peekRuns = (departmentId?: DepartmentId | null): AssessmentRun[] | undefined => {
-  if (liveService("assessment")) return undefined;
+  if (platformModeOf() !== "simulated" || liveService("assessment")) return undefined;
   return listRunRequests()
     .filter((stored) => !departmentId || stored.departmentId === departmentId)
     .map((stored) => buildScenarioRun(stored));
@@ -130,4 +146,4 @@ export const peekRuns = (departmentId?: DepartmentId | null): AssessmentRun[] | 
  * results as simulated, and it changes the moment an administrator switches the
  * capability on.
  */
-export const isScenarioMode = (): boolean => liveService("assessment") === null;
+export const isScenarioMode = (): boolean => platformModeOf() === "simulated";

@@ -24,6 +24,21 @@ Element.prototype.scrollTo = Element.prototype.scrollTo ?? (() => {});
 Element.prototype.scrollIntoView = Element.prototype.scrollIntoView ?? (() => {});
 
 /**
+ * jsdom does not implement ResizeObserver. Two libraries the admin dashboard uses — the
+ * command palette (cmdk, behind the model picker) and the chart library (recharts) — call it
+ * to measure their containers, and throw on mount without it. The stub does nothing but exist,
+ * which is correct here: no test asserts layout, it only needs the components to render.
+ */
+class ResizeObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+if (typeof globalThis.ResizeObserver === "undefined") {
+  globalThis.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
+}
+
+/**
  * Node defines its own experimental global `localStorage`, which is `undefined`
  * unless the process is started with `--localstorage-file`. Because vitest's
  * jsdom environment aliases `window` to `globalThis`, that Node global shadows

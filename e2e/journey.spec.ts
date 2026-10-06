@@ -1306,4 +1306,23 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
 
     expectCleanRuntime();
   });
+
+  test("the admin dashboard shows charts and ONE platform-mode switch", async ({ page }) => {
+    await page.goto(ADMIN_ROUTE);
+    await page.getByRole("button", { name: "Yes, I am the administrator" }).click();
+
+    // The dashboard renders its charts.
+    await expect(page.getByRole("heading", { name: "Platform overview" })).toBeVisible();
+    await expect(page.getByText("Simulation runs by department")).toBeVisible();
+    await expect(page.getByText("Reference figures: published vs modelled")).toBeVisible();
+
+    // ONE master switch, not six.
+    const mode = page.getByRole("switch", { name: "Platform mode is live" });
+    await expect(mode).not.toBeChecked();
+    await mode.click();
+    await expect(mode).toBeChecked();
+    await expect(page.getByText(/the platform uses only real services/)).toBeVisible();
+
+    expectCleanRuntime();
+  });
 });

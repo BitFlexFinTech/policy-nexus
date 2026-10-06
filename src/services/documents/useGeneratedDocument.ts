@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Department } from "@/config/departments";
-import { describeCapability } from "@/config/platform";
+import { describeCapability, isPlatformLive } from "@/config/platform";
 import { usePlatformConfig } from "@/config/usePlatformConfig";
 import { buildLongReport, buildPolicyDraft } from "@/services/assessment/documents";
 import { buildImplementationPack } from "@/services/assessment/implementationPack";
@@ -109,7 +109,19 @@ export const useGeneratedDocument = (
     };
   }, [live, key, kind, run, grounding]);
 
-  if (!live) return { document: simulated, pending: false, error: null, source: localSource };
+  if (!live) {
+    // Live mode with no drafting service connected: show NOTHING rather than the local
+    // generator's text dressed up as the model's answer (owner's rule).
+    if (isPlatformLive(config)) {
+      return {
+        document: null,
+        pending: false,
+        error: "Live mode: no drafting service is connected.",
+        source: localSource,
+      };
+    }
+    return { document: simulated, pending: false, error: null, source: localSource };
+  }
   if (fetched && fetched.key === key) {
     return {
       document: fetched.document ?? null,

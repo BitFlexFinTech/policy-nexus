@@ -93,7 +93,8 @@ describe("the simulated support desk", () => {
     fireEvent.click(screen.getByRole("button", { name: "Yes, I am the administrator" }));
 
     expect(screen.getByRole("heading", { name: "Support inbox (1)" })).toBeInTheDocument();
-    expect(screen.getByText("CASE-0001")).toBeInTheDocument();
+    // The case id appears in the inbox row and in the dashboard's "Recent support cases" table.
+    expect(screen.getAllByText("CASE-0001").length).toBeGreaterThan(0);
 
     const assign = screen.getByLabelText("Assign CASE-0001");
     fireEvent.change(assign, { target: { value: "Rudo Support" } });

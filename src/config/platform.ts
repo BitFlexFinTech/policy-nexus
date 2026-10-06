@@ -48,6 +48,14 @@ export interface SsoConfig {
 }
 
 export interface PlatformConfig {
+  /**
+   * THE ONE MASTER SWITCH (owner's rule, 2026-10-06). `simulated` runs the deterministic
+   * scenario engine and shows its results, plainly labelled; `live` uses only real services and
+   * shows nothing (a clear "not connected" state) where a service is missing — never a simulated
+   * figure dressed up as real. It flips every capability together, so the admin has one control,
+   * not six.
+   */
+  platformMode: CapabilityMode;
   assessment: CapabilityConfig;
   drafting: CapabilityConfig;
   extraction: CapabilityConfig;
@@ -93,23 +101,38 @@ export const CAPABILITY_LABELS: Record<CapabilityId, string> = {
 export const OPENROUTER_CHAT_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 
 /**
- * Suggested OpenRouter model ids for the drafting selector. Any id OpenRouter carries may
- * be typed instead — the field is a suggestion, never a closed list, so the platform never
- * hardcodes a model that may not exist.
+ * The model the drafting capability uses unless an administrator chooses another — the
+ * owner's chosen default (2026-10-06). It is a real OpenRouter model id, read from
+ * OpenRouter's own list.
+ */
+export const DEFAULT_DRAFTING_MODEL = "deepseek/deepseek-v4.1-flash";
+
+/**
+ * Suggested OpenRouter model ids for the drafting picker — the default first. Every id was
+ * read from OpenRouter's own model list, so none is invented; the picker also accepts ANY
+ * other id OpenRouter carries (typed in), so this is a convenience list, never a closed one.
  */
 export const OPENROUTER_MODEL_SUGGESTIONS: readonly string[] = [
-  "deepseek/deepseek-chat",
-  "deepseek/deepseek-reasoner",
-  "deepseek/deepseek-chat-v3.1",
-  "deepseek/deepseek-v3.1:free",
-  "google/gemini-2.0-flash-001",
-  "anthropic/claude-3.5-sonnet",
+  DEFAULT_DRAFTING_MODEL,
+  "deepseek/deepseek-v4-pro",
+  "deepseek/deepseek-v3.2",
+  "openai/gpt-6.1-sol",
+  "openai/gpt-6-luna",
+  "anthropic/claude-sonnet-5.5",
+  "anthropic/claude-opus-5",
+  "google/gemini-3.8-flash",
+  "meta-llama/llama-4-maverick",
+  "mistralai/mistral-large-4-0",
+  "qwen/qwen3.8-flash",
+  "x-ai/grok-4.5",
+  "z-ai/glm-5.3-flash",
 ];
 
 const SIMULATED: CapabilityConfig = { mode: "simulated", endpoint: "", key: "", model: "" };
 
 /** Everything simulated: the default, and the state the platform ships in. */
 export const DEFAULT_PLATFORM_CONFIG: PlatformConfig = {
+  platformMode: "simulated",
   assessment: { ...SIMULATED },
   drafting: { ...SIMULATED },
   extraction: { ...SIMULATED },
@@ -153,6 +176,7 @@ export const normaliseConfig = (value: unknown): PlatformConfig => {
   const record = isRecord(value) ? value : {};
   const sso = isRecord(record.sso) ? record.sso : {};
   return {
+    platformMode: asMode(record.platformMode, "simulated"),
     assessment: normaliseService(record.assessment, DEFAULT_PLATFORM_CONFIG.assessment),
     drafting: normaliseService(record.drafting, DEFAULT_PLATFORM_CONFIG.drafting),
     extraction: normaliseService(record.extraction, DEFAULT_PLATFORM_CONFIG.extraction),
@@ -166,6 +190,40 @@ export const normaliseConfig = (value: unknown): PlatformConfig => {
     },
   };
 };
+
+/* ------------------------------------------------------------------------- */
+/* The platform mode — the one master switch                                  */
+/* ------------------------------------------------------------------------- */
+
+/** The platform's one mode. Defaults to simulated. */
+export const platformModeOf = (config: PlatformConfig = getConfig()): CapabilityMode =>
+  config.platformMode;
+
+/** True only when the whole platform is switched to live. */
+export const isPlatformLive = (config: PlatformConfig = getConfig()): boolean =>
+  config.platformMode === "live";
+
+/**
+ * The whole platform at the chosen mode — the master switch. Setting it flips every capability
+ * together, so an administrator has one control rather than six, and the platform can never be
+ * half-live by accident.
+ */
+export const withPlatformMode = (
+  config: PlatformConfig,
+  mode: CapabilityMode,
+): PlatformConfig => ({
+  ...config,
+  platformMode: mode,
+  assessment: { ...config.assessment, mode },
+  drafting: { ...config.drafting, mode },
+  extraction: { ...config.extraction, mode },
+  library: { ...config.library, mode },
+  sso: { ...config.sso, mode },
+});
+
+/** Set the whole platform mode and persist it — the single master switch, in one step. */
+export const setPlatformMode = (mode: CapabilityMode): PlatformConfig =>
+  saveConfig(withPlatformMode(getConfig(), mode));
 
 /* ------------------------------------------------------------------------- */
 /* Store                                                                      */

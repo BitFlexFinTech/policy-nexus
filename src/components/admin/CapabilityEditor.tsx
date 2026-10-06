@@ -4,10 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { ModelCombobox } from "@/components/admin/ModelCombobox";
 import {
   CAPABILITY_LABELS,
+  DEFAULT_DRAFTING_MODEL,
   OPENROUTER_CHAT_ENDPOINT,
-  OPENROUTER_MODEL_SUGGESTIONS,
   describeCapability,
   type CapabilityConfig,
   type CapabilityId,
@@ -76,6 +77,27 @@ export function CapabilityEditor({
     setProbing(false);
   };
 
+  /**
+   * Switch the capability between live and simulated. For the drafting model, switching it on
+   * fills in the two values an administrator should not have to type — OpenRouter's address and
+   * the default model — so going live is simply "paste your key, and it works".
+   */
+  const toggleMode = (checked: boolean) => {
+    if (!checked) {
+      update({ mode: "simulated" });
+      return;
+    }
+    if (id === "drafting") {
+      update({
+        mode: "live",
+        endpoint: capability.endpoint.trim() || OPENROUTER_CHAT_ENDPOINT,
+        model: capability.model.trim() || DEFAULT_DRAFTING_MODEL,
+      });
+      return;
+    }
+    update({ mode: "live" });
+  };
+
   return (
     <section className="rounded-lg border bg-card p-4">
       <header className="flex flex-wrap items-start justify-between gap-2">
@@ -90,7 +112,7 @@ export function CapabilityEditor({
           <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
             <Switch
               checked={capability.mode === "live"}
-              onCheckedChange={(checked) => update({ mode: checked ? "live" : "simulated" })}
+              onCheckedChange={toggleMode}
               aria-label={`${CAPABILITY_LABELS[id]} runs live`}
             />
             Live
@@ -99,27 +121,20 @@ export function CapabilityEditor({
       </header>
 
       <div className="mt-3 grid gap-3 md:grid-cols-2">
-        <div className="space-y-1">
-          <Label htmlFor={`cap-${id}-endpoint`} className={FIELD_LABEL}>
-            {id === "drafting" ? "OpenRouter address" : "Service address"}
-          </Label>
-          <Input
-            id={`cap-${id}-endpoint`}
-            value={capability.endpoint}
-            placeholder={id === "drafting" ? OPENROUTER_CHAT_ENDPOINT : "Absolute address of the service"}
-            onChange={(event) => update({ endpoint: event.target.value })}
-            className="h-8 text-xs"
-          />
-          {id === "drafting" && (
-            <button
-              type="button"
-              className="text-[10px] font-medium text-primary hover:underline"
-              onClick={() => update({ endpoint: OPENROUTER_CHAT_ENDPOINT })}
-            >
-              Use the OpenRouter address
-            </button>
-          )}
-        </div>
+        {id !== "drafting" && (
+          <div className="space-y-1">
+            <Label htmlFor={`cap-${id}-endpoint`} className={FIELD_LABEL}>
+              Service address
+            </Label>
+            <Input
+              id={`cap-${id}-endpoint`}
+              value={capability.endpoint}
+              placeholder="Absolute address of the service"
+              onChange={(event) => update({ endpoint: event.target.value })}
+              className="h-8 text-xs"
+            />
+          </div>
+        )}
 
         <div className="space-y-1">
           <Label htmlFor={`cap-${id}-key`} className={FIELD_LABEL}>
@@ -150,24 +165,17 @@ export function CapabilityEditor({
         {id === "drafting" && (
           <div className="space-y-1">
             <Label htmlFor={`cap-${id}-model`} className={FIELD_LABEL}>
-              Model (OpenRouter)
+              Model
             </Label>
-            <Input
+            <ModelCombobox
               id={`cap-${id}-model`}
+              aria-label="Model"
               value={capability.model}
-              onChange={(event) => update({ model: event.target.value })}
-              placeholder="Choose a model, or type any OpenRouter model id"
-              className="h-8 text-xs"
-              autoComplete="off"
-              list={`cap-${id}-model-options`}
+              onChange={(model) => update({ model })}
             />
-            <datalist id={`cap-${id}-model-options`}>
-              {OPENROUTER_MODEL_SUGGESTIONS.map((model) => (
-                <option key={model} value={model} />
-              ))}
-            </datalist>
             <p className="text-[10px] leading-relaxed text-muted-foreground">
-              Type any model id OpenRouter offers. The list is a suggestion, not a limit.
+              Search the suggested models, or type any model id OpenRouter offers. The list is a
+              suggestion, not a limit.
             </p>
           </div>
         )}

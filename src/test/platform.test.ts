@@ -24,6 +24,7 @@ const CALLBACK = "http://localhost:8080/auth/callback";
 const service = () => ({ mode: "live" as const, endpoint: LOCAL, key: "test-key", model: "model-1" });
 
 const complete = (): PlatformConfig => ({
+  platformMode: "live",
   assessment: service(),
   drafting: service(),
   extraction: service(),

@@ -28,6 +28,17 @@ describe("the platform administration dashboard", () => {
     ["Simulation runs recorded", "Department documents added", "Support cases"].forEach((label) =>
       expect(screen.getByText(label)).toBeInTheDocument(),
     );
+    // The charts and tables are present.
+    [
+      "Simulation runs by department",
+      "Activity over time",
+      "Department documents by department",
+      "Support cases by state",
+      "Support cases by category",
+      "Reference figures: published vs modelled",
+      "Recent runs",
+      "Recent support cases",
+    ].forEach((title) => expect(screen.getByText(title)).toBeInTheDocument());
     expect(screen.getByText("What still needs the server")).toBeInTheDocument();
   });
 

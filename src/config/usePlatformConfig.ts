@@ -4,6 +4,7 @@ import {
   getConfigServerSnapshot,
   getConfigSnapshot,
   saveConfig,
+  setPlatformMode,
   subscribeToConfig,
   type PlatformConfig,
 } from "./platform";
@@ -23,4 +24,6 @@ export const usePlatformConfig = (): PlatformConfig =>
 export const platformConfigActions = {
   saveConfig,
   clearConfig,
+  /** Set the whole platform to `simulated` or `live` in one step — the master switch. */
+  setPlatformMode,
 };

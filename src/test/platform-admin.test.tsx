@@ -70,7 +70,7 @@ describe("platform administration screen", () => {
     enterAdmin();
 
     // Only the drafting capability carries a model field.
-    expect(screen.getAllByLabelText("Model (OpenRouter)")).toHaveLength(1);
+    expect(screen.getAllByLabelText("Model")).toHaveLength(1);
 
     fireEvent.click(screen.getByRole("switch", { name: "Assessment service runs live" }));
     fireEvent.change(screen.getAllByLabelText("Service address")[0], {

@@ -48,6 +48,9 @@
  *     chrome deliberately carries no link to it
  * 29. The simulated support desk exists and is honestly labelled — the store, the officer's
  *     open-a-case form, the administrator's inbox, and the "kept in this browser only" statement
+ * 30. There is ONE platform-mode master switch (owner's rule, 2026-10-06): `simulated` runs the
+ *     scenario engine and shows its results; `live` uses only real services and shows nothing where
+ *     one is missing. The administration screen carries the single control and the banner reads it.
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -1364,6 +1367,46 @@ if (!existsSync(cssPath)) {
     notes.push("INFO  the simulated support desk exists and is honestly labelled (officer form, administrator inbox, kept in this browser only)");
   }
   check("the simulated support desk exists and is honestly labelled", problems);
+}
+
+// ---------------------------------------------------------------------------------------------
+// check 30 — THE PLATFORM HAS ONE MODE MASTER SWITCH
+// The owner's rule (2026-10-06): demo and live must be ONE control, not six. `simulated` runs the
+// deterministic scenario engine and shows its results; `live` uses only real services and shows
+// nothing where one is missing — never a simulated figure dressed up as real. This fails the build
+// if the master switch, the single control, or the banner that reads it is removed.
+{
+  const problems = [];
+  const platformPath = join(ROOT, "src/config/platform.ts");
+  const adminPath = join(ROOT, "src/pages/PlatformAdmin.tsx");
+  const noticePath = join(ROOT, "src/components/PlatformModeNotice.tsx");
+
+  if (!existsSync(platformPath)) {
+    problems.push("src/config/platform.ts is missing");
+  } else {
+    const platform = readFileSync(platformPath, "utf8");
+    for (const symbol of ["platformMode", "withPlatformMode", "isPlatformLive", "setPlatformMode"]) {
+      if (!new RegExp(`\\b${symbol}\\b`).test(platform)) {
+        problems.push(`src/config/platform.ts no longer carries the master switch (${symbol})`);
+      }
+    }
+  }
+  if (!existsSync(adminPath)) {
+    problems.push("src/pages/PlatformAdmin.tsx is missing");
+  } else {
+    const admin = readFileSync(adminPath, "utf8");
+    if (!/Platform mode/.test(admin) || !/setPlatformMode/.test(admin)) {
+      problems.push("the administration screen no longer carries the ONE platform-mode control");
+    }
+  }
+  if (!existsSync(noticePath) || !/isPlatformLive/.test(readFileSync(noticePath, "utf8"))) {
+    problems.push("the mode banner no longer reads the platform mode");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the platform has ONE mode master switch (simulated / live), read by the banner");
+  }
+  check("the platform has one mode master switch", problems);
 }
 
 
