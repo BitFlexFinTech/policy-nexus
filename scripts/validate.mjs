@@ -1748,6 +1748,54 @@ if (!existsSync(cssPath)) {
 }
 
 
+// ---------------------------------------------------------------------------------------------
+// check 38 — THE ECONOMIC BAROMETER NAMES THE SOURCE OF EVERY FIGURE (ZEPARI Batch G)
+// The owner's decision: the barometer tracks the institute's own indicators. Each reading carries the
+// body that published it, so a figure is NEVER shown without a source (the platform's sourcing rule).
+// This fails the build if the source field, the seam, the honest statement, or the wiring is removed.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const store = readIf("src/services/research/researchBarometer.ts");
+  if (store === null) {
+    problems.push("src/services/research/researchBarometer.ts is missing — there is no barometer");
+  } else if (!/source: string/.test(store)) {
+    problems.push("a barometer reading no longer carries a source — a figure could be shown unsourced");
+  }
+
+  const seam = readIf("src/services/research/researchBarometerStore.ts");
+  if (seam === null) {
+    problems.push("src/services/research/researchBarometerStore.ts is missing — the barometer has no seam");
+  } else {
+    for (const [symbol, why] of [
+      ["LOCAL_RESEARCH_BAROMETER_STORE", "the Local client is gone"],
+      ["createSharedResearchBarometerStore", "the Shared client is gone"],
+      ["researchBarometerStoreFor", "the chooser is gone"],
+    ]) {
+      if (!seam.includes(symbol)) problems.push(`the barometer seam: ${why} (${symbol})`);
+    }
+  }
+
+  const panel = readIf("src/components/research/ResearchBarometerPanel.tsx");
+  if (panel === null) {
+    problems.push("src/components/research/ResearchBarometerPanel.tsx is missing");
+  } else if (!/never shows a number without its source/.test(panel)) {
+    problems.push("the barometer panel no longer states that a figure is never shown without its source");
+  }
+
+  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
+  if (workspace && !/<ResearchBarometerPanel \/>/.test(workspace)) {
+    problems.push("the research workspace no longer renders the Economic Barometer");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the Economic Barometer names the source of every figure");
+  }
+  check("the Economic Barometer names the source of every figure", problems);
+}
+
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

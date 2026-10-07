@@ -121,7 +121,7 @@ export const RESEARCH_PARTS: readonly ResearchPart[] = [
     id: "barometer",
     label: "Economic Barometer",
     note: "The institute's own economic indicators, tracked over time.",
-    built: false,
+    built: true,
   },
   {
     id: "findings",
