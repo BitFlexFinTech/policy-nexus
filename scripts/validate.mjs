@@ -1556,9 +1556,18 @@ if (!existsSync(cssPath)) {
     problems.push("src/App.tsx no longer routes the research landing and workspace");
   }
 
-  const landing = readIf("src/pages/Landing.tsx");
-  if (landing && (!/Choose a service/.test(landing) || !/to="\/research"/.test(landing))) {
-    problems.push("the opening page no longer presents the choice between the two services");
+  // The opening page (`/`) presents the choice of the two services. That choice is composed from
+  // PLATFORM_HOME (owner's item 1, 2026-10-07), so this reads the homepage and the config together.
+  const landing = readIf("src/pages/Home.tsx");
+  if (landing) {
+    const config = readIf("src/config/brand.ts") || "";
+    const rendersChoice =
+      /PLATFORM_HOME\.tools\.heading/.test(landing) && /PLATFORM_HOME\.tools\.research/.test(landing);
+    const configNamesChoice =
+      /heading:\s*"Choose a service"/.test(config) && /to:\s*"\/research"/.test(config);
+    if (!(rendersChoice && configNamesChoice)) {
+      problems.push("the opening page no longer presents the choice between the two services");
+    }
   }
 
   if (problems.length === 0) {
@@ -1895,6 +1904,76 @@ if (!existsSync(cssPath)) {
   check("the research workspace is a real workspace, not empty boxes", problems);
 }
 
+
+// check 41 — THE PLATFORM HOMEPAGE REBUILD (owner's three asks, 2026-10-07)
+// The owner directed a platform homepage at `/`, the policy-simulation landing MOVED to `/simulation`,
+// a centred copyright line in every footer, and a static (non-clickable) hover picture of each tool's
+// landing on its door. This gate fails the build if any of that is undone: if `/` stops rendering the
+// new homepage, if `/simulation` stops rendering the moved landing, if the copyright line loses its
+// "Oreida Pvt Ltd" name or its centred alignment, or if the hover picture stops being an inert,
+// assistive-technology-hidden layer.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  // 1. `/` is the new homepage, and `/simulation` is the moved policy-simulation landing.
+  const home = readIf("src/pages/Home.tsx");
+  const app = readIf("src/App.tsx");
+  if (home === null) {
+    problems.push("src/pages/Home.tsx is missing — the platform homepage has no home");
+  }
+  if (app === null) {
+    problems.push("src/App.tsx is missing");
+  } else {
+    if (!/path="\/"\s+element=\{<Home\s*\/>\}/.test(app)) {
+      problems.push('src/App.tsx no longer renders the platform homepage at "/"');
+    }
+    if (!/path="\/simulation"\s+element=\{<SimulationLanding\s*\/>\}/.test(app)) {
+      problems.push('src/App.tsx no longer renders the policy-simulation landing at "/simulation"');
+    }
+  }
+
+  // 2. The centred copyright line: composed once, named in full, and rendered centred.
+  const brand = readIf("src/config/brand.ts");
+  if (brand === null || !/copyright:\s*`© 2026 \$\{PROMOTER_NAME\}\. All rights reserved\.`/.test(brand)) {
+    problems.push(
+      "src/config/brand.ts no longer composes the copyright line as `© 2026 ${PROMOTER_NAME}. All rights reserved.`",
+    );
+  }
+  const copyrightSources = ["src/components/public/PublicPageShell.tsx", "src/components/SovereignFooter.tsx", "src/components/research/ResearchShell.tsx"];
+  for (const rel of copyrightSources) {
+    const source = readIf(rel);
+    if (source === null) {
+      problems.push(`${rel} is missing`);
+    } else if (!/PROMOTER\.copyright/.test(source)) {
+      problems.push(`${rel} no longer renders the copyright line`);
+    } else if (!/text-center/.test(source)) {
+      problems.push(`${rel} no longer centres the copyright line`);
+    }
+  }
+
+  // 3. The hover picture is a static layer: inert (no pointer events) and hidden from assistive
+  //    technology, and it is the tool's OWN landing component that is reused.
+  if (home !== null) {
+    if (!/pointer-events-none/.test(home)) {
+      problems.push("the homepage hover preview is no longer inert (pointer-events-none removed)");
+    }
+    if (!/aria-hidden="true"/.test(home)) {
+      problems.push("the homepage hover preview is no longer hidden from assistive technology");
+    }
+    if (!/<Landing\s*\/>/.test(home) || !/<ResearchLanding\s*\/>/.test(home)) {
+      problems.push("the homepage hover preview no longer reuses the two tool landings");
+    }
+    if (!/hover: hover/.test(home) || !/pointer: fine/.test(home)) {
+      problems.push("the homepage hover preview no longer guards against touch devices");
+    }
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the platform homepage rebuild is in place (new /, moved /simulation, centred copyright, inert hover preview)");
+  }
+  check("the platform homepage rebuild is in place", problems);
+}
 
 // summary
 console.log("\n" + "-".repeat(72));

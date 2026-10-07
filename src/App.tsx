@@ -4,7 +4,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Home from "./pages/Landing.tsx";
+import Home from "./pages/Home.tsx";
+import SimulationLanding from "./pages/Landing.tsx";
 import ChooseDepartment from "./pages/ChooseDepartment.tsx";
 import ResearchLanding from "./pages/ResearchLanding.tsx";
 import ResearchOverview from "./pages/research/ResearchOverview.tsx";
@@ -79,6 +80,10 @@ const App = () => (
         <BrandIconOverride />
         <Routes>
           <Route path="/" element={<Home />} />
+          {/* The Nzwisiso policy-simulation landing — MOVED here from `/` (owner's item 1,
+              2026-10-07) when `/` became the platform homepage. Its look and its one action
+              ("Choose your Department" → /start) are unchanged. */}
+          <Route path="/simulation" element={<SimulationLanding />} />
           <Route path="/start" element={<ChooseDepartment />} />
           {/* The ZEPARI research assistant — a separate product in the same platform. Its own
               landing page (with the two one-click entries), and a workspace that needs a research

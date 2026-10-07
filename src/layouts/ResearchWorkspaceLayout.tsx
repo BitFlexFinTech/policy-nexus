@@ -17,7 +17,7 @@ export function ResearchWorkspaceLayout() {
   }, []);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-background">
+    <div className="zepari flex h-screen flex-col overflow-hidden bg-background">
       <ResearchHeader />
       <ResearchNav />
       <main className="min-h-0 flex-1 overflow-y-auto">
@@ -25,9 +25,10 @@ export function ResearchWorkspaceLayout() {
           <Outlet />
         </div>
       </main>
-      <footer className="flex items-center justify-center border-t bg-primary px-4 py-2">
-        <span className="text-center text-[10px] tracking-wide text-primary-foreground/80">
-          {PROMOTER.line}
+      <footer className="flex flex-col items-center justify-center border-t bg-card px-4 py-2">
+        <span className="text-center text-[10px] tracking-wide text-zp-ink-muted">{PROMOTER.line}</span>
+        <span className="mt-0.5 text-center text-[10px] tracking-wide text-zp-ink-muted">
+          {PROMOTER.copyright}
         </span>
       </footer>
     </div>

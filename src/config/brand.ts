@@ -189,6 +189,13 @@ export const PROMOTER = {
   line:
     `Project promoter: ${PROMOTER_NAME} · ${PROMOTER_BUSINESS_LEAD} (Business Lead) · ` +
     `${PROMOTER_TECHNICAL_LEAD} (Technical Lead)`,
+  /**
+   * The copyright line, rendered centred in every footer (owner's item 2, 2026-10-07). Written in
+   * ONE place so the year and the entity can never drift apart. It matches Government house style —
+   * the Ministry of ICT's own footer reads "© 2025 Ministry of ICT, Postal & Courier Services. All
+   * rights reserved."
+   */
+  copyright: `© 2026 ${PROMOTER_NAME}. All rights reserved.`,
 } as const;
 
 /**
@@ -201,6 +208,77 @@ export const VOCABULARY = {
   agentMemory: `${NAME} agent memory`,
   agentFeed: "Stakeholder agent feed",
   scenarioEngine: "Scenario engine",
+} as const;
+
+/**
+ * THE NATIONAL AI STRATEGY — the Government's own plan, named once and cited once.
+ *
+ * The owner's direction (2026-10-07): the new platform homepage tells the national story, and every
+ * national claim must carry its body, publication and period on screen. Nothing here is invented —
+ * the strategy name, its priority sectors and the "Nzwisiso.ai" campaign are what the strategy
+ * itself states (campaign named p.43; see `SUPPORTED_INITIATIVE` above for the citation).
+ */
+export const AI_STRATEGY = {
+  name: "Zimbabwe National Artificial Intelligence Strategy 2026–2030",
+  publisher: "Ministry of Information Communication Technology, Postal and Courier Services",
+  /** The sectors the strategy names as priorities, in the order it lists them. */
+  prioritySectors: ["Healthcare", "Agriculture", "Education", "Financial inclusion"] as const,
+  /** The strategy's own flagship public campaign, in its own words. */
+  campaign: "Nzwisiso.ai",
+  campaignNote:
+    "The strategy names a flagship public campaign, Nzwisiso.ai, to make AI understandable, " +
+    "relevant and trusted through practical demonstrations.",
+} as const;
+
+/**
+ * THE PLATFORM HOMEPAGE COPY (owner's item 1, 2026-10-07). The national framing, kept here so it has
+ * one home and the page holds no copy of its own. Every national line reads a sourced fact; the two
+ * tools and their shared rules are reused from `GOVERNMENT_PAGE` in `src/config/research.ts`, so the
+ * homepage and the "Built for Government" page can never disagree.
+ */
+export const PLATFORM_HOME = {
+  eyebrow: "Government of Zimbabwe · Policy intelligence",
+  heading: "Policy intelligence for Zimbabwe's 2030 goals",
+  standfirst:
+    `${NAME} brings two AI assistants to Government's policy work. One tests a draft policy ` +
+    "against the groups it reaches, before it is implemented. The other carries the evidence " +
+    "behind it. Together they move a policy from research to decision.",
+  /** The two national commitments the platform is built to serve, each with its source. */
+  commitments: [
+    {
+      label: "Full digitalisation by 2030",
+      body: "Government's commitment to bring public services fully online by 2030, alongside Vision 2030 — an upper-middle-income economy by 2030.",
+      source: "Zimbabwe National Artificial Intelligence Strategy 2026–2030; Government of Zimbabwe.",
+    },
+    {
+      label: "A connected knowledge-based society",
+      body: "The Ministry's own vision for 2030, in its own words: a connected knowledge-based society with secure information systems.",
+      source: "Ministry of ICT, Postal and Courier Services (ictministry.gov.zw).",
+    },
+  ],
+  /** The Ministry's published documents the platform aligns with. */
+  documents: [
+    "Zimbabwe National Policy for ICT 2022–2027",
+    "Cyber and Data Protection Act (Chapter 12:07)",
+    "National Broadband Plan 2023–2030",
+  ],
+  /** The doors and how they label themselves. */
+  tools: {
+    heading: "Choose a service",
+    simulation: {
+      name: `${NAME} Policy Simulation Assistant`,
+      role: "Test a draft policy against the groups it reaches, before it is implemented.",
+      door: "Open the policy simulation",
+      to: "/simulation",
+    },
+    research: {
+      name: "ZEPARI Policy Research Assistant",
+      role: "The evidence behind a policy, from ZEPARI's own research.",
+      door: "Enter the research assistant",
+      to: "/research",
+    },
+  },
+  togetherHeading: "How they work together",
 } as const;
 
 /**

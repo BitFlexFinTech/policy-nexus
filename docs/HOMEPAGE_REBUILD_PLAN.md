@@ -1,5 +1,10 @@
 # HOMEPAGE REBUILD + FOOTER & ZEPARI-LOGO FIXES — the plan to BUILD next
 
+> **STATUS: DONE — 2026-10-07.** Every step in §5 was built and verified in one session
+> (validate · typecheck · lint · 616/616 unit tests · build · 34/34 Playwright). See the
+> `RESUME HERE` block of `PROJECT_STATUS.md` for the build list and the evidence. This file
+> remains the SPEC. The only thing NOT done is publishing to the live host (a separate step).
+
 Written 2026-10-07, so a brand-new chat can type **"continue where you left off"** and start the build
 with no history and no clarifying questions. This file is the SPEC; `PROJECT_STATUS.md` points here.
 
@@ -157,8 +162,10 @@ refresh the ONE review zip.
 `npm run validate && npm run typecheck && npm run lint && npm test && npm run build`, then
 `npx playwright test`. New assertions to add: the copyright line is present and centred; the ZEPARI logo
 renders on a light header (not a white box on a dark bar); hovering a door shows the preview and moving the
-mouse away reverts it; clicking the door opens the tool; the preview is absent on a phone viewport and under
-`prefers-reduced-motion`. Then refresh the ONE review zip (`Review Zip/nzwisiso-policy-dashboard-review.zip`,
+mouse away reverts it; clicking the door opens the tool; the preview is absent on a phone viewport; and it
+still appears under `prefers-reduced-motion` but with the fade skipped (§5 is authoritative on this — motion
+is reduced, never the content removed).
+Then refresh the ONE review zip (`Review Zip/nzwisiso-policy-dashboard-review.zip`,
 **no `.env` inside**). **Never push `main`.** Publishing to the live host is a separate later step.
 
 ## 9. FILES THE BUILD WILL TOUCH (expected)

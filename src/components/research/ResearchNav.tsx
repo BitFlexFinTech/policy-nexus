@@ -31,7 +31,7 @@ export function ResearchNav() {
             cn(
               "whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
               isActive
-                ? "bg-primary/10 text-primary"
+                ? "bg-zp-blue/10 text-zp-navy"
                 : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
             )
           }

@@ -52,7 +52,7 @@ describe("platform administration — landing page content", () => {
     expect(getContent().text["how.heading"]).toBe("How the platform works");
 
     cleanup();
-    renderAt("/");
+    renderAt("/simulation");
     expect(screen.getByRole("heading", { name: "How the platform works" })).toBeInTheDocument();
   });
 });

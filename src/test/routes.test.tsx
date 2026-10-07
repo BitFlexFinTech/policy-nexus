@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import App from "@/App";
 import { clearSession, getSessionDepartmentId, signInToDepartment } from "@/session/session";
+import { PLATFORM_HOME } from "@/config/brand";
 
 /**
  * Route smoke + guard test. Every route must render without throwing, and the
@@ -26,8 +27,14 @@ describe("routes smoke-render and the workspace guard", () => {
     clearSession();
   });
 
-  it("renders the public landing page at / — and it holds no department picker", () => {
+  it("renders the platform homepage at / — the new service homepage, no department picker", () => {
     renderAt("/");
+    expect(landingHeading()).toHaveTextContent(PLATFORM_HOME.heading);
+    expect(screen.queryByRole("group", { name: /select a department/i })).toBeNull();
+  });
+
+  it("renders the policy-simulation landing at /simulation", () => {
+    renderAt("/simulation");
     expect(landingHeading()).toHaveTextContent("Zimbabwe AI Policy Intelligence Initiative");
     expect(screen.queryByRole("group", { name: /select a department/i })).toBeNull();
   });
@@ -77,7 +84,7 @@ describe("routes smoke-render and the workspace guard", () => {
     signInToDepartment("health");
     renderAt("/app");
     fireEvent.click(screen.getByRole("button", { name: /Sign out/ }));
-    expect(landingHeading()).toHaveTextContent("Zimbabwe AI Policy Intelligence Initiative");
+    expect(landingHeading()).toHaveTextContent(PLATFORM_HOME.heading);
     expect(getSessionDepartmentId()).toBeNull();
   });
 

@@ -53,7 +53,7 @@ export default function ResearchLanding() {
     <ResearchShell>
       <section className="grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zp-navy">
             Policy research assistant
           </p>
           <h1
@@ -89,13 +89,13 @@ export default function ResearchLanding() {
 
         <aside
           aria-labelledby="research-confidentiality-heading"
-          className="rounded-xl border bg-primary-tint p-5"
+          className="rounded-xl border border-zp-line bg-zp-surface p-5"
         >
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />
+            <ShieldCheck className="h-4 w-4 text-zp-blue" aria-hidden="true" />
             <h2
               id="research-confidentiality-heading"
-              className="text-xs font-semibold uppercase tracking-[0.16em] text-primary"
+              className="text-xs font-semibold uppercase tracking-[0.16em] text-zp-navy"
             >
               {RESEARCH_CONFIDENTIALITY.heading}
             </h2>
@@ -153,7 +153,7 @@ export default function ResearchLanding() {
             const Icon = capability.icon;
             return (
               <li key={capability.title} className="rounded-lg border bg-card p-4">
-                <Icon className="h-4 w-4 text-primary" aria-hidden="true" />
+                <Icon className="h-4 w-4 text-zp-blue" aria-hidden="true" />
                 <span className="mt-2 block text-sm font-semibold tracking-tight text-foreground">
                   {capability.title}
                 </span>

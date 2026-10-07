@@ -2,7 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { Buffer } from "node:buffer";
 import { readFileSync } from "node:fs";
 import { DEPARTMENTS, DEPARTMENT_COUNT, findDepartment } from "../src/config/departments";
-import { BRAND } from "../src/config/brand";
+import { BRAND, PROMOTER } from "../src/config/brand";
 import { ADMIN_ROUTE } from "../src/config/platform";
 import { citedInstrumentLabel } from "../src/config/instruments";
 import { createStoredZip } from "../src/services/documents/zip";
@@ -85,7 +85,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
 
   /** The two-step entry introduced in Phase M: landing page → chooser. */
   const openChooser = async (page: Page) => {
-    await page.goto("/");
+    await page.goto("/simulation");
     await page.getByRole("link", { name: "Choose your Department" }).first().click();
     await expect(page).toHaveURL(/\/start$/);
     await expect(page.getByRole("heading", { level: 1, name: "Choose your Department" })).toBeVisible();
@@ -131,7 +131,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
   };
 
   test("the landing page hands off to the chooser, which lists all 16 departments", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/simulation");
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Zimbabwe AI Policy Intelligence Initiative" }),
@@ -175,8 +175,8 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
     expectCleanRuntime();
   });
 
-  test("homepage presents the platform and carries the official footer", async ({ page }) => {
-    await page.goto("/");
+  test("the policy-simulation landing presents the platform and carries the official footer", async ({ page }) => {
+    await page.goto("/simulation");
 
     // Government-aesthetic structure: the initiative is the capability, the product
     // is credited beneath it, and the masthead names the initiative — not the
@@ -413,7 +413,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
    */
   test("the first action is above the fold on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/");
+    await page.goto("/simulation");
 
     const action = page.getByRole("link", { name: "Choose a department" }).first();
     await expect(action).toBeVisible();
@@ -431,7 +431,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
 
   test("the engine explanation fits a phone viewport with no sideways scroll", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/");
+    await page.goto("/simulation");
 
     const behind = page.locator("#behind-the-assessment");
     await expect(
@@ -485,7 +485,7 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
  * assertion prints all three widths in its message, so a failure says what was measured.
  */
 test("the drawing stays crisp at three card widths", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/simulation");
 
   const measure = () =>
     page.evaluate(() => {
@@ -1258,7 +1258,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
 
   test("the admin screen edits the landing page's wording (item 9)", async ({ page }) => {
     // The public page shows the wording it ships with.
-    await page.goto("/");
+    await page.goto("/simulation");
     await expect(page.getByRole("heading", { name: "How it works" })).toBeVisible();
 
     // The screen sits behind the administrator gate: it asks one plain question first.
@@ -1273,7 +1273,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     ).toBeVisible();
 
     // The public page now shows the changed wording, and not the old one.
-    await page.goto("/");
+    await page.goto("/simulation");
     await expect(page.getByRole("heading", { name: "How the platform works" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "How it works" })).toHaveCount(0);
 
@@ -1358,4 +1358,130 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
 
     expectCleanRuntime();
   });
+
+  /**
+   * THE PLATFORM HOMEPAGE — the owner's item 1 (2026-10-07). `/` introduces the whole platform
+   * (the national story and both tools); each tool keeps its own landing at `/simulation` and
+   * `/research`.
+   */
+  test("the platform homepage presents the national story and both tools", async ({ page }) => {
+    await page.goto("/");
+
+    // ONE level-one heading, the homepage's own — not the policy-simulation landing's.
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Policy intelligence for Zimbabwe's 2030 goals" }),
+    ).toBeVisible();
+    // The national story, each line sourced on the page.
+    await expect(page.getByText("Full digitalisation by 2030", { exact: true })).toBeVisible();
+    await expect(page.getByText("A connected knowledge-based society", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Zimbabwe National Artificial Intelligence Strategy 2026–2030" }),
+    ).toBeVisible();
+    // The choice of both tools, and how they work together.
+    await expect(page.getByRole("heading", { name: "Choose a service" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "How they work together", exact: true }),
+    ).toBeVisible();
+
+    expectCleanRuntime();
+  });
+
+  test("the footer carries the centred copyright line on every public page", async ({ page }) => {
+    for (const path of ["/", "/simulation", "/research"]) {
+      await page.goto(path);
+      const copyright = page.getByText(PROMOTER.copyright);
+      await expect(copyright, `copyright on ${path}`).toBeVisible();
+      const align = await copyright.evaluate((node) => getComputedStyle(node).textAlign);
+      expect(align, `copyright centred on ${path}`).toBe("center");
+    }
+    expectCleanRuntime();
+  });
+
+  test("the ZEPARI landing wears a light header with the institute's own logo", async ({ page }) => {
+    await page.goto("/research");
+
+    // The institute's own artwork, never enlarged past its real 230px width.
+    const logo = page.getByAltText("Zimbabwe Economic Policy Analysis and Research Institute (ZEPARI)");
+    await expect(logo).toBeVisible();
+    const box = await logo.boundingBox();
+    expect(box?.width ?? 0).toBeLessThanOrEqual(230);
+
+    // A LIGHT header: measured from the rendered colour, not asserted from the classes.
+    const header = page.locator("header").first();
+    const background = await header.evaluate((node) => getComputedStyle(node).backgroundColor);
+    const rgb = (background.match(/\d+/g) ?? []).map(Number);
+    const brightness = (rgb[0] + rgb[1] + rgb[2]) / 3;
+    expect(brightness, `header background ${background} is light`).toBeGreaterThan(200);
+
+    expectCleanRuntime();
+  });
+
+  /**
+   * THE DOORS' HOVER PICTURE (owner's item 1, 2026-10-07). Hovering a door turns the page into a
+   * static picture of that tool's landing — a flourish only: nothing in the picture is clickable,
+   * moving away reverts it, and clicking the door opens the real tool.
+   */
+  test("hovering a door shows a static, non-clickable preview of that tool's landing", async ({ page }) => {
+    await page.goto("/");
+    const preview = page.getByTestId("door-preview");
+    await expect(preview).toHaveCount(0);
+
+    // Point at the policy-simulation door: the picture of the simulation landing appears.
+    await page.getByRole("link", { name: "Open the policy simulation" }).first().hover();
+    await expect(preview).toBeVisible();
+    await expect(preview).toHaveAttribute("data-preview", "simulation");
+    // The picture is inert: no pointer events, and hidden from assistive technology.
+    expect(await preview.evaluate((node) => getComputedStyle(node).pointerEvents)).toBe("none");
+    await expect(preview).toHaveAttribute("aria-hidden", "true");
+
+    // Moving the mouse away reverts to the neutral homepage.
+    await page.mouse.move(2, 2);
+    await expect(preview).toHaveCount(0);
+
+    // The research door shows the ZEPARI picture, and the door itself still opens the real tool
+    // (the picture is behind the doors, which stay clickable on top).
+    await page.getByRole("link", { name: "Enter the research assistant" }).first().hover();
+    await expect(preview).toHaveAttribute("data-preview", "zepari");
+    await page.getByRole("link", { name: "Enter the research assistant" }).first().click();
+    await expect(page).toHaveURL(/\/research$/);
+
+    expectCleanRuntime();
+  });
+
+  test("the hover preview stays off on a touch device, and its fade is skipped under reduced motion", async ({
+    browser,
+  }) => {
+    // A touch device reports no hover capability, so the guard keeps the picture off entirely.
+    const touch = await browser.newContext({
+      hasTouch: true,
+      isMobile: true,
+      viewport: { width: 390, height: 844 },
+    });
+    const touchPage = await touch.newPage();
+    await touchPage.goto(`${BASE_URL}/`);
+    expect(
+      await touchPage.evaluate(
+        () => window.matchMedia("(hover: hover) and (pointer: fine)").matches,
+      ),
+    ).toBe(false);
+    // Even a dispatched entry event cannot turn it on.
+    await touchPage
+      .getByRole("link", { name: "Open the policy simulation" })
+      .first()
+      .dispatchEvent("mouseenter");
+    await expect(touchPage.getByTestId("door-preview")).toHaveCount(0);
+    await touch.close();
+
+    // A reader who asked for reduced motion still SEES the picture — the fade is simply skipped.
+    const still = await browser.newContext({
+      reducedMotion: "reduce",
+      viewport: { width: 1280, height: 800 },
+    });
+    const stillPage = await still.newPage();
+    await stillPage.goto(`${BASE_URL}/`);
+    await stillPage.getByRole("link", { name: "Open the policy simulation" }).first().hover();
+    await expect(stillPage.getByTestId("door-preview")).toBeVisible();
+    await still.close();
+  });
+
 });

@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { RESEARCH_INSTITUTION, RESEARCH_NAME } from "@/config/research";
+import { ZepariMasthead } from "@/components/zepari/ZepariMasthead";
 import { researchSessionActions, useResearchSession } from "@/session/useResearchSession";
 
 /**
- * The research workspace header. It carries the institute's identity, who is signed in, the
- * one-click entry marker (mock-first rule), and the way out — so a researcher is always oriented
- * and can always leave, from wherever they are in the workspace.
+ * The research workspace header. It carries the institute's identity (the light ZEPARI masthead),
+ * who is signed in, the one-click entry marker (mock-first rule), and the way out — so a researcher
+ * is always oriented and can always leave, from wherever they are in the workspace.
  */
 export function ResearchHeader() {
   const session = useResearchSession();
@@ -18,27 +18,19 @@ export function ResearchHeader() {
   };
 
   return (
-    <header className="flex flex-wrap items-center justify-between gap-3 border-b bg-primary px-4 py-2 text-primary-foreground">
-      <div className="flex min-w-0 flex-col">
-        <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary-foreground/75">
-          {RESEARCH_INSTITUTION}
-        </span>
-        <h1 className="truncate text-sm font-semibold tracking-tight">{RESEARCH_NAME}</h1>
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
+    <ZepariMasthead>
+      <div className="flex flex-wrap items-center justify-end gap-2">
         {session && (
           <span className="flex flex-col text-right">
-            <span className="text-[10px] uppercase tracking-wide text-primary-foreground/75">
-              Signed in
-            </span>
-            <span className="text-xs font-medium">{session.name}</span>
+            <span className="text-[10px] uppercase tracking-wide text-zp-ink-muted">Signed in</span>
+            <span className="text-xs font-medium text-zp-navy">{session.name}</span>
           </span>
         )}
-        <span className="rounded border border-primary-foreground/30 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-primary-foreground/75">
+        <span className="rounded border border-zp-line px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-zp-ink-muted">
           Entry: one-click (Mock)
         </span>
         <Button
-          variant="secondary"
+          variant="outline"
           size="sm"
           className="h-7 px-2 text-[10px] uppercase tracking-wide"
           onClick={leave}
@@ -46,6 +38,6 @@ export function ResearchHeader() {
           Leave
         </Button>
       </div>
-    </header>
+    </ZepariMasthead>
   );
 }

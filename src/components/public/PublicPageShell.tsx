@@ -236,6 +236,11 @@ function OfficialFooter() {
             Simulated results · Prepared for decision support
           </p>
         </div>
+
+        {/* The copyright line, centred (owner's item 2, 2026-10-07). */}
+        <p className="mt-4 border-t border-primary-foreground/15 pt-4 text-center text-[10px] tracking-wide text-primary-foreground/75">
+          {PROMOTER.copyright}
+        </p>
       </div>
     </footer>
   );

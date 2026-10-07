@@ -18,6 +18,9 @@ export function SovereignFooter() {
       <span className="mt-0.5 text-[9px] tracking-wide text-primary-foreground/75 text-center">
         {PROMOTER.line}
       </span>
+      <span className="mt-0.5 text-[9px] tracking-wide text-primary-foreground/75 text-center">
+        {PROMOTER.copyright}
+      </span>
     </footer>
   );
 }
