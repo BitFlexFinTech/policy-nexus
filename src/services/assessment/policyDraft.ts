@@ -273,12 +273,12 @@ export const buildPolicyDraft = (
     paragraphs: [
       department.name,
       `DRAFT POLICY — ${run.policyTitle}`,
-      `${BRAND.initiative} · prepared on ${BRAND.productName}`,
-      `Run reference ${run.reference} · recorded ${formatInstant(run.createdAt)} · horizon ${run.horizonLabel} (${run.horizonMonths} months)`,
+      BRAND.initiative,
+      `Reference ${run.reference} · recorded ${formatInstant(run.createdAt)} · horizon ${run.horizonLabel} (${run.horizonMonths} months)`,
       // Item 1 — the paper trail, on the instrument itself. One line, inside the block that
       // already identifies the run, so the document's mandated structure is unchanged.
       `Prepared by: ${preparerDisclosure(run, department)}`,
-      "DRAFT FOR REVIEW — this is not an adopted instrument. It is prepared for decision support: the platform informs, and a human decides.",
+      "DRAFT FOR REVIEW — this is not an adopted instrument. It is issued for the responsible officer's consideration, and it is the officer who decides.",
       `Marking: ${BRAND.classification}`,
     ],
   });
@@ -289,8 +289,8 @@ export const buildPolicyDraft = (
     id: "foreword",
     heading: "Foreword",
     paragraphs: [
-      `This policy concerns "${run.policyTitle}", prepared by ${preparerLine(run, department)}. Its measures were examined by controlled simulation before adoption, and the findings of that examination are recorded in the clauses and annexes that follow.`,
-      `The examination modelled the response of ${run.reactions.length} stakeholder groups over a ${run.horizonLabel.toLowerCase()} horizon and tested the draft against ${run.impacts.length} of the department's stated priorities. Where it showed a pressure the draft did not answer, this policy carries a provision for it.`,
+      `This policy concerns "${run.policyTitle}", prepared by ${preparerLine(run, department)}. It sets out what ${department.shortName} shall do, the groups it reaches, and what it will publish, over a ${run.horizonLabel.toLowerCase()} horizon.`,
+      `The policy is directed at the department's own ${run.impacts.length} stated priorities and provides for the concerns of the ${run.reactions.length} groups it reaches. Where a concern is not yet settled, this policy carries a provision for it rather than leaving it to be discovered after implementation.`,
       "The instrument remains a draft until it is adopted through the department's own approval process. Nothing in it decides a question that belongs to a person: it sets out what the department intends to do, and what the department will publish so that its effect can be seen.",
       `Foreword to be signed by the Honourable Minister responsible for ${department.name}: ${BLANK}, with the date of signature.`,
     ],
@@ -302,8 +302,8 @@ export const buildPolicyDraft = (
     id: "acknowledgements",
     heading: "Acknowledgements",
     paragraphs: [
-      "This draft was prepared from the department's own stated priorities, its reference indicators and its cited-instrument register, together with the policy text submitted for examination.",
-      `The examination was carried out with the ${VOCABULARY.simulationCore}, which is deterministic: the same inputs always produce the same result, and the result can be reproduced from the inputs recorded at ${ANNEX.runInputs}.`,
+      "This draft was prepared from the department's own stated priorities, its own reference indicators and its cited-instrument register, together with the policy text the department submitted.",
+      `The figures and provisions in this policy were derived by a deterministic process: the same inputs always produce the same result, and the result can be reproduced from the inputs recorded at ${ANNEX.runInputs}.`,
       `Contributions to be acknowledged, and the offices that must be consulted before submission, are recorded by the department: ${BLANK}.`,
     ],
   });
@@ -314,10 +314,10 @@ export const buildPolicyDraft = (
     id: "executive-summary",
     heading: "Executive summary",
     paragraphs: [
-      `This policy carries the submitted draft, "${run.policyTitle}", into effect while answering the pressures the examination identified. It is directed at the stated priorities of ${department.shortName} and is to be monitored against the department's own reference indicators.`,
-      `The examination modelled ${run.reactions.length} stakeholder groups. ${listOf(reactive.map((reaction) => reaction.label))} are modelled as receptive; ${conditional.length > 0 ? listOf(conditional.map((reaction) => reaction.label)) : "no group is modelled as conditional"} as conditional; and ${reluctant.length === 0 ? "no group is modelled as resistant" : `${listOf(reluctant.map((reaction) => reaction.label))} as resistant`}. The run records a confidence of ${run.confidence} out of 100, which describes the firmness of the modelled range and not the certainty of any outcome.`,
-      `The examination raised ${run.risks.length} risks, each of which the policy meets with a provision in clause ${CLAUSE.risk}, and produced ${run.recommendations.length} recommended steps. Those steps appear as measures in clause ${CLAUSE.measures}, as an implementation matrix at ${ANNEX.implementationMatrix}, and as provisions in clauses ${CLAUSE.risk}, ${CLAUSE.engagement} and ${CLAUSE.transitional}.`,
-      `What this policy does not claim: it is a structured and reproducible scenario analysis, not a forecast of public opinion or of administrative results. Its figures are indicative and must be read with the method and limitations note at ${ANNEX.method}.`,
+      `This policy carries the department's submitted draft, "${run.policyTitle}", into effect while answering the concerns raised in preparing it. It is directed at the stated priorities of ${department.shortName} and is to be monitored against the department's own reference indicators.`,
+      `The policy reaches ${run.reactions.length} groups. ${listOf(reactive.map((reaction) => reaction.label))} are expected to support it; ${conditional.length > 0 ? listOf(conditional.map((reaction) => reaction.label)) : "no group is expected to hold conditional concerns"} may hold conditional concerns; and ${reluctant.length === 0 ? "no group is expected to resist" : `${listOf(reluctant.map((reaction) => reaction.label))} may resist`}. The position is stated as a range of behaviour under stated assumptions, with a reading of ${run.confidence} out of 100; it is not a forecast of any outcome.`,
+      `The policy meets ${run.risks.length} risks, each with a provision in clause ${CLAUSE.risk}, and carries ${run.recommendations.length} further measures. Those measures appear in clause ${CLAUSE.measures}, as an implementation matrix at ${ANNEX.implementationMatrix}, and as provisions in clauses ${CLAUSE.risk}, ${CLAUSE.engagement} and ${CLAUSE.transitional}.`,
+      `What this policy does not claim: the position it reads from is a reproducible scenario, not a forecast of public opinion or of administrative results. Its figures are indicative and must be read with the note at ${ANNEX.method}.`,
     ],
     table: {
       caption: "Table 1 — The modelled position this policy answers",
@@ -333,10 +333,10 @@ export const buildPolicyDraft = (
     heading: `${CLAUSE.introduction}. Introduction and background`,
     paragraphs: [
       `${department.name} is constituted with the following mandate: ${department.mandate}`,
-      `This policy addresses "${run.policyTitle}". The draft was developed for a ${run.horizonLabel.toLowerCase()} horizon and reached the examination as ${run.source === "upload" ? "an uploaded document" : run.source === "preset" ? "one of the department's own prepared drafts" : "policy text entered directly by the responsible officer"}.`,
-      "The problem it addresses: policies are implemented without a structured way of examining the likely responses of those they affect, so the cost of a provision that is not understood is discovered after implementation rather than before it. This policy answers that problem in two ways — its measures state who does what, and its monitoring provisions state what will be published so that the position can be read from evidence rather than from opinion.",
-      `The policy applies to ${department.shortName} and to the offices and agencies through which it implements policy, and it is intended to reach the stakeholder groups modelled at clause ${CLAUSE.situation}.`,
-      `It was examined by controlled simulation before adoption. The examination is recorded at ${ANNEX.runInputs} so that any reader can reproduce it from the recorded inputs and check that the same result follows.`,
+      `This policy addresses "${run.policyTitle}". It applies for a ${run.horizonLabel.toLowerCase()} horizon, and it was prepared from ${run.source === "upload" ? "a document the department uploaded" : run.source === "preset" ? "one of the department's own prepared drafts" : "policy text entered directly by the responsible officer"}.`,
+      "The problem it addresses: policies are implemented without a settled way of reading the likely responses of those they affect, so the cost of a provision that is not understood is discovered after implementation rather than before it. This policy answers that problem in two ways — its measures state who does what, and its monitoring provisions state what will be published so that the position can be read from evidence rather than from opinion.",
+      `The policy applies to ${department.shortName} and to the offices and agencies through which it implements policy, and it is intended to reach the groups it describes at clause ${CLAUSE.situation}.`,
+      `Its provisions were settled in advance and are recorded at ${ANNEX.runInputs}, so that any reader can follow how each was reached and repeat the reading.`,
       `A reader in a meeting can work from the clause numbers alone: clause ${CLAUSE.measures} states the measures, clause ${CLAUSE.implementation} states who carries them out, clause ${CLAUSE.monitoring} states how their effect will be read, and the annexes carry the matrices.`,
     ],
   });
@@ -348,7 +348,7 @@ export const buildPolicyDraft = (
     heading: `${CLAUSE.situation}. Situation analysis`,
     paragraphs: [
       `This clause records the position the policy starts from. Every figure is either a published figure, with the body that publishes it and the period stated beside it, or is labelled ${MODELLED_SHARE_LABEL} because no publisher publishes that return. A modelled figure is never presented as a published one.`,
-      `The indicators below are the department's own reference figures. They are also the measures in the monitoring and evaluation matrix at clause ${CLAUSE.monitoring}, so that progress is read from one set of figures rather than several.`,
+      `The baseline below is the department's own reference set for the sector. It is also the set the monitoring and evaluation matrix at clause ${CLAUSE.monitoring} reports against, so that progress is read from one set of figures rather than several.`,
     ],
     table: {
       caption: "Table 2 — Reference indicators, with the basis of each figure",
@@ -363,11 +363,11 @@ export const buildPolicyDraft = (
 
   numbered.push({
     id: "situation-groups",
-    heading: `${CLAUSE.situation}.2 Modelled stakeholder position`,
+    heading: `${CLAUSE.situation}.2 The groups this policy reaches`,
     paragraphs: [
-      "The examination modelled how each group below may respond to the draft. A support index is a modelled measure on a scale of 0 to 100; it is not a vote share, a poll result, or a statement of what any group has actually said.",
-      `Where a group stands on a published national share, the share is stated with the figure it stands for. Where no published share exists, the group is labelled ${MODELLED_SHARE_LABEL} and its weight was set neutrally in the examination.`,
-      `The engagement provisions at clause ${CLAUSE.engagement} are directed at the groups the examination shows as conditional or resistant, because those are the groups whose implementation questions have to be settled before obligations bite.`,
+      "This clause records the groups the policy reaches and the position each is expected to take. A support index is a measure on a scale of 0 to 100; it is not a vote share, a poll result, or a statement of what any group has actually said.",
+      `Where a group stands on a published national share, the share is stated with the figure it stands for. Where no published share exists, the group is labelled ${MODELLED_SHARE_LABEL} and its weight is set neutrally.`,
+      `The engagement provisions at clause ${CLAUSE.engagement} are directed at the groups whose concerns are conditional or resistant, because those are the groups whose implementation questions have to be settled before obligations bite.`,
     ],
     table: {
       caption: "Table 3 — Modelled position of each group the policy reaches",
@@ -386,7 +386,7 @@ export const buildPolicyDraft = (
     heading: `${CLAUSE.situation}.3 Stated priorities the policy is directed at`,
     paragraphs: [
       "The policy is directed at the department's own stated priorities, and the effect of its measures on each of them is to be reported against them.",
-      `The modelled effect of the draft on these priorities is recorded in the examination at ${ANNEX.runInputs}; where a priority is modelled as moving against the draft, the policy answers it in clause ${CLAUSE.measures} and clause ${CLAUSE.risk}.`,
+      `Where a priority is expected to move against the policy, the policy answers it in clause ${CLAUSE.measures} and clause ${CLAUSE.risk}. How each provision was reached is recorded at ${ANNEX.runInputs}.`,
     ],
     bullets: department.priorities.map((priority) => `${priority.label} — ${priority.note}`),
     listStyle: "clauses",
@@ -411,16 +411,16 @@ export const buildPolicyDraft = (
 
   numbered.push({
     id: "situation-documents",
-    heading: `${CLAUSE.situation}.4 Departmental material the examination read`,
+    heading: `${CLAUSE.situation}.4 The department's own material`,
     paragraphs:
       material.read.length > 0
         ? [
-            `The department supplied ${material.documents.length} of its own ${material.documents.length === 1 ? "document" : "documents"} through its Document Library, and the examination read ${material.read.length} of them — ${material.characters} characters of the department's own material. Each is listed at ${ANNEX.documents}, with what was and was not read.`,
-            "That material is the department's own record, not the platform's. Where it repeats one of the department's stated priorities, the sentence carrying that wording is quoted below, so a reader sees the department's own words rather than a summary of them.",
+            `The department supplied ${material.documents.length} of its own ${material.documents.length === 1 ? "document" : "documents"} through its Document Library, and ${material.read.length} of them were read for this policy — ${material.characters} characters of the department's own material. Each is listed at ${ANNEX.documents}, with what was and was not read.`,
+            "That material is the department's own record. Where it repeats one of the department's stated priorities, the sentence carrying that wording is quoted below, so a reader sees the department's own words rather than a summary of them.",
           ]
         : [
-            "The department supplied no document of its own for this examination, so the position recorded in this clause rests on the submitted draft and the department's own reference figures alone.",
-            `A department can add its reports, spreadsheets and statistics through its Document Library, and every run it makes afterwards reads them and records them at ${ANNEX.documents}. Nothing is inferred from a document that was not read.`,
+            "The department supplied no document of its own for this policy, so the position recorded in this clause rests on the submitted draft and the department's own reference figures alone.",
+            `A department can add its reports, spreadsheets and statistics through its Document Library, and the policy it prepares afterwards draws on them and records them at ${ANNEX.documents}. Nothing is inferred from a document that was not read.`,
           ],
     bullets: materialBullets,
     listStyle: "bullets",
@@ -432,7 +432,7 @@ export const buildPolicyDraft = (
     id: "vision",
     heading: `${CLAUSE.vision}. Policy goal and objectives`,
     paragraphs: [
-      `Goal: to give effect to the mandate of ${department.name} by acting on the pressures this examination identified, so that its stated priorities are advanced and the groups this policy reaches are brought into the implementation.`,
+      `Goal: to give effect to the mandate of ${department.name} by carrying its stated priorities into binding measures, so that each priority is advanced and the groups this policy reaches are brought into the implementation.`,
       `The objectives below are the operative objectives of this policy. Each is carried into at least one measure at clause ${CLAUSE.measures}, and each is monitored against the department's own indicators at clause ${CLAUSE.monitoring}.`,
     ],
     bullets: department.priorities.map(
@@ -444,15 +444,15 @@ export const buildPolicyDraft = (
 
   numbered.push({
     id: "principles",
-    heading: `${CLAUSE.vision}.2 Guiding principles applied in preparing this draft`,
+    heading: `${CLAUSE.vision}.2 Guiding principles`,
     paragraphs: [
-      "The principles below describe how this draft was prepared, and each can be checked against the platform's own behaviour rather than taken on trust.",
+      "The principles below guide how this policy is carried out, and each is written so that it can be checked against what the department publishes.",
     ],
     bullets: [
-      "Decision support, not decision-making: the platform informs, and a human decides.",
-      `Every figure is either published with its source stated, or labelled ${MODELLED_SHARE_LABEL}.`,
-      `The draft was examined before adoption, and the examination is reproducible from the inputs recorded at ${ANNEX.runInputs}.`,
-      `No policy text and no result leaves the responsible officer's own machine. ${SOVEREIGNTY_STATEMENT}`,
+      "Decision support, not decision-making: the analysis informs, and a person decides.",
+      "Proportionality: every measure is directed at a stated priority, and its effect is reported against the department's own baseline.",
+      `Transparency: every figure is either published with its source stated, or labelled ${MODELLED_SHARE_LABEL}.`,
+      `Inclusiveness: the groups this policy reaches are engaged before their obligations bite, as clause ${CLAUSE.engagement} provides.`,
     ],
     listStyle: "clauses",
   });
@@ -465,9 +465,9 @@ export const buildPolicyDraft = (
     id: "legal",
     heading: `${CLAUSE.legal}. Legal and institutional framework`,
     paragraphs: [
-      `This policy is made under the mandate of ${department.name} recorded at clause ${CLAUSE.introduction}, and it is to be read with the ${(registerCitations.bullets ?? []).length} instruments listed at Annex C.`,
-      "Each instrument is drawn from the department's own instrument register and is stated exactly as the platform's cited-instrument table records it. No instrument is named in this policy that the register does not contain; a citation the register cannot verify is refused rather than printed.",
-      `The register holds the categories the department relies on — principal Acts, statutory instruments, and national policies or strategies. Where an instrument is amended, replaced or read differently by the responsible legal office, that office updates Annex C; this clause is not to be reinterpreted in place: ${BLANK}.`,
+      `This policy is made under the mandate of ${department.name} recorded at clause ${CLAUSE.introduction}, and it is to be read with the ${(registerCitations.bullets ?? []).length} instruments listed at ${ANNEX.instruments}.`,
+      `Each instrument is stated exactly as the department's own instrument register records it. No instrument is named in this policy that the register does not contain; an instrument the register cannot verify is left out rather than printed.`,
+      `The register holds the categories the department relies on — principal Acts, statutory instruments, and national policies or strategies. Where an instrument is amended, replaced or read differently by the responsible legal office, that office updates ${ANNEX.instruments}; this clause is not to be reinterpreted in place: ${BLANK}.`,
     ],
   });
 
@@ -478,7 +478,7 @@ export const buildPolicyDraft = (
     heading: `${CLAUSE.measures}. Policy measures`,
     paragraphs: [
       `This clause states the measures that give effect to the objectives at clause ${CLAUSE.vision}. Each is an obligation on the Department, so that the policy does not rest on intention alone.`,
-      `The measures are drawn from the policy's own objectives and from the groups the examination shows as conditional or resistant; the draft submitted for examination is then carried into effect as a further set of provisions.`,
+      `The measures rest on the policy's own objectives and on the groups whose concerns are conditional or resistant; the department's submitted draft is then carried into effect as a further set of provisions.`,
     ],
     bullets: [
       ...department.priorities.map(
@@ -496,12 +496,12 @@ export const buildPolicyDraft = (
 
   numbered.push({
     id: "measures-arising",
-    heading: `${CLAUSE.measures}.2 Measures arising from the examination`,
+    heading: `${CLAUSE.measures}.2 Further measures`,
     paragraphs: [
       run.recommendations.length === 1
-        ? `The examination produced one step the draft did not already provide for. It is a measure of this policy, not a suggestion beside it, and its responsible office and date are recorded in the implementation matrix at clause ${CLAUSE.implementation}.`
-        : `The examination produced ${run.recommendations.length} steps the draft did not already provide for. They are measures of this policy, not suggestions beside it, and their responsible offices and dates are recorded in the implementation matrix at clause ${CLAUSE.implementation}.`,
-      `Each step is carried into the provisions that give it effect: the risk provisions at clause ${CLAUSE.risk}, the engagement provisions at clause ${CLAUSE.engagement}, and the transitional provisions at clause ${CLAUSE.transitional}.`,
+        ? `One further measure gives effect to a provision the submitted draft did not already contain. It is a measure of this policy, not a suggestion beside it, and its responsible office and date are recorded in the implementation matrix at clause ${CLAUSE.implementation}.`
+        : `${run.recommendations.length} further measures give effect to provisions the submitted draft did not already contain. They are measures of this policy, not suggestions beside them, and their responsible offices and dates are recorded in the implementation matrix at clause ${CLAUSE.implementation}.`,
+      `Each measure is carried into the provisions that give it effect: the risk provisions at clause ${CLAUSE.risk}, the engagement provisions at clause ${CLAUSE.engagement}, and the transitional provisions at clause ${CLAUSE.transitional}.`,
     ],
     bullets: run.recommendations.map(
       (recommendation) => `${recommendation.label} — ${recommendation.note}`,
@@ -515,8 +515,8 @@ export const buildPolicyDraft = (
     id: "implementation",
     heading: `${CLAUSE.implementation}. Implementation framework`,
     paragraphs: [
-      "This clause sets out who carries out each measure. The responsible office and the funding source are the department's to state, and the platform does not invent them, so they are marked for completion rather than left out.",
-      `The phasing follows clause ${CLAUSE.transitional}: measures that restate the submitted draft begin with the groups the examination models as receptive, and the measures arising from the examination follow once the engagement at clause ${CLAUSE.engagement} is complete. The dates below are therefore the policy's own phasing; the department sets the calendar dates.`,
+      "This clause sets out who carries out each measure. The responsible office and the funding source are the department's to state, so they are marked for completion rather than left out.",
+      `The phasing follows clause ${CLAUSE.transitional}: the measures that restate the submitted draft begin with the groups expected to support it, and the further measures follow once the engagement at clause ${CLAUSE.engagement} is complete. The dates below are therefore the policy's own phasing; the department sets the calendar dates.`,
       "Where a single office is accountable for a measure, naming it once here is sufficient; where a measure falls to more than one office, the lead office is named first and the supporting offices after it.",
     ],
     table: implementationMatrixTable(run),
@@ -528,9 +528,9 @@ export const buildPolicyDraft = (
     id: "risk",
     heading: `${CLAUSE.risk}. Risk management`,
     paragraphs: [
-      "Every risk the examination raised is met with a specific provision, so that the policy does not depend on the risk not materialising.",
-      `The provisions below also carry the steps recommended by the examination, which is why they read as obligations rather than as advice. Their monitoring is provided for at clause ${CLAUSE.monitoring}.`,
-      "Two risks are the department's own to add and are not modelled by the platform: the cost of compliance to those it affects, and any legal question about the instrument relied on. Both are marked for completion where they arise.",
+      "Every risk identified in preparing this policy is met with a specific provision, so that the policy does not depend on the risk not materialising.",
+      `The provisions below also carry the further measures, which is why they read as obligations rather than as advice. Their monitoring is provided for at clause ${CLAUSE.monitoring}.`,
+      "Two risks are the department's own to add and are not set out here: the cost of compliance to those it affects, and any legal question about the instrument relied on. Both are marked for completion where they arise.",
     ],
     bullets: [
       ...run.risks.map(
@@ -549,10 +549,10 @@ export const buildPolicyDraft = (
     id: "engagement",
     heading: `${CLAUSE.engagement}. Stakeholder engagement and communication`,
     paragraphs: [
-      `The examination models ${conditional.length} ${conditional.length === 1 ? "group" : "groups"} as conditional and ${reluctant.length} as ${reluctant.length === 1 ? "resistant" : "resistant"}, and treats late communication as a source of that reluctance. Engagement is therefore a provision of this policy rather than an activity beside it.`,
+      `This policy reaches ${conditional.length} ${conditional.length === 1 ? "group" : "groups"} whose concerns are conditional and ${reluctant.length} whose concerns are resistant, and it treats late communication as a source of that resistance. Engagement is therefore a provision of this policy rather than an activity beside it.`,
       conditional.length === 0 && reluctant.length === 0
-        ? "No modelled group is recorded as resistant, so no group requires a pre-commencement meeting before obligations bite; the department shall still publish this policy before any measure takes effect."
-        : "The groups the examination shows as waiting on implementation detail are engaged before their obligations bite, and the minutes of that engagement are retained for the review at clause " +
+        ? "No group is recorded as resistant, so no group requires a pre-commencement meeting before obligations bite; the department shall still publish this policy before any measure takes effect."
+        : "The groups waiting on implementation detail are engaged before their obligations bite, and the minutes of that engagement are retained for the review at clause " +
           `${CLAUSE.monitoring}.`,
     ],
     bullets: [
@@ -563,7 +563,7 @@ export const buildPolicyDraft = (
       reluctant.length > 0
         ? `The department shall meet ${listOf(reluctant.map((reaction) => reaction.label))} before obligations commence and record the compliance-cost concerns raised, together with the department's response.`
         : "The department shall record compliance-cost concerns raised by any affected group and publish its response.",
-      `The department shall brief ${reactive.length > 0 ? listOf(reactive.map((reaction) => reaction.label)) : "the groups the examination models as receptive"} on what changes for them, so that the measures in clause ${CLAUSE.measures} are known before they begin.`,
+      `The department shall brief ${reactive.length > 0 ? listOf(reactive.map((reaction) => reaction.label)) : "the groups expected to support it"} on what changes for them, so that the measures in clause ${CLAUSE.measures} are known before they begin.`,
       `Every engagement round shall be minuted, and the minutes retained for the review at clause ${CLAUSE.monitoring}.`,
       `${BLANK} — the office responsible for stakeholder communication.`,
     ],
@@ -576,7 +576,7 @@ export const buildPolicyDraft = (
     id: "finance",
     heading: `${CLAUSE.finance}. Financial implications`,
     paragraphs: [
-      "This clause states the cost categories the policy creates. An amount is a decision of the department and the Ministry of Finance, and the platform does not invent one: no figure below is modelled, and none is a published figure.",
+      "This clause states the cost categories the policy creates. An amount is a decision of the department and the Ministry of Finance, and none is stated here: no figure below is modelled, and none is a published figure.",
       `Each category follows from a provision of this policy, so the schedule is complete against the measures in clause ${CLAUSE.measures} and the implementation obligations in clause ${CLAUSE.implementation}.`,
       "Recurring costs are those that continue after the policy is in force; one-off costs are those that arise once, in preparing for it.",
     ],
@@ -590,7 +590,7 @@ export const buildPolicyDraft = (
     heading: `${CLAUSE.monitoring}. Monitoring, evaluation and review`,
     paragraphs: [
       "The policy is monitored against the department's own reference indicators, so that progress is read from one set of figures rather than several. Each indicator below carries its basis: a published figure names the body that publishes it, and a modelled figure says so.",
-      `The policy shall be reviewed when ${rng.pick(REVIEW_TRIGGERS)}. The review shall compare the actual position with the position modelled in the examination, report the comparison against the indicators below, and be published.`,
+      `The policy shall be reviewed when ${rng.pick(REVIEW_TRIGGERS)}. The review shall compare the actual position with the baseline recorded at clause ${CLAUSE.situation}, report the comparison against the indicators below, and be published.`,
       `The department shall set the target for each indicator and name the office that collects it: ${BLANK}. Where a target is set, the review reports against it; where none is set, the review reports the movement from the baseline.`,
     ],
     table: monitoringMatrixTable(department),
@@ -602,12 +602,12 @@ export const buildPolicyDraft = (
     id: "transitional",
     heading: `${CLAUSE.transitional}. Transitional provisions`,
     paragraphs: [
-      "Obligations that begin before the supporting systems exist are the clearest risk the examination identified, so this policy starts in phases rather than on a single date.",
+      "Obligations that begin before the supporting systems exist are the clearest risk to implementation, so this policy starts in phases rather than on a single date.",
       `Phase one begins with ${
         reactive.length > 0
           ? listOf(reactive.map((reaction) => reaction.label))
           : "the groups the department's own offices serve directly"
-      }, which the examination models as receptive. Phase two extends to ${
+      }, which are expected to support it. Phase two extends to ${
         conditional.length > 0
           ? listOf(conditional.map((reaction) => reaction.label))
           : "the remaining affected groups"
@@ -624,9 +624,9 @@ export const buildPolicyDraft = (
 
   annexes.push({
     id: "annex-a",
-    heading: `${ANNEX.implementationMatrix} — Implementation matrix for the steps the examination recommended`,
+    heading: `${ANNEX.implementationMatrix} — Implementation matrix`,
     paragraphs: [
-      `The ${run.recommendations.length} steps recommended by the examination, each with what it requires, who carries it, and when it is due. The office and the calendar date are the department's to state.`,
+      `The ${run.recommendations.length} further measures, each with what it requires, who carries it, and when it is due. The office and the calendar date are the department's to state.`,
     ],
     table: recommendedStepsTable(run),
   });
@@ -654,11 +654,11 @@ export const buildPolicyDraft = (
     paragraphs:
       material.documents.length > 0
         ? [
-            `The department supplied ${material.documents.length} ${material.documents.length === 1 ? "document" : "documents"} of its own through its Document Library. The examination read ${material.read.length} of them — ${material.characters} characters — and a document that could not be read is listed below as recorded by name and contributes nothing, to this policy or to the examination.`,
-            "Only text that was really read is counted or quoted, and only a sentence that carries one of the department's stated priorities is shown beside it. Quoted wording is the department's own, recorded as it was supplied: the platform does not present it as a published figure, and nothing in this policy is inferred from a filename.",
+            `The department supplied ${material.documents.length} ${material.documents.length === 1 ? "document" : "documents"} of its own through its Document Library. ${material.read.length} of them were read — ${material.characters} characters — and a document that could not be read is listed below as recorded by name and contributes nothing, to this policy or to its preparation.`,
+            "Only text that was really read is counted or quoted, and only a sentence that carries one of the department's stated priorities is shown beside it. Quoted wording is the department's own, recorded as it was supplied: it is not presented as a published figure, and nothing in this policy is inferred from a filename.",
           ]
         : [
-            "The department supplied no document of its own for this examination, so nothing in this policy rests on departmental material beyond the submitted draft, and nothing is inferred from a document that was not read.",
+            "The department supplied no document of its own for this policy, so nothing in this policy rests on departmental material beyond the submitted draft, and nothing is inferred from a document that was not read.",
             "A department adds its own reports, spreadsheets and statistics through its Document Library, and every run it makes afterwards reads them and records them here.",
           ],
     table:
@@ -683,7 +683,7 @@ export const buildPolicyDraft = (
     id: "annex-run-inputs",
     heading: `${ANNEX.runInputs} — Run inputs and reproducibility`,
     paragraphs: [
-      "This annex records the exact inputs the examination was derived from, so that any reader can reproduce it and check that the same result follows. A run is reproducible when the department, the policy text, the horizon and the assumptions are the same.",
+      "This annex records the exact inputs this policy was derived from, so that any reader can follow how it was reached. The reading is reproducible when the department, the policy text, the horizon and the assumptions are the same.",
     ],
     bullets: [
       `Department: ${department.name} (${department.abbr})`,
@@ -814,7 +814,7 @@ const buildAcronyms = (sections: readonly GeneratedSection[]): GeneratedSection 
     id: "acronyms",
     heading: "Abbreviations and acronyms",
     paragraphs: [
-      "Every abbreviation used in this policy is listed below with its expansion. An abbreviation the platform cannot expand is not listed, and no expansion here is invented.",
+      "Every abbreviation used in this policy is listed below with its expansion, and no expansion here is invented.",
     ],
     bullets: used.map(([abbreviation, expansion]) => `${abbreviation} — ${expansion}`),
     listStyle: "bullets",

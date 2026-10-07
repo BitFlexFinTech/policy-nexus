@@ -120,7 +120,7 @@ export const citationsSectionFor = (department: Department): GeneratedSection =>
   id: "citations",
   heading: "8. Citations",
   paragraphs: [
-    "This draft rests on the instruments below. Each is drawn from the department's own instrument register and is stated exactly as the platform's cited-instrument table records it; no instrument is named here that the register does not contain.",
+    "This draft rests on the instruments below. Each is drawn from the department's own instrument register and is stated exactly as that register records it; no instrument is named here that the register does not contain.",
     `A figure in this draft is either a published figure with its source stated, or the word ${MODELLED_SHARE_LABEL}. A modelled figure is never presented as a published one.`,
   ],
   bullets: department.instruments.map((id) => {

@@ -1352,6 +1352,14 @@ because the block it sits in already names itself.
 ## Verification log
 | Date | Command | Result |
 |---|---|---|
+| 2026-10-07 | **item (i) — the drafted-policy rework** · `npm run validate` | PASS — all checks green | 
+| 2026-10-07 | item (i) · `npm run typecheck` | PASS — `tsc -b`, 0 errors | 
+| 2026-10-07 | item (i) · `npm run lint` | PASS — 0 errors, 7 pre-existing react-refresh warnings | 
+| 2026-10-07 | item (i) · `npm test` | PASS — **579/579 across 59 files** (was 561; **+18** — the new `src/test/policy-draft-voice.test.ts`) | 
+| 2026-10-07 | item (i) · `npm run build` | PASS — `assets/index-uLV5uJB8.js` (not yet published; the live host still carries the previous bundle) | 
+| 2026-10-07 | item (i) · `npx playwright test` | PASS — **22/22** on the preview build | 
+| 2026-10-07 | item (i) · `policy-draft-voice` gate mutation | The gate was **watched to fail** on three phrases (`the examination`, `the platform`, `simulation`) before the rewrite, then pass after — so the gate genuinely bites | 
+
 | 2026-09-24 | `git checkout -b feature/unified-platform` + `git tag` | PASS — branch `feature/unified-platform`; tag `baseline-pre-unified-platform` @ `7451db0` |
 | 2026-09-24 | `npm view lovable-tagger` (peer deps) | PASS — 1.1.13 peer `vite >=5 <8`; 1.3.4 peer `vite >=5 <9` |
 | 2026-09-24 | `npm install` attempt 1 | **FAIL (ERESOLVE)** — lovable-tagger 1.1.13 vs vite 8 |
@@ -2010,6 +2018,17 @@ and the Google News index were used instead.
 `docs/PROPOSAL_PROMPT.md` from the heavier pack down to **three documents** is DONE, and the pilot
 material added here survived it unchanged: it is now Part 1 section 5 of the funding memo, a slide in
 the deck, and the opener of the one-page ask.
+
+## Files touched this session (2026-10-07 — the drafted-policy rework, item i)
+
+- `src/services/assessment/policyDraft.ts` — every narrator sentence rewritten to the policy voice (cover, foreword, acknowledgements, executive summary, introduction, situation analysis, groups, priorities, the department's own material, vision, principles, legal, measures, further measures, implementation, risk, engagement, finance, monitoring, transitional, Annex A, Annex D and the acronyms note). Section **ids are unchanged**, so the order gate still holds.
+- `src/config/draftingPrompts.ts` — the `POLICY_DRAFT_STRUCTURE` headings updated to match the five renamed sections ("2.2 The groups this policy reaches", "2.4 The department's own material", "3.2 Guiding principles", "5.2 Further measures", "Annex A — Implementation matrix").
+- `src/services/documents/drafting.ts` — the citations clause prose no longer says "the platform's cited-instrument table".
+- `src/test/policy-draft-voice.test.ts` — **NEW.** The gate: 16 per-department voice checks + the disclosure check + the operative-measures check (18 tests).
+- `PROJECT_STATUS.md` — this file (item i marked DONE; verification log; this list; the plain summary).
+
+**Explicitly NOT changed:** `package.json` (no new dependency); `src/components/ui/**`; any colour, font or route; the department side's behaviour. **Not deployed** — the live host still carries the previous bundle.
+
 
 ## Known-red / open items
 
@@ -4209,12 +4228,12 @@ in the order the owner has raised them.
 
 ## RESUME HERE
 
-**START HERE (2026-10-06) — the ZEPARI research product + the three pending fixes.**
+**START HERE (2026-10-07) — the ZEPARI research product + the remaining pending fixes. Item (i), the drafted-policy rework, is DONE (see the DO FIRST list below and the verification log); the next pending item is (iii), the proposal edits. Nothing has been published yet, so the live host still carries the previous bundle.**
 **Branch** `feature/unified-platform` (never `main`). **Live build** `assets/index-D2gkonoE.js` (sha256 `77cb59e4…`). **Global rule** `follow-exact-instructions-no-assumptions.md` is installed in BOTH global rules folders (`~/.cline/rules`, `~/Documents/Cline/Rules`, byte-identical) and checked by `node ~/.cline/rules/check-rules.mjs`.
 
 **DO FIRST, in order (the owner's explicit instruction):**
-1. **(i) The drafted-policy rework — raised TWICE.** `src/services/assessment/policyDraft.ts` produces a document that reads as a **REPORT** that cites modelled indicators and stakeholder groups, not an actual drafted policy. Rework it so the instrument reads as a **POLICY** in the fixed Zimbabwean format: the **measures / priority areas are the heart**, the assessment's findings become the provisions, and every "the examination… / the platform's table…" sentence is removed from the instrument's voice. Add a gate that fails if those report phrases return.
-2. **(ii) Save the researched Zimbabwean policy structure** — a reference doc plus the per-department structure in `src/config/draftingPrompts.ts`, sourced from ZEPARI's *Strengthening the Zimbabwe National Policy Making Process*, NDS2 2026–2030, the National Agriculture Policy Framework 2019–2030, the National Health Strategy 2021–2025, the Devolution and Decentralisation Policy and the National Trade Policy. **To do in the build (NOT a decision):** read each department's real policy document and copy its exact format; where a document cannot be opened, name it and use the closest verified Zimbabwean format.
+1. **(i) The drafted-policy rework — raised TWICE. DONE (2026-10-07).** The instrument now reads as a **POLICY**, not a report about the assessment. Every narrator sentence ("the examination modelled… / the platform's table… / the indicators below are…", and "simulation") is removed from the instrument's own voice and rewritten as what the Department shall do or provide; the **measures are the heart** and the findings become the provisions. The report voice survives only in the two sections that are the platform's OWN honesty disclosure — **Annex F (Method and limitations)** and the closing **Note on this draft** — which must carry `DISCLAIMER.long` (validate check 8) and the sovereignty statement. **Gate:** `src/test/policy-draft-voice.test.ts` — for all 16 departments it fails if any reporter phrase (`examination`, `the platform`, `simulation`, `the indicators below are`, `submitted for examination`) returns to the instrument's narrative voice; it also asserts the two disclosure sections still carry the disclaimer, and that the measures still read "The Department shall". The gate was watched to fail on three phrases before the rewrite and pass after. **Files:** `src/services/assessment/policyDraft.ts`, `src/config/draftingPrompts.ts` (the matching structure headings), `src/services/documents/drafting.ts` (the citations clause prose), `src/test/policy-draft-voice.test.ts` (new).
+2. **(ii) Save the researched Zimbabwean policy structure — reference doc DONE; per-department reading OPEN.** `docs/ZIMBABWE_POLICY_STRUCTURE.md` is written and committed (it records the real national-policy skeleton, sourced from ZEPARI's *Strengthening the Zimbabwe National Policy Making Process*, NDS2 2026–2030, the National Agriculture Policy Framework 2019–2030, the National Health Strategy 2021–2025, the Devolution and Decentralisation Policy and the National Trade Policy). **The per-department format reading is still OPEN** (labelled in the doc as "to complete in the build"): read each of the 16 departments' real policy document and copy its exact section list; where a document cannot be opened, name it and use the closest verified Zimbabwean format. **Not a decision — ordinary build work.**
 3. **(iii) The proposal edits** — `docs/PROPOSAL_PROMPT.md` and every file in `Minister Submission/`: the **four addressees** (Minister of ICT; **Dr. Gibson Chigumira**, Executive Director ZEPARI; **Dr. Jesimen Chipika**, Deputy Governor RBZ and Chairperson of the ZEPARI Board of Trustees; the **ZEPARI Board**, incl. Chamber of Mines and CZI); **Oreida Pvt Ltd seeks to partner with ZEPARI and the Ministry of ICT**; add the **ZEPARI endorsement ask**; rewrite the funding route. Keep every existing fact and the honest *"no endorsement is held"* line.
 
 **THEN — the ZEPARI Research Assistant, in batches:**
@@ -4488,6 +4507,14 @@ owner's goal is the **group** goal (150 groups are 20 published / 130 modelled).
 6. **Everything was re-checked, and it is live:** all checks green, and the public site serves exactly this build.
 
 **PLAIN SUMMARY (OWNER-FACING).**
+
+**This session (2026-10-07 — the drafted-policy rework, item i). In plain words:**
+1. **The policy draft now reads like a real policy, not a report about the examination.** You raised this twice. Every sentence that talked *about* the process — "the examination modelled…", "the platform's table…", "the indicators below are…", "simulation" — has been removed from the document's own voice. It now simply states what the Department shall do and provide: the **measures are the heart** of the instrument, and what the assessment found has been turned into the policy's provisions.
+2. **One honest exception, on purpose.** Two parts of the document are the **platform's own honesty notes**, not policy text: **Annex F (Method and limitations)** and the closing **Note on this draft**. They must keep the plain statement that the figures are a simulated range and that nothing leaves the officer's machine — so they are allowed, correctly, to name the platform. Everything else is held to the policy voice.
+3. **It cannot quietly go back.** A new automatic check (**18 tests**) builds the draft for all 16 departments and fails the build if any of those reporter phrases returns to the document's voice. I watched it fail first, then pass — so it really works.
+4. **Nothing else changed.** No new dependency; no colour, font, layout or route change; the department side is otherwise exactly as it was.
+5. **Everything was re-checked:** all checks green — **579 automatic tests and 22 browser tests** — and the build succeeds. **Not yet published:** the live site still carries the previous build, so switching it over is the next, separate step.
+
 
 **This session (2026-10-06 — four demo fixes). In plain words:**
 1. **The "Prepared by" name is now fixed for the demo — you don't type anything.** The card on the entry screen simply shows **Hon. Tatenda A Mavetera — Minister of ICT**, and every drafted policy is attributed to that name.
