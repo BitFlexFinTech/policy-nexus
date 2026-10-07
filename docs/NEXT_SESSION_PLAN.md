@@ -1,5 +1,8 @@
 # NEXT SESSION PLAN — the drafted policy: grounding, length, and the department data library
 
+> **SUPERSEDED (2026-10-07).** The drafted-policy work this file describes is **DONE**. For new work,
+> read **`docs/ZEPARI_BUILD_PLAN.md`** instead. This file is kept as the record of that completed series.
+
 Written 2026-10-05 at the owner's request, so a new chat continues without re-explaining anything.
 Read this together with `PROJECT_STATUS.md` (its RESUME HERE block) and `docs/PLATFORM_ENRICHMENT_PLAN.md`.
 
