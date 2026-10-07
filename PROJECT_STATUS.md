@@ -4063,9 +4063,9 @@ fifteen places and inside every generated document, so **only a build could ever
    claim and bundle fingerprint) and a review zip.
 
 **Two facts recorded so the next session does not have to ask:**
-- **The pack needs one line changed, and that file is the owner's** (`Minister Submission/**`): its
-  wording "prepared against the 24 September 2026 reference date" stops being true once the date is live.
-  Report it; do not edit it.
+- **The pack's "prepared against the 24 September 2026 reference date" line** (`Minister Submission/**`):
+  this line is **no longer present in the pack** (checked 2026-10-07), so no edit is needed there. **The
+  pack was edited on 2026-10-07 (item iii)** for the ZEPARI changes (see the RESUME HERE block).
 - **A run recorded before this change keeps its own stored date** (`2026-09-24`) — honest, because that is
   when it was recorded under the old scheme. Do not rewrite history.
 
@@ -4180,6 +4180,17 @@ gate bites: it caught the author of the rule, on the day the rule was made.
 and one new check in `scripts/validate.mjs`.
 
 
+**Verification log — this session's real output, not a claim (item iii, the proposal edits).**
+`npm run validate` → `VALIDATE: PASS — all checks green`, with `INFO configuration today: 510
+indicators (275 published / 235 modelled) · 150 stakeholder groups (20 published / 130 modelled), 40
+modelled per department` · `npm run typecheck` **exit 0** · `npm run lint` **exit 0, 0 errors, 7
+pre-existing warnings** · `npm test` → **579 passed (579) across 59 files** · `npm run build` → **✓
+built in 1.18s** · the two Office files regenerated from their markdown by pandoc (as the originals
+were) and re-checked: the `.docx` carries **ZEPARI 37×**, and the `.pptx` is **14 slides** with the
+ZEPARI slide (slide 9) and the funding-route slide (slide 13). **No `src/` change, so the built site
+is byte-identical and needed no redeploy** (the live host still carries `assets/index-D2gkonoE.js`).
+
+
 ## NEXT PHASE — after the live-date task (NOT STARTED; these stay, nothing is being removed)
 
 Recorded 2026-10-03 so the next session knows what is still outstanding **after** the live-date task,
@@ -4195,8 +4206,12 @@ in the order the owner has raised them.
    range in `src/test/departments.test.ts`, `MODELLED_IDS` and the 20 / 130 split in the reference and
    weights tests, `toHaveLength(150)` in `src/test/workspace.test.tsx`, `toHaveLength(320)` in
    `src/test/indicator-basis.test.tsx`, and "150 nationally" in `e2e/journey.spec.ts`.
-   **The pack** (`Minister Submission/**`) still quotes 72 / 24 / 160 / 20 / 52 / 24 / 136 and is the
-   owner's file — it now needs **150 / 40 / 320 / 20 / 130 / 39 / 281**; **reported, not edited.**
+   **The pack** (`Minister Submission/**`) — **EDITED 2026-10-07 (item iii).** It once quoted
+   **72 / 24 / 160 / 20 / 52 / 24 / 136**, the superseded figures; both markdown files (and their
+   regenerated `.docx`/`.pptx`) now carry the figures the configuration holds —
+   **150 groups (40 per department; 20 published-share / 130 modelled) and 510 indicators (275 published /
+   235 modelled)** — alongside the ZEPARI partnership, the four addressees, the ZEPARI endorsement ask and
+   the four-bucket funding route.
 2. ~~**`/platform-admin` needs a real guard**~~ — **DONE 2026-10-06 (the administrator gate).** The screen
    now asks one plain question — "Are you the administrator?" — before it will show the settings, and the
    answer is remembered for the browser tab only (`src/session/adminAccess.ts`, one-module swap seam). It
@@ -4228,13 +4243,13 @@ in the order the owner has raised them.
 
 ## RESUME HERE
 
-**START HERE (2026-10-07) — the ZEPARI research product + the remaining pending fixes. Item (i), the drafted-policy rework, is DONE (see the DO FIRST list below and the verification log); the next pending item is (iii), the proposal edits. Nothing has been published yet, so the live host still carries the previous bundle.**
+**START HERE (2026-10-07) — the ZEPARI research product + the remaining pending fixes. Items (i) the drafted-policy rework AND (iii) the proposal edits are DONE (see the DO FIRST list below and the verification log). The next pending item is (ii)'s per-department format reading (ordinary build work), then the ZEPARI Research Assistant batches A–G. Nothing has been published yet, so the live host still carries the previous bundle.**
 **Branch** `feature/unified-platform` (never `main`). **Live build** `assets/index-D2gkonoE.js` (sha256 `77cb59e4…`). **Global rule** `follow-exact-instructions-no-assumptions.md` is installed in BOTH global rules folders (`~/.cline/rules`, `~/Documents/Cline/Rules`, byte-identical) and checked by `node ~/.cline/rules/check-rules.mjs`.
 
 **DO FIRST, in order (the owner's explicit instruction):**
 1. **(i) The drafted-policy rework — raised TWICE. DONE (2026-10-07).** The instrument now reads as a **POLICY**, not a report about the assessment. Every narrator sentence ("the examination modelled… / the platform's table… / the indicators below are…", and "simulation") is removed from the instrument's own voice and rewritten as what the Department shall do or provide; the **measures are the heart** and the findings become the provisions. The report voice survives only in the two sections that are the platform's OWN honesty disclosure — **Annex F (Method and limitations)** and the closing **Note on this draft** — which must carry `DISCLAIMER.long` (validate check 8) and the sovereignty statement. **Gate:** `src/test/policy-draft-voice.test.ts` — for all 16 departments it fails if any reporter phrase (`examination`, `the platform`, `simulation`, `the indicators below are`, `submitted for examination`) returns to the instrument's narrative voice; it also asserts the two disclosure sections still carry the disclaimer, and that the measures still read "The Department shall". The gate was watched to fail on three phrases before the rewrite and pass after. **Files:** `src/services/assessment/policyDraft.ts`, `src/config/draftingPrompts.ts` (the matching structure headings), `src/services/documents/drafting.ts` (the citations clause prose), `src/test/policy-draft-voice.test.ts` (new).
 2. **(ii) Save the researched Zimbabwean policy structure — reference doc DONE; per-department reading OPEN.** `docs/ZIMBABWE_POLICY_STRUCTURE.md` is written and committed (it records the real national-policy skeleton, sourced from ZEPARI's *Strengthening the Zimbabwe National Policy Making Process*, NDS2 2026–2030, the National Agriculture Policy Framework 2019–2030, the National Health Strategy 2021–2025, the Devolution and Decentralisation Policy and the National Trade Policy). **The per-department format reading is still OPEN** (labelled in the doc as "to complete in the build"): read each of the 16 departments' real policy document and copy its exact section list; where a document cannot be opened, name it and use the closest verified Zimbabwean format. **Not a decision — ordinary build work.**
-3. **(iii) The proposal edits** — `docs/PROPOSAL_PROMPT.md` and every file in `Minister Submission/`: the **four addressees** (Minister of ICT; **Dr. Gibson Chigumira**, Executive Director ZEPARI; **Dr. Jesimen Chipika**, Deputy Governor RBZ and Chairperson of the ZEPARI Board of Trustees; the **ZEPARI Board**, incl. Chamber of Mines and CZI); **Oreida Pvt Ltd seeks to partner with ZEPARI and the Ministry of ICT**; add the **ZEPARI endorsement ask**; rewrite the funding route. Keep every existing fact and the honest *"no endorsement is held"* line.
+3. **(iii) The proposal edits — DONE (2026-10-07).** Edited `docs/PROPOSAL_PROMPT.md` and all four files in `Minister Submission/` (`Oreida_Proposal_Minister_of_ICT.md` + regenerated `.docx`; `Oreida_Pitch_Deck_Minister_of_ICT.md` + regenerated `.pptx`, both by pandoc as the originals were). **(1) The four addressees** are now named in the address block, the covering letter, the memo recommendation, the pitch deck and the one-page ask: the Minister of ICT; **Dr. Gibson Chigumira** (Executive Director, ZEPARI); **Dr. Jesimen Chipika** (Deputy Governor RBZ; Chairperson, ZEPARI Board of Trustees); the **ZEPARI Board of Trustees** (incl. the Chamber of Mines of Zimbabwe and CZI). **(2) The partnership** — "Oreida Pvt Ltd seeks to partner with ZEPARI and the Ministry of ICT" — is stated in the context, the background, the covering letter and the ask. **(3) The ZEPARI endorsement ask** is added (partner on the evidence base and the methods; endorse the platform as a pilot for ZEPARI's evidence-based policy work); the **deck gained a "Why ZEPARI is the research partner" slide**; and a verified-facts block for ZEPARI (from its own site — the Zimbabwe Economic Policy Analysis and Research Institute, an autonomous think-tank, established 2003 by a Deed of Trust) was added to the prompt. **(4) The funding route is rewritten** into four named, matched buckets: the build (Ministry/Treasury or the POTRAZ Universal Service Fund); capacity (ZEPARI/ACBF); the pilot study (a ZEPARI development partner — UNDP/AfDB/World Bank/USAID); the first sector pilot (Chamber of Mines or CZI). **Every existing fact is kept, the honest "no endorsement is held" line is kept (and now names ZEPARI too), and the deck length guide was raised 12 → 14 slides.** **Single-source-of-truth correction (rule 03):** the two `Minister Submission/` markdown files quoted the platform's **superseded** coverage figures (72 groups / 24 per department / 160 indicators / 24 published / 136 modelled); these were corrected to the figures the configuration and `PROPOSAL_PROMPT.md` already hold — **150 groups (40 per department; 20 published-share / 130 modelled) and 510 indicators (275 published / 235 modelled)**. **Files:** `docs/PROPOSAL_PROMPT.md`, `Minister Submission/Oreida_Proposal_Minister_of_ICT.md` (+`.docx`), `Minister Submission/Oreida_Pitch_Deck_Minister_of_ICT.md` (+`.pptx`). **No `src/` change; no dependency change.**
 
 **THEN — the ZEPARI Research Assistant, in batches:**
 - **A** — a SECOND OpenRouter model capability + the two keys in the admin (Nzwisiso · ZEPARI), usage/cost measured per key.
@@ -4514,6 +4529,15 @@ owner's goal is the **group** goal (150 groups are 20 published / 130 modelled).
 3. **It cannot quietly go back.** A new automatic check (**18 tests**) builds the draft for all 16 departments and fails the build if any of those reporter phrases returns to the document's voice. I watched it fail first, then pass — so it really works.
 4. **Nothing else changed.** No new dependency; no colour, font, layout or route change; the department side is otherwise exactly as it was.
 5. **Everything was re-checked:** all checks green — **579 automatic tests and 22 browser tests** — and the build succeeds. **Not yet published:** the live site still carries the previous build, so switching it over is the next, separate step.
+
+
+**This session (2026-10-07 — the proposal edits, item iii). In plain words:**
+1. **The proposal is now addressed to four readers, not one.** The paper that goes to the Minister now also goes, in the same pack, to **Dr. Gibson Chigumira** (Executive Director of ZEPARI, the Zimbabwe Economic Policy Analysis and Research Institute), **Dr. Jesimen Chipika** (Deputy Governor of the Reserve Bank and Chairperson of the ZEPARI Board), and the **ZEPARI Board** (including the Chamber of Mines and CZI). The names and roles are exactly the ones you gave.
+2. **The paper now asks ZEPARI to partner, and to endorse.** It states plainly that Oreida Pvt Ltd seeks to **partner with ZEPARI and the Ministry**, and it adds a second ask: that ZEPARI **partner on the evidence base and endorse the platform** for its evidence-based policy work.
+3. **The money question is now a route, not one bill.** The proposal sets out four named funding buckets — the build (Ministry/Treasury or the POTRAZ Universal Service Fund); training and know-how (ZEPARI with ACBF); the pilot study (a ZEPARI development partner such as UNDP, AfDB, the World Bank or USAID); and the first industry pilot (the Chamber of Mines or CZI).
+4. **Everything you asked to keep is kept.** Every existing fact stays, and the honest line — **"no endorsement is held"** — is kept and now names ZEPARI as well as the Ministry.
+5. **One correction I made, so the paper is not wrong:** the two submission files were still carrying the platform's **old** coverage figures (72 groups, 160 indicators). I put them back in step with the truth the platform now holds — **150 groups (40 per department) and 510 indicators, 275 published to 235 modelled** — so the paper matches the demonstration it describes. (Rule: one source of truth.)
+6. **Nothing in the running platform changed.** This was paperwork only: no new dependency, no design or route change. The Word and PowerPoint files were rebuilt from the text, and every automatic check is green.
 
 
 **This session (2026-10-06 — four demo fixes). In plain words:**

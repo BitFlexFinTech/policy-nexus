@@ -1,8 +1,8 @@
-# Nzwisiso AI™ — A Pilot Policy-Simulation Capability for Digitalize Zimbabwe
+# Nzwisiso AI™ — A Pilot Policy-Simulation Capability for Digitalize Zimbabwe, in partnership with ZEPARI
 
 **A working demonstration of applied AI in public service**
 
-Proposal to the Hon. Tatenda Mavetera, MP — Minister of Information Communication Technology, Postal and Courier Services
+Proposal to: the Hon. Tatenda Mavetera, MP — Minister of Information Communication Technology, Postal and Courier Services · Dr. Gibson Chigumira — Executive Director, ZEPARI · Dr. Jesimen Chipika — Deputy Governor, RBZ and Chairperson of the ZEPARI Board of Trustees · the ZEPARI Board of Trustees
 
 Submitted by **Oreida Pvt Ltd** — Mr Edmore Zviitwah and Mr Tadii Tendayi
 
@@ -25,7 +25,7 @@ Keep this slide short. The point is the timing of the cost: after, instead of be
 # What is different here
 
 - This is **not** a concept, a mock-up or a slideware promise. It is a built, deployed platform that runs today in an ordinary web browser.
-- It models **72 stakeholder groups** (24 per institution) and holds **160 reference indicators** across **16 government institutions**.
+- It models **150 stakeholder groups** (40 per institution) and holds **510 reference indicators** across **16 government institutions**.
 - The same department and the same policy text always produce a **byte-identical** result — no randomness, no clock in the result.
 - It makes **no network request at all**: no external AI service, no third-party script, and no document text leaves the machine.
 
@@ -36,8 +36,8 @@ The differentiating claim is reproducibility plus sovereignty. Say both.
 # What already exists
 
 - **16 government institutions**, from the Office of the President and Cabinet to ZIDA.
-- **72 modelled stakeholder groups** — 20 stand on a published national share, 52 are labelled `Modelled`.
-- **160 reference indicators** — 24 are published figures naming their publisher and period, 136 are `Modelled`.
+- **150 modelled stakeholder groups** — 20 stand on a published national share, 130 are labelled `Modelled`.
+- **510 reference indicators** — 275 are published figures naming their publisher and period, 235 are `Modelled`.
 - **48 prepared policy drafts** (three per institution), ready to run today.
 - **A complete officer journey:** choose a department → upload or paste a draft → run → read the assessment → export → generate a drafted policy.
 
@@ -89,6 +89,17 @@ This is the honesty slide. Do not soften it.
 Say plainly: this is a proposal put to the programme's owners, not an announcement of their decision.
 :::
 
+# Why ZEPARI is the research partner
+
+- **ZEPARI** is the **Zimbabwe Economic Policy Analysis and Research Institute** — an autonomous economic policy analysis and research think-tank, established in 2003 by a Deed of Trust.
+- Its stated mission is to conduct applied economic policy analysis, research and capacity building to promote a culture of evidence-based policy making in Zimbabwe.
+- That is exactly the evidence base this platform consumes. We seek to **partner with ZEPARI**: the Ministry hosts the capability, and ZEPARI owns the evidence and the methods independently.
+- **No endorsement is held.** ZEPARI holds **no** endorsement of this platform today; obtaining ZEPARI's endorsement is part of the ask.
+
+::: notes
+Say plainly: this is a proposal put to ZEPARI too, not an announcement of their decision.
+:::
+
 # Who it serves first
 
 - The first user is a **policy officer** in a department, testing a real draft before it goes up for approval.
@@ -101,7 +112,8 @@ Keep the pilot small on purpose. One run is enough to judge the capability.
 
 # What approval unlocks
 
-- **Endorsement** of the platform as a pilot for **Digitalize Zimbabwe**.
+- **Endorsement** of the platform as a pilot for **Digitalize Zimbabwe**, and **ZEPARI's endorsement** of it as a pilot for ZEPARI's evidence-based policy work.
+- **ZEPARI's partnership** on the evidence base and the methods.
 - **Funding** for three named build steps: server-side document text extraction; server-side identity verification; and deployment onto Government infrastructure.
 - **Hosting** of the pilot inside the Ministry.
 - A decision on **one institution and one policy question** to test.
@@ -124,11 +136,22 @@ These four are the whole ask. Everything else is detail in the proposal document
 Every figure is an assumption, not an approved cost. A full Treasury business case would follow an approval in principle. Do not quote a total; the figures are placeholders until the Ministry confirms its envelope.
 :::
 
+# The proposed funding route
+
+- **The build** — the Ministry of ICT, through **Treasury**, or the **POTRAZ Universal Service Fund**.
+- **Capacity** — **ZEPARI**, with **ACBF** (the African Capacity Building Foundation).
+- **The pilot study** — a **ZEPARI development partner** (UNDP, AfDB, World Bank or USAID) `[QUESTION — needs a decision]`.
+- **The first sector pilot** — the **Chamber of Mines of Zimbabwe** or **CZI**.
+
+::: notes
+No single budget carries the whole cost. Each funding line is a proposed route, not an agreement already in place.
+:::
+
 # The roadmap and the ask
 
-- **Approve** a pilot; **endorse** it for Digitalize Zimbabwe; **fund** the three build steps; **host** it in the Ministry; **name** the first institution and policy question.
+- **Approve** a pilot; **endorse** it for Digitalize Zimbabwe; **partner with ZEPARI** and **endorse** it for ZEPARI's evidence-based policy work; **fund** the three build steps; **host** it in the Ministry; **name** the first institution and policy question.
 - Then: the three build steps → the pilot run → a review of the results → a decision on any wider rollout.
-- **What we could not confirm:** the budget envelope and cost-sharing, the approval deadline, the number of institutions to prioritise first, and the owning office of the programme. **Who to ask:** the Cabinet Office and the Ministry's legal desk; the Ministry of ICT; and Treasury.
+- **What we could not confirm:** the budget envelope and cost-sharing, the approval deadline, the number of institutions to prioritise first, the owning office of the programme, and ZEPARI's own approval route for endorsing a pilot. **Who to ask:** the Cabinet Office and the Ministry's legal desk; the Ministry of ICT; ZEPARI; and Treasury.
 - **Submitted by Oreida Pvt Ltd — Mr Edmore Zviitwah and Mr Tadii Tendayi.**
 
 ::: notes

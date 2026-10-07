@@ -35,6 +35,27 @@ colleagues, Treasury and the Public Service Commission** as the deciding readers
 turn a working technical demonstration into the three documents needed to have it **approved,
 funded and hosted**.
 
+### Who the documents are addressed to — the four addressees
+
+Submit the three documents, together, to **four named readers**. Address the documents to all four;
+do not drop one, and do not add a fifth.
+
+1. **Hon. Tatenda A. Mavetera, MP** — Minister of Information Communication Technology, Postal and
+   Courier Services.
+2. **Dr. Gibson Chigumira** — Executive Director, **ZEPARI**, the Zimbabwe Economic Policy Analysis
+   and Research Institute.
+3. **Dr. Jesimen Chipika** — Deputy Governor of the **Reserve Bank of Zimbabwe**, and Chairperson of
+   the **ZEPARI Board of Trustees**.
+4. **The ZEPARI Board of Trustees** — including the seats held by the **Chamber of Mines of
+   Zimbabwe** and the **Confederation of Zimbabwe Industries (CZI)**.
+
+**What is proposed to them, stated once.** Oreida Pvt Ltd seeks to **partner with ZEPARI and the
+Ministry of ICT** to take a working policy-simulation demonstration to an approved, funded,
+Ministry-hosted pilot. The Ministry is asked to **host** the pilot and to **endorse the platform as
+a pilot for the Digitalize Zimbabwe initiative**. ZEPARI is asked to **partner on the evidence base
+and the methods** and to **endorse the platform as a pilot for ZEPARI's evidence-based policy work**.
+**Neither endorsement is held today, and both are part of the ask.**
+
 ### The context in one paragraph
 
 A fully working, browser-based policy assessment platform has already been built and deployed. Its
@@ -44,9 +65,12 @@ concept, a mock-up or a slideware promise — it runs today in an ordinary web b
 network request at all**, and it is the proof of concept for a proposed national capability: the
 **Zimbabwe AI Policy Intelligence Initiative**, championed by the **Minister of Information
 Communication Technology, Postal and Courier Services, Hon. Tatenda A. Mavetera, MP**, and
-delivered on the **Nzwisiso AI™** platform. It is reachable today at a demonstration address; moving
-it onto Government infrastructure is one of the build items this memo asks to fund. **Do not state
-or imply that it already runs on Government infrastructure or in the Government estate.**
+delivered on the **Nzwisiso AI™** platform. **The proposal is made jointly to the Ministry of ICT
+and to ZEPARI:** Oreida Pvt Ltd seeks to partner with both — the Ministry to host the pilot inside
+Government, and ZEPARI to partner on the evidence base and to endorse the platform for its
+evidence-based policy work. It is reachable today at a demonstration address; moving it onto
+Government infrastructure is one of the build items this memo asks to fund. **Do not state or imply
+that it already runs on Government infrastructure or in the Government estate.**
 
 
 ### What already exists — treat every line below as a verified fact, and do not inflate it
@@ -191,10 +215,33 @@ and do not rename it. The spelling the Government uses is **"Digitalize Zimbabwe
   result reviewable by a person — which is how a national capability can be assessed before any
   national rollout is committed to.
 
-**Never claim** that the Government, the Ministry, or the Digitalize Zimbabwe programme has
+**Never claim** that the Government, the Ministry, ZEPARI or the Digitalize Zimbabwe programme has
 endorsed, approved, funded or adopted this platform, or that it is an official digitalisation
 project. The correct framing, everywhere, is: **"proposed as a pilot for the Digitalize Zimbabwe
-initiative"** — a proposal put to the programme's owners, not a statement of their decision.
+initiative, in partnership with ZEPARI"** — a proposal put to the programme's and the institute's
+owners, not a statement of their decision.
+
+### The research partner — ZEPARI (verified facts)
+
+Use these facts and **no others**. Do not add detail about ZEPARI that is not written here, and do
+not rename or re-style it.
+
+- **ZEPARI** is the **Zimbabwe Economic Policy Analysis and Research Institute** — an **autonomous
+  economic policy analysis and research think-tank, established in 2003 by a Deed of Trust** (from
+  its own site, `zepari.co.zw`).
+- Its stated mission is to **conduct applied economic policy analysis, research and capacity
+  building** to promote a culture of **evidence-based policy making** in Zimbabwe, and to inform the
+  investing public. It publishes **research studies, policy briefs and an economic barometer**, and
+  works through **research, capacity building and consultancy**.
+- The leadership named in this proposal: **Dr. Gibson Chigumira** (Executive Director) and
+  **Dr. Jesimen Chipika** (Chairperson of the Board of Trustees; also Deputy Governor of the Reserve
+  Bank of Zimbabwe).
+- **Why ZEPARI is the natural research partner — the only claim you may make:** ZEPARI's mandate is
+  exactly the evidence base this platform consumes — it is the institution whose business is
+  **evidence-based policy analysis**. Partnering with ZEPARI gives the pilot an **independent
+  research owner** for the evidence and the methods, while the Ministry hosts the capability. Do
+  **not** claim any relationship with ZEPARI beyond what is being proposed, and do not claim that
+  ZEPARI has endorsed, approved or partnered with this platform.
 
 ### What you must NOT claim — the honesty rails
 
@@ -231,7 +278,9 @@ This is the document a Minister actually reads, so it is **two pages and no long
 way a ministerial briefing is written: short, structured, numbered paragraphs, neutral in tone, and
 **carrying a recommendation**. Sections, in this order, each one kept as short as the memo can
 afford:
-1. **Recommendation** — what is being asked for, in three sentences, at the very top.
+1. **Recommendation** — what is being asked for, in three sentences, at the very top: approve the
+   pilot; **endorse it for Digitalize Zimbabwe** and **partner with and endorse it for ZEPARI**; fund
+   the three build steps; and host it in the Ministry.
 2. **Background** — what the platform is, and that it already exists and works.
 3. **The problem it addresses** — policies are implemented without a structured way to examine
    likely stakeholder responses first; the cost of that is discovered after implementation.
@@ -245,8 +294,11 @@ afford:
    that what is proposed is a **pilot** — one institution, assessed on its results, before any
    national rollout is committed to. Quote the programme's own wording where the facts above supply
    it: *"committed to full digitalisation by 2030"*, the National AI Strategy's four named priority
-   sectors, and the Presidential Internet Scheme's **2,400 wards**. **Close with the boundary**: this
-   is a proposal put to the programme's owners, not an announcement of their decision.
+   sectors, and the Presidential Internet Scheme's **2,400 wards**. Then state, in one or two
+   sentences, the **ZEPARI research partnership** (using only the ZEPARI facts above): ZEPARI is
+   asked to partner on the evidence base and the methods, and to endorse the platform as a pilot for
+   its evidence-based policy work. **Close with the boundary**: this is a proposal put to the
+   programme's and the institute's owners, not an announcement of their decision.
 6. **Governance and legal position, in one paragraph.** The platform informs; a human decides. Every
    result is reproducible and reviewable, no document text leaves the machine, and every generated
    document carries the decision-support disclaimer. State that **a legal instrument would be
@@ -257,17 +309,29 @@ afford:
    `[QUESTION — needs a decision]` if it is not known. Every threshold and timeline is an
    assumption. Do **not** produce a separate procurement paper.
 8. **Financial implications** — a short estimate table, **one-off** costs (the three build items
-   below, the pilot, and any deployment work) separated from **recurring** costs (hosting, support,
-   training). Every figure `[ASSUMPTION — to be confirmed]`, none presented as approved. A full
-   Treasury business case is **not** part of this memo.
+   below, the pilot study, and any deployment work) separated from **recurring** costs (hosting,
+   support, training). Every figure `[ASSUMPTION — to be confirmed]`, none presented as approved. A
+   full Treasury business case is **not** part of this memo. **Also state the proposed funding route,
+   because no single budget should carry the whole cost** — four named buckets, each matched to what
+   it should pay for:
+   - **The build** (the three build steps) — the Ministry of ICT, through **Treasury**, or the
+     **POTRAZ Universal Service Fund**.
+   - **Capacity** (training and the transfer of know-how to officers) — **ZEPARI**, with **ACBF**
+     (the African Capacity Building Foundation).
+   - **The pilot study** (the one institution, one policy question, one run) — a **development
+     partner ZEPARI already works with** — UNDP, the African Development Bank, the World Bank or
+     USAID — marked as a `[QUESTION — needs a decision]` until one is named.
+   - **The first sector pilot** (applying the tool to one industry) — the **Chamber of Mines of
+     Zimbabwe** or the **Confederation of Zimbabwe Industries**.
+   Present each as a **proposed** route, not an agreement already in place.
 9. **Implementation approach and timeframe** — phased, with the three named build items first
    (server-side document extraction, server-side identity verification, and deployment onto
    Government infrastructure), and the **pilot institution named as the first milestone**.
 10. **Risk and mitigation** — including the reputational risk of overclaiming, how the product
     design already mitigates it (the disclaimer, the `Modelled` labels, reproducibility), and the
-    *specific* risk of borrowing a national programme's name: say plainly that the platform holds
-    **no** endorsement from Digitalize Zimbabwe or the Ministry, and that obtaining one is part of
-    what is being asked for.
+    *specific* risk of borrowing a national programme's or an institution's name: say plainly that
+    the platform holds **no** endorsement from Digitalize Zimbabwe, the Ministry **or ZEPARI**, and
+    that obtaining those endorsements is part of what is being asked for.
 11. **Consultation** — which offices must be consulted before submission (Treasury, the Public
     Service Commission, the Attorney General's office, the data protection authority), each marked
     as a question if the correct list is not known — plus **the office that owns Digitalize
@@ -275,23 +339,32 @@ afford:
 
 The memo closes with a **"What we could not confirm"** paragraph that names who to ask.
 
-**Part 2 — The pitch deck (10 to 12 slides, outline plus speaker notes).**
+**Part 2 — The pitch deck (10 to 14 slides, outline plus speaker notes).**
 It must survive being read *without* a presenter, and it must never claim more than the platform
 does. Suggested spine: the problem · what is different here · **why this is the pilot for Digitalize
 Zimbabwe** (one slide: what the programme is, in its own words, using only the verified facts above,
-**and the line that no endorsement is held and is being asked for**) · a live demonstration, not a
-promise · what one run actually produces · the governance boundary · who it serves first · what has
-been built already · what approval unlocks · the cost, marked as estimates · the roadmap · the ask ·
-the close. **Speaker notes must say what to click and in what order during a live demonstration**,
-including what to do if the network is unavailable.
+**and the line that no endorsement is held and is being asked for**) · **why ZEPARI is the research
+partner** (one slide, using only the ZEPARI facts above, **and the same no-endorsement line for
+ZEPARI**) · a live demonstration, not a promise · what one run actually produces · the governance
+boundary · who it serves first · what has been built already · what approval unlocks · the cost,
+marked as estimates · **the proposed funding route** (the four buckets) · the roadmap · the ask (both
+endorsements, the funding route, the hosting) · the close. The deck may run to **14 slides** to carry
+the ZEPARI partner and the funding route; do not pad it beyond that.
+
+**Speaker notes must say what to click and in what order during a live demonstration**, including
+what to do if the network is unavailable.
 
 **Part 3 — The one-page ask.**
 One page, unmistakable, and the only page some readers will read: exactly what approval is being
 requested, from whom, by when, and what happens if it is granted. **Open it by naming the pilot**:
-this platform is put forward as a pilot for the **Digitalize Zimbabwe** initiative, and the ask
-therefore includes **the programme's endorsement** alongside the funding and the hosting decision.
-Separate what is needed **now** from what is needed at each later stage, in a short table. If the
-correct approval route is unknown, say so and list the questions to resolve rather than guessing.
+this platform is put forward as a pilot for the **Digitalize Zimbabwe** initiative **in partnership
+with ZEPARI**, and the ask therefore includes **the programme's endorsement, ZEPARI's endorsement
+and ZEPARI's research partnership** alongside the funding and the hosting decision. **Address it to
+all four addressees.** Separate what is needed **now** from what is needed at each later stage, in a
+short table, **and show the four funding buckets** (the build — Ministry/Treasury or the POTRAZ
+Universal Service Fund; capacity — ZEPARI/ACBF; the pilot study — a ZEPARI development partner; and
+the first sector pilot — the Chamber of Mines or CZI). If the correct approval route is unknown, say
+so and list the questions to resolve rather than guessing.
 Close with the **named-source statement** in two sentences, and a **"What we could not confirm"**
 line naming who to ask.
 
@@ -330,7 +403,7 @@ do not omit it to look authoritative.
 - Number every paragraph in the memo and in the one-page ask, so a reader in a meeting can refer to
   "paragraph 7.3".
 - Put every table in a table. Do not describe a table in prose.
-- **Fit the stated lengths**: the memo is two pages, the deck is 10 to 12 slides, the ask is one
+- **Fit the stated lengths**: the memo is two pages, the deck is 10 to 14 slides, the ask is one
   page. Length is part of the specification, not a style preference.
 - Finish with a **"What we could not confirm"** paragraph that names who to ask.
 
@@ -346,13 +419,16 @@ do not omit it to look authoritative.
 5. Is the pitch deck readable with **no presenter**, and does its demonstration script say what to
    click, in order?
 6. Is there a **"What we could not confirm"** paragraph, and does it name who to ask?
-7. Could a Minister read **the memo** and know, within one minute, exactly what is being asked of
-   them?
-8. Does the memo's **pilot case** name the programme exactly as **"Digitalize Zimbabwe"**, use only
-   the verified facts supplied, and carry the line that **no endorsement is held**? If any statement
-   in the pack implies the programme has already adopted the platform, that is a failure — fix it.
-9. Are there **exactly three documents** — the memo, the deck and the ask — with **no** separate
-   legal instrument, procurement paper, governance annex or sources register?
+7. Could each of the four addressees read **the memo** and know, within one minute, exactly what is
+   being asked of them?
+8. Does the memo's **pilot case** name the programme exactly as **"Digitalize Zimbabwe"** and the
+   research partner exactly as **"ZEPARI"**, use only the verified facts supplied, and carry the line
+   that **no endorsement is held**? If any statement in the pack implies the programme or ZEPARI has
+   already adopted the platform, that is a failure — fix it.
+9. Do the documents **address all four addressees**, and do the memo, the deck and the ask carry
+   **both endorsements** (Digitalize Zimbabwe and ZEPARI) and the **four-bucket funding route**?
+10. Are there **exactly three documents** — the memo, the deck and the ask — with **no** separate
+    legal instrument, procurement paper, governance annex or sources register?
 
 ---
 
@@ -367,8 +443,8 @@ do not omit it to look authoritative.
   stand alone.
 - Keep `PROJECT_STATUS.md` and `PRODUCTION_READINESS.md` for **yourself**, not for the meeting: they
   are the engineering record of exactly what is built and what is still simulated. They are internal
-  documents and contain deployment and credential notes, so **do not hand them to the Minister or to
-  Cabinet**. The document for that room is **Part 1 — the funding memo**.
+  documents and contain deployment and credential notes, so **do not hand them to the Minister, to
+  ZEPARI or to Cabinet**. The document for that room is **Part 1 — the funding memo**.
 - **What the live site actually is today (re-checked 2026-10-06, after four demo fixes — the fixed demo name, the government-voice closing card, the slow-living graph and ONE platform-mode control).**
   The host `nzwisiso.bitflex.app` serves `assets/index-D2gkonoE.js`
   (`77cb59e415413b53639ca37485af7605679bb3894376f4c15c2003a8dbff3aee`), which is byte-identical to the
