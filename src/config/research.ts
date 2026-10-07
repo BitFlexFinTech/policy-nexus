@@ -115,7 +115,7 @@ export const RESEARCH_PARTS: readonly ResearchPart[] = [
     id: "brief",
     label: "Policy brief",
     note: "A short brief drafted from the research.",
-    built: false,
+    built: true,
   },
   {
     id: "barometer",
@@ -129,4 +129,15 @@ export const RESEARCH_PARTS: readonly ResearchPart[] = [
     note: "Route findings to the departments they concern.",
     built: false,
   },
+];
+
+/**
+ * The sections every research brief carries, in order (ZEPARI Batch F). Fixed here so the brief's
+ * shape has one home, and a reader can see the structure even before a model drafts the words.
+ */
+export const RESEARCH_BRIEF_SECTIONS: readonly string[] = [
+  "Purpose",
+  "Context",
+  "Key findings",
+  "Recommendations",
 ];

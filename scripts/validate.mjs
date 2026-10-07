@@ -1705,6 +1705,49 @@ if (!existsSync(cssPath)) {
 }
 
 
+// ---------------------------------------------------------------------------------------------
+// check 37 — THE RESEARCH POLICY BRIEF IS GROUNDED AND NEVER FABRICATES A BRIEF (ZEPARI Batch F)
+// The owner's decision: a short brief drafted from the research library, with its sources shown. The
+// structure and the sources are always shown; the words need the research model, and WITHOUT one the
+// platform writes NO brief. This fails the build if the brief service, its honest not-connected path,
+// the fixed structure, the panel, or the wiring is removed.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const brief = readIf("src/services/research/researchBrief.ts");
+  if (brief === null) {
+    problems.push("src/services/research/researchBrief.ts is missing — there is no research brief");
+  } else {
+    for (const [symbol, why] of [
+      ["draftResearchBrief", "the brief entry point is gone"],
+      ['liveService("research")', "the brief no longer uses the research model key"],
+      ["No brief model is connected", "the honest not-connected path is gone (a brief could be fabricated)"],
+    ]) {
+      if (!brief.includes(symbol)) problems.push(`the research brief: ${why} (${symbol})`);
+    }
+  }
+
+  const panel = readIf("src/components/research/ResearchBriefPanel.tsx");
+  if (panel === null) problems.push("src/components/research/ResearchBriefPanel.tsx is missing");
+
+  const config = readIf("src/config/research.ts");
+  if (config && !/RESEARCH_BRIEF_SECTIONS/.test(config)) {
+    problems.push("the brief's fixed structure (RESEARCH_BRIEF_SECTIONS) is gone");
+  }
+
+  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
+  if (workspace && !/<ResearchBriefPanel \/>/.test(workspace)) {
+    problems.push("the research workspace no longer renders the policy brief");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the research policy brief is grounded in the research library and never fabricates a brief");
+  }
+  check("the research policy brief is grounded and never fabricates a brief", problems);
+}
+
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

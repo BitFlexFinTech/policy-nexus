@@ -5,6 +5,7 @@ import { RESEARCH_CONFIDENTIALITY, RESEARCH_NAME, RESEARCH_PARTS } from "@/confi
 import { ResearchLibraryPanel } from "@/components/research/ResearchLibraryPanel";
 import { ResearchDataSourcesPanel } from "@/components/research/ResearchDataSourcesPanel";
 import { ResearchChatPanel } from "@/components/research/ResearchChatPanel";
+import { ResearchBriefPanel } from "@/components/research/ResearchBriefPanel";
 import { researchSessionActions, useResearchSession } from "@/session/useResearchSession";
 
 /**
@@ -72,6 +73,10 @@ export default function ResearchWorkspace() {
 
       <div className="mt-6">
         <ResearchChatPanel />
+      </div>
+
+      <div className="mt-6">
+        <ResearchBriefPanel />
       </div>
 
       <section aria-labelledby="research-workspace-parts" className="mt-6 rounded-lg border bg-card p-5 sm:p-6">
