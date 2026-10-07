@@ -1617,6 +1617,49 @@ if (!existsSync(cssPath)) {
 }
 
 
+// ---------------------------------------------------------------------------------------------
+// check 35 — THE INSTITUTION DATA-CONNECTORS ARE A MOCK-FIRST SEAM THAT INVENTS NOTHING (ZEPARI Batch D)
+// The owner's decision: the research assistant reads figures from the institute's own data sources.
+// The seam records WHICH sources ZEPARI may read from; it reads NO figures itself, and says so — so
+// the platform invents neither a source nor a figure. This fails the build if the seam, either client,
+// the honest statement, the panel, or the wiring is removed.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const seam = readIf("src/services/research/researchConnectorStore.ts");
+  if (seam === null) {
+    problems.push("src/services/research/researchConnectorStore.ts is missing — the data-connectors have no seam");
+  } else {
+    for (const [symbol, why] of [
+      ["LOCAL_RESEARCH_CONNECTOR_STORE", "the Local client is gone"],
+      ["createSharedResearchConnectorStore", "the Shared client is gone"],
+      ["researchConnectorStoreFor", "the chooser is gone"],
+      ["No figures are read from these sources yet", "the honest statement that no figure is read is gone"],
+    ]) {
+      if (!seam.includes(symbol)) problems.push(`the data-connector seam: ${why} (${symbol})`);
+    }
+  }
+
+  for (const rel of [
+    "src/services/research/researchDataSources.ts",
+    "src/components/research/ResearchDataSourcesPanel.tsx",
+  ]) {
+    if (readIf(rel) === null) problems.push(`${rel} is missing — the data-connectors are incomplete`);
+  }
+
+  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
+  if (workspace && !/<ResearchDataSourcesPanel \/>/.test(workspace)) {
+    problems.push("the research workspace no longer renders the institution data-connectors");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the institution data-connectors are a mock-first seam that reads no figure until a server is connected");
+  }
+  check("the institution data-connectors are a mock-first seam that invents nothing", problems);
+}
+
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

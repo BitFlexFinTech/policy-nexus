@@ -103,7 +103,7 @@ export const RESEARCH_PARTS: readonly ResearchPart[] = [
     id: "connectors",
     label: "Institution data connectors",
     note: "Read figures from the institute's own data sources.",
-    built: false,
+    built: true,
   },
   {
     id: "chat",
