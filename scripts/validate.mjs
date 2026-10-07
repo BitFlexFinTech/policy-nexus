@@ -1568,6 +1568,55 @@ if (!existsSync(cssPath)) {
 }
 
 
+// ---------------------------------------------------------------------------------------------
+// check 34 — THE RESEARCH LIBRARY IS A MOCK-FIRST SEAM, LABELLED PLAINLY (ZEPARI Batch C)
+// The owner's decision: ZEPARI's research documents are kept on the servers ZEPARI holds; until that
+// server is connected they are kept in THIS BROWSER, and the surface says so. This fails the build if
+// the seam, either client, the honest label, the panel, or the workspace wiring is removed.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const seam = readIf("src/services/research/researchDocumentStore.ts");
+  if (seam === null) {
+    problems.push("src/services/research/researchDocumentStore.ts is missing — the research library has no seam");
+  } else {
+    for (const [symbol, why] of [
+      ["LOCAL_RESEARCH_LIBRARY_STORE", "the Local client is gone"],
+      ["createSharedResearchLibraryStore", "the Shared client is gone"],
+      ["researchDocumentStoreFor", "the chooser is gone"],
+      ['describeCapability(config, "library")', "the seam no longer follows the library capability"],
+      ["This browser (Local)", "the honest Local label is gone"],
+      ["Shared with nobody", "the honest limit is gone"],
+    ]) {
+      if (!seam.includes(symbol)) problems.push(`the research library seam: ${why} (${symbol})`);
+    }
+  }
+
+  for (const rel of [
+    "src/services/research/researchDocuments.ts",
+    "src/components/research/ResearchLibraryPanel.tsx",
+  ]) {
+    if (readIf(rel) === null) problems.push(`${rel} is missing — the research library is incomplete`);
+  }
+
+  const panel = readIf("src/components/research/ResearchLibraryPanel.tsx");
+  if (panel && !/researchDocumentStoreFor/.test(panel)) {
+    problems.push("the research library panel no longer routes through the seam");
+  }
+
+  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
+  if (workspace && !/<ResearchLibraryPanel \/>/.test(workspace)) {
+    problems.push("the research workspace no longer renders the research library");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the research library is a mock-first seam, kept in this browser and labelled plainly");
+  }
+  check("the research library is a mock-first seam, labelled plainly", problems);
+}
+
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

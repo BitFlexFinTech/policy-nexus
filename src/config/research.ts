@@ -97,7 +97,7 @@ export const RESEARCH_PARTS: readonly ResearchPart[] = [
     id: "library",
     label: "Research library",
     note: "ZEPARI's own research documents, kept on the servers ZEPARI holds.",
-    built: false,
+    built: true,
   },
   {
     id: "connectors",

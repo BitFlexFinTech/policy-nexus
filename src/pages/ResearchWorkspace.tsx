@@ -1,11 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ResearchShell } from "@/components/research/ResearchShell";
-import {
-  RESEARCH_CONFIDENTIALITY,
-  RESEARCH_NAME,
-  RESEARCH_PARTS,
-} from "@/config/research";
+import { RESEARCH_CONFIDENTIALITY, RESEARCH_NAME, RESEARCH_PARTS } from "@/config/research";
+import { ResearchLibraryPanel } from "@/components/research/ResearchLibraryPanel";
 import { researchSessionActions, useResearchSession } from "@/session/useResearchSession";
 
 /**
@@ -62,6 +59,10 @@ export default function ResearchWorkspace() {
           {RESEARCH_CONFIDENTIALITY.body}
         </p>
       </section>
+
+      <div className="mt-6">
+        <ResearchLibraryPanel />
+      </div>
 
       <section aria-labelledby="research-workspace-parts" className="mt-6 rounded-lg border bg-card p-5 sm:p-6">
         <h2
