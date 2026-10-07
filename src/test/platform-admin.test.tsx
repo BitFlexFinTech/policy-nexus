@@ -31,15 +31,15 @@ describe("platform administration screen", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "Platform administration" }),
     ).toBeInTheDocument();
-    // The service cards the owner asked to remove are gone; the drafting card (the OpenRouter
-    // key) and the sign-in card remain.
-    ["Drafting model (OpenRouter)", "Government sign-in (SSO)"].forEach((label) =>
-      expect(screen.getByRole("heading", { name: label })).toBeInTheDocument(),
+    // The service cards the owner asked to remove are gone; the two OpenRouter cards (the drafting
+    // key and the research key) and the sign-in card remain.
+    ["Drafting model (OpenRouter)", "Research model (OpenRouter)", "Government sign-in (SSO)"].forEach(
+      (label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument(),
     );
     ["Assessment service", "Document text extraction", "Shared document library"].forEach((label) =>
       expect(screen.queryByRole("heading", { name: label })).toBeNull(),
     );
-    expect(screen.getAllByText("simulated")).toHaveLength(2);
+    expect(screen.getAllByText("simulated")).toHaveLength(3);
     // The mode is shown plainly, in the platform-mode badge.
     expect(screen.getAllByText("Simulated").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Everything is simulated/)).toBeInTheDocument();

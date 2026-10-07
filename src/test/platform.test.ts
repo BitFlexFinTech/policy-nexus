@@ -27,6 +27,7 @@ const complete = (): PlatformConfig => ({
   platformMode: "live",
   assessment: service(),
   drafting: service(),
+  research: service(),
   extraction: service(),
   library: service(),
   sso: { mode: "live", issuer: IDP, clientId: "client-1", redirectUri: CALLBACK, departmentClaim: "department_id" },
@@ -65,12 +66,18 @@ describe("platform configuration", () => {
     expect(describeCapability(getConfig(), "assessment").state).toBe("misconfigured");
   });
 
-  it("requires a model for the drafting capability but not the others", () => {
+  it("requires a model for the two model capabilities (drafting and research), but not the others", () => {
     saveConfig({
       ...DEFAULT_PLATFORM_CONFIG,
       drafting: { mode: "live", endpoint: LOCAL, key: "k", model: "" },
     });
     expect(describeCapability(getConfig(), "drafting").state).toBe("misconfigured");
+
+    saveConfig({
+      ...DEFAULT_PLATFORM_CONFIG,
+      research: { mode: "live", endpoint: LOCAL, key: "k", model: "" },
+    });
+    expect(describeCapability(getConfig(), "research").state).toBe("misconfigured");
 
     saveConfig({
       ...DEFAULT_PLATFORM_CONFIG,
@@ -85,6 +92,16 @@ describe("platform configuration", () => {
     expect(liveService("assessment")).toMatchObject({ endpoint: LOCAL, key: "test-key" });
     expect(liveService("extraction")).toMatchObject({ endpoint: LOCAL });
     expect(isAnyCapabilityLive()).toBe(true);
+  });
+
+  it("keeps the research key separate from the drafting key, so each is metered on its own", () => {
+    saveConfig({
+      ...DEFAULT_PLATFORM_CONFIG,
+      drafting: { mode: "live", endpoint: LOCAL, key: "draft-key", model: "model-a" },
+      research: { mode: "live", endpoint: LOCAL, key: "research-key", model: "model-b" },
+    });
+    expect(liveService("drafting")).toMatchObject({ key: "draft-key", model: "model-a" });
+    expect(liveService("research")).toMatchObject({ key: "research-key", model: "model-b" });
   });
 
   it("needs an issuer, a client ID and a redirect address for sign-in", () => {

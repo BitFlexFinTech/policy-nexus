@@ -21,7 +21,7 @@
 
 import { createKeyValueStore } from "@/lib/browserStorage";
 
-export type CapabilityId = "assessment" | "drafting" | "extraction" | "library" | "sso";
+export type CapabilityId = "assessment" | "drafting" | "research" | "extraction" | "library" | "sso";
 export type CapabilityMode = "simulated" | "live";
 
 /** A service capability reached over HTTP. */
@@ -58,6 +58,13 @@ export interface PlatformConfig {
   platformMode: CapabilityMode;
   assessment: CapabilityConfig;
   drafting: CapabilityConfig;
+  /**
+   * The ZEPARI research assistant's OWN OpenRouter credential, separate from the drafting key, so
+   * the two assistants' usage and cost are metered against separate keys (owner's decision,
+   * 2026-10-06). It is reached through the same OpenRouter address; only the key and the model
+   * differ.
+   */
+  research: CapabilityConfig;
   extraction: CapabilityConfig;
   /** The shared document-library server. Off by default: documents stay in the browser. */
   library: CapabilityConfig;
@@ -79,6 +86,7 @@ export const ADMIN_ROUTE = "/platform-admin";
 export const CAPABILITY_IDS: readonly CapabilityId[] = [
   "assessment",
   "drafting",
+  "research",
   "extraction",
   "library",
   "sso",
@@ -87,6 +95,7 @@ export const CAPABILITY_IDS: readonly CapabilityId[] = [
 export const CAPABILITY_LABELS: Record<CapabilityId, string> = {
   assessment: "Assessment service",
   drafting: "Drafting model (OpenRouter)",
+  research: "Research model (OpenRouter)",
   extraction: "Document text extraction",
   library: "Shared document library",
   sso: "Government sign-in (SSO)",
@@ -135,6 +144,7 @@ export const DEFAULT_PLATFORM_CONFIG: PlatformConfig = {
   platformMode: "simulated",
   assessment: { ...SIMULATED },
   drafting: { ...SIMULATED },
+  research: { ...SIMULATED },
   extraction: { ...SIMULATED },
   library: { ...SIMULATED },
   sso: { mode: "simulated", issuer: "", clientId: "", redirectUri: "", departmentClaim: "department_id" },
@@ -179,6 +189,7 @@ export const normaliseConfig = (value: unknown): PlatformConfig => {
     platformMode: asMode(record.platformMode, "simulated"),
     assessment: normaliseService(record.assessment, DEFAULT_PLATFORM_CONFIG.assessment),
     drafting: normaliseService(record.drafting, DEFAULT_PLATFORM_CONFIG.drafting),
+    research: normaliseService(record.research, DEFAULT_PLATFORM_CONFIG.research),
     extraction: normaliseService(record.extraction, DEFAULT_PLATFORM_CONFIG.extraction),
     library: normaliseService(record.library, DEFAULT_PLATFORM_CONFIG.library),
     sso: {
@@ -216,6 +227,7 @@ export const withPlatformMode = (
   platformMode: mode,
   assessment: { ...config.assessment, mode },
   drafting: { ...config.drafting, mode },
+  research: { ...config.research, mode },
   extraction: { ...config.extraction, mode },
   library: { ...config.library, mode },
   sso: { ...config.sso, mode },
@@ -349,7 +361,7 @@ export const describeCapability = (
   const missing: string[] = [];
   if (!isAbsoluteHttpUrl(capability.endpoint)) missing.push("endpoint URL");
   if (!capability.key.trim()) missing.push("key");
-  if (id === "drafting" && !capability.model.trim()) missing.push("model name");
+  if ((id === "drafting" || id === "research") && !capability.model.trim()) missing.push("model name");
   return missing.length
     ? {
         id,

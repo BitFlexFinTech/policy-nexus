@@ -65,7 +65,7 @@ export function CapabilityEditor({
     // fill it (and the default model) automatically, so the key the administrator types is the
     // only thing they must supply. The capability's mode is NOT set here — the ONE platform-mode
     // control governs every capability at once (owner's instruction).
-    if (id === "drafting") {
+    if (id === "drafting" || id === "research") {
       next.endpoint = next.endpoint.trim() || OPENROUTER_CHAT_ENDPOINT;
       next.model = next.model.trim() || DEFAULT_DRAFTING_MODEL;
     }
@@ -73,6 +73,7 @@ export function CapabilityEditor({
       ...config,
       assessment: id === "assessment" ? next : config.assessment,
       drafting: id === "drafting" ? next : config.drafting,
+      research: id === "research" ? next : config.research,
       extraction: id === "extraction" ? next : config.extraction,
     });
     setProbe(null);
@@ -97,7 +98,7 @@ export function CapabilityEditor({
       </header>
 
       <div className="mt-3 grid gap-3 md:grid-cols-2">
-        {id !== "drafting" && (
+        {id !== "drafting" && id !== "research" && (
           <div className="space-y-1">
             <Label htmlFor={`cap-${id}-endpoint`} className={FIELD_LABEL}>
               Service address
@@ -114,7 +115,7 @@ export function CapabilityEditor({
 
         <div className="space-y-1">
           <Label htmlFor={`cap-${id}-key`} className={FIELD_LABEL}>
-            {id === "drafting" ? "OpenRouter key" : "Key"}
+            {id === "drafting" ? "OpenRouter key" : id === "research" ? "ZEPARI OpenRouter key" : "Key"}
           </Label>
           <div className="flex gap-2">
             <Input
@@ -138,14 +139,14 @@ export function CapabilityEditor({
           </div>
         </div>
 
-        {id === "drafting" && (
+        {(id === "drafting" || id === "research") && (
           <div className="space-y-1">
             <Label htmlFor={`cap-${id}-model`} className={FIELD_LABEL}>
-              Model
+              {id === "research" ? "Research model" : "Model"}
             </Label>
             <ModelCombobox
               id={`cap-${id}-model`}
-              aria-label="Model"
+              aria-label={id === "research" ? "Research model" : "Model"}
               value={capability.model}
               onChange={(model) => update({ model })}
             />

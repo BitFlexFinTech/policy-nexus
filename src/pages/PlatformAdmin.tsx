@@ -22,14 +22,16 @@ import { clearAllBrowserData } from "@/lib/browserData";
 import { adminAccessActions } from "@/session/useAdminAccess";
 
 /**
- * The only capability card kept on this screen (owner's instruction, demo).
+ * The capability cards kept on this screen (owner's instructions, demo).
  *
- * The drafting card stays because its OpenRouter key is typed in by hand and is the one real
- * service usable now. The other service cards are removed: their addresses are fixed and live in
+ * Two OpenRouter cards stay because their keys are typed in by hand and are the real services
+ * usable now: the **drafting** key (the Nzwisiso policy drafter) and the **research** key (the
+ * ZEPARI research assistant), entered separately so each assistant's usage is metered against its
+ * own key. The other service cards are removed: their addresses are fixed and live in
  * configuration, and the ONE platform-mode control governs every service at once. Government
  * sign-in is deliberately left as it is.
  */
-const SERVICE_CAPABILITIES = ["drafting"] as const;
+const SERVICE_CAPABILITIES = ["drafting", "research"] as const;
 
 /**
  * Platform administration — where capability credentials are entered.

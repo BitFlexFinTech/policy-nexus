@@ -1465,6 +1465,52 @@ if (!existsSync(cssPath)) {
 }
 
 
+// ---------------------------------------------------------------------------------------------
+// check 32 — THE RESEARCH ASSISTANT HAS ITS OWN SEPARATE OPENROUTER KEY (ZEPARI Batch A)
+// The owner's decision (2026-10-06): the ZEPARI research assistant uses its OWN OpenRouter key,
+// entered separately from the drafting key, so each assistant's usage and cost are metered against
+// its own key. This fails the build if the second capability, its label, its default, its
+// persistence, its model requirement, or its card is removed.
+{
+  const problems = [];
+  const platformPath = join(ROOT, "src/config/platform.ts");
+  const adminPath = join(ROOT, "src/pages/PlatformAdmin.tsx");
+
+  if (!existsSync(platformPath)) {
+    problems.push("src/config/platform.ts is missing");
+  } else {
+    const platform = readFileSync(platformPath, "utf8");
+    for (const [symbol, why] of [
+      ["research: CapabilityConfig", "the research capability is not part of PlatformConfig"],
+      ['research: "Research model (OpenRouter)"', "the research capability has no label"],
+      ["research: { ...SIMULATED }", "the research capability has no default (it must ship simulated)"],
+      ["research: { ...config.research, mode }", "the master switch no longer flips the research capability"],
+      ["research: normaliseService(record.research", "a stored research key would be dropped on reload"],
+    ]) {
+      if (!platform.includes(symbol)) problems.push(`src/config/platform.ts: ${why} (${symbol})`);
+    }
+    // Reached through OpenRouter, so it needs a model name exactly like drafting.
+    if (!/id === "drafting" \|\| id === "research"\) && !capability\.model\.trim\(\)/.test(platform)) {
+      problems.push("the research capability no longer requires a model name");
+    }
+  }
+
+  if (!existsSync(adminPath)) {
+    problems.push("src/pages/PlatformAdmin.tsx is missing");
+  } else {
+    const admin = readFileSync(adminPath, "utf8");
+    if (!/SERVICE_CAPABILITIES\s*=\s*\[\s*"drafting"\s*,\s*"research"\s*\]/.test(admin)) {
+      problems.push("the administration screen no longer shows BOTH OpenRouter cards (drafting and research)");
+    }
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the ZEPARI research assistant has its own OpenRouter key, separate from the drafting key");
+  }
+  check("the research assistant has its own separate OpenRouter key", problems);
+}
+
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

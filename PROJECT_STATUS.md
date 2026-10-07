@@ -1352,6 +1352,12 @@ because the block it sits in already names itself.
 ## Verification log
 | Date | Command | Result |
 |---|---|---|
+| 2026-10-07 | **ZEPARI Batch A — the second OpenRouter key (the research assistant's own credential)** · `npm run validate` | PASS — all checks green, including the new **check 32** |
+| 2026-10-07 | ZEPARI Batch A · `npm run typecheck` | PASS — `tsc -b`, 0 errors |
+| 2026-10-07 | ZEPARI Batch A · `npm run lint` | PASS — 0 errors, 7 pre-existing react-refresh warnings |
+| 2026-10-07 | ZEPARI Batch A · `npm test` | PASS — **580/580 across 59 files** (was 579; **+1** — the new two-key separation test in `src/test/platform.test.ts`) |
+| 2026-10-07 | ZEPARI Batch A · `npm run build` | PASS — `✓ assets/index-BrD5wY-q.js` |
+| 2026-10-07 | ZEPARI Batch A · **check 32 proved able to fail by mutation** | PASS — removing `"research"` from `SERVICE_CAPABILITIES` → `FAIL the research assistant has its own separate OpenRouter key — 1 violation(s)`; restored **byte-identical** (`cf6a56c62199c7fa0f35467e82bdc585b4626995e892e487ccc3e50d3339be14`) |
 | 2026-10-07 | **item (i) — the drafted-policy rework** · `npm run validate` | PASS — all checks green | 
 | 2026-10-07 | item (i) · `npm run typecheck` | PASS — `tsc -b`, 0 errors | 
 | 2026-10-07 | item (i) · `npm run lint` | PASS — 0 errors, 7 pre-existing react-refresh warnings | 
@@ -4243,7 +4249,7 @@ in the order the owner has raised them.
 
 ## RESUME HERE
 
-**START HERE (2026-10-07) — the ZEPARI research product. Items (i) the drafted-policy rework, (ii) the Zimbabwean policy structure (completed as far as the tools allow — the real document for each of the 16 departments is named and **six** of their tables of contents are recorded; locating the remaining ten addresses is BLOCKED on search-host tooling) AND (iii) the proposal edits are DONE (see the DO FIRST list below and the verification log). The next work is the ZEPARI Research Assistant batches A–G. Nothing has been published yet, so the live host still carries the previous bundle.**
+**START HERE (2026-10-07) — the ZEPARI research product. Items (i) the drafted-policy rework, (ii) the Zimbabwean policy structure (completed as far as the tools allow — the real document for each of the 16 departments is named and **six** of their tables of contents are recorded; locating the remaining ten addresses is BLOCKED on search-host tooling) AND (iii) the proposal edits are DONE (see the DO FIRST list below and the verification log). Of the ZEPARI Research Assistant batches A–G, **Batch A is DONE (2026-10-07)** — the research assistant now has its OWN OpenRouter key, entered on `/platform-admin` separately from the drafting key, so the two assistants are metered apart (validate **check 32**, mutation-proved, plus a source test that the two keys never share a value); the next work is **Batch B**. Nothing has been published yet, so the live host still carries the previous bundle.**
 **Branch** `feature/unified-platform` (never `main`). **Live build** `assets/index-D2gkonoE.js` (sha256 `77cb59e4…`). **Global rule** `follow-exact-instructions-no-assumptions.md` is installed in BOTH global rules folders (`~/.cline/rules`, `~/Documents/Cline/Rules`, byte-identical) and checked by `node ~/.cline/rules/check-rules.mjs`.
 
 **DO FIRST, in order (the owner's explicit instruction):**
