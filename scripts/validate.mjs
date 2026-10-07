@@ -1539,7 +1539,7 @@ if (!existsSync(cssPath)) {
 
   for (const rel of [
     "src/pages/ResearchLanding.tsx",
-    "src/pages/ResearchWorkspace.tsx",
+    "src/pages/research/ResearchOverview.tsx",
     "src/session/researchSession.ts",
     "src/routes/RequireResearchSession.tsx",
   ]) {
@@ -1605,8 +1605,8 @@ if (!existsSync(cssPath)) {
     problems.push("the research library panel no longer routes through the seam");
   }
 
-  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
-  if (workspace && !/<ResearchLibraryPanel \/>/.test(workspace)) {
+  const app = readIf("src/App.tsx");
+  if (app && !/<ResearchLibraryPanel \/>/.test(app)) {
     problems.push("the research workspace no longer renders the research library");
   }
 
@@ -1648,8 +1648,8 @@ if (!existsSync(cssPath)) {
     if (readIf(rel) === null) problems.push(`${rel} is missing — the data-connectors are incomplete`);
   }
 
-  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
-  if (workspace && !/<ResearchDataSourcesPanel \/>/.test(workspace)) {
+  const app = readIf("src/App.tsx");
+  if (app && !/<ResearchDataSourcesPanel \/>/.test(app)) {
     problems.push("the research workspace no longer renders the institution data-connectors");
   }
 
@@ -1693,8 +1693,8 @@ if (!existsSync(cssPath)) {
   const panel = readIf("src/components/research/ResearchChatPanel.tsx");
   if (panel === null) problems.push("src/components/research/ResearchChatPanel.tsx is missing");
 
-  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
-  if (workspace && !/<ResearchChatPanel \/>/.test(workspace)) {
+  const app = readIf("src/App.tsx");
+  if (app && !/<ResearchChatPanel \/>/.test(app)) {
     problems.push("the research workspace no longer renders the grounded research chat");
   }
 
@@ -1736,8 +1736,8 @@ if (!existsSync(cssPath)) {
     problems.push("the brief's fixed structure (RESEARCH_BRIEF_SECTIONS) is gone");
   }
 
-  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
-  if (workspace && !/<ResearchBriefPanel \/>/.test(workspace)) {
+  const app = readIf("src/App.tsx");
+  if (app && !/<ResearchBriefPanel \/>/.test(app)) {
     problems.push("the research workspace no longer renders the policy brief");
   }
 
@@ -1784,8 +1784,8 @@ if (!existsSync(cssPath)) {
     problems.push("the barometer panel no longer states that a figure is never shown without its source");
   }
 
-  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
-  if (workspace && !/<ResearchBarometerPanel \/>/.test(workspace)) {
+  const app = readIf("src/App.tsx");
+  if (app && !/<ResearchBarometerPanel \/>/.test(app)) {
     problems.push("the research workspace no longer renders the Economic Barometer");
   }
 
@@ -1830,8 +1830,8 @@ if (!existsSync(cssPath)) {
     problems.push("the findings panel no longer states the boundary (a finding never feeds the engine)");
   }
 
-  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
-  if (workspace && !/<ResearchFindingsPanel \/>/.test(workspace)) {
+  const app = readIf("src/App.tsx");
+  if (app && !/<ResearchFindingsPanel \/>/.test(app)) {
     problems.push("the research workspace no longer renders findings-to-departments");
   }
 
@@ -1839,6 +1839,60 @@ if (!existsSync(cssPath)) {
     notes.push("INFO  findings are routed to the 16 departments and never feed the simulation engine");
   }
   check("findings are routed to departments and never feed the engine", problems);
+}
+
+
+// ---------------------------------------------------------------------------------------------
+// check 40 — THE RESEARCH WORKSPACE IS A REAL WORKSPACE, NOT EMPTY BOXES (redesign, 2026-10-07)
+// The owner's complaint: the research assistant was six panels stacked with nothing in them. It is now
+// a workspace with a section navigation, a home that orients, and a seeded demonstration sample so it
+// works the moment it opens. This fails the build if the shell, the navigation, the sections, the home,
+// or the seeded sample is removed.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const layout = readIf("src/layouts/ResearchWorkspaceLayout.tsx");
+  if (layout === null) {
+    problems.push("src/layouts/ResearchWorkspaceLayout.tsx is missing — the research workspace has no shell");
+  } else if (!/seedResearchSample/.test(layout)) {
+    problems.push("the research workspace shell no longer seeds the demonstration sample");
+  }
+
+  const nav = readIf("src/components/research/ResearchNav.tsx");
+  if (nav === null) {
+    problems.push("src/components/research/ResearchNav.tsx is missing — there is no section navigation");
+  } else {
+    for (const section of ["/research/app/library", "/research/app/ask", "/research/app/barometer", "/research/app/findings"]) {
+      if (!nav.includes(section)) problems.push(`the research navigation is missing a section (${section})`);
+    }
+  }
+
+  const overview = readIf("src/pages/research/ResearchOverview.tsx");
+  if (overview === null) {
+    problems.push("src/pages/research/ResearchOverview.tsx is missing — the workspace has no home");
+  } else if (!/Reset the sample/.test(overview) || !/Try this/.test(overview)) {
+    problems.push("the research home no longer offers the try-this path and the reset control");
+  }
+
+  const app = readIf("src/App.tsx");
+  if (app) {
+    for (const route of ["/research/app", "/research/app/library", "/research/app/barometer", "/research/app/findings"]) {
+      if (!app.includes(`path="${route}"`)) problems.push(`src/App.tsx no longer routes a research section (${route})`);
+    }
+  }
+
+  const sample = readIf("src/services/research/researchSample.ts");
+  if (sample === null) {
+    problems.push("src/services/research/researchSample.ts is missing — the workspace would open empty");
+  } else if (!/seedResearchSample/.test(sample) || !/resetResearchSample/.test(sample)) {
+    problems.push("the demonstration sample no longer seeds and resets");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the research workspace has its own shell, section navigation, home and a seeded demonstration sample");
+  }
+  check("the research workspace is a real workspace, not empty boxes", problems);
 }
 
 

@@ -1346,7 +1346,9 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     // One-click entry signs the researcher in and opens the research workspace.
     await page.getByRole("button", { name: "Enter as Dr. Gibson Chigumira" }).click();
     await expect(page).toHaveURL(/\/research\/app$/);
-    await expect(page.getByText("Research workspace")).toBeVisible();
+    await expect(
+      page.getByRole("navigation", { name: "Research assistant sections" }),
+    ).toBeVisible();
     await expect(page.getByText(/Dr\. Gibson Chigumira/)).toBeVisible();
 
     // The two products keep SEPARATE sessions: the department workspace is not signed in, so a

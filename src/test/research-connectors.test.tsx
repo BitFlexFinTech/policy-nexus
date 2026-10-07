@@ -84,7 +84,7 @@ describe("the institution data-connector seam", () => {
   });
 
   it("shows the data sources on the research workspace, honestly labelled", () => {
-    window.history.pushState({}, "", "/research/app");
+    window.history.pushState({}, "", "/research/app/data");
     signInResearcher("chipika");
     render(<App />);
 

@@ -85,7 +85,7 @@ describe("the grounded research chat", () => {
 
   it("renders on the research workspace, and writes no answer with no model", async () => {
     seedDocument();
-    window.history.pushState({}, "", "/research/app");
+    window.history.pushState({}, "", "/research/app/ask");
     signInResearcher("chigumira");
     render(<App />);
 

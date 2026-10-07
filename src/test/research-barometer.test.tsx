@@ -8,6 +8,7 @@ import {
   type PlatformConfig,
 } from "@/config/platform";
 import { clearAllBarometerReadings } from "@/services/research/researchBarometer";
+import { seedResearchSample } from "@/services/research/researchSample";
 import {
   LOCAL_RESEARCH_BAROMETER_STORE,
   getResearchBarometerStore,
@@ -39,6 +40,9 @@ describe("the Economic Barometer seam", () => {
   beforeEach(() => {
     window.localStorage.clear();
     clearConfig();
+    // Mark the demonstration sample as already seeded, so the workspace does not add it during the
+    // render and this test counts only what it adds itself.
+    seedResearchSample();
     clearAllBarometerReadings();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
@@ -76,7 +80,7 @@ describe("the Economic Barometer seam", () => {
   });
 
   it("refuses a reading with no source, and records one that names its source", async () => {
-    window.history.pushState({}, "", "/research/app");
+    window.history.pushState({}, "", "/research/app/barometer");
     signInResearcher("chigumira");
     render(<App />);
 

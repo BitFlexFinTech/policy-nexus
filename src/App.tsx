@@ -7,7 +7,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "./pages/Landing.tsx";
 import ChooseDepartment from "./pages/ChooseDepartment.tsx";
 import ResearchLanding from "./pages/ResearchLanding.tsx";
-import ResearchWorkspace from "./pages/ResearchWorkspace.tsx";
+import ResearchOverview from "./pages/research/ResearchOverview.tsx";
+import { ResearchLibraryPanel } from "./components/research/ResearchLibraryPanel";
+import { ResearchDataSourcesPanel } from "./components/research/ResearchDataSourcesPanel";
+import { ResearchChatPanel } from "./components/research/ResearchChatPanel";
+import { ResearchBriefPanel } from "./components/research/ResearchBriefPanel";
+import { ResearchBarometerPanel } from "./components/research/ResearchBarometerPanel";
+import { ResearchFindingsPanel } from "./components/research/ResearchFindingsPanel";
 import Index from "./pages/Index.tsx";
 import Documents from "./pages/Documents.tsx";
 import Support from "./pages/Support.tsx";
@@ -32,6 +38,7 @@ import { useContent } from "@/config/useContent";
 import { RequireSession } from "./routes/RequireSession.tsx";
 import { RequireResearchSession } from "./routes/RequireResearchSession.tsx";
 import { WorkspaceLayout } from "./layouts/WorkspaceLayout.tsx";
+import { ResearchWorkspaceLayout } from "./layouts/ResearchWorkspaceLayout.tsx";
 
 const queryClient = new QueryClient();
 
@@ -73,7 +80,15 @@ const App = () => (
               session. A department session never opens it, and it never opens the department side. */}
           <Route path="/research" element={<ResearchLanding />} />
           <Route element={<RequireResearchSession />}>
-            <Route path="/research/app" element={<ResearchWorkspace />} />
+            <Route element={<ResearchWorkspaceLayout />}>
+              <Route path="/research/app" element={<ResearchOverview />} />
+              <Route path="/research/app/library" element={<ResearchLibraryPanel />} />
+              <Route path="/research/app/data" element={<ResearchDataSourcesPanel />} />
+              <Route path="/research/app/ask" element={<ResearchChatPanel />} />
+              <Route path="/research/app/brief" element={<ResearchBriefPanel />} />
+              <Route path="/research/app/barometer" element={<ResearchBarometerPanel />} />
+              <Route path="/research/app/findings" element={<ResearchFindingsPanel />} />
+            </Route>
           </Route>
           {/* Everything under /app requires a department session, and shares one
               workspace shell (header + secondary nav + sovereign footer). */}

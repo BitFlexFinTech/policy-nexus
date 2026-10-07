@@ -87,7 +87,7 @@ describe("the research library seam", () => {
   });
 
   it("shows the research library on the research workspace, honestly labelled", () => {
-    window.history.pushState({}, "", "/research/app");
+    window.history.pushState({}, "", "/research/app/library");
     signInResearcher("chigumira");
     render(<App />);
 

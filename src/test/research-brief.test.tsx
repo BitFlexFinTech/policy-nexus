@@ -92,7 +92,7 @@ describe("the research policy brief", () => {
 
   it("renders on the research workspace, and writes no brief with no model", async () => {
     seedDocument();
-    window.history.pushState({}, "", "/research/app");
+    window.history.pushState({}, "", "/research/app/brief");
     signInResearcher("chipika");
     render(<App />);
 

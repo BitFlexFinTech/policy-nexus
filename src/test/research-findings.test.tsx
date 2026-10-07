@@ -9,6 +9,7 @@ import {
 } from "@/config/platform";
 import { findDepartment } from "@/config/departments";
 import { clearAllResearchFindings } from "@/services/research/researchFindings";
+import { seedResearchSample } from "@/services/research/researchSample";
 import {
   LOCAL_RESEARCH_FINDINGS_STORE,
   getResearchFindingsStore,
@@ -34,6 +35,9 @@ describe("the findings seam", () => {
   beforeEach(() => {
     window.localStorage.clear();
     clearConfig();
+    // Mark the demonstration sample as already seeded, so the workspace does not add it during the
+    // render and this test counts only what it adds itself.
+    seedResearchSample();
     clearAllResearchFindings();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
@@ -71,7 +75,7 @@ describe("the findings seam", () => {
   });
 
   it("refuses a finding with no department, then routes one that names its department", async () => {
-    window.history.pushState({}, "", "/research/app");
+    window.history.pushState({}, "", "/research/app/findings");
     signInResearcher("chipika");
     render(<App />);
 

@@ -54,8 +54,11 @@ describe("the ZEPARI research assistant", () => {
   it("signs a researcher in and opens the research workspace", () => {
     renderAt("/research");
     fireEvent.click(screen.getByRole("button", { name: `Enter as ${RESEARCHERS[0].name}` }));
-    // The research workspace is shown, naming the researcher who entered.
-    expect(screen.getByText("Research workspace")).toBeInTheDocument();
+    // The research workspace opens: its section navigation is shown and the header names the
+    // researcher who entered.
+    expect(
+      screen.getByRole("navigation", { name: "Research assistant sections" }),
+    ).toBeInTheDocument();
     expect(screen.getByText(new RegExp(RESEARCHERS[0].name))).toBeInTheDocument();
     // The research session exists; the DEPARTMENT session does not — the two are kept apart.
     expect(getResearchSession()?.researcherId).toBe(RESEARCHERS[0].id);
