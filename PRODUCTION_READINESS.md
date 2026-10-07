@@ -4,6 +4,15 @@ Every active mock, placeholder, or simulated capability in this build, what repl
 and where it is entered. **Updated every session.** Nothing here is a bug — these are
 deliberate scenario-mode implementations behind swappable seams.
 
+## 0. Planned next — the ZEPARI research product and the drafted-policy rework (recorded 2026-10-06)
+- **Two products, one platform:** **Nzwisiso Policy Simulation Assistant** (departments — today's platform, unchanged) and **ZEPARI Policy Research Assistant** (research). One URL → a choice at the door; the ZEPARI landing carries **one-click logins for Dr. Gibson Chigumira** (Executive Director, ZEPARI) and **Dr. Jesimen Chipika** (Deputy Governor, RBZ; Chairperson, ZEPARI Board of Trustees).
+- **AI = OpenRouter's API only.** ZEPARI's documents and data are stored on **the servers we set up**. A **SECOND OpenRouter key** is entered on the admin screen for the research assistant (the first drafts the policy), so usage and cost are measured **per key**. **Oreida's monthly fee covers the AI usage** — ZEPARI is not billed per token.
+- **Confidentiality (to be stated on the page):** **Oreida cannot read any research.** As administrators we manage only live support, the servers and the API seams — **never the documents**.
+- **STRICT RULE:** the **AI research side never feeds a figure into the deterministic engine.**
+- **The drafted-policy rework (the owner raised it twice):** the instrument must read as a **POLICY**, not a report that cites modelled indicators and groups — the **measures/priority areas are its heart**. The analysed **real Zimbabwean policy structure** replaces the derived section list.
+- Each new surface — **library · institution data-connectors · chat-grounding · policy brief · Economic Barometer · findings-to-departments** — carries its own build gate.
+
+
 ## 1. Simulation / assessment engine
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
