@@ -13,7 +13,7 @@
  * DETERMINISM: plain authored data. No clock, no randomness.
  */
 
-import { PROMOTER } from "@/config/brand";
+import { NAME, PROMOTER } from "@/config/brand";
 
 /** The research product's name — plain, no registered mark (owner's decision). */
 export const RESEARCH_NAME = "ZEPARI Policy Research Assistant";
@@ -141,3 +141,65 @@ export const RESEARCH_BRIEF_SECTIONS: readonly string[] = [
   "Key findings",
   "Recommendations",
 ];
+
+/**
+ * THE LANDING DIRECTION (ZEPARI build plan, §2). The words the research product's own landing page
+ * leads with — the headline, the standfirst, the four moves and the trust lines — kept here so they
+ * have one home and a screen never holds its own copy.
+ */
+export const RESEARCH_HEADLINE = "Zimbabwe's economic evidence — from question to policy.";
+
+export const RESEARCH_STANDFIRST =
+  "The ZEPARI Policy Research Assistant turns the institute's own evidence into answers, briefs and " +
+  "publications — and puts them in front of the people who make policy. One dashboard, from the " +
+  "first question to lasting impact.";
+
+/** The four moves a researcher makes, in order — a real sequence, so it is shown numbered. */
+export const RESEARCH_LOOP: readonly string[] = ["Ask", "Draft", "Publish", "Reach"];
+
+/** The three trust lines, stated plainly (the confidentiality promise and the billing line reused). */
+export const RESEARCH_TRUST: readonly string[] = [
+  `${PROMOTER.name} cannot read any research.`,
+  RESEARCH_BILLING,
+  RESEARCH_BOUNDARY,
+];
+
+/**
+ * THE "BUILT FOR GOVERNMENT" PAGE (ZEPARI build plan, §3). Every fact here is drawn from the Ministry
+ * of ICT's own published material (verified 2026-10-07), so nothing is invented.
+ */
+export const GOVERNMENT_PAGE = {
+  eyebrow: "Built for Government",
+  hero: "From evidence to decision — one platform for Zimbabwe's policy work.",
+  standfirst:
+    `The ${NAME} Policy Simulation Assistant lets a department test a draft policy before it is ` +
+    "implemented. The ZEPARI Research Assistant provides the evidence behind it. Together they carry " +
+    "a policy from research to decision — in step with Vision 2030 and the Ministry's own vision of " +
+    "a connected, knowledge-based society with secure information systems by 2030.",
+  ministryVision: "A connected knowledge-based society with secure information systems by 2030.",
+  ministryVisionBy: "Republic of Zimbabwe, Ministry of ICT, Postal and Courier Services",
+  assistants: [
+    { name: `${NAME} Policy Simulation Assistant`, role: "Test a draft policy before it is implemented." },
+    { name: "ZEPARI Policy Research Assistant", role: "The evidence behind the policy." },
+  ],
+  together: [
+    "Evidence reaches the policy desk.",
+    "The policy desk can ask the evidence desk.",
+    "Private by design.",
+  ],
+  rules: [
+    "Each side keeps control of its own data.",
+    "Only the minimum is shared.",
+    "Shared items are for a person to read, never for the machine.",
+    "Every item keeps its source.",
+    "A record is kept of what was shared, to whom and when.",
+  ],
+  alignment: [
+    "Vision 2030 — an upper-middle-income economy by 2030.",
+    "The Ministry's vision — a connected knowledge-based society with secure information systems by 2030.",
+    "National ICT Policy 2022–2027.",
+    "Cyber and Data Protection Act (Chapter 12:07).",
+    "The Zimbabwe National AI Strategy.",
+    "Digitalize Zimbabwe.",
+  ],
+} as const;

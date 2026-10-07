@@ -80,6 +80,42 @@
   }
 }
 
+/**
+ * THE ZEPARI RESEARCH PRODUCT'S OWN PALETTE (owner's decision, 2026-10-07).
+ *
+ * The build plan (docs/ZEPARI_BUILD_PLAN.md, §1 rule 3) revises the old "one palette" rule: the
+ * department side keeps the emerald + gold Zimbabwe State palette above, and the ZEPARI research
+ * side carries ZEPARI's OWN blue + gold, read from zepari.co.zw's own stylesheet — blue #3686d6,
+ * deep navy #1e4098, light #0094f0, gold #b58328, lighter #d2ac67.
+ *
+ * Every name below is NEW (the emerald tokens above are untouched, so nothing on the department side
+ * can change), and it is scoped to `.zepari`, so only the research screens wear these colours. Each
+ * text/background pair these screens actually use was checked against the 4.5:1 (text) and 3:1
+ * (rule) floors, so a label is never drawn in a colour too light to read.
+ */
+.zepari {
+  /* Blue + gold identity */
+  --zp-navy: 223 67% 36%; /* #1e4098 — masthead, headings, ink on a light surface */
+  --zp-blue: 210 66% 53%; /* #3686d6 — accent fill, active section, marks */
+  --zp-sky: 203 100% 47%; /* #0094f0 — one bright highlight per view */
+  --zp-gold: 39 64% 43%; /* #b58328 — gold rule on a light surface */
+  --zp-gold-soft: 39 54% 61%; /* #d2ac67 — gold on the dark surface */
+
+  /* Blue-tinted light neutrals — the research product's paper */
+  --zp-canvas: 214 35% 96%;
+  --zp-surface: 210 40% 99%;
+  --zp-line: 216 25% 87%;
+  --zp-ink: 216 30% 13%;
+  --zp-ink-muted: 216 14% 40%;
+
+  /* Dark instrument neutrals — the analyst's terminal */
+  --zp-term-bg: 223 45% 9%;
+  --zp-term-panel: 223 38% 13%;
+  --zp-term-line: 222 26% 22%;
+  --zp-term-text: 210 40% 93%;
+  --zp-term-muted: 215 22% 66%;
+}
+
 @layer base {
   * {
     @apply border-border;

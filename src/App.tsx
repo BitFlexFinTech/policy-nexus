@@ -14,6 +14,11 @@ import { ResearchChatPanel } from "./components/research/ResearchChatPanel";
 import { ResearchBriefPanel } from "./components/research/ResearchBriefPanel";
 import { ResearchBarometerPanel } from "./components/research/ResearchBarometerPanel";
 import { ResearchFindingsPanel } from "./components/research/ResearchFindingsPanel";
+import DesignOptions from "./pages/research/designs/DesignOptions.tsx";
+import DesignDesk from "./pages/research/designs/DesignDesk.tsx";
+import DesignTerminal from "./pages/research/designs/DesignTerminal.tsx";
+import DesignLab from "./pages/research/designs/DesignLab.tsx";
+import BuiltForGovernment from "./pages/research/designs/BuiltForGovernment.tsx";
 import Index from "./pages/Index.tsx";
 import Documents from "./pages/Documents.tsx";
 import Support from "./pages/Support.tsx";
@@ -79,6 +84,14 @@ const App = () => (
               landing page (with the two one-click entries), and a workspace that needs a research
               session. A department session never opens it, and it never opens the department side. */}
           <Route path="/research" element={<ResearchLanding />} />
+          {/* Stage D design options (docs/ZEPARI_BUILD_PLAN.md, §5): the three UI directions offered
+              to the owner, plus the "Built for Government" page. They are unguarded ON PURPOSE — the
+              choice is made BEFORE the product is built, so they must open without a research session. */}
+          <Route path="/research/designs" element={<DesignOptions />} />
+          <Route path="/research/designs/desk" element={<DesignDesk />} />
+          <Route path="/research/designs/terminal" element={<DesignTerminal />} />
+          <Route path="/research/designs/lab" element={<DesignLab />} />
+          <Route path="/research/designs/government" element={<BuiltForGovernment />} />
           <Route element={<RequireResearchSession />}>
             <Route element={<ResearchWorkspaceLayout />}>
               <Route path="/research/app" element={<ResearchOverview />} />
