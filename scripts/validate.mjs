@@ -1975,6 +1975,45 @@ if (!existsSync(cssPath)) {
   check("the platform homepage rebuild is in place", problems);
 }
 
+// check 42 — THE TWO TOOLS ARE KEPT APART ON THEIR OWN PAGES (owner's instruction, 2026-10-07)
+// The choice between the two products lives on the platform homepage (`/`). Each tool's OWN page must
+// not offer a card for the other tool — the Nzwisiso policy-simulation page used to, and it passed
+// every gate because nothing asserted the card's ABSENCE. This fails the build if `src/pages/Landing.tsx`
+// again links to `/research` or shows a "Choose a service" chooser, or if either tool page (the
+// simulation landing at `/simulation`, the research landing at `/research`) loses its way back to `/`.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const landing = readIf("src/pages/Landing.tsx");
+  if (landing === null) {
+    problems.push("src/pages/Landing.tsx is missing");
+  } else {
+    if (/to="\/research"/.test(landing)) {
+      problems.push('src/pages/Landing.tsx links to "/research" — a tool page must not offer the other tool');
+    }
+    if (/Choose a service/.test(landing)) {
+      problems.push('src/pages/Landing.tsx shows a "Choose a service" chooser — that choice belongs on the homepage');
+    }
+  }
+
+  // Each tool's way home lives in its own SHELL HEADER, so it costs no height in the page content
+  // (the simulation landing's primary action must stay on a phone's first screen).
+  const publicShell = readIf("src/components/public/PublicPageShell.tsx");
+  if (publicShell === null || !/Back to home/.test(publicShell) || !/to="\/"/.test(publicShell)) {
+    problems.push('the public shell (PublicPageShell) carries no "Back to home" link to "/"');
+  }
+  const researchShell = readIf("src/components/research/ResearchShell.tsx");
+  if (researchShell === null || !/Back to home/.test(researchShell) || !/to="\/"/.test(researchShell)) {
+    problems.push('the research shell (ResearchShell) carries no "Back to home" link to "/"');
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the two tools are kept apart on their own pages — each links back to the platform home and offers no card for the other tool");
+  }
+  check("the two tools are kept apart on their own pages", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

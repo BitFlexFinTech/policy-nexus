@@ -70,4 +70,10 @@ describe("the ZEPARI research assistant", () => {
     expect(window.location.pathname).toBe("/research");
     expect(screen.getByRole("heading", { level: 1, name: RESEARCH_NAME })).toBeInTheDocument();
   });
+
+  it("carries a way back to the platform home", () => {
+    renderAt("/research");
+    const back = screen.getByRole("link", { name: /back to home/i });
+    expect(back).toHaveAttribute("href", "/");
+  });
 });

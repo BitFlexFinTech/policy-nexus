@@ -74,51 +74,6 @@ export default function Landing() {
   const content = useContent();
   return (
     <PublicPageShell>
-      {/* THE CHOICE AT THE DOOR (owner's decision, 2026-10-06): opening the platform presents the
-          two services before either product's detail — the policy-simulation assistant
-          (departments) and the ZEPARI policy-research assistant. It sits first for that reason. */}
-      <section
-        aria-labelledby="service-choice-heading"
-        className="mb-4 rounded-lg border bg-card p-4 sm:mb-6 sm:p-5"
-      >
-        <h2
-          id="service-choice-heading"
-          className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground"
-        >
-          Choose a service
-        </h2>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <div className="flex flex-col rounded-md border bg-background p-4">
-            <p className="text-sm font-semibold tracking-tight text-foreground">
-              {BRAND.name} — policy simulation
-            </p>
-            <p className="mt-1 flex-1 text-[11px] leading-relaxed text-muted-foreground">
-              Assess a department's policy draft against the groups it reaches, before implementation.
-            </p>
-            <Button asChild size="sm" className="mt-3 self-start">
-              <Link to="/start">
-                Choose a department
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </Link>
-            </Button>
-          </div>
-          <div className="flex flex-col rounded-md border bg-background p-4">
-            <p className="text-sm font-semibold tracking-tight text-foreground">
-              ZEPARI — policy research
-            </p>
-            <p className="mt-1 flex-1 text-[11px] leading-relaxed text-muted-foreground">
-              Research and policy analysis for ZEPARI's own evidence-based policy work.
-            </p>
-            <Button asChild size="sm" variant="outline" className="mt-3 self-start">
-              <Link to="/research">
-                Enter the research assistant
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
       {/* The authority line — the first thing on the page, and therefore the first
           thing in any screenshot or link a colleague opens. Every government
           artefact opens by stating what it is and whose it is; that is the whole
@@ -195,7 +150,7 @@ export default function Landing() {
           <p className="mt-3 max-w-xl text-pretty text-lg font-medium leading-relaxed text-foreground sm:mt-5 sm:text-xl">
             {BRAND.summary}
           </p>
-          <p className="mt-2 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:mt-3">
+          <p className="mt-1 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:mt-3">
             {BRAND.description}
           </p>
 
@@ -210,7 +165,7 @@ export default function Landing() {
 
               On a phone the gap above it is tighter, because the first screen is the
               only screen a reader is guaranteed to see. */}
-          <div className="mt-4 sm:mt-8">
+          <div className="mt-2 sm:mt-8">
             <Button asChild size="lg" className="h-11 px-5 text-sm">
               <Link to="/start">
                 Choose your Department

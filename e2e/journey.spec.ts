@@ -405,17 +405,17 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
    * prove either: the classes compile whether or not they fit.
    */
   /**
-   * The FIRST action on the opening page must be reachable without scrolling on the phone, because
-   * the Minister's first look at this page may well be a link opened on a phone. Since 2026-10-07 the
-   * opening page presents the CHOICE of the two services first (owner's decision), so the first
-   * action a visitor can take is that choice — which is what this now measures at a real width,
-   * instead of trusting the classes.
+   * The FIRST action on the policy-simulation landing must be reachable without scrolling on the
+   * phone, because a Department's first look at this page may well be a link opened on a phone.
+   * Since 2026-10-07 the choice between the two products lives on the platform homepage (`/`), and
+   * this tool's own landing carries only its single action — so that action is what this measures at
+   * a real width, instead of trusting the classes.
    */
   test("the first action is above the fold on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/simulation");
 
-    const action = page.getByRole("link", { name: "Choose a department" }).first();
+    const action = page.getByRole("link", { name: "Choose your Department" }).first();
     await expect(action).toBeVisible();
 
     const box = await action.boundingBox();
@@ -1382,6 +1382,16 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await expect(
       page.getByRole("heading", { name: "How they work together", exact: true }),
     ).toBeVisible();
+
+    // The service cards sit ABOVE the hero (owner's instruction, 2026-10-07): the "Choose a service"
+    // heading is higher on the page than the level-one heading.
+    const order = await page.evaluate(() => {
+      const top = (id: string) =>
+        document.querySelector(id)?.getBoundingClientRect().top ?? -1;
+      return { cards: top("#service-choice-heading"), hero: top("#home-heading") };
+    });
+    expect(order.cards).toBeGreaterThan(0);
+    expect(order.hero).toBeGreaterThan(order.cards);
 
     expectCleanRuntime();
   });

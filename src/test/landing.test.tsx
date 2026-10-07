@@ -14,7 +14,7 @@ import {
 
 const renderLanding = () =>
   render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={["/simulation"]}>
       <Landing />
     </MemoryRouter>,
   );
@@ -469,5 +469,30 @@ describe("Landing — the pure public landing page", () => {
         `${BRAND.name} creates a simulated population representing relevant stakeholder perspectives and examines how those agents interact within the policy scenario.`,
       );
     });
+  });
+});
+/**
+ * THE TWO TOOLS ARE KEPT APART (owner's instruction, 2026-10-07).
+ *
+ * The choice between the two products lives on the platform homepage (`/`). A tool's own landing must
+ * NOT offer a card for the other tool. The Nzwisiso policy-simulation page used to, and it passed
+ * every gate because nothing asserted the card's ABSENCE — this is that missing assertion. Scoped to
+ * the page's `<main>`, because the shared site-wide footer is a separate, intentional element.
+ */
+describe("the policy-simulation landing keeps the two tools apart", () => {
+  it("offers no ZEPARI chooser, and its one way back is the platform home", () => {
+    renderLanding();
+    const main = document.querySelector("main");
+    expect(main).not.toBeNull();
+    const region = within(main as HTMLElement);
+
+    // No chooser heading, and no link into the other tool, in the page's own content.
+    expect(region.queryByRole("heading", { name: "Choose a service" })).toBeNull();
+    const hrefs = region.getAllByRole("link").map((link) => link.getAttribute("href"));
+    expect(hrefs).not.toContain("/research");
+
+    // The way back to the platform home is in the masthead (shown off the home page).
+    const back = screen.getByRole("link", { name: /back to home/i });
+    expect(back).toHaveAttribute("href", "/");
   });
 });

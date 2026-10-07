@@ -32,7 +32,7 @@ export function PublicPageShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <OfficialMasthead markSrc={logoSrc(content, coatOfArms)} />
+      <OfficialMasthead markSrc={logoSrc(content, coatOfArms)} atHome={location.pathname === "/"} />
       <OfficialNoticeStrip />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">{children}</main>
       <OfficialFooter />
@@ -54,7 +54,7 @@ function Wordmark() {
 }
 
 /** State identity first, service identity second, closed by the national rule. */
-function OfficialMasthead({ markSrc }: { markSrc: string }) {
+function OfficialMasthead({ markSrc, atHome }: { markSrc: string; atHome: boolean }) {
   return (
     <header className="bg-primary text-primary-foreground">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
@@ -76,9 +76,23 @@ function OfficialMasthead({ markSrc }: { markSrc: string }) {
             </span>
           </div>
         </div>
-        <span className="hidden text-[11px] uppercase tracking-[0.16em] text-primary-foreground/75 md:inline">
-          {BRAND.initiativeShort}
-        </span>
+        <div className="flex items-center gap-4">
+          <span className="hidden text-[11px] uppercase tracking-[0.16em] text-primary-foreground/75 md:inline">
+            {BRAND.initiativeShort}
+          </span>
+          {/* The way home for a tool page (owner's instruction, 2026-10-07): shown on every public
+              page EXCEPT the platform home itself. It lives in the masthead so it costs NO height in
+              the page's content — the tool landing's primary action must stay on a phone's first
+              screen, which the browser test measures. */}
+          {!atHome && (
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-[0.14em] text-primary-foreground underline-offset-4 hover:underline"
+            >
+              ← Back to home
+            </Link>
+          )}
+        </div>
       </div>
       <div className="h-[3px] w-full bg-gold" />
     </header>

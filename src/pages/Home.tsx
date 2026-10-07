@@ -61,11 +61,11 @@ function Door({
     <div
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
-      className="flex flex-col rounded-lg border bg-card p-5 transition-colors hover:border-primary/40"
+      className="flex flex-col rounded-lg border bg-card p-3.5 transition-colors hover:border-primary/40"
     >
-      <p className="text-base font-semibold tracking-tight text-foreground">{name}</p>
-      <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground">{role}</p>
-      <Button asChild size="sm" className="mt-4 self-start">
+      <p className="text-sm font-semibold tracking-tight text-foreground">{name}</p>
+      <p className="mt-1 flex-1 text-xs leading-relaxed text-muted-foreground">{role}</p>
+      <Button asChild size="sm" className="mt-2.5 self-start">
         <Link to={to}>
           {action}
           <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -133,6 +133,38 @@ export default function Home() {
             {preview === "zepari" ? <ResearchLanding /> : <Landing />}
           </div>
         )}
+
+        {/* THE TWO DOORS — the choice of service, now at the TOP of the page (owner's instruction,
+            2026-10-07): the cards sit ABOVE the "Government of Zimbabwe · Policy intelligence" line
+            and are compact, so they never interrupt the story told below. They sit above the picture
+            layer (z-50), so on a hover-capable device the doors stay visible and clickable while the
+            rest of the page becomes the hovered tool's landing behind them. */}
+        <section aria-labelledby="service-choice-heading" className="relative z-50 mb-8">
+          <h2
+            id="service-choice-heading"
+            className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground"
+          >
+            {PLATFORM_HOME.tools.heading}
+          </h2>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <Door
+              name={PLATFORM_HOME.tools.simulation.name}
+              role={PLATFORM_HOME.tools.simulation.role}
+              action={PLATFORM_HOME.tools.simulation.door}
+              to={PLATFORM_HOME.tools.simulation.to}
+              onEnter={() => show("simulation")}
+              onLeave={hide}
+            />
+            <Door
+              name={PLATFORM_HOME.tools.research.name}
+              role={PLATFORM_HOME.tools.research.role}
+              action={PLATFORM_HOME.tools.research.door}
+              to={PLATFORM_HOME.tools.research.to}
+              onEnter={() => show("zepari")}
+              onLeave={hide}
+            />
+          </div>
+        </section>
 
         {/* The national hero — the most characteristic thing on the page: what this is for, and who
             it serves, stated the way a Government document states it. */}
@@ -213,36 +245,6 @@ export default function Home() {
           <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
             {AI_STRATEGY.publisher}. {SUPPORTED_INITIATIVE.citation}.
           </p>
-        </section>
-
-        {/* THE TWO DOORS — the choice of service, with the hover picture. This section sits above
-            the picture layer (z-50), so the doors stay visible and clickable while the rest of the
-            page becomes the tool's landing behind them. */}
-        <section aria-labelledby="service-choice-heading" className="relative z-50 mt-12">
-          <h2
-            id="service-choice-heading"
-            className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground"
-          >
-            {PLATFORM_HOME.tools.heading}
-          </h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <Door
-              name={PLATFORM_HOME.tools.simulation.name}
-              role={PLATFORM_HOME.tools.simulation.role}
-              action={PLATFORM_HOME.tools.simulation.door}
-              to={PLATFORM_HOME.tools.simulation.to}
-              onEnter={() => show("simulation")}
-              onLeave={hide}
-            />
-            <Door
-              name={PLATFORM_HOME.tools.research.name}
-              role={PLATFORM_HOME.tools.research.role}
-              action={PLATFORM_HOME.tools.research.door}
-              to={PLATFORM_HOME.tools.research.to}
-              onEnter={() => show("zepari")}
-              onLeave={hide}
-            />
-          </div>
         </section>
 
         {/* How the two work together — the owner's own three lines, plus the strict boundary. */}

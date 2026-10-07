@@ -119,12 +119,12 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-07, after the platform homepage was rebuilt — a new `/` homepage carrying the national story and both tools, the policy-simulation landing moved to `/simulation`, the ZEPARI light header + logo, the centred footer copyright, and the static door hover preview — on top of the ZEPARI research assistant rebuilt as a real seven-section workspace — Overview, Library, Data sources, Ask, Policy brief, Economic Barometer, Findings — and all sixteen departments' drafts made to follow a real Zimbabwean instrument whose own structure was read from the document; the host and the working copy are IN STEP).**
+- **Status today (2026-10-07, after the platform-homepage follow-up — the two service cards moved to the top of the homepage, each tool page given a "← Back to home" masthead button, and the ZEPARI chooser card removed from the `/simulation` landing — on top of the platform homepage rebuilt, the ZEPARI research assistant rebuilt as a real seven-section workspace — Overview, Library, Data sources, Ask, Policy brief, Economic Barometer, Findings — and all sixteen departments' drafts made to follow a real Zimbabwean instrument whose own structure was read from the document; the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-Cm7saUXB.js` (`2c083d0c4b6289fe8d27c7d906be0c4a56dd217dbb17b53959a11dc6321833cc`) — fetched
+  `assets/index-CpnaeIPD.js` (`eaeef670a426526addeb81b52a92176c2e40100250123ae17489a1757ccd17ef`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R` over
-  explicit FTPS, **never `--delete`** — 14 files (3 new, 11 modified), 2,078,003 bytes — and the SSL validation token
+  explicit FTPS, **never `--delete`** — 14 files (2 new, 12 modified), 2,076,771 bytes — and the SSL validation token
   (`.well-known/pki-validation/`, 25 Sep) and `cgi-bin/` were confirmed intact afterwards. **`npm run
   sync:check` reports IN SYNC.** The published bundle carries the owner's items 1–11 plus the 2026-10-02
   expansion and the 2026-10-04 dataset-expansion batches 1–4 and the PART 11 batches 1–7 — **150** canonical stakeholder groups, every

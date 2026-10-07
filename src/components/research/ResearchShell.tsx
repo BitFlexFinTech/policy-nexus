@@ -18,9 +18,9 @@ export function ResearchShell({ children }: { children: ReactNode }) {
       <ZepariMasthead>
         <Link
           to="/"
-          className="text-[11px] font-medium uppercase tracking-[0.16em] text-zp-navy underline-offset-4 hover:underline"
+          className="inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-[0.14em] text-zp-navy underline-offset-4 hover:underline"
         >
-          All services
+          ← Back to home
         </Link>
       </ZepariMasthead>
 
