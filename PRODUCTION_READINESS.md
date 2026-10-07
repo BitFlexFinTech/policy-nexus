@@ -116,9 +116,9 @@ client is registered.
   the fetched file was checked for this session's work markers ("Named sources", "Structural
   relationships"). `npm run validate` now checks that this file and `PROJECT_STATUS.md` agree on the
   bundle name and carry the hash, so the claim cannot go stale in silence.
-- **Status today (2026-10-06, after four demo fixes — the fixed demo name, the government-voice closing card, the slow-living graph and ONE platform-mode control — on top of the earlier live build; the host and the working copy are IN STEP).**
+- **Status today (2026-10-07, after the ZEPARI research product — the front door with the two one-click entries, the research library, the data-connectors, the grounded chat, the policy brief, the Economic Barometer and findings-to-departments — on top of the completed per-department policy reading; the host and the working copy are IN STEP).**
   `nzwisiso.bitflex.app` serves
-  `assets/index-D2gkonoE.js` (`77cb59e415413b53639ca37485af7605679bb3894376f4c15c2003a8dbff3aee`) — fetched
+  `assets/index-C0DSySnQ.js` (`061f4245c8ac8260bd614b7c6bc8d3fd003e3bec6ae3b6429807ef4888fdafc1`) — fetched
   and hashed against the local `dist/` build (identical), and the site returns **200**, with 0 console
   errors, 0 page errors and 0 off-origin requests. The upload was `lftp mirror -R --only-newer` over
   explicit FTPS, **never `--delete`** — 13 files, 1,966,994 bytes — and the SSL validation token

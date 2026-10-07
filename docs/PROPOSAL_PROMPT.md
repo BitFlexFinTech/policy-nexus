@@ -445,10 +445,10 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister, to
   ZEPARI or to Cabinet**. The document for that room is **Part 1 — the funding memo**.
-- **What the live site actually is today (re-checked 2026-10-06, after four demo fixes — the fixed demo name, the government-voice closing card, the slow-living graph and ONE platform-mode control).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-D2gkonoE.js`
-  (`77cb59e415413b53639ca37485af7605679bb3894376f4c15c2003a8dbff3aee`), which is byte-identical to the
-  local build, so **the live site is the build published on 2026-10-06** — it shows the **live date and
+- **What the live site actually is today (re-checked 2026-10-07, after the ZEPARI research product — the front door, the research library, the data-connectors, the grounded chat, the policy brief, the Economic Barometer and findings-to-departments).**
+  The host `nzwisiso.bitflex.app` serves `assets/index-C0DSySnQ.js`
+  (`061f4245c8ac8260bd614b7c6bc8d3fd003e3bec6ae3b6429807ef4888fdafc1`), which is byte-identical to the
+  local build, so **the live site is the build published on 2026-10-07** — it shows the **live date and
   time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (275 published / 235 modelled), and it carries the authority line, the modelled
   agent population, the named sources (with the corrected sentence naming both publishers the stakeholder
   shares stand on), the official Coat of Arms, the favicon set, the Nzwisiso.ai
