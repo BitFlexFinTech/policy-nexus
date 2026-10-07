@@ -127,7 +127,7 @@ export const RESEARCH_PARTS: readonly ResearchPart[] = [
     id: "findings",
     label: "Findings to departments",
     note: "Route findings to the departments they concern.",
-    built: false,
+    built: true,
   },
 ];
 

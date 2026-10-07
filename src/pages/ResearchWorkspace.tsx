@@ -7,6 +7,7 @@ import { ResearchDataSourcesPanel } from "@/components/research/ResearchDataSour
 import { ResearchChatPanel } from "@/components/research/ResearchChatPanel";
 import { ResearchBriefPanel } from "@/components/research/ResearchBriefPanel";
 import { ResearchBarometerPanel } from "@/components/research/ResearchBarometerPanel";
+import { ResearchFindingsPanel } from "@/components/research/ResearchFindingsPanel";
 import { researchSessionActions, useResearchSession } from "@/session/useResearchSession";
 
 /**
@@ -82,6 +83,10 @@ export default function ResearchWorkspace() {
 
       <div className="mt-6">
         <ResearchBarometerPanel />
+      </div>
+
+      <div className="mt-6">
+        <ResearchFindingsPanel />
       </div>
 
       <section aria-labelledby="research-workspace-parts" className="mt-6 rounded-lg border bg-card p-5 sm:p-6">

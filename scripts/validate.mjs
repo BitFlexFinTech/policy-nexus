@@ -1796,6 +1796,52 @@ if (!existsSync(cssPath)) {
 }
 
 
+// ---------------------------------------------------------------------------------------------
+// check 39 — FINDINGS ARE ROUTED TO DEPARTMENTS AND NEVER FEED THE ENGINE (ZEPARI findings surface)
+// The owner's decision: a research finding is routed to the departments it concerns. A finding is a
+// NOTE for a human reader — the strict boundary holds, so it is never read by the simulation engine.
+// This fails the build if the destination departments, the real-department check, the boundary
+// statement, or the wiring is removed.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const store = readIf("src/services/research/researchFindings.ts");
+  if (store === null) {
+    problems.push("src/services/research/researchFindings.ts is missing — there are no findings");
+  } else {
+    if (!/departments: DepartmentId\[\]/.test(store)) {
+      problems.push("a finding no longer carries its destination departments");
+    }
+    if (!/isDepartmentId/.test(store)) {
+      problems.push("findings are no longer scoped to real departments");
+    }
+  }
+
+  const seam = readIf("src/services/research/researchFindingsStore.ts");
+  if (seam === null) {
+    problems.push("src/services/research/researchFindingsStore.ts is missing — the findings have no seam");
+  }
+
+  const panel = readIf("src/components/research/ResearchFindingsPanel.tsx");
+  if (panel === null) {
+    problems.push("src/components/research/ResearchFindingsPanel.tsx is missing");
+  } else if (!/RESEARCH_BOUNDARY/.test(panel)) {
+    problems.push("the findings panel no longer states the boundary (a finding never feeds the engine)");
+  }
+
+  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
+  if (workspace && !/<ResearchFindingsPanel \/>/.test(workspace)) {
+    problems.push("the research workspace no longer renders findings-to-departments");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  findings are routed to the 16 departments and never feed the simulation engine");
+  }
+  check("findings are routed to departments and never feed the engine", problems);
+}
+
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));
