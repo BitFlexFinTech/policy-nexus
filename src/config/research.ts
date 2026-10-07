@@ -109,7 +109,7 @@ export const RESEARCH_PARTS: readonly ResearchPart[] = [
     id: "chat",
     label: "Grounded research chat",
     note: "Ask a question answered from the research library, with its sources shown.",
-    built: false,
+    built: true,
   },
   {
     id: "brief",

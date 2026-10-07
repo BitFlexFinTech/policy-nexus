@@ -1660,6 +1660,51 @@ if (!existsSync(cssPath)) {
 }
 
 
+// ---------------------------------------------------------------------------------------------
+// check 36 — THE RESEARCH CHAT IS GROUNDED AND NEVER FABRICATES AN ANSWER (ZEPARI Batch E)
+// The owner's decision: the research assistant answers from ZEPARI's own documents and shows its
+// sources. Retrieval always runs; a written answer needs the research model, and WITHOUT one the
+// platform shows the sources and says so — never an invented answer. This fails the build if the
+// retrieval, the chat service, its honest not-connected path, the panel, or the wiring is removed.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const retrieval = readIf("src/services/research/researchRetrieval.ts");
+  if (retrieval === null) {
+    problems.push("src/services/research/researchRetrieval.ts is missing — the chat is not grounded");
+  } else if (!/findSources/.test(retrieval)) {
+    problems.push("the retrieval no longer offers findSources — the chat cannot show its sources");
+  }
+
+  const chat = readIf("src/services/research/researchChat.ts");
+  if (chat === null) {
+    problems.push("src/services/research/researchChat.ts is missing — there is no grounded chat");
+  } else {
+    for (const [symbol, why] of [
+      ["askResearchQuestion", "the chat entry point is gone"],
+      ['liveService("research")', "the chat no longer uses the research model key"],
+      ["No answer model is connected", "the honest not-connected path is gone (an answer could be fabricated)"],
+    ]) {
+      if (!chat.includes(symbol)) problems.push(`the research chat: ${why} (${symbol})`);
+    }
+  }
+
+  const panel = readIf("src/components/research/ResearchChatPanel.tsx");
+  if (panel === null) problems.push("src/components/research/ResearchChatPanel.tsx is missing");
+
+  const workspace = readIf("src/pages/ResearchWorkspace.tsx");
+  if (workspace && !/<ResearchChatPanel \/>/.test(workspace)) {
+    problems.push("the research workspace no longer renders the grounded research chat");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the research chat is grounded in the research library and never fabricates an answer");
+  }
+  check("the research chat is grounded and never fabricates an answer", problems);
+}
+
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));
