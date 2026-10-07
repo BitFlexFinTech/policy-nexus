@@ -405,25 +405,25 @@ test.describe("policy-nexus — the whole journey, in a real browser", () => {
    * prove either: the classes compile whether or not they fit.
    */
   /**
-   * The primary action must be reachable without scrolling on the phone, because the
-   * Minister's first look at this page may well be a link opened on a phone. The
-   * authority line was compacted (two short columns instead of four stacked lines)
-   * rather than trimmed, and this test measures the result at a real width instead of
-   * trusting the classes.
+   * The FIRST action on the opening page must be reachable without scrolling on the phone, because
+   * the Minister's first look at this page may well be a link opened on a phone. Since 2026-10-07 the
+   * opening page presents the CHOICE of the two services first (owner's decision), so the first
+   * action a visitor can take is that choice — which is what this now measures at a real width,
+   * instead of trusting the classes.
    */
-  test("the primary action is above the fold on a phone", async ({ page }) => {
+  test("the first action is above the fold on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
 
-    const action = page.getByRole("link", { name: "Choose your Department" }).first();
+    const action = page.getByRole("link", { name: "Choose a department" }).first();
     await expect(action).toBeVisible();
 
     const box = await action.boundingBox();
-    expect(box, "the primary action has a box").not.toBeNull();
+    expect(box, "the first action has a box").not.toBeNull();
     const viewportHeight = page.viewportSize()?.height ?? 844;
     const bottom = (box?.y ?? 0) + (box?.height ?? 0);
-    console.log(`PHONE-FOLD: primary action bottom edge at ${Math.round(bottom)}px of ${viewportHeight}px`);
-    expect(bottom, "the primary action sits within the first screen of a phone").toBeLessThanOrEqual(
+    console.log(`PHONE-FOLD: first action bottom edge at ${Math.round(bottom)}px of ${viewportHeight}px`);
+    expect(bottom, "the first action sits within the first screen of a phone").toBeLessThanOrEqual(
       viewportHeight,
     );
   });
@@ -1321,6 +1321,38 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await mode.click();
     await expect(mode).toBeChecked();
     await expect(page.getByText(/the platform uses only real services/)).toBeVisible();
+
+    expectCleanRuntime();
+  });
+
+  test("opens with a choice of two services, and the ZEPARI research assistant has its own entry", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // The choice at the door: the two services, presented before either product's detail.
+    await expect(page.getByRole("heading", { name: "Choose a service" })).toBeVisible();
+    const researchLink = page.getByRole("link", { name: "Enter the research assistant" });
+    await expect(researchLink).toBeVisible();
+
+    // The research side has its own landing page, with the confidentiality promise.
+    await researchLink.click();
+    await expect(page).toHaveURL(/\/research$/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "ZEPARI Policy Research Assistant" }),
+    ).toBeVisible();
+    await expect(page.getByText(/cannot read any research/i)).toBeVisible();
+
+    // One-click entry signs the researcher in and opens the research workspace.
+    await page.getByRole("button", { name: "Enter as Dr. Gibson Chigumira" }).click();
+    await expect(page).toHaveURL(/\/research\/app$/);
+    await expect(page.getByText("Research workspace")).toBeVisible();
+    await expect(page.getByText(/Dr\. Gibson Chigumira/)).toBeVisible();
+
+    // The two products keep SEPARATE sessions: the department workspace is not signed in, so a
+    // direct visit is sent to the department chooser, not opened.
+    await page.goto("/app");
+    await expect(page).toHaveURL(/\/start$/);
 
     expectCleanRuntime();
   });

@@ -176,6 +176,12 @@ function OfficialFooter() {
             >
               Choose your Department
             </Link>
+            <Link
+              to="/research"
+              className="text-xs text-primary-foreground/85 underline-offset-4 hover:underline"
+            >
+              ZEPARI research assistant
+            </Link>
           </nav>
 
           <div className="flex flex-col gap-2">

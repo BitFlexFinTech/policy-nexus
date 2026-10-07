@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "./pages/Landing.tsx";
 import ChooseDepartment from "./pages/ChooseDepartment.tsx";
+import ResearchLanding from "./pages/ResearchLanding.tsx";
+import ResearchWorkspace from "./pages/ResearchWorkspace.tsx";
 import Index from "./pages/Index.tsx";
 import Documents from "./pages/Documents.tsx";
 import Support from "./pages/Support.tsx";
@@ -28,6 +30,7 @@ import { ADMIN_ROUTE } from "@/config/platform";
 import { faviconOverride } from "@/config/content";
 import { useContent } from "@/config/useContent";
 import { RequireSession } from "./routes/RequireSession.tsx";
+import { RequireResearchSession } from "./routes/RequireResearchSession.tsx";
 import { WorkspaceLayout } from "./layouts/WorkspaceLayout.tsx";
 
 const queryClient = new QueryClient();
@@ -65,6 +68,13 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/start" element={<ChooseDepartment />} />
+          {/* The ZEPARI research assistant — a separate product in the same platform. Its own
+              landing page (with the two one-click entries), and a workspace that needs a research
+              session. A department session never opens it, and it never opens the department side. */}
+          <Route path="/research" element={<ResearchLanding />} />
+          <Route element={<RequireResearchSession />}>
+            <Route path="/research/app" element={<ResearchWorkspace />} />
+          </Route>
           {/* Everything under /app requires a department session, and shares one
               workspace shell (header + secondary nav + sovereign footer). */}
           <Route element={<RequireSession />}>

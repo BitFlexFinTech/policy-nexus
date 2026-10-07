@@ -1352,6 +1352,14 @@ because the block it sits in already names itself.
 ## Verification log
 | Date | Command | Result |
 |---|---|---|
+| 2026-10-07 | **ZEPARI Batch B — the front door (the choice of two services; the ZEPARI landing + two one-click entries)** · `npm run validate` | PASS — all checks green, including the new **check 33** |
+| 2026-10-07 | ZEPARI Batch B · `npm run typecheck` | PASS — `tsc -b`, 0 errors |
+| 2026-10-07 | ZEPARI Batch B · `npm run lint` | PASS — 0 errors, 7 pre-existing react-refresh warnings |
+| 2026-10-07 | ZEPARI Batch B · `npm test` | PASS — **585/585 across 60 files** (was 580/59; **+5** — the new `src/test/research.test.tsx`) |
+| 2026-10-07 | ZEPARI Batch B · `npm run build` | PASS — `✓ assets/index-DTmtDSVM.js` |
+| 2026-10-07 | ZEPARI Batch B · `npx playwright test` | PASS — **23/23** (was 22; **+1** — the door and ZEPARI entry journey). `PHONE-FOLD: first action bottom edge at 399px of 844px` |
+| 2026-10-07 | ZEPARI Batch B · **check 33 proved able to fail by mutation** | PASS — renaming the research workspace route → `FAIL the ZEPARI research assistant has its own entry and landing — 1 violation(s)`; restored **byte-identical** (`6321b318b953cc4894625d536190c33c4f40ae055904b08d4965dbd435e9f16c`) |
+| 2026-10-07 | ZEPARI Batch B · two source-of-truth defects found and fixed at source | the promoter's name is no longer retyped (`src/config/research.ts` composes it from `PROMOTER.name`; the "one place only" test is green) and the bare product name was removed from a JSX comment (validate check 15 green) |
 | 2026-10-07 | **ZEPARI Batch A — the second OpenRouter key (the research assistant's own credential)** · `npm run validate` | PASS — all checks green, including the new **check 32** |
 | 2026-10-07 | ZEPARI Batch A · `npm run typecheck` | PASS — `tsc -b`, 0 errors |
 | 2026-10-07 | ZEPARI Batch A · `npm run lint` | PASS — 0 errors, 7 pre-existing react-refresh warnings |
@@ -4249,7 +4257,7 @@ in the order the owner has raised them.
 
 ## RESUME HERE
 
-**START HERE (2026-10-07) — the ZEPARI research product. Items (i) the drafted-policy rework, (ii) the Zimbabwean policy structure (completed as far as the tools allow — the real document for each of the 16 departments is named and **six** of their tables of contents are recorded; locating the remaining ten addresses is BLOCKED on search-host tooling) AND (iii) the proposal edits are DONE (see the DO FIRST list below and the verification log). Of the ZEPARI Research Assistant batches A–G, **Batch A is DONE (2026-10-07)** — the research assistant now has its OWN OpenRouter key, entered on `/platform-admin` separately from the drafting key, so the two assistants are metered apart (validate **check 32**, mutation-proved, plus a source test that the two keys never share a value); the next work is **Batch B**. Nothing has been published yet, so the live host still carries the previous bundle.**
+**START HERE (2026-10-07) — the ZEPARI research product. Items (i) the drafted-policy rework, (ii) the Zimbabwean policy structure (completed as far as the tools allow — the real document for each of the 16 departments is named and **six** of their tables of contents are recorded; locating the remaining ten addresses is BLOCKED on search-host tooling) AND (iii) the proposal edits are DONE (see the DO FIRST list below and the verification log). Of the ZEPARI Research Assistant batches A–G, **Batches A and B are DONE (2026-10-07)** — **Batch A**: the research assistant's OWN OpenRouter key, entered on `/platform-admin` separately from the drafting key, so the two are metered apart (validate **check 32**, mutation-proved); **Batch B**: the **front door** — the opening page presents the **choice** of the two services, the **ZEPARI research assistant** has its **own landing page at `/research`** with the **two one-click entries** (Dr. Gibson Chigumira; Dr. Jesimen Chipika) and the confidentiality promise, and a **workspace at `/research/app`**, with the two products keeping **separate sessions** (validate **check 33**, mutation-proved, +5 tests, +1 e2e journey). The next work is **Batch C**. Nothing has been published yet, so the live host still carries the previous bundle.**
 **Branch** `feature/unified-platform` (never `main`). **Live build** `assets/index-D2gkonoE.js` (sha256 `77cb59e4…`). **Global rule** `follow-exact-instructions-no-assumptions.md` is installed in BOTH global rules folders (`~/.cline/rules`, `~/Documents/Cline/Rules`, byte-identical) and checked by `node ~/.cline/rules/check-rules.mjs`.
 
 **DO FIRST, in order (the owner's explicit instruction):**

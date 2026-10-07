@@ -1511,6 +1511,63 @@ if (!existsSync(cssPath)) {
 }
 
 
+// ---------------------------------------------------------------------------------------------
+// check 33 — THE ZEPARI RESEARCH ASSISTANT HAS ITS OWN ENTRY AND LANDING (ZEPARI Batch B)
+// The owner's decision (2026-10-06): the platform carries TWO products, and opening the site
+// presents a choice — the Nzwisiso policy-simulation assistant (departments) and the ZEPARI
+// policy-research assistant, which has its own landing page and two one-click entries. This fails
+// the build if the choice, the landing, the two entries, the separate session, or the routes are
+// removed. It also fails if a registered mark is put on the ZEPARI name (owner's decision 7).
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const research = readIf("src/config/research.ts");
+  if (research === null) {
+    problems.push("src/config/research.ts is missing — the research product has no single source of truth");
+  } else {
+    for (const name of ["Dr. Gibson Chigumira", "Dr. Jesimen Chipika"]) {
+      if (!research.includes(name)) problems.push(`src/config/research.ts no longer names ${name}`);
+    }
+    if (!/cannot read any research/.test(research)) {
+      problems.push("src/config/research.ts no longer carries the confidentiality promise");
+    }
+    if (/®/.test(research)) {
+      problems.push("src/config/research.ts asserts a registered mark on the ZEPARI name (owner's decision: none)");
+    }
+  }
+
+  for (const rel of [
+    "src/pages/ResearchLanding.tsx",
+    "src/pages/ResearchWorkspace.tsx",
+    "src/session/researchSession.ts",
+    "src/routes/RequireResearchSession.tsx",
+  ]) {
+    if (readIf(rel) === null) problems.push(`${rel} is missing — the research entry is incomplete`);
+  }
+
+  const session = readIf("src/session/researchSession.ts");
+  if (session && (!/signInResearcher/.test(session) || !/clearResearchSession/.test(session))) {
+    problems.push("the research session no longer offers sign-in and sign-out");
+  }
+
+  const app = readIf("src/App.tsx");
+  if (app && (!/path="\/research"/.test(app) || !/path="\/research\/app"/.test(app))) {
+    problems.push("src/App.tsx no longer routes the research landing and workspace");
+  }
+
+  const landing = readIf("src/pages/Landing.tsx");
+  if (landing && (!/Choose a service/.test(landing) || !/to="\/research"/.test(landing))) {
+    problems.push("the opening page no longer presents the choice between the two services");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the ZEPARI research assistant has its own entry and landing, kept apart from the department workspace");
+  }
+  check("the ZEPARI research assistant has its own entry and landing", problems);
+}
+
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));
