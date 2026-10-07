@@ -445,9 +445,9 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister, to
   ZEPARI or to Cabinet**. The document for that room is **Part 1 — the funding memo**.
-- **What the live site actually is today (re-checked 2026-10-07, after the ZEPARI research product — the front door, the research library, the data-connectors, the grounded chat, the policy brief, the Economic Barometer and findings-to-departments).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-C0DSySnQ.js`
-  (`061f4245c8ac8260bd614b7c6bc8d3fd003e3bec6ae3b6429807ef4888fdafc1`), which is byte-identical to the
+- **What the live site actually is today (re-checked 2026-10-07, after the ZEPARI research assistant was rebuilt as a real seven-section workspace and all sixteen departments' drafts were made to follow a real Zimbabwean instrument whose own structure was read from the document).**
+  The host `nzwisiso.bitflex.app` serves `assets/index-piHLan5-.js`
+  (`838f41277cbf9b54cddffa1aad19a1c51e5b6975f2b9274cc03d038817f34b7a`), which is byte-identical to the
   local build, so **the live site is the build published on 2026-10-07** — it shows the **live date and
   time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (275 published / 235 modelled), and it carries the authority line, the modelled
   agent population, the named sources (with the corrected sentence naming both publishers the stakeholder
