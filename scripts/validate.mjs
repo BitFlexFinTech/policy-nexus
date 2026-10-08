@@ -2347,6 +2347,54 @@ if (!existsSync(cssPath)) {
   check("the two confidentiality cards are in place and are not swapped", problems);
 }
 
+// check 48 — THE RESEARCH SCREENS WEAR ZEPARI'S COLOURS, NEVER THE DEPARTMENT'S EMERALD (owner's
+// report, 2026-10-07: "the buttons on the research assistant are still green, this is unacceptable …
+// why are the accents and some of the colors still green instead of using ZEPARI's color theme").
+//
+// The `.zepari` scope had always defined ZEPARI's colours — but under NEW names, while every SHARED
+// component inside it (the button's `bg-primary`, the input's focus `--ring`, the page paper) read the
+// PLATFORM's tokens, which are the State emerald in `:root`. Measured before the fix: the Ask button
+// computed to `rgba(0, 102, 0, 0.9)` = #006600. This check fails the build if the remap is removed,
+// if it stops pointing at a `--zp-*` token, or if `:root` is ever moved BELOW the scope (which would
+// make the palette-lock test read ZEPARI's value as the State palette).
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const css = readIf("src/index.css");
+  if (css === null) {
+    problems.push("src/index.css is missing");
+  } else {
+    const rootAt = css.indexOf(":root");
+    const zepariAt = css.indexOf(".zepari");
+    if (rootAt === -1) {
+      problems.push("src/index.css no longer holds the `:root` palette — the State colours are gone");
+    }
+    if (zepariAt === -1) {
+      problems.push("src/index.css no longer holds the `.zepari` scope — the research screens would wear the department palette");
+    }
+    if (rootAt > -1 && zepariAt > -1 && zepariAt < rootAt) {
+      problems.push("the `.zepari` scope is declared BEFORE `:root` — the locked-palette test reads the FIRST `--primary:` in the file, so it would read ZEPARI's value as the State emerald");
+    }
+    const scope = zepariAt > -1 ? css.slice(zepariAt) : "";
+    for (const [line, why] of [
+      ["--primary: var(--zp-navy)", "the research side's solid fills are not ZEPARI navy — a shared button would fall back to the department emerald again (the owner's report)"],
+      ["--ring: var(--zp-blue)", "the research side's focus outlines are not ZEPARI blue"],
+      ["--background: var(--zp-canvas)", "the research side's page paper is not ZEPARI's"],
+    ]) {
+      if (!scope.includes(line)) problems.push(`the ZEPARI colour scope: ${why} (${line})`);
+    }
+    if (!/--primary: 120 100% 20%;/.test(css)) {
+      problems.push("the State emerald (`--primary: 120 100% 20%`) is no longer in the palette — the department side is a locked constraint");
+    }
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the research screens wear ZEPARI's navy, blue and neutrals: the shared buttons, focus rings and page paper inside `.zepari` no longer fall back to the department emerald");
+  }
+  check("the research screens wear ZEPARI's colours, never the department emerald", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

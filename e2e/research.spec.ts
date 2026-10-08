@@ -76,4 +76,53 @@ test.describe("the ZEPARI research assistant — the redesigned workspace", () =
 
     expect(errors, `console errors: ${errors.join(" | ")}`).toEqual([]);
   });
+
+  /**
+   * THE RESEARCH SIDE WEARS ZEPARI'S COLOURS, NEVER THE DEPARTMENT'S EMERALD — measured, not asserted
+   * from the source. The owner's report (2026-10-07): "the buttons on the research assistant are still
+   * green, this is unacceptable". The Ask button really did compute to rgba(0, 102, 0, 0.9) = #006600.
+   * This measures the Ask button's own colour AND the shared tokens inside the `.zepari` scope, and
+   * then checks the department side still wears the State emerald — because the fix must not have
+   * touched it.
+   */
+  test("the research side wears ZEPARI's colours, never the department's emerald", async ({ page }) => {
+    const documentToken = (name: string) =>
+      page.evaluate((token) => getComputedStyle(document.documentElement).getPropertyValue(token).trim(), name);
+
+    // The research workspace — entered as a researcher, then the Ask section.
+    await page.goto("/research");
+    await page.getByRole("button", { name: "Enter as Dr. Gibson Chigumira" }).click();
+    await expect(page).toHaveURL(/\/research\/app$/);
+    await page.goto("/research/app/ask");
+    await expect(page.getByRole("heading", { name: /ask the research library/i })).toBeVisible();
+
+    const scope = page.locator(".zepari").first();
+    const scopeToken = (name: string) =>
+      scope.evaluate((el, token) => getComputedStyle(el).getPropertyValue(token).trim(), name);
+    expect(await scopeToken("--primary"), "the research scope must not carry the State emerald").not.toBe(
+      "120 100% 20%",
+    );
+    expect(await scopeToken("--ring"), "the research focus ring must not be the State emerald").not.toBe(
+      "120 100% 20%",
+    );
+
+    const askColour = await page
+      .getByRole("button", { name: /^ask/i })
+      .first()
+      .evaluate((node) => getComputedStyle(node).backgroundColor);
+    expect(askColour, `the Ask button is ${askColour}`).not.toContain("0, 102, 0");
+    const channels = askColour.match(/\d+/g)?.map(Number) ?? [];
+    expect(
+      channels[2],
+      `the Ask button must be a blue — red ${channels[0]}, green ${channels[1]}, blue ${channels[2]} (${askColour})`,
+    ).toBeGreaterThan(channels[1]);
+
+    // The DEPARTMENT side is untouched: the State emerald is still the platform's own primary there.
+    await page.goto("/simulation");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    expect(
+      await documentToken("--primary"),
+      "the policy simulator must still wear the State emerald — the ZEPARI fix must not reach the department side",
+    ).toBe("120 100% 20%");
+  });
 });

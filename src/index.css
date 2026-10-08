@@ -114,6 +114,51 @@
   --zp-term-line: 222 26% 22%;
   --zp-term-text: 210 40% 93%;
   --zp-term-muted: 215 22% 66%;
+
+  /* ----------------------------------------------------------------------------------------------
+     THE PLATFORM'S OWN TOKENS, REMAPPED INSIDE THE RESEARCH SCOPE.
+
+     The owner's report (2026-10-07): "the buttons on the research assistant are still green, this is
+     unacceptable … why are the accents and some of the colors still green instead of using ZEPARI's
+     color theme." He was right, and this is the cause: the block above defines ZEPARI's colours under
+     NEW names only, so every SHARED component inside the research screens kept reading the
+     DEPARTMENT's tokens — `ui/button.tsx`'s default fill is `bg-primary` and the focus outline is
+     `--ring`, both of which are the State emerald in `:root`. Measured before this fix: the Ask
+     button computed to `rgba(0, 102, 0, 0.9)` = #006600.
+
+     Pointing those tokens at ZEPARI's own values fixes every shared part at once — solid buttons,
+     outline-button hover, inputs and their focus rings, links, cards, borders and page paper — with
+     NO change to any `src/components/ui/**` file, and NO new colour value: every line below reads a
+     `--zp-*` token defined above, except the two places where a token already exists for the purpose.
+     The department side cannot change, because this scope is `.zepari` only.
+
+     Two deliberate choices:
+       - `--primary` is ZEPARI's NAVY, not its lighter blue: white text on navy measures about 8.6:1
+         (legible), while white on #3686d6 is only about 3.2:1 (not legible at body size). The lighter
+         blue stays what the palette says it is — the accent and the focus ring.
+       - `--primary-foreground` is `--zp-surface` (a one-step-off-white that is already a token here)
+         rather than a new white, so this block introduces no colour value of its own.
+     `npm run validate` (check 48) fails the build if any of these three lines is removed, and the
+     research browser test measures the Ask button's real colour.
+     ---------------------------------------------------------------------------------------------- */
+  --background: var(--zp-canvas);
+  --foreground: var(--zp-ink);
+  --card: var(--zp-surface);
+  --card-foreground: var(--zp-ink);
+  --popover: var(--zp-surface);
+  --popover-foreground: var(--zp-ink);
+  --primary: var(--zp-navy);
+  --primary-foreground: var(--zp-surface);
+  --primary-tint: var(--zp-canvas);
+  --secondary: var(--zp-canvas);
+  --secondary-foreground: var(--zp-navy);
+  --muted: var(--zp-canvas);
+  --muted-foreground: var(--zp-ink-muted);
+  --accent: var(--zp-canvas);
+  --accent-foreground: var(--zp-navy);
+  --border: var(--zp-line);
+  --input: var(--zp-line);
+  --ring: var(--zp-blue);
 }
 
 @layer base {
