@@ -62,6 +62,15 @@ export function ResearchBriefPanel() {
         </Button>
       </div>
 
+      {/* Same note as the chat's, for the same reason: the first brief is slow because the model is
+          downloaded from this site once (about 80 MB). */}
+      {drafting && (
+        <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground" role="status">
+          Drawing the brief from ZEPARI's documents with the model in this browser. The first brief
+          downloads the model from this site once (about 80 MB); after that it is quick.
+        </p>
+      )}
+
       {brief && (
         <div className="mt-3 space-y-3">
           <p className="text-[10px] leading-relaxed text-muted-foreground">{brief.detail}</p>

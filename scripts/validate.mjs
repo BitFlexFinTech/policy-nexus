@@ -2395,6 +2395,73 @@ if (!existsSync(cssPath)) {
   check("the research screens wear ZEPARI's colours, never the department emerald", problems);
 }
 
+// check 49 — THE FREE IN-BROWSER MODEL IS WIRED, AND NOTHING IT NEEDS COMES FROM OUTSIDE OUR SITE
+// (owner's decision, 2026-10-07: "go with free in-browser model we need the research engine to
+// actually work for the demo presentation", and the earlier instruction "local models … not chatboxes
+// that are hosted outside Zimbabwe").
+//
+// The model runs in the visitor's browser, so the only thing that keeps the promise is the library's
+// configuration: remote models OFF, and the model files and the engine's own WebAssembly files pointed
+// at OUR OWN web root. This fails the build if any of that is removed, if either service stops asking
+// the browser model, or if the models are allowed into the code store (about 118 MB of binary that must
+// be fetched onto a machine, never committed).
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const model = readIf("src/services/research/researchBrowserModel.ts");
+  if (model === null) {
+    problems.push("src/services/research/researchBrowserModel.ts is missing — with no key connected the assistant could only quote the library");
+  } else {
+    for (const [symbol, why] of [
+      ["env.allowRemoteModels = false", "remote models are no longer switched off — a request could leave our own site (the owner's sovereignty instruction)"],
+      ['env.localModelPath = "/models/"', "the model files are no longer read from our own web root"],
+      ["wasmPaths = \"/models/ort/\"", "the engine's own WebAssembly files are no longer read from our own web root"],
+      ["Xenova/distilbert-base-uncased-distilled-squad", "the answering model is gone"],
+      ["answer(question, passage.text)", "the two-argument call is gone — the object form returns an empty answer with no error, which looks exactly like a model that cannot run"],
+    ]) {
+      if (!model.includes(symbol)) problems.push(`the in-browser model: ${why} (${symbol})`);
+    }
+  }
+
+  for (const [file, label] of [
+    ["src/services/research/researchChat.ts", "the chat"],
+    ["src/services/research/researchBrief.ts", "the brief"],
+  ]) {
+    const source = readIf(file);
+    if (source && !source.includes("researchBrowserModel")) {
+      problems.push(`${label} no longer asks the free in-browser model — with no key it would answer only by quoting the library`);
+    }
+  }
+
+  const fetcher = readIf("scripts/fetch-models.mjs");
+  if (fetcher === null) {
+    problems.push("scripts/fetch-models.mjs is missing — the models could not be put on a machine or on the server");
+  } else {
+    if (!fetcher.includes("Xenova/distilbert-base-uncased-distilled-squad")) {
+      problems.push("the model fetcher no longer fetches the answering model");
+    }
+    if (!fetcher.includes("huggingface.co/")) {
+      problems.push("the model fetcher no longer names where the files come from");
+    }
+  }
+
+  const packageJson = readIf("package.json");
+  if (packageJson && !/"fetch:models"/.test(packageJson)) {
+    problems.push("`npm run fetch:models` is gone from package.json");
+  }
+
+  const ignore = readIf(".gitignore");
+  if (ignore && !/^public\/models\/$/m.test(ignore)) {
+    problems.push("public/models/ is no longer gitignored — about 118 MB of model binary could be committed into the code store");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the free in-browser model is wired, reads every file from our own site, and its binary is kept out of the code store");
+  }
+  check("the free in-browser model is wired and reads nothing from outside our site", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

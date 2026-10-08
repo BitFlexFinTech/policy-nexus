@@ -94,3 +94,46 @@ export const ASSEMBLED_BRIEF_DETAIL =
   "Assembled from ZEPARI's own documents. No brief model is connected, so this brief quotes the " +
   "passages the topic matched, in the brief's fixed sections, and says plainly which section it " +
   "could not produce.";
+
+/**
+ * The brief, with the FREE in-browser model's findings folded in. The model points at the sentence each
+ * document carries for this topic — a real quotation, not prose it made up — and the sections that need
+ * a judgement still say plainly that they were not produced, because a small extractive model cannot
+ * give one.
+ */
+export const assembleBriefWithFindings = (
+  topic: string,
+  findings: readonly { text: string; sourceName: string }[],
+  sections: readonly string[],
+): string => {
+  const [best, ...others] = findings;
+  const body = (section: string): string[] => {
+    if (section === "Purpose") {
+      return [
+        `This brief was requested on “${topic}”.`,
+        "The sentences below were read out of ZEPARI's own documents by the model running in this " +
+          "browser. Every one of them is a quotation from a document.",
+      ];
+    }
+    if (section === "Recommendations") {
+      return [
+        "Not produced. A recommendation is a judgement, and the model in this browser can only point " +
+          "at sentences that already exist in the documents. The quotations above are everything the " +
+          "library carries for this topic.",
+      ];
+    }
+    if (!findings.length) {
+      return ["No passage in the research library answered this topic for this section."];
+    }
+    if (section === "Context") {
+      return [`Quoted from ${best.sourceName}: “${best.text}”`];
+    }
+    const quoted = others.length ? others : [best];
+    return quoted.map((finding) => `• “${finding.text}” — ${finding.sourceName}`);
+  };
+
+  return sections
+    .flatMap((section) => [section, ...body(section), ""])
+    .join("\n")
+    .trim();
+};

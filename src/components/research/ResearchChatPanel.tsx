@@ -62,6 +62,17 @@ export function ResearchChatPanel() {
         </Button>
       </div>
 
+      {/* THE FIRST QUESTION IS SLOW AND MUST NOT LOOK FROZEN: with no key connected the free model runs
+          in this browser, so the first question downloads it from this site once (about 80 MB — the
+          model plus the engine's own files), and later questions use the copy already held. Measured on
+          2026-10-07: the answer appears in a few seconds once the files are held. */}
+      {asking && (
+        <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground" role="status">
+          Reading ZEPARI's documents with the model in this browser. The first question downloads the
+          model from this site once (about 80 MB); after that it is quick.
+        </p>
+      )}
+
       {answer && (
         <div className="mt-3 space-y-3">
           <p className="text-[10px] leading-relaxed text-muted-foreground">{answer.detail}</p>

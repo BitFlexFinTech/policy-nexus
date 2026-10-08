@@ -7,19 +7,26 @@
  *  - **Retrieval** always runs, locally and deterministically, over the documents ZEPARI added
  *    (see `researchRetrieval.ts`). The matching passages are the SOURCES, and they are real text.
  *  - **The written answer** is produced by the research model (OpenRouter, the research key entered
- *    on the administration screen) when one is connected. **When none is connected the question is
- *    still ANSWERED — from the library** (see `researchAssembly.ts`): the matched passages are
- *    quoted, each under the name of the document it came from, and the answer says plainly that it
- *    was assembled rather than written. The owner's build plan requires answers "from the library
- *    WITH OR WITHOUT AI" (`docs/ZEPARI_BUILD_PLAN.md`, Stage B), and a question that goes unanswered
- *    is not a demonstration of anything. Nothing is ever invented: every quotation really appears in
- *    the documents, and no figure is stated that is not in them.
+ *    on the administration screen) when one is connected, or — with no key, which is the owner's
+ *    default — by the **FREE model running in the visitor's own browser** (`researchBrowserModel.ts`).
+ *    **If neither can run, the question is still ANSWERED, by quoting the library**
+ *    (`researchAssembly.ts`): the matched passages are quoted, each under the name of the document it
+ *    came from, and the answer says plainly that it was assembled rather than written. The owner's
+ *    build plan requires answers "from the library WITH OR WITHOUT AI" (`docs/ZEPARI_BUILD_PLAN.md`,
+ *    Stage B), and a question that goes unanswered is not a demonstration of anything. Nothing is ever
+ *    invented at any of the three levels: every quotation really appears in the documents, and no
+ *    figure is stated that is not in them.
  *
  * The strict boundary holds: nothing here reaches the policy-simulation engine.
  */
 
 import { liveService, OPENROUTER_CHAT_ENDPOINT, type CapabilityConfig } from "@/config/platform";
 import { ASSEMBLED_ANSWER_DETAIL, assembleAnswer } from "./researchAssembly";
+import {
+  answerWithBrowserModel,
+  IN_BROWSER_ANSWER_DETAIL,
+  passagesFromSources,
+} from "./researchBrowserModel";
 import { listResearchDocuments } from "./researchDocuments";
 import { findSources, type ResearchSource } from "./researchRetrieval";
 
@@ -93,7 +100,8 @@ const researchClient = (config: CapabilityConfig) => ({
  */
 export const askResearchQuestion = async (question: string): Promise<ResearchChatAnswer> => {
   const trimmed = question.trim();
-  const sources = findSources(trimmed, listResearchDocuments());
+  const documents = listResearchDocuments();
+  const sources = findSources(trimmed, documents);
   const config = liveService("research");
 
   if (!config) {
@@ -106,10 +114,23 @@ export const askResearchQuestion = async (question: string): Promise<ResearchCha
           "No document in the research library matches this question. Add the relevant document to the library first.",
       };
     }
-    /* NO MODEL CONNECTED — the question is still answered, from the library itself. This is the free
-       default the owner's build plan requires ("answers from the library WITH OR WITHOUT AI"), and a
-       refusal to answer was a defect: the owner asked a question and the screen appeared to do
-       nothing. Every word below is quoted from a document that really matched. */
+    /* NO ANSWER MODEL CONNECTED — the FREE in-browser model answers, which is the owner's default (no
+       key, no cost, nothing leaving this machine). If it cannot run at all — no model files on the
+       server, no WebAssembly in this browser — the question is still answered by quoting the library.
+       Either way it IS answered: "a question the screen appeared to ignore" was the defect the owner
+       reported on 2026-10-07. */
+    const written = await answerWithBrowserModel(
+      trimmed,
+      passagesFromSources(sources, (id) => documents.find((document) => document.id === id)?.text),
+    );
+    if (written) {
+      return {
+        status: "answered",
+        answer: `“${written.text}”\n\nQuoted from ${written.sourceName} — read by the model running in this browser.`,
+        sources,
+        detail: IN_BROWSER_ANSWER_DETAIL,
+      };
+    }
     return {
       status: "assembled",
       answer: assembleAnswer(sources),

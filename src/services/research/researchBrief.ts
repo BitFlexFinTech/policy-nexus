@@ -15,7 +15,12 @@
 
 import { liveService, OPENROUTER_CHAT_ENDPOINT, type CapabilityConfig } from "@/config/platform";
 import { RESEARCH_BRIEF_SECTIONS } from "@/config/research";
-import { ASSEMBLED_BRIEF_DETAIL, assembleBrief } from "./researchAssembly";
+import { ASSEMBLED_BRIEF_DETAIL, assembleBrief, assembleBriefWithFindings } from "./researchAssembly";
+import {
+  findingsWithBrowserModel,
+  IN_BROWSER_BRIEF_DETAIL,
+  passagesFromSources,
+} from "./researchBrowserModel";
 import { listResearchDocuments } from "./researchDocuments";
 import { findSources, type ResearchSource } from "./researchRetrieval";
 
@@ -93,7 +98,8 @@ const briefClient = (config: CapabilityConfig) => ({
  */
 export const draftResearchBrief = async (topic: string): Promise<ResearchBrief> => {
   const trimmed = topic.trim();
-  const sources = findSources(trimmed, listResearchDocuments());
+  const documents = listResearchDocuments();
+  const sources = findSources(trimmed, documents);
   const structure = RESEARCH_BRIEF_SECTIONS;
   const config = liveService("research");
 
@@ -108,8 +114,24 @@ export const draftResearchBrief = async (topic: string): Promise<ResearchBrief> 
           "No document in the research library matches this topic. Add the relevant document to the library first.",
       };
     }
-    /* NO MODEL CONNECTED — the brief is still produced, assembled from the library. Same reason as
-       the chat: the build plan's free default is "answers from the library WITH OR WITHOUT AI". */
+    /* NO ANSWER MODEL CONNECTED — the FREE in-browser model is asked to point at the sentence each
+       document carries for this topic (the owner's default: no key, no cost, nothing leaving this
+       machine). If it cannot run at all, the brief is still produced by quoting the library. Same
+       reason as the chat: the build plan's free default is "answers from the library WITH OR WITHOUT
+       AI", and a topic with no brief is not a demonstration of anything. */
+    const findings = await findingsWithBrowserModel(
+      trimmed,
+      passagesFromSources(sources, (id) => documents.find((document) => document.id === id)?.text),
+    );
+    if (findings.length) {
+      return {
+        status: "drafted",
+        brief: assembleBriefWithFindings(trimmed, findings, structure),
+        sources,
+        structure,
+        detail: IN_BROWSER_BRIEF_DETAIL,
+      };
+    }
     return {
       status: "assembled",
       brief: assembleBrief(trimmed, sources, structure),
