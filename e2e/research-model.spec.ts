@@ -14,15 +14,15 @@ import { join } from "node:path";
  *      own instruction ("local models … not chatboxes that are hosted outside Zimbabwe").
  *
  * It is SKIPPED, with a clear reason, when the model files are not on this machine: they are about
- * 118 MB of binary and are deliberately kept out of the code store. `npm run fetch:models` puts them
+ * about 53 MB of binary and are deliberately kept out of the code store. `npm run fetch:models` puts them
  * there, and `npm run build` copies them into the site.
  */
 const ANSWER_MODEL_FILE = join(
   process.cwd(),
   "public",
   "models",
-  "Xenova",
-  "distilbert-base-uncased-distilled-squad",
+  "onnx-community",
+  "mobilebert-uncased-squad-v2-ONNX",
   "onnx",
   "model_quantized.onnx",
 );

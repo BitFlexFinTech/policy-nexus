@@ -19,7 +19,7 @@
  * `src/services/research/researchAssembly.ts`), which is the "without AI" half of the same plan.
  *
  * WHAT IS DOWNLOADED, with the size checked against Hugging Face on 2026-10-07:
- *   Xenova/distilbert-base-uncased-distilled-squad   onnx/model_quantized.onnx   67 MB
+ *   onnx-community/mobilebert-uncased-squad-v2-ONNX  onnx/model_quantized.onnx   25.7 MB
  * plus the model's tokenizer/config files (about 1 MB).
  *
  * ONLY WHAT THE ENGINE USES IS DOWNLOADED. `Xenova/all-MiniLM-L6-v2` (23 MB) is the plan's SEMANTIC
@@ -43,19 +43,32 @@ const PUBLIC_MODELS = join(ROOT, "public", "models");
 const ORT_TARGET = join(PUBLIC_MODELS, "ort");
 
 /**
- * ONLY THE TWO ENGINE FILES A REAL BROWSER ASKS FOR are copied. The package ships four WebAssembly
- * variants (about 60 MB in total), and keeping all four would put 60 MB of never-requested binary on
- * the server. MEASURED 2026-10-07 in Chromium: the engine asked for `…asyncify.wasm`; `…jsep.wasm` is
- * kept as well, because that is the variant a WebGPU-capable browser (the owner's own Chrome) may ask
- * for. A browser asking for either of the other two would get a 404 and the assistant would fall back
- * to quoting the library — safe, but not the demonstration we want.
+ * ONLY THE ENGINE FILE A REAL BROWSER ASKS FOR is copied. The package ships four WebAssembly variants
+ * (about 90 MB in total) and keeping more than one puts tens of megabytes of never-requested binary on
+ * the server. MEASURED twice, 2026-10-07 in Chromium: the engine asked for `…asyncify.wasm` (26 MB).
+ * A second variant (`…jsep.wasm`, 27 MB) was kept at first "in case a WebGPU browser wants it", and
+ * then REMOVED on the owner's instruction that this is for the demonstration: a browser that asked for
+ * it would get a 404 and the assistant would fall back to quoting the library, and the full set belongs
+ * on the VPS, not here.
  */
-const ORT_VARIANTS = /^ort-wasm-simd-threaded\.(asyncify|jsep)\.(wasm|mjs)$/;
+const ORT_VARIANTS = /^ort-wasm-simd-threaded\.asyncify\.(wasm|mjs)$/;
 
-/** The model the engine runs today, and exactly which files it needs (Hugging Face's own listing). */
+/**
+ * THE MODEL THE ENGINE RUNS — chosen for the demonstration.
+ *
+ * The owner's decision (2026-10-07): this must go onto the demo site quickly, "because this is only for
+ * demo purpose to show that it actually works… once the approve we will load on it on a VPS". The
+ * first model tried was `Xenova/distilbert-base-uncased-distilled-squad` at 65 MB; MobileBERT fine-tuned
+ * on SQuAD v2 gives a very similar style of answer at 25.7 MB, and the site's upload speed is about
+ * 16 KiB/s, so the smaller one is roughly 40 minutes sooner to publish.
+ *
+ * THE FULL MODEL IS A ONE-LINE CHANGE, and nothing else in the code needs to move when it is swapped:
+ * replace the `id` below with "Xenova/distilbert-base-uncased-distilled-squad" and run
+ * `npm run fetch:models` on the machine that publishes. Recorded here so the VPS step is trivial.
+ */
 const MODELS = [
   {
-    id: "Xenova/distilbert-base-uncased-distilled-squad",
+    id: "onnx-community/mobilebert-uncased-squad-v2-ONNX",
     role: "answering — pulls the sentence that answers a question out of the passages",
     files: [
       "config.json",
@@ -150,7 +163,7 @@ const main = async () => {
     [
       "",
       "Done. `npm run build` copies these into dist/, and `npm run deploy` uploads them.",
-      "They are NOT in the code store — public/models/ is gitignored on purpose (about 118 MB).",
+      "They are NOT in the code store — public/models/ is gitignored on purpose (about 53 MB).",
       "",
     ].join("\n"),
   );

@@ -2403,7 +2403,7 @@ if (!existsSync(cssPath)) {
 // The model runs in the visitor's browser, so the only thing that keeps the promise is the library's
 // configuration: remote models OFF, and the model files and the engine's own WebAssembly files pointed
 // at OUR OWN web root. This fails the build if any of that is removed, if either service stops asking
-// the browser model, or if the models are allowed into the code store (about 118 MB of binary that must
+// the browser model, or if the models are allowed into the code store (about 53 MB of binary that must
 // be fetched onto a machine, never committed).
 {
   const problems = [];
@@ -2417,7 +2417,7 @@ if (!existsSync(cssPath)) {
       ["env.allowRemoteModels = false", "remote models are no longer switched off — a request could leave our own site (the owner's sovereignty instruction)"],
       ['env.localModelPath = "/models/"', "the model files are no longer read from our own web root"],
       ["wasmPaths = \"/models/ort/\"", "the engine's own WebAssembly files are no longer read from our own web root"],
-      ["Xenova/distilbert-base-uncased-distilled-squad", "the answering model is gone"],
+      ["onnx-community/mobilebert-uncased-squad-v2-ONNX", "the answering model is gone"],
       ["answer(question, passage.text)", "the two-argument call is gone — the object form returns an empty answer with no error, which looks exactly like a model that cannot run"],
     ]) {
       if (!model.includes(symbol)) problems.push(`the in-browser model: ${why} (${symbol})`);
@@ -2438,7 +2438,7 @@ if (!existsSync(cssPath)) {
   if (fetcher === null) {
     problems.push("scripts/fetch-models.mjs is missing — the models could not be put on a machine or on the server");
   } else {
-    if (!fetcher.includes("Xenova/distilbert-base-uncased-distilled-squad")) {
+    if (!fetcher.includes("onnx-community/mobilebert-uncased-squad-v2-ONNX")) {
       problems.push("the model fetcher no longer fetches the answering model");
     }
     if (!fetcher.includes("huggingface.co/")) {
@@ -2453,7 +2453,7 @@ if (!existsSync(cssPath)) {
 
   const ignore = readIf(".gitignore");
   if (ignore && !/^public\/models\/$/m.test(ignore)) {
-    problems.push("public/models/ is no longer gitignored — about 118 MB of model binary could be committed into the code store");
+    problems.push("public/models/ is no longer gitignored — about 53 MB of model binary could be committed into the code store");
   }
 
   if (problems.length === 0) {

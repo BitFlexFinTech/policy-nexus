@@ -2,12 +2,18 @@
  * THE FREE, IN-BROWSER RESEARCH MODEL — the default the owner chose (2026-10-07): *"go with free
  * in-browser model we need the research engine to actually work for the demo presentation."*
  *
- * WHAT IT IS. Two small open-source models run inside the visitor's own browser, downloaded from OUR
- * OWN SITE (never from huggingface.co at run time — the owner's instruction: *"local models … not
- * chatboxes that are hosted outside Zimbabwe"*):
+ * WHAT IT IS. A small open-source model runs inside the visitor's own browser, downloaded from OUR OWN
+ * SITE (never from huggingface.co at run time — the owner's instruction: *"local models … not chatboxes
+ * that are hosted outside Zimbabwe"*):
  *
- *   Xenova/all-MiniLM-L6-v2                        ~23 MB   semantic search (used elsewhere)
- *   Xenova/distilbert-base-uncased-distilled-squad ~67 MB   pulls the answer sentence out of a passage
+ *   onnx-community/mobilebert-uncased-squad-v2-ONNX   25.7 MB   pulls the answer sentence out of a passage
+ *
+ * It is MobileBERT fine-tuned on SQuAD v2 — chosen on the owner's instruction (2026-10-07) that this is a
+ * build for the demonstration: it has to go up quickly at a host which uploads at about 16 KiB/s, and it
+ * gives the same style of answer as the larger 65 MB model at less than half the size. The larger model
+ * (`Xenova/distilbert-base-uncased-distilled-squad`) belongs on the VPS and is a two-line change.
+ * A second model, `Xenova/all-MiniLM-L6-v2` (23 MB), is the plan's SEMANTIC SEARCH model and is NOT
+ * downloaded or wired yet — matching is by wording until it is.
  *
  * There is NO key, NO account, NO cost and NO per-question charge, and no question or document ever
  * leaves the visitor's machine.
@@ -26,7 +32,14 @@
 
 import type { ResearchSource } from "./researchRetrieval";
 
-const ANSWER_MODEL = "Xenova/distilbert-base-uncased-distilled-squad";
+/**
+ * THE MODEL ID in one place. MobileBERT fine-tuned on SQuAD v2 — chosen on the owner's instruction that
+ * this is for the demonstration: it answers in the same extractive style as the larger model and is
+ * 25.7 MB instead of 65 MB, which at this host's upload speed is about 40 minutes sooner to publish.
+ * The full model (`Xenova/distilbert-base-uncased-distilled-squad`) belongs on the VPS; swapping to it
+ * is one line here plus one line in `scripts/fetch-models.mjs`.
+ */
+const ANSWER_MODEL = "onnx-community/mobilebert-uncased-squad-v2-ONNX";
 
 /** One passage the model may read: the document's real text, and the name to attribute an answer to. */
 export interface BrowserPassage {
