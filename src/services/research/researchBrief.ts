@@ -119,8 +119,13 @@ export const draftResearchBrief = async (topic: string): Promise<ResearchBrief> 
        machine). If it cannot run at all, the brief is still produced by quoting the library. Same
        reason as the chat: the build plan's free default is "answers from the library WITH OR WITHOUT
        AI", and a topic with no brief is not a demonstration of anything. */
+    /* The model is asked a QUESTION about the topic, not given the bare topic: measured 2026-10-07, a
+       bare topic like "agriculture policy pillars" makes a small extractive model point at the document's
+       TITLE ("national agriculture policy framework 2019 - 2030") and miss the substance, while a
+       question shape pulls out the sentence that carries the answer. The same reason the chat asks a
+       question. */
     const findings = await findingsWithBrowserModel(
-      trimmed,
+      `What does this document say about ${trimmed}?`,
       passagesFromSources(sources, (id) => documents.find((document) => document.id === id)?.text),
     );
     if (findings.length) {
