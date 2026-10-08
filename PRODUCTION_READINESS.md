@@ -200,9 +200,11 @@ client is registered.
 - **Phases L+M+N together:** `npx playwright test` → **6/6**; `npm test` → **9 files, 144 tests**;
   `npm run validate` → all 9 checks green. The landing page has been rendered at 1440×900 and
   390×844 and inspected as images (two columns / single column, CTA above the fold, nothing clipped).
-- **Operational note (cost a real debugging cycle):** `npm run dev` serves at
-  **http://localhost:8080/** — `vite.config.ts` pins `server.port = 8080`. Opening 5173 shows a stale
-  build. This, not the code, was why the new landing page appeared missing.
+- **Operational note (updated 2026-10-07):** `npm run dev` serves at **http://localhost:5180/** —
+  `vite.config.ts` pins `server.port = 5180` with `strictPort: true`, this project's **OWN** port under the
+  global rule `unique-dev-port-per-project.md`. It used to be 8080, which **five other projects also
+  pinned**, so two dev servers collided and one project's page appeared at another's address. Opening 5173
+  or 8080 no longer shows this project.
 - Stated plainly: the Phases L+M+N work recorded here was verified against the **local** production
   preview. That deployment note is **superseded** — see §6c: when it was written the live host
   (`nzwisiso.bitflex.app`) served the Phase D bundle, and the live host was redeployed again in **R7**
