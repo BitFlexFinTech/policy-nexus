@@ -13,7 +13,6 @@ import {
   SUPPORTED_INITIATIVE,
 } from "@/config/brand";
 import { GOVERNMENT_PAGE, RESEARCH_BOUNDARY } from "@/config/research";
-import { cn } from "@/lib/utils";
 
 /** Which tool's landing is being shown as a static picture, if any. */
 type Preview = null | "simulation" | "zepari";
@@ -61,11 +60,15 @@ function Door({
     <div
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
-      className="flex flex-col rounded-lg border bg-card p-3.5 transition-colors hover:border-primary/40"
+      className="flex flex-col rounded-lg bg-gold-foreground p-3.5 ring-1 ring-inset ring-gold/30 transition-all hover:ring-gold/70"
     >
-      <p className="text-sm font-semibold tracking-tight text-foreground">{name}</p>
-      <p className="mt-1 flex-1 text-xs leading-relaxed text-muted-foreground">{role}</p>
-      <Button asChild size="sm" className="mt-2.5 self-start">
+      <p className="text-sm font-semibold tracking-tight text-gold">{name}</p>
+      <p className="mt-1 flex-1 text-xs leading-relaxed text-gold/80">{role}</p>
+      <Button
+        asChild
+        size="sm"
+        className="mt-2.5 self-start !bg-gold !text-gold-foreground hover:!bg-gold/90"
+      >
         <Link to={to}>
           {action}
           <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -112,82 +115,77 @@ export default function Home() {
 
   useEffect(() => clearIntent, []);
 
-  // The page's accent follows the hovered tool, so the whole page reads as that tool's.
-  const accent = preview === "zepari" ? "text-zp-navy" : "text-primary";
-
   return (
-    <PublicPageShell>
-      <div className="zepari relative">
-        {/* THE STATIC PICTURE — the hovered tool's own landing, shown behind the doors and never
-            clickable. It is `aria-hidden` (invisible to assistive technology) and
-            `pointer-events-none` (no click, no scroll capture), and it fades in only where motion is
-            welcome. It is absent entirely on touch devices, and its fade is skipped under
-            `prefers-reduced-motion` — the picture still appears, it simply does not move. */}
-        {preview && (
-          <div
-            data-testid="door-preview"
-            data-preview={preview}
-            aria-hidden="true"
-            className="pointer-events-none fixed inset-0 z-40 overflow-hidden bg-background motion-safe:animate-[slide-up-fade_0.25s_ease-out]"
-          >
-            {preview === "zepari" ? <ResearchLanding /> : <Landing />}
-          </div>
-        )}
-
-        {/* THE TWO DOORS — the choice of service, now at the TOP of the page (owner's instruction,
-            2026-10-07): the cards sit ABOVE the "Government of Zimbabwe · Policy intelligence" line
-            and are compact, so they never interrupt the story told below. They sit above the picture
-            layer (z-50), so on a hover-capable device the doors stay visible and clickable while the
-            rest of the page becomes the hovered tool's landing behind them. */}
-        <section aria-labelledby="service-choice-heading" className="relative z-50 mb-8">
-          <h2
-            id="service-choice-heading"
-            className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground"
-          >
-            {PLATFORM_HOME.tools.heading}
-          </h2>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <Door
-              name={PLATFORM_HOME.tools.simulation.name}
-              role={PLATFORM_HOME.tools.simulation.role}
-              action={PLATFORM_HOME.tools.simulation.door}
-              to={PLATFORM_HOME.tools.simulation.to}
-              onEnter={() => show("simulation")}
-              onLeave={hide}
-            />
-            <Door
-              name={PLATFORM_HOME.tools.research.name}
-              role={PLATFORM_HOME.tools.research.role}
-              action={PLATFORM_HOME.tools.research.door}
-              to={PLATFORM_HOME.tools.research.to}
-              onEnter={() => show("zepari")}
-              onLeave={hide}
-            />
-          </div>
-        </section>
-
-        {/* The national hero — the most characteristic thing on the page: what this is for, and who
-            it serves, stated the way a Government document states it. */}
-        <section aria-labelledby="home-heading" className="relative z-10">
-          <SectionRule />
-          <p
-            className={cn(
-              "mt-4 text-xs font-semibold uppercase tracking-[0.18em] transition-colors",
-              accent,
+    <PublicPageShell
+      accent="gold"
+      hero={
+        /* THE GOLD BAND — the platform home's OWN colour identity (owner's instruction, 2026-10-07).
+           The two service cards live INSIDE this band at the very top of the page, so they sit in the
+           coloured top section and do not disturb the story below. Gold + black are the Zimbabwe
+           flag's colours, so the home page is unmistakably different from the green policy tool and
+           the blue research tool. */
+        <section className="bg-gold text-gold-foreground">
+          <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+            {/* THE STATIC PICTURE — the hovered tool's own landing, shown behind the doors and never
+                clickable (`aria-hidden` + `pointer-events-none`). Absent on touch screens; its fade
+                is skipped under `prefers-reduced-motion` but the picture still appears. */}
+            {preview && (
+              <div
+                data-testid="door-preview"
+                data-preview={preview}
+                aria-hidden="true"
+                className="pointer-events-none fixed inset-0 z-40 overflow-hidden bg-background motion-safe:animate-[slide-up-fade_0.25s_ease-out]"
+              >
+                {preview === "zepari" ? <ResearchLanding /> : <Landing />}
+              </div>
             )}
-          >
-            {PLATFORM_HOME.eyebrow}
-          </p>
-          <h1
-            id="home-heading"
-            className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
-          >
-            {PLATFORM_HOME.heading}
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-            {PLATFORM_HOME.standfirst}
-          </p>
+
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-foreground/70">
+              {PLATFORM_HOME.eyebrow}
+            </p>
+            <h1
+              id="home-heading"
+              className="mt-2 max-w-3xl text-2xl font-bold tracking-tight sm:text-4xl"
+            >
+              {PLATFORM_HOME.heading}
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gold-foreground/80 sm:text-base">
+              {PLATFORM_HOME.standfirst}
+            </p>
+
+            {/* THE TWO DOORS — inside the gold band, above the picture layer (z-50), so they stay
+                visible and clickable while the rest of the page becomes the hovered tool's landing. */}
+            <div className="relative z-50 mt-5">
+              <h2
+                id="service-choice-heading"
+                className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-foreground/70"
+              >
+                {PLATFORM_HOME.tools.heading}
+              </h2>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <Door
+                  name={PLATFORM_HOME.tools.simulation.name}
+                  role={PLATFORM_HOME.tools.simulation.role}
+                  action={PLATFORM_HOME.tools.simulation.door}
+                  to={PLATFORM_HOME.tools.simulation.to}
+                  onEnter={() => show("simulation")}
+                  onLeave={hide}
+                />
+                <Door
+                  name={PLATFORM_HOME.tools.research.name}
+                  role={PLATFORM_HOME.tools.research.role}
+                  action={PLATFORM_HOME.tools.research.door}
+                  to={PLATFORM_HOME.tools.research.to}
+                  onEnter={() => show("zepari")}
+                  onLeave={hide}
+                />
+              </div>
+            </div>
+          </div>
         </section>
+      }
+    >
+      <div className="relative">
 
         {/* The national commitments this platform is built to serve — each with its source. */}
         <section aria-labelledby="commitments-heading" className="relative z-10 mt-12">
@@ -218,7 +216,7 @@ export default function Home() {
         {/* The national AI strategy — named, with its priority sectors and its own campaign. */}
         <section
           aria-labelledby="strategy-heading"
-          className="relative z-10 mt-12 rounded-lg border border-l-4 border-border border-l-primary bg-card p-5 sm:p-6"
+          className="relative z-10 mt-12 rounded-lg border border-l-4 border-border border-l-gold-rule bg-card p-5 sm:p-6"
         >
           <SectionRule />
           <h2
@@ -275,11 +273,11 @@ export default function Home() {
         {/* Governance and the minister-facing line — who decides, and what grounds the work. */}
         <section
           aria-labelledby="governance-heading"
-          className="relative z-10 mt-12 rounded-lg border border-l-4 border-border border-l-primary bg-card p-5"
+          className="relative z-10 mt-12 rounded-lg border border-l-4 border-border border-l-gold-rule bg-card p-5"
         >
           <h2
             id="governance-heading"
-            className="text-xs font-semibold uppercase tracking-[0.16em] text-primary"
+            className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground"
           >
             How decisions are made
           </h2>
@@ -296,7 +294,7 @@ export default function Home() {
 
         {/* The closing call to action — both doors again, with names distinct from the section above
             so no action is announced twice. */}
-        <section className="relative z-10 mt-12 rounded-lg border border-primary/25 bg-card p-5 sm:p-6">
+        <section className="relative z-10 mt-12 rounded-lg border border-gold-rule/50 bg-card p-5 sm:p-6">
           <SectionRule />
           <h2 className="mt-4 text-lg font-semibold tracking-tight text-foreground">
             Start with either assistant
@@ -306,13 +304,22 @@ export default function Home() {
             side.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
-            <Button asChild size="lg" className="h-11 px-5 text-sm">
+            <Button
+              asChild
+              size="lg"
+              className="h-11 px-5 text-sm !bg-gold !text-gold-foreground hover:!bg-gold/90"
+            >
               <Link to={PLATFORM_HOME.tools.simulation.to}>
                 Open the policy simulation
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="h-11 px-5 text-sm">
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="h-11 border-gold-rule px-5 text-sm text-foreground"
+            >
               <Link to={PLATFORM_HOME.tools.research.to}>
                 Go to the research assistant
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />

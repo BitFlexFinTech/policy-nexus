@@ -2014,6 +2014,37 @@ if (!existsSync(cssPath)) {
   check("the two tools are kept apart on their own pages", problems);
 }
 
+// check 43 — THE HOME PAGE AND THE TOOLS WEAR DIFFERENT IDENTITIES (owner's instruction, 2026-10-07)
+// The owner's instruction: the platform home and the tools must be clearly different, not one page
+// frame reused. The home page wears Zimbabwe GOLD (`accent="gold"`, gold + black — the flag's
+// colours, distinct from both tools); the tool landings keep the emerald State palette. This fails the
+// build if the home page loses its gold identity, if a tool landing takes it, or if the shell stops
+// supporting both.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const home = readIf("src/pages/Home.tsx");
+  if (home === null || !/PublicPageShell[\s\S]{0,120}accent="gold"/.test(home)) {
+    problems.push('src/pages/Home.tsx no longer wears the gold identity (`accent="gold"`) — it would look like the tool again');
+  }
+
+  const landing = readIf("src/pages/Landing.tsx");
+  if (landing && /accent="gold"/.test(landing)) {
+    problems.push("src/pages/Landing.tsx is gold — the policy tool must keep its own emerald identity");
+  }
+
+  const shell = readIf("src/components/public/PublicPageShell.tsx");
+  if (shell === null || !/bg-gold/.test(shell) || !/bg-primary/.test(shell)) {
+    problems.push("the public shell no longer supports BOTH identities (gold for the home page, emerald for the tools)");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the home page wears gold and the tool landings wear emerald — the two are kept visually apart");
+  }
+  check("the home page and the tools wear different identities", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

@@ -1383,15 +1383,42 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
       page.getByRole("heading", { name: "How they work together", exact: true }),
     ).toBeVisible();
 
-    // The service cards sit ABOVE the hero (owner's instruction, 2026-10-07): the "Choose a service"
-    // heading is higher on the page than the level-one heading.
+    // The service cards live in the gold band at the very TOP of the page (owner's instruction,
+    // 2026-10-07): the "Choose a service" heading sits above the page's own content.
     const order = await page.evaluate(() => {
-      const top = (id: string) =>
-        document.querySelector(id)?.getBoundingClientRect().top ?? -1;
-      return { cards: top("#service-choice-heading"), hero: top("#home-heading") };
+      const top = (id: string) => document.querySelector(id)?.getBoundingClientRect().top ?? -1;
+      return { cards: top("#service-choice-heading"), content: top("#commitments-heading") };
     });
     expect(order.cards).toBeGreaterThan(0);
-    expect(order.hero).toBeGreaterThan(order.cards);
+    expect(order.content).toBeGreaterThan(order.cards);
+
+    expectCleanRuntime();
+  });
+
+  test("the home page wears gold and the tool wears green — they are clearly different", async ({ page }) => {
+    const headerBackground = async (path: string) => {
+      await page.goto(path);
+      return page
+        .locator("header")
+        .first()
+        .evaluate((node) => getComputedStyle(node).backgroundColor);
+    };
+    const home = await headerBackground("/");
+    const tool = await headerBackground("/simulation");
+    const rgb = (value: string) => (value.match(/\d+/g) ?? []).map(Number);
+
+    // The home masthead is the brand GOLD: a strong red channel, no blue.
+    const [homeRed, , homeBlue] = rgb(home);
+    expect(homeRed, `home masthead colour ${home}`).toBeGreaterThan(200);
+    expect(homeBlue, `home masthead colour ${home}`).toBeLessThan(80);
+
+    // The tool masthead is the emerald GREEN: the green channel dominates.
+    const [toolRed, toolGreen, toolBlue] = rgb(tool);
+    expect(toolGreen, `tool masthead colour ${tool}`).toBeGreaterThan(toolRed);
+    expect(toolGreen, `tool masthead colour ${tool}`).toBeGreaterThan(toolBlue);
+
+    // And they are not the same colour.
+    expect(home).not.toBe(tool);
 
     expectCleanRuntime();
   });
