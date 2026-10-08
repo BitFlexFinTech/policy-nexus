@@ -445,10 +445,10 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister, to
   ZEPARI or to Cabinet**. The document for that room is **Part 1 — the funding memo**.
-- **What the live site actually is today (re-checked 2026-10-07, at the end of the evening, after the homepage's service bar was built on top of the platform homepage rebuild).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-DIrUXNfu.js`
-  (`0f36e2b459b0c7027151ddc52400f649cbc4cbd0ef5b33113c81e98bc0285a02`), which is byte-identical to the
-  local build, so **the live site is the build published on 2026-10-07** (the platform homepage rebuild — a new `/` homepage with the national story and both tools, the policy-simulation landing moved to `/simulation`, and the centred footer copyright — now opening with a **black-and-gold service bar holding only the two cards**, the home masthead the flag's black with a gold hairline) — it shows the **live date and
+- **What the live site actually is today (re-checked 2026-10-07, at the end of the evening, after the home page's two service cards were moved to the very top — directly under the Government header and above the "Internal service" line).**
+  The host `nzwisiso.bitflex.app` serves `assets/index-BYV6ezJx.js`
+  (`c743be836606387612d196fa925b9986a9952919e4416ab800a4fde6b5558847`), which is byte-identical to the
+  local build, so **the live site is the build published on 2026-10-07** (the platform homepage rebuild — a new `/` homepage with the national story and both tools, the policy-simulation landing moved to `/simulation`, and the centred footer copyright — now opening with a **black-and-gold service bar holding only the two cards, at the very top under the Government header**, the home masthead the flag's black with a gold hairline) — it shows the **live date and
   time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (275 published / 235 modelled), and it carries the authority line, the modelled
   agent population, the named sources (with the corrected sentence naming both publishers the stakeholder
   shares stand on), the official Coat of Arms, the favicon set, the Nzwisiso.ai

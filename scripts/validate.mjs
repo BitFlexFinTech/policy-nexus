@@ -2078,6 +2078,42 @@ if (!existsSync(cssPath)) {
   check("the home page and the tools wear different identities", problems);
 }
 
+// check 44 — THE HOME PAGE'S SERVICE BAR SITS AT THE VERY TOP OF THE PAGE (owner's instruction,
+// 2026-10-07 — reported twice). The owner's words: the two cards "should be at the very top of the
+// page so they don't disturb the content", and after the first attempt they were still "under the
+// part that says 'Internal service'". The agreed arrangement is therefore: the coat-of-arms masthead,
+// then the SERVICE BAR, then the notice strip, then the page's own content. This fails the build if
+// the shell ever draws the notice strip before the service-bar slot again — the exact placement the
+// owner rejected — and the homepage browser test measures the same five positions in a real browser.
+// (This is the check the first attempt was missing: it passed every gate while still being wrong.)
+{
+  const problems = [];
+  const shellPath = "src/components/public/PublicPageShell.tsx";
+  const shellFile = join(ROOT, shellPath);
+  if (!existsSync(shellFile)) {
+    problems.push(`${shellPath} is missing`);
+  } else {
+    const shell = readFileSync(shellFile, "utf8");
+    // The rendered order, read straight out of the JSX.
+    const heroAt = shell.indexOf("{hero}");
+    const stripAt = shell.indexOf("<OfficialNoticeStrip");
+    if (heroAt === -1) {
+      problems.push("the public shell no longer renders the `hero` slot — the home page's service bar would disappear");
+    } else if (stripAt === -1) {
+      problems.push("the public shell no longer renders the notice strip");
+    } else if (heroAt > stripAt) {
+      problems.push('the public shell draws the notice strip BEFORE the `hero` slot — the home page\'s cards would again sit under the "Internal service" line, which the owner rejected');
+    }
+    if (!/data-testid="notice-strip"/.test(shell)) {
+      problems.push('the notice strip carries no `data-testid="notice-strip"` — the browser test cannot measure where the cards sit relative to it');
+    }
+  }
+  if (problems.length === 0) {
+    notes.push("INFO  the home page's service bar is drawn directly under the Government header and ABOVE the \"Internal service\" line — the placement the owner asked for");
+  }
+  check("the home page's service bar sits at the very top of the page", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

@@ -17,9 +17,11 @@ import coatOfArms from "@/assets/zimbabwe-coat-of-arms.png";
  * the home page and opening a tool are visibly different things, not the same page frame reused.
  * Both identities are drawn from the tokens already in `src/index.css`; no new colour is introduced.
  *
- * `hero` is an optional full-width band rendered at the very top of the page, directly under the
- * masthead. The home page uses it for its black-and-gold SERVICE BAR, which holds only the two
- * service doors, sits above the content, and so does not disturb it.
+ * `hero` is an optional full-width band rendered directly under the masthead and ABOVE the notice
+ * strip, so the first thing after the Government header is the page's own content rather than the
+ * administrative line. The home page uses it for its black-and-gold SERVICE BAR, which holds only
+ * the two service doors — at the very top, under the Government header and above the "Internal
+ * service" line (owner's instruction, 2026-10-07, after reporting it twice).
  */
 type Accent = "emerald" | "gold";
 
@@ -87,8 +89,12 @@ export function PublicPageShell({
         atHome={location.pathname === "/"}
         surface={surface}
       />
-      <OfficialNoticeStrip surface={surface} />
+      {/* The page's own top band, ABOVE the notice strip (owner's instruction, 2026-10-07): the home
+          page's service bar must be the first thing under the Government header, so the two cards are
+          never pushed down by the administrative line. The strip is measured against this order by
+          the homepage browser test and by validate check 44. */}
       {hero}
+      <OfficialNoticeStrip surface={surface} />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">{children}</main>
       <OfficialFooter surface={surface} />
     </div>
@@ -171,7 +177,7 @@ function OfficialMasthead({
 function OfficialNoticeStrip({ surface }: { surface: (typeof SURFACE)[Accent] }) {
   const now = useNow();
   return (
-    <div className={cn("border-b", surface.strip)}>
+    <div data-testid="notice-strip" className={cn("border-b", surface.strip)}>
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-4 gap-y-1.5 px-4 py-2.5 sm:px-6">
         <span
           className={cn(

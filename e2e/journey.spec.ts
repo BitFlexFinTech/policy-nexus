@@ -1383,18 +1383,33 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
       page.getByRole("heading", { name: "How they work together", exact: true }),
     ).toBeVisible();
 
-    // The service bar is the FIRST thing on the page (owner's instruction, 2026-10-07): the "Choose
-    // a service" heading sits above the page's own title AND above the page's own content.
+    // THE ORDER THE OWNER ASKED FOR (2026-10-07, reported twice): the Government header, then the
+    // service bar holding the two cards, then the "Internal service" line, then the page's own
+    // content. The earlier build drew the notice strip BEFORE the cards, so the cards sat under the
+    // "Internal service" line — and no test measured it. These five measurements are that missing test.
     const order = await page.evaluate(() => {
-      const top = (id: string) => document.querySelector(id)?.getBoundingClientRect().top ?? -1;
+      const box = (selector: string) => document.querySelector(selector)?.getBoundingClientRect();
+      const top = (selector: string) => box(selector)?.top ?? -1;
       return {
+        headerBottom: box("header")?.bottom ?? -1,
         cards: top("#service-choice-heading"),
+        notice: top('[data-testid="notice-strip"]'),
         title: top("#home-heading"),
         content: top("#commitments-heading"),
       };
     });
-    expect(order.cards).toBeGreaterThan(0);
-    expect(order.title).toBeGreaterThan(order.cards);
+    expect(order.cards, "the service bar must be on the page").toBeGreaterThan(0);
+    // Nothing sits between the Government header and the cards.
+    expect(
+      order.cards,
+      `cards ${order.cards} vs the Government header's bottom ${order.headerBottom}`,
+    ).toBeGreaterThanOrEqual(order.headerBottom);
+    // The cards are ABOVE the "Internal service" line — the exact placement the owner rejected.
+    expect(
+      order.notice,
+      `"Internal service" line ${order.notice} vs the cards ${order.cards}`,
+    ).toBeGreaterThan(order.cards);
+    expect(order.title).toBeGreaterThan(order.notice);
     expect(order.content).toBeGreaterThan(order.title);
 
     expectCleanRuntime();

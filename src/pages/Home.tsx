@@ -120,10 +120,12 @@ export default function Home() {
       accent="gold"
       hero={
         /* THE SERVICE BAR — the platform home's OWN identity (owner's instruction, 2026-10-07). It
-           holds ONLY the two service doors, so it is the first thing on the page and never pushes the
-           story below. It is the Zimbabwe flag's black with gold accents: the gold hairline the shell
-           draws under the masthead, and two gold-bordered black cards. The owner's complaint about the
-           previous build is exactly why gold is an accent here and never a big yellow field. */
+           holds ONLY the two service doors, and the shell draws it directly under the Government
+           header and ABOVE the "Internal service" line, so the cards are the first thing on the page
+           after the header and are never pushed down by the administrative line. It is the Zimbabwe
+           flag's black with gold accents: the gold hairline the shell draws under the masthead, and
+           two gold-bordered black cards. The owner's complaint about the earlier builds is exactly why
+           gold is an accent here and never a big yellow field. */
         <section className="bg-gold-foreground text-primary-foreground">
           <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6">
             {/* THE STATIC PICTURE — the hovered tool's own landing, shown behind the doors and never

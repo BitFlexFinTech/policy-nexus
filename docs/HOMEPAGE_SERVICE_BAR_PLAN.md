@@ -16,9 +16,12 @@ named below. Then build in the order in §4.
    yellow (`--gold`, #FFD700). Gold must be an **accent**, never a big yellow field.
 
 ## 1. What to build
-- **Order on the home page `/`:** masthead → **slim black-and-gold service bar holding ONLY the two cards** →
-  page title + standfirst → the national story → footer. The cards are the very first thing and never push
-  the content.
+- **Order on the home page `/` (the owner's final agreed placement, 2026-10-07 — reported twice):**
+  the Government header (coat of arms) → **slim black-and-gold service bar holding ONLY the two cards** →
+  the "Internal service" notice strip → page title + standfirst → the national story → footer. The cards
+  are the very first thing under the Government header — nothing sits between the header and the cards —
+  and they never push the content down. The notice strip is drawn **below** the cards; this order is
+  measured by the homepage browser test and held by validate **check 44**.
 - **Colour:** the bar is the **Zimbabwe flag's black with gold accents** — a gold hairline under the
   masthead, **dark cards with a gold border and gold card titles**, a **gold action button**. **No yellow
   background anywhere.**
