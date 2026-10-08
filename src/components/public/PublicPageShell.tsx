@@ -109,9 +109,16 @@ export function PublicPageShell({
           never pushed down by the administrative line. The strip is measured against this order by
           the homepage browser test and by validate check 44. */}
       <div className="relative z-50">{hero}</div>
-      <div data-testid="notice-strip-wrap" className="relative z-50 bg-background">
-        <OfficialNoticeStrip surface={surface} />
-      </div>
+      {/* WHILE A PICTURE OF A TOOL IS BEING SHOWN, THE PAGE'S OWN NOTICE LINE STEPS ASIDE (owner's
+          instruction, 2026-10-07): the tool's page now begins at the BOTTOM OF THE CARDS and brings its
+          own status line with it, so the home page's line would otherwise print a second, competing
+          line above the tool's page — and, because it sits between the cards and the content, it would
+          cut the top off the picture. It returns the moment the picture goes. */}
+      {overlay ? null : (
+        <div data-testid="notice-strip-wrap" className="relative z-50 bg-background">
+          <OfficialNoticeStrip surface={surface} />
+        </div>
+      )}
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">{children}</main>
       {overlay}
       <OfficialFooter surface={surface} />

@@ -14,6 +14,7 @@
     "typecheck": "tsc -b --pretty false",
     "validate": "node scripts/validate.mjs",
     "sync:check": "node scripts/sync-check.mjs",
+    "deploy": "bash scripts/deploy.sh",
     "e2e": "playwright test"
   },
   "dependencies": {

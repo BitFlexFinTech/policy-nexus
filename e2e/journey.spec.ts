@@ -1503,40 +1503,88 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     expect(await preview.evaluate((node) => getComputedStyle(node).pointerEvents)).toBe("none");
     await expect(preview).toHaveAttribute("aria-hidden", "true");
 
-    // THE "Internal service" LINE IS NEVER COVERED WHILE HOVERING (owner's instruction, 2026-10-07 —
-    // reported because the cards were covering it). The page's chrome is painted ABOVE the picture, so
-    // the strip's layer sits higher in the paint order than the picture, and the strip itself stays
-    // BELOW the cards.
-    const layers = await page.evaluate(() => {
-      const zOf = (selector: string) => {
-        const el = document.querySelector(selector);
-        return el ? Number(getComputedStyle(el).zIndex) || 0 : null;
-      };
-      const topOf = (selector: string) =>
-        document.querySelector(selector)?.getBoundingClientRect().top ?? -1;
+    // THE BOTTOM OF THE CARD IS THE TOP OF THE SCREEN (owner's instruction, 2026-10-07): the picture
+    // begins at the cards' bottom edge, so the tool's page is read from ITS OWN HEADER DOWN and its
+    // start is never hidden behind the chrome. Measured here in a real browser with a card hovered.
+    const geometry = await page.evaluate(() => {
+      const bar = document.querySelector('[data-testid="service-bar"]');
+      const picture = document.querySelector('[data-testid="door-preview"]');
+      const heading = picture?.querySelector("h1");
+      const rect = (el: Element | null | undefined) => (el ? el.getBoundingClientRect() : null);
       return {
-        stripZ: zOf('[data-testid="notice-strip-wrap"]'),
-        pictureZ: zOf('[data-testid="door-preview"]'),
-        stripTop: topOf('[data-testid="notice-strip"]'),
+        barTop: rect(bar)?.top ?? -1,
+        barBottom: rect(bar)?.bottom ?? -1,
+        pictureTop: rect(picture)?.top ?? -1,
+        pictureBottom: rect(picture)?.bottom ?? -1,
+        viewportHeight: window.innerHeight,
+        headingTop: heading ? heading.getBoundingClientRect().top : -1,
+        headingText: heading?.textContent?.trim() ?? "",
       };
     });
-    const door = await page
-      .getByRole("link", { name: "Open the policy simulation" })
-      .first()
-      .boundingBox();
-    expect(layers.pictureZ, "the hover picture must be on the page").not.toBeNull();
+    // The cards have not moved: they are still on screen, above the picture.
+    expect(geometry.barTop, "the cards' bar must still be on screen").toBeGreaterThanOrEqual(0);
     expect(
-      layers.stripZ,
-      `the "Internal service" layer (z ${layers.stripZ}) must be painted above the picture (z ${layers.pictureZ})`,
-    ).toBeGreaterThan(layers.pictureZ as number);
+      geometry.pictureTop,
+      `the picture (top ${geometry.pictureTop}) must begin at the BOTTOM EDGE OF THE CARDS (bottom ${geometry.barBottom}), never at the top of the screen`,
+    ).toBeGreaterThanOrEqual(geometry.barBottom - 1);
+    // ... and it runs to the bottom of the window, so the space below the cards is the tool's page.
     expect(
-      layers.stripTop,
-      `the "Internal service" line (top ${layers.stripTop}) must sit BELOW the cards (bottom ${(door?.y ?? 0) + (door?.height ?? 0)})`,
-    ).toBeGreaterThanOrEqual((door?.y ?? 0) + (door?.height ?? 0) - 1);
+      geometry.pictureBottom,
+      `the picture (bottom ${geometry.pictureBottom}) must reach the bottom of the window (${geometry.viewportHeight})`,
+    ).toBeGreaterThanOrEqual(geometry.viewportHeight - 1);
+    // The tool's page is seen from its own top: its first heading is on screen and is not cut off.
+    expect(geometry.headingText, "the picture must show the tool's own page").not.toHaveLength(0);
+    expect(
+      geometry.headingTop,
+      `the tool page's own heading (top ${geometry.headingTop}) must be visible under the cards, not hidden above the screen`,
+    ).toBeGreaterThanOrEqual(geometry.pictureTop - 1);
+    expect(geometry.headingTop).toBeLessThan(geometry.viewportHeight);
 
-    // Moving the mouse away reverts to the neutral homepage.
+    // Rolling the wheel over the cards slides the picture, so the rest of that page is reachable
+    // without leaving the hover (the picture is not a page, so it never takes the pointer itself).
+    await page.mouse.wheel(0, 600);
+    await expect
+      .poll(async () => preview.evaluate((node) => node.scrollTop), {
+        message: "the wheel over the cards must slide the picture, or the rest of the tool's page can never be reached",
+      })
+      .toBeGreaterThan(0);
+    // ...and the page UNDERNEATH must not scroll: if it did, the cards would move out from under the
+    // pointer, the hover would end and the picture would vanish mid-read — the defect found on
+    // 2026-10-07, which is why the listener is non-passive.
+    expect(
+      await page.evaluate(() => window.scrollY),
+      "the home page must not scroll while a tool's picture is up",
+    ).toBe(0);
+    await expect(preview).toBeVisible();
+
+    // The home page's OWN notice line steps aside while the picture is up — the tool's page begins at
+    // the cards' bottom edge and brings its own status line with it (so a `notice-strip-wrap` inside
+    // the picture is expected, and one belonging to the home page is not).
+    const ownStrip = () =>
+      page.evaluate(
+        () =>
+          Array.from(document.querySelectorAll('[data-testid="notice-strip-wrap"]')).filter(
+            (node) => !node.closest('[data-testid="door-preview"]'),
+          ).length,
+      );
+    expect(
+      await ownStrip(),
+      "the home page's own notice line must step aside while a tool's picture is up",
+    ).toBe(0);
+    expect(
+      await page.evaluate(
+        () =>
+          document
+            .querySelector('[data-testid="door-preview"]')
+            ?.querySelector('[data-testid="notice-strip"]') !== null,
+      ),
+      "the tool's page must bring its OWN status line, right under the cards",
+    ).toBe(true);
+
+    // Moving the mouse away reverts to the neutral homepage, notice line and all.
     await page.mouse.move(2, 2);
     await expect(preview).toHaveCount(0);
+    expect(await ownStrip(), "the home page's own notice line must come straight back").toBe(1);
 
     // The research door shows the ZEPARI picture, and the door itself still opens the real tool
     // (the picture is behind the doors, which stay clickable on top).

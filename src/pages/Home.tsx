@@ -93,6 +93,15 @@ export default function Home() {
   const [preview, setPreview] = useState<Preview>(null);
   const intent = useRef<number | null>(null);
 
+  /* THE BOTTOM OF THE CARD IS THE TOP OF THE SCREEN (owner's instruction, 2026-10-07). The picture of
+     a tool's page used to be pinned to the very top of the screen, so its beginning sat behind the
+     Government header and the cards and the reader only ever saw the MIDDLE of that page. The picture
+     now begins at the bottom edge of the card bar, so the tool's page is read from its own header
+     down — the whole page, in order, with nothing of it hidden above. */
+  const barRef = useRef<HTMLElement | null>(null);
+  const pictureRef = useRef<HTMLDivElement | null>(null);
+  const [pictureTop, setPictureTop] = useState(0);
+
   const clearIntent = () => {
     if (intent.current !== null) {
       window.clearTimeout(intent.current);
@@ -115,6 +124,51 @@ export default function Home() {
 
   useEffect(() => clearIntent, []);
 
+  /**
+   * Keep the picture's top edge on the bottom edge of the card bar. Measured while a picture is up,
+   * and re-measured on scroll or resize, so the edge never drifts from the cards (and so no sliver of
+   * the hidden part of the tool's page can appear above them).
+   */
+  useEffect(() => {
+    if (!preview) return;
+    const measure = () => {
+      const bottom = barRef.current?.getBoundingClientRect().bottom ?? 0;
+      setPictureTop(Math.max(0, Math.round(bottom)));
+    };
+    measure();
+    window.addEventListener("scroll", measure, { passive: true });
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("scroll", measure);
+      window.removeEventListener("resize", measure);
+    };
+  }, [preview]);
+
+  /**
+   * The picture is not a page: nothing inside it is clickable, and it never takes the pointer. So the
+   * wheel is read on the CARDS, where the pointer already is. Rolling the wheel slides the picture up,
+   * which is how the WHOLE of the tool's page is reached without leaving the hover.
+   *
+   * The listener is attached directly to the bar and is NOT passive, because the picture and the page
+   * must not scroll at the same time: if the page underneath scrolled, the cards would move out from
+   * under the pointer, the hover would end, and the picture would vanish mid-read — which is exactly
+   * what happened before this listener was made non-passive. (React's own `onWheel` is passive, so it
+   * cannot stop the page scrolling underneath.) While a picture is up the wheel belongs to it alone;
+   * moving the pointer off the cards hands the wheel straight back to the page.
+   */
+  useEffect(() => {
+    const bar = barRef.current;
+    if (!preview || !bar) return;
+    const slidePicture = (event: WheelEvent) => {
+      const node = pictureRef.current;
+      if (!node) return;
+      event.preventDefault();
+      node.scrollTop += event.deltaY;
+    };
+    bar.addEventListener("wheel", slidePicture, { passive: false });
+    return () => bar.removeEventListener("wheel", slidePicture);
+  }, [preview]);
+
   return (
     <PublicPageShell
       accent="gold"
@@ -125,8 +179,14 @@ export default function Home() {
            after the header and are never pushed down by the administrative line. It is the Zimbabwe
            flag's black with gold accents: the gold hairline the shell draws under the masthead, and
            two gold-bordered black cards. The owner's complaint about the earlier builds is exactly why
-           gold is an accent here and never a big yellow field. */
-        <section className="bg-gold-foreground text-primary-foreground">
+           gold is an accent here and never a big yellow field. Its bottom edge is also the "top of the
+           screen" for the hover picture (see `pictureTop` above) — this section is the measuring
+           anchor for that, which is why it carries a test handle. */
+        <section
+          ref={barRef}
+          data-testid="service-bar"
+          className="bg-gold-foreground text-primary-foreground"
+        >
           <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6">
             {/* THE TWO DOORS — inside the bar, above the picture layer (z-50), so they stay visible
                 and clickable while the rest of the page becomes the hovered tool's landing. */}
@@ -160,17 +220,22 @@ export default function Home() {
         </section>
       }
       overlay={
-        /* THE STATIC PICTURE — the hovered tool's own landing, shown UNDERNEATH the page's chrome and
-           never clickable (`aria-hidden` + `pointer-events-none`). The SHELL renders this, outside the
-           card bar, so the Government header, the cards and the "Internal service" line are painted on
-           top of it and can never be covered by it (owner's instruction, 2026-10-07). Absent on touch
+        /* THE STATIC PICTURE — the hovered tool's own landing, drawn BELOW the page's chrome and never
+           clickable (`aria-hidden` + `pointer-events-none`). THE BOTTOM OF THE CARD IS THE TOP OF THE
+           SCREEN: the picture is anchored to the bottom of the window, and its TOP is the measured
+           bottom edge of the card bar, so the tool's page is read from its own header down — the whole
+           page, never the middle of it — while the Government header and the cards stay exactly where
+           they are (owner's instruction, 2026-10-07). Rolling the wheel over the cards slides the
+           picture up, so the rest of that page is reachable without leaving the hover. Absent on touch
            screens; its fade is skipped under `prefers-reduced-motion` but the picture still appears. */
         preview && (
           <div
+            ref={pictureRef}
             data-testid="door-preview"
             data-preview={preview}
             aria-hidden="true"
-            className="pointer-events-none fixed inset-0 z-40 overflow-hidden bg-background motion-safe:animate-[slide-up-fade_0.25s_ease-out]"
+            style={{ top: pictureTop }}
+            className="pointer-events-none fixed inset-x-0 bottom-0 z-40 overflow-y-auto bg-background motion-safe:animate-[slide-up-fade_0.25s_ease-out]"
           >
             {preview === "zepari" ? <ResearchLanding /> : <Landing />}
           </div>

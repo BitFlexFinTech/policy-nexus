@@ -114,16 +114,21 @@ AI Strategy 2026–2030 block (priority sectors + "Nzwisiso.ai") · **the two to
 with its door · **how they work together** · governance + the minister-facing line · closing CTA with both
 doors · the official footer. Fully readable with no hovering. Sources named on the page.
 
-**Step 5 — the hover preview (item 1, the flourish). SUPERSEDED IN PART 2026-10-07 (evening): the layer
-is now drawn BELOW the page's chrome, not "over the page" as first built.** The owner reported that the
-full-screen layer ran behind the cards and so covered the "Internal service" line; the shell now takes
-the picture through its `overlay` slot and paints the header, the cards' band and the notice strip above
-it (`relative z-50`), so the picture sits underneath them. Held by validate check 46 and measured by the
-homepage browser test while a card is hovered. The rest of this step stands. On each door: `onMouseEnter`/`onMouseLeave` set a
-preview state (`null | "simulation" | "zepari"`); a second **static layer** cross-fades in showing that tool's landing content (reuse the real components as read-only, `aria-hidden`,
-`pointer-events-none`). The
-doors never move. Guarded by `@media (hover: hover)`, `prefers-reduced-motion`, and a short intent delay.
-Plain CSS in `src/index.css`; no new library.
+**Step 5 — the hover preview (item 1, the flourish). SUPERSEDED TWICE on 2026-10-07; the geometry below
+is the one in force.** The layer was first built fading in "over the page"; the owner then reported the
+"Internal service" line being covered, so it was moved below the page's chrome; and then the owner
+reported that the tool's page was still **cut off** — only its middle was visible, because the picture
+was pinned to the top of the screen and the tool page's own header sat behind the cards. **In force
+now:** the picture begins at the **bottom edge of the cards' bar** (measured from the bar's
+`getBoundingClientRect().bottom`, re-measured on scroll and resize) and runs to the bottom of the window,
+so the tool's page is read from its own header down; the home page's own notice line steps aside while it
+is up (the tool's page brings its own); and the wheel over the cards slides the picture, non-passively, so
+the whole page is reachable. Held by validate check 46 (mutation-proved three ways) and measured by the
+homepage browser test with a card hovered. The rest of this step stands: a preview state
+(`null | "simulation" | "zepari"`) drives a second **static layer** showing that tool's landing content
+(reuse the real components as read-only, `aria-hidden`, `pointer-events-none`); the doors never move;
+guarded by `@media (hover: hover)`, `prefers-reduced-motion`, and a short intent delay. Plain CSS in
+`src/index.css`; no new library.
 
 **Step 6 — prove & record.** Full suite green (see §8), update `PROJECT_STATUS.md` + `PRODUCTION_READINESS.md`,
 refresh the ONE review zip.

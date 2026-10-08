@@ -446,8 +446,8 @@ do not omit it to look authoritative.
   documents and contain deployment and credential notes, so **do not hand them to the Minister, to
   ZEPARI or to Cabinet**. The document for that room is **Part 1 — the funding memo**.
 - **What the live site actually is today (re-checked 2026-10-07, at the end of the evening, after the ZEPARI landing page was given its own status band and the hover picture was moved below the page's chrome).**
-  The host `nzwisiso.bitflex.app` serves `assets/index-1OGSQvcA.js`
-  (`8f1e2a9405fdd97edc50e89a936829162fbb6896fa05207202e68c8114fa4704`), which is byte-identical to the
+  The host `nzwisiso.bitflex.app` serves `assets/index-C6cIFjNj.js`
+  (`f104f60ecb5c9227c47cd8b335b4d0d0a99923753221d71e9bce4480a8c07c72`), which is byte-identical to the
   local build, so **the live site is the build published on 2026-10-07** (the platform homepage rebuild — a new `/` homepage with the national story and both tools, the policy-simulation landing moved to `/simulation`, and the centred footer copyright — now opening with a **black-and-gold service bar holding only the two cards, at the very top under the Government header**, the home masthead the flag's black with a gold hairline; the ZEPARI landing page now carries its own status band, worded for the research product) — it shows the **live date and
   time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (275 published / 235 modelled), and it carries the authority line, the modelled
   agent population, the named sources (with the corrected sentence naming both publishers the stakeholder

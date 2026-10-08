@@ -2169,13 +2169,18 @@ if (!existsSync(cssPath)) {
   check("the ZEPARI landing page carries its own status band", problems);
 }
 
-// check 46 — THE PAGE'S CHROME IS NEVER COVERED BY THE HOVER PICTURE (owner's instruction, 2026-10-07
-// — reported because the cards were covering the "Internal service" line). The picture must be drawn
-// in the shell's `overlay` slot, OUTSIDE the card bar, and the header, the cards' band and the notice
-// strip must each be painted above it (`relative z-50` against the picture's `z-40`). This fails the
-// build if the picture is put back inside the card bar, if the chrome loses its layer, or if the
-// strip's measuring handle disappears. The homepage browser test measures the same thing in a real
-// browser: the strip's layer above the picture, and the strip itself below the cards.
+// check 46 — THE PICTURE OF A TOOL'S PAGE BEGINS AT THE BOTTOM OF THE CARDS (owner's instruction,
+// 2026-10-07, verbatim: "when the mouse hovers over the card the bottom of the card should be treated
+// as the top of the screen. so the user sees the whole page for the tool including the header etc").
+// The picture used to be pinned to the very top of the screen (`fixed inset-0`), so the START of the
+// tool's page sat behind the Government header and the cards, and the reader only ever saw the MIDDLE
+// of that page — the defect the owner reported. It must now be anchored to the BOTTOM of the window
+// with its TOP measured from the bottom edge of the card bar; the header and the cards must stay
+// exactly where they are and stay painted above it; the page's own notice line must step aside while a
+// picture is up (the tool's page brings its own, and that line sits between the cards and the content,
+// where it would cut the top off the picture); and the wheel over the cards must slide the picture, so
+// the whole of the tool's page stays reachable. The homepage browser test measures the edge in a real
+// browser, with a card hovered.
 {
   const problems = [];
   const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
@@ -2191,8 +2196,11 @@ if (!existsSync(cssPath)) {
     if (!/relative z-50">\{hero\}/.test(shell)) {
       problems.push("the public shell no longer paints the cards' band above the hover picture (`relative z-50` around `{hero}`)");
     }
+    if (!/\{overlay \? null : \(/.test(shell)) {
+      problems.push("the public shell no longer lets the page's own notice line step aside while a tool's picture is up — that line sits between the cards and the content, so it would cut the top off the picture and print a second, competing line above the tool's own band");
+    }
     if (!/data-testid="notice-strip-wrap"/.test(shell)) {
-      problems.push('the notice strip has no `data-testid="notice-strip-wrap"` — the browser test cannot measure that it is painted above the hover picture');
+      problems.push('the notice strip has no `data-testid="notice-strip-wrap"` — the browser test cannot measure it');
     }
     if (!/relative z-50 bg-background">\s*<OfficialNoticeStrip/.test(shell)) {
       problems.push("the notice strip is no longer wrapped in an opaque `relative z-50 bg-background` layer — a translucent strip would let the hover picture show through it");
@@ -2201,14 +2209,38 @@ if (!existsSync(cssPath)) {
 
   if (home === null) {
     problems.push("src/pages/Home.tsx is missing");
-  } else if (!/overlay=\{/.test(home)) {
-    problems.push("src/pages/Home.tsx no longer passes its hover picture through the shell's `overlay` slot — a layer drawn inside the card bar would be painted behind the cards again");
+  } else {
+    if (!/overlay=\{/.test(home)) {
+      problems.push("src/pages/Home.tsx no longer passes its hover picture through the shell's `overlay` slot — a layer drawn inside the card bar would be painted behind the cards again");
+    }
+    if (/fixed inset-0/.test(home)) {
+      problems.push('the hover picture is pinned to the very TOP of the screen again (`fixed inset-0`) — the bottom of the card must be the top of the screen, or the tool\'s page is seen from its middle with its own header hidden behind the cards (the owner\'s report)');
+    }
+    if (!/fixed inset-x-0 bottom-0/.test(home)) {
+      problems.push("the hover picture is no longer anchored to the BOTTOM of the window (`fixed inset-x-0 bottom-0`)");
+    }
+    if (!/style=\{\{ top: pictureTop \}\}/.test(home)) {
+      problems.push("the hover picture's top edge is no longer the measured bottom edge of the cards (`style={{ top: pictureTop }}`)");
+    }
+    if (!/ref=\{barRef\}/.test(home) || !/data-testid="service-bar"/.test(home)) {
+      problems.push('the cards\' bar has lost its measuring anchor (`ref={barRef}` + `data-testid="service-bar"`) — the picture\'s top edge would have nothing to measure against');
+    }
+    if (!/getBoundingClientRect\(\)\.bottom/.test(home)) {
+      problems.push("src/pages/Home.tsx no longer measures the BOTTOM edge of the cards");
+    }
+    if (
+      !/bar\.addEventListener\("wheel", slidePicture, \{ passive: false \}\)/.test(home) ||
+      !/event\.preventDefault\(\)/.test(home) ||
+      !/node\.scrollTop \+= event\.deltaY/.test(home)
+    ) {
+      problems.push("rolling the wheel over the cards no longer slides the picture — the rest of the tool's page would be unreachable, so the reader could never see the whole page. The listener must stay NON-passive (`{ passive: false }`) and stop the page scrolling underneath, or the cards move out from under the pointer and the picture vanishes mid-read (the defect found on 2026-10-07)");
+    }
   }
 
   if (problems.length === 0) {
-    notes.push("INFO  the hover picture is drawn below the page's chrome: the header, the cards' band and the \"Internal service\" line are each painted above it, so the line always stays below the cards");
+    notes.push("INFO  the hover picture begins at the BOTTOM EDGE OF THE CARDS: the tool's page is read from its own header down, the header and the cards stay put and painted above it, the page's own notice line steps aside while it is up, and the wheel over the cards slides it so the whole page stays reachable");
   }
-  check("the page's chrome is never covered by the hover picture", problems);
+  check("the picture of a tool's page begins at the bottom of the cards", problems);
 }
 
 // summary
