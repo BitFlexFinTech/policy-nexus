@@ -128,20 +128,6 @@ export default function Home() {
            gold is an accent here and never a big yellow field. */
         <section className="bg-gold-foreground text-primary-foreground">
           <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6">
-            {/* THE STATIC PICTURE — the hovered tool's own landing, shown behind the doors and never
-                clickable (`aria-hidden` + `pointer-events-none`). Absent on touch screens; its fade
-                is skipped under `prefers-reduced-motion` but the picture still appears. */}
-            {preview && (
-              <div
-                data-testid="door-preview"
-                data-preview={preview}
-                aria-hidden="true"
-                className="pointer-events-none fixed inset-0 z-40 overflow-hidden bg-background motion-safe:animate-[slide-up-fade_0.25s_ease-out]"
-              >
-                {preview === "zepari" ? <ResearchLanding /> : <Landing />}
-              </div>
-            )}
-
             {/* THE TWO DOORS — inside the bar, above the picture layer (z-50), so they stay visible
                 and clickable while the rest of the page becomes the hovered tool's landing. */}
             <div className="relative z-50">
@@ -172,6 +158,23 @@ export default function Home() {
             </div>
           </div>
         </section>
+      }
+      overlay={
+        /* THE STATIC PICTURE — the hovered tool's own landing, shown UNDERNEATH the page's chrome and
+           never clickable (`aria-hidden` + `pointer-events-none`). The SHELL renders this, outside the
+           card bar, so the Government header, the cards and the "Internal service" line are painted on
+           top of it and can never be covered by it (owner's instruction, 2026-10-07). Absent on touch
+           screens; its fade is skipped under `prefers-reduced-motion` but the picture still appears. */
+        preview && (
+          <div
+            data-testid="door-preview"
+            data-preview={preview}
+            aria-hidden="true"
+            className="pointer-events-none fixed inset-0 z-40 overflow-hidden bg-background motion-safe:animate-[slide-up-fade_0.25s_ease-out]"
+          >
+            {preview === "zepari" ? <ResearchLanding /> : <Landing />}
+          </div>
+        )
       }
     >
       <div className="relative">

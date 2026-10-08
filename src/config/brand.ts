@@ -282,6 +282,21 @@ export const PLATFORM_HOME = {
 } as const;
 
 /**
+ * THE STATUS BAND the public pages wear: what this service is. Composed ONCE here (the department
+ * side's wording) because `PublicPageShell` renders it on the platform home page and on the policy
+ * tool's page. The ZEPARI research pages carry their OWN band with their OWN wording
+ * (`RESEARCH_SERVICE_NOTICE` in `src/config/research.ts`): the simulation sentence below would be
+ * FALSE on the research side — that assistant answers from ZEPARI's own library and models nothing —
+ * which is why the two are separate, and why `npm run validate` (check 45) fails if they are swapped.
+ */
+export const SERVICE_NOTICE = {
+  badge: "Internal service",
+  body:
+    `Decision support for ${BRAND.entity} ministries, departments and agencies. Simulation results ` +
+    "are modelled, and are labelled as simulated wherever they appear.",
+} as const;
+
+/**
  * The decision-support disclaimer. It is rendered on the executive summary, the
  * full assessment, and every exported/printed document, and is checked by
  * `npm run validate` (check 8) — the wording must not be softened.

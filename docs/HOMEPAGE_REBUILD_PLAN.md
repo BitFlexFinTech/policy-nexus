@@ -114,10 +114,14 @@ AI Strategy 2026–2030 block (priority sectors + "Nzwisiso.ai") · **the two to
 with its door · **how they work together** · governance + the minister-facing line · closing CTA with both
 doors · the official footer. Fully readable with no hovering. Sources named on the page.
 
-**Step 5 — the hover preview (item 1, the flourish).** On each door: `onMouseEnter`/`onMouseLeave` set a
-preview state (`null | "simulation" | "zepari"`); a second **static layer** cross-fades in over the page
-showing that tool's landing content (reuse the real components as read-only, `aria-hidden`,
-`pointer-events-none`), and the page's accent swaps to that tool's palette (`transition-colors`). The
+**Step 5 — the hover preview (item 1, the flourish). SUPERSEDED IN PART 2026-10-07 (evening): the layer
+is now drawn BELOW the page's chrome, not "over the page" as first built.** The owner reported that the
+full-screen layer ran behind the cards and so covered the "Internal service" line; the shell now takes
+the picture through its `overlay` slot and paints the header, the cards' band and the notice strip above
+it (`relative z-50`), so the picture sits underneath them. Held by validate check 46 and measured by the
+homepage browser test while a card is hovered. The rest of this step stands. On each door: `onMouseEnter`/`onMouseLeave` set a
+preview state (`null | "simulation" | "zepari"`); a second **static layer** cross-fades in showing that tool's landing content (reuse the real components as read-only, `aria-hidden`,
+`pointer-events-none`). The
 doors never move. Guarded by `@media (hover: hover)`, `prefers-reduced-motion`, and a short intent delay.
 Plain CSS in `src/index.css`; no new library.
 

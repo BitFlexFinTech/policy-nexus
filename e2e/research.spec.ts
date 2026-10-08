@@ -25,6 +25,14 @@ test.describe("the ZEPARI research assistant — the redesigned workspace", () =
       page.getByRole("heading", { level: 1, name: "ZEPARI Policy Research Assistant" }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Enter as Dr. Gibson Chigumira" })).toBeVisible();
+    // The status band (owner's instruction, 2026-10-07): the ZEPARI landing page wears the same band
+    // the other landing pages wear, worded for the research product — and never the simulation
+    // sentence, which would be false here.
+    const band = page.getByTestId("research-notice-strip");
+    await expect(band).toBeVisible();
+    await expect(band).toContainText("Internal service");
+    await expect(band).toContainText("research library");
+    await expect(band).not.toContainText("Simulation results are modelled");
     await page.screenshot({ path: `${SHOTS}/research-landing-desktop.png`, fullPage: true });
 
     // Enter, and the workspace home.

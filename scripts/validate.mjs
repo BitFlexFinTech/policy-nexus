@@ -2114,6 +2114,103 @@ if (!existsSync(cssPath)) {
   check("the home page's service bar sits at the very top of the page", problems);
 }
 
+// check 45 — THE ZEPARI LANDING PAGE CARRIES THE STATUS BAND, WORDED FOR RESEARCH (owner's
+// instruction, 2026-10-07). The ZEPARI landing page was the only landing page without the band that
+// the home page and the policy tool's page wear. It now has one, and its words come from ZEPARI's own
+// config — never from the department side, because "Simulation results are modelled" would be FALSE
+// on the research side (that assistant models nothing; it answers from ZEPARI's own library). This
+// fails the build if the band disappears, if its words stop coming from the research config, if the
+// department sentence is pasted onto the research side, or if either band's wording moves back into a
+// component instead of its single config home.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const researchShell = readIf("src/components/research/ResearchShell.tsx");
+  if (researchShell === null) {
+    problems.push("src/components/research/ResearchShell.tsx is missing");
+  } else {
+    if (!/<ResearchServiceNotice\s*\/>/.test(researchShell)) {
+      problems.push("the ZEPARI pages no longer render a status band — the research landing page would be the only landing page without one");
+    }
+    if (!/RESEARCH_SERVICE_NOTICE\.body/.test(researchShell)) {
+      problems.push("the ZEPARI status band no longer reads its wording from `RESEARCH_SERVICE_NOTICE` — the words must live in the research config, not in the shell");
+    }
+  }
+
+  const research = readIf("src/config/research.ts");
+  if (research === null) {
+    problems.push("src/config/research.ts is missing");
+  } else {
+    if (!/export const RESEARCH_SERVICE_NOTICE/.test(research)) {
+      problems.push("`RESEARCH_SERVICE_NOTICE` is missing from the research config");
+    }
+    if (/Simulation results are modelled/i.test(research)) {
+      problems.push('the research config carries the DEPARTMENT band\'s sentence ("Simulation results are modelled…") — that claim is false on the research side');
+    }
+    if (!/research library/.test(research)) {
+      problems.push("the ZEPARI status band no longer says where its answers come from (the research library)");
+    }
+  }
+
+  // The two bands stay two separate sources, each in its own single config home.
+  const brand = readIf("src/config/brand.ts");
+  if (brand === null || !/export const SERVICE_NOTICE/.test(brand)) {
+    problems.push("`SERVICE_NOTICE` is missing from the brand config — the department band's wording must live in one place");
+  }
+  const publicShell = readIf("src/components/public/PublicPageShell.tsx");
+  if (publicShell !== null && /are modelled, and are labelled as simulated/.test(publicShell)) {
+    problems.push("the department band's sentence is written inside PublicPageShell again — it belongs in src/config/brand.ts");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  both status bands are in place and worded apart: the department pages say the results are modelled, and the ZEPARI pages say where their answers and figures come from");
+  }
+  check("the ZEPARI landing page carries its own status band", problems);
+}
+
+// check 46 — THE PAGE'S CHROME IS NEVER COVERED BY THE HOVER PICTURE (owner's instruction, 2026-10-07
+// — reported because the cards were covering the "Internal service" line). The picture must be drawn
+// in the shell's `overlay` slot, OUTSIDE the card bar, and the header, the cards' band and the notice
+// strip must each be painted above it (`relative z-50` against the picture's `z-40`). This fails the
+// build if the picture is put back inside the card bar, if the chrome loses its layer, or if the
+// strip's measuring handle disappears. The homepage browser test measures the same thing in a real
+// browser: the strip's layer above the picture, and the strip itself below the cards.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+  const shell = readIf("src/components/public/PublicPageShell.tsx");
+  const home = readIf("src/pages/Home.tsx");
+
+  if (shell === null) {
+    problems.push("src/components/public/PublicPageShell.tsx is missing");
+  } else {
+    if (!/\{overlay\}/.test(shell)) {
+      problems.push("the public shell no longer renders the `overlay` slot — the home page's hover picture would have nowhere to go below the chrome");
+    }
+    if (!/relative z-50">\{hero\}/.test(shell)) {
+      problems.push("the public shell no longer paints the cards' band above the hover picture (`relative z-50` around `{hero}`)");
+    }
+    if (!/data-testid="notice-strip-wrap"/.test(shell)) {
+      problems.push('the notice strip has no `data-testid="notice-strip-wrap"` — the browser test cannot measure that it is painted above the hover picture');
+    }
+    if (!/relative z-50 bg-background">\s*<OfficialNoticeStrip/.test(shell)) {
+      problems.push("the notice strip is no longer wrapped in an opaque `relative z-50 bg-background` layer — a translucent strip would let the hover picture show through it");
+    }
+  }
+
+  if (home === null) {
+    problems.push("src/pages/Home.tsx is missing");
+  } else if (!/overlay=\{/.test(home)) {
+    problems.push("src/pages/Home.tsx no longer passes its hover picture through the shell's `overlay` slot — a layer drawn inside the card bar would be painted behind the cards again");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the hover picture is drawn below the page's chrome: the header, the cards' band and the \"Internal service\" line are each painted above it, so the line always stays below the cards");
+  }
+  check("the page's chrome is never covered by the hover picture", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

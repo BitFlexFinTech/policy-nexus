@@ -13,7 +13,7 @@
  * DETERMINISM: plain authored data. No clock, no randomness.
  */
 
-import { NAME, PROMOTER } from "@/config/brand";
+import { NAME, PROMOTER, SERVICE_NOTICE } from "@/config/brand";
 
 /** The research product's name — plain, no registered mark (owner's decision). */
 export const RESEARCH_NAME = "ZEPARI Policy Research Assistant";
@@ -49,6 +49,28 @@ export const RESEARCH_BILLING =
 export const RESEARCH_BOUNDARY =
   "The research assistant and the policy-simulation engine are kept apart: no figure from the " +
   "research side is ever fed into the simulation engine.";
+
+/**
+ * THE ZEPARI STATUS BAND (owner's instruction, 2026-10-07): the ZEPARI landing page was the only
+ * landing page without the status band the others wear, so it now carries one, worded for the
+ * RESEARCH product rather than copied from the department side.
+ *
+ * It must NOT carry the department band's simulation sentence — this assistant models nothing, it
+ * answers from ZEPARI's own library — so the two wordings are kept apart and a build check fails if
+ * they are ever swapped. Both claims below are already recorded facts of this product: the research
+ * chat is grounded in the library and never fabricates an answer, and the Economic Barometer names
+ * the body that published every figure.
+ *
+ * There is deliberately NO fiscal-year line here: the department side's figures share one fixed
+ * frame, while ZEPARI's figures each carry their own period and their own named publisher, so
+ * printing a single fiscal year would imply a shared frame that does not exist.
+ */
+export const RESEARCH_SERVICE_NOTICE = {
+  badge: SERVICE_NOTICE.badge,
+  body:
+    "Decision support for ZEPARI's research and policy analysis. Answers come only from the " +
+    "documents in the research library, and every figure names the body that published it.",
+} as const;
 
 export interface Researcher {
   id: string;

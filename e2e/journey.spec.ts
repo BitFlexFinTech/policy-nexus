@@ -1503,6 +1503,37 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     expect(await preview.evaluate((node) => getComputedStyle(node).pointerEvents)).toBe("none");
     await expect(preview).toHaveAttribute("aria-hidden", "true");
 
+    // THE "Internal service" LINE IS NEVER COVERED WHILE HOVERING (owner's instruction, 2026-10-07 —
+    // reported because the cards were covering it). The page's chrome is painted ABOVE the picture, so
+    // the strip's layer sits higher in the paint order than the picture, and the strip itself stays
+    // BELOW the cards.
+    const layers = await page.evaluate(() => {
+      const zOf = (selector: string) => {
+        const el = document.querySelector(selector);
+        return el ? Number(getComputedStyle(el).zIndex) || 0 : null;
+      };
+      const topOf = (selector: string) =>
+        document.querySelector(selector)?.getBoundingClientRect().top ?? -1;
+      return {
+        stripZ: zOf('[data-testid="notice-strip-wrap"]'),
+        pictureZ: zOf('[data-testid="door-preview"]'),
+        stripTop: topOf('[data-testid="notice-strip"]'),
+      };
+    });
+    const door = await page
+      .getByRole("link", { name: "Open the policy simulation" })
+      .first()
+      .boundingBox();
+    expect(layers.pictureZ, "the hover picture must be on the page").not.toBeNull();
+    expect(
+      layers.stripZ,
+      `the "Internal service" layer (z ${layers.stripZ}) must be painted above the picture (z ${layers.pictureZ})`,
+    ).toBeGreaterThan(layers.pictureZ as number);
+    expect(
+      layers.stripTop,
+      `the "Internal service" line (top ${layers.stripTop}) must sit BELOW the cards (bottom ${(door?.y ?? 0) + (door?.height ?? 0)})`,
+    ).toBeGreaterThanOrEqual((door?.y ?? 0) + (door?.height ?? 0) - 1);
+
     // Moving the mouse away reverts to the neutral homepage.
     await page.mouse.move(2, 2);
     await expect(preview).toHaveCount(0);

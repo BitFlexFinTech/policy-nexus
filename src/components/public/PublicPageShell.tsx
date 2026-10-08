@@ -1,6 +1,6 @@
 import { useEffect, type CSSProperties, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { BRAND, PROMOTER, SOVEREIGNTY_STATEMENT, WORDMARK } from "@/config/brand";
+import { BRAND, PROMOTER, SERVICE_NOTICE, SOVEREIGNTY_STATEMENT, WORDMARK } from "@/config/brand";
 import { REFERENCE_FISCAL_YEAR } from "@/config/reference";
 import { ADMIN_ROUTE } from "@/config/platform";
 import { formatClock, useNow } from "@/lib/clock";
@@ -64,10 +64,15 @@ export function PublicPageShell({
   children,
   accent = "emerald",
   hero,
+  overlay,
 }: {
   children: ReactNode;
   accent?: Accent;
   hero?: ReactNode;
+  /** A full-width layer drawn BELOW the header, the top band and the notice strip (see the render
+   *  below). The home page uses it for its hover picture; keeping it out of the `hero` slot is what
+   *  stops the picture ever covering the page's own chrome. */
+  overlay?: ReactNode;
 }) {
   const location = useLocation();
   const content = useContent();
@@ -84,18 +89,31 @@ export function PublicPageShell({
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <OfficialMasthead
-        markSrc={logoSrc(content, coatOfArms)}
-        atHome={location.pathname === "/"}
-        surface={surface}
-      />
+      {/* THE CHROME IS PAINTED ABOVE THE HOVER PICTURE (owner's instruction, 2026-10-07 — reported
+          because the "Internal service" line was being covered by the cards). The Government header,
+          the page's own top band and the notice strip each sit in a `relative z-50` layer, while the
+          hover picture is rendered in the `overlay` slot at `z-40`: so the picture can never cover the
+          header, the cards or the "Internal service" line, and that line always stays BELOW the cards
+          where it belongs. The wrapper around the strip is opaque (`bg-background`) on purpose — the
+          strip's own tint is translucent, so without it the picture would show through the strip.
+          Held by the homepage browser test and by validate check 44. */}
+      <div className="relative z-50">
+        <OfficialMasthead
+          markSrc={logoSrc(content, coatOfArms)}
+          atHome={location.pathname === "/"}
+          surface={surface}
+        />
+      </div>
       {/* The page's own top band, ABOVE the notice strip (owner's instruction, 2026-10-07): the home
           page's service bar must be the first thing under the Government header, so the two cards are
           never pushed down by the administrative line. The strip is measured against this order by
           the homepage browser test and by validate check 44. */}
-      {hero}
-      <OfficialNoticeStrip surface={surface} />
+      <div className="relative z-50">{hero}</div>
+      <div data-testid="notice-strip-wrap" className="relative z-50 bg-background">
+        <OfficialNoticeStrip surface={surface} />
+      </div>
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">{children}</main>
+      {overlay}
       <OfficialFooter surface={surface} />
     </div>
   );
@@ -185,12 +203,9 @@ function OfficialNoticeStrip({ surface }: { surface: (typeof SURFACE)[Accent] })
             surface.chip,
           )}
         >
-          Internal service
+          {SERVICE_NOTICE.badge}
         </span>
-        <span className="text-xs leading-relaxed text-muted-foreground">
-          Decision support for {BRAND.entity} ministries, departments and agencies. Simulation results
-          are modelled, and are labelled as simulated wherever they appear.
-        </span>
+        <span className="text-xs leading-relaxed text-muted-foreground">{SERVICE_NOTICE.body}</span>
         <span className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] uppercase tracking-wide text-muted-foreground">
           {/* The live date. Hidden on the narrowest phones only, where the strip already
               wraps; it is always shown from the small breakpoint up, and the footer carries
