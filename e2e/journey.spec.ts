@@ -1383,19 +1383,26 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
       page.getByRole("heading", { name: "How they work together", exact: true }),
     ).toBeVisible();
 
-    // The service cards live in the gold band at the very TOP of the page (owner's instruction,
-    // 2026-10-07): the "Choose a service" heading sits above the page's own content.
+    // The service bar is the FIRST thing on the page (owner's instruction, 2026-10-07): the "Choose
+    // a service" heading sits above the page's own title AND above the page's own content.
     const order = await page.evaluate(() => {
       const top = (id: string) => document.querySelector(id)?.getBoundingClientRect().top ?? -1;
-      return { cards: top("#service-choice-heading"), content: top("#commitments-heading") };
+      return {
+        cards: top("#service-choice-heading"),
+        title: top("#home-heading"),
+        content: top("#commitments-heading"),
+      };
     });
     expect(order.cards).toBeGreaterThan(0);
-    expect(order.content).toBeGreaterThan(order.cards);
+    expect(order.title).toBeGreaterThan(order.cards);
+    expect(order.content).toBeGreaterThan(order.title);
 
     expectCleanRuntime();
   });
 
-  test("the home page wears gold and the tool wears green — they are clearly different", async ({ page }) => {
+  test("the home page wears the flag's black with gold, and the tool wears green — they are clearly different", async ({
+    page,
+  }) => {
     const headerBackground = async (path: string) => {
       await page.goto(path);
       return page
@@ -1407,9 +1414,10 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     const tool = await headerBackground("/simulation");
     const rgb = (value: string) => (value.match(/\d+/g) ?? []).map(Number);
 
-    // The home masthead is the brand GOLD: a strong red channel, no blue.
-    const [homeRed, , homeBlue] = rgb(home);
-    expect(homeRed, `home masthead colour ${home}`).toBeGreaterThan(200);
+    // The home masthead is the flag's BLACK — deliberately NOT the yellow field the owner rejected.
+    const [homeRed, homeGreen, homeBlue] = rgb(home);
+    expect(homeRed, `home masthead colour ${home}`).toBeLessThan(80);
+    expect(homeGreen, `home masthead colour ${home}`).toBeLessThan(80);
     expect(homeBlue, `home masthead colour ${home}`).toBeLessThan(80);
 
     // The tool masthead is the emerald GREEN: the green channel dominates.
@@ -1419,6 +1427,15 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
 
     // And they are not the same colour.
     expect(home).not.toBe(tool);
+
+    // The home masthead closes with the GOLD hairline — the accent that marks the home page.
+    await page.goto("/");
+    const homeRule = await page
+      .getByTestId("masthead-rule")
+      .evaluate((node) => getComputedStyle(node).backgroundColor);
+    const [ruleRed, , ruleBlue] = rgb(homeRule);
+    expect(ruleRed, `home masthead rule ${homeRule}`).toBeGreaterThan(200);
+    expect(ruleBlue, `home masthead rule ${homeRule}`).toBeLessThan(80);
 
     expectCleanRuntime();
   });

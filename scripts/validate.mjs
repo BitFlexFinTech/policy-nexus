@@ -2014,12 +2014,15 @@ if (!existsSync(cssPath)) {
   check("the two tools are kept apart on their own pages", problems);
 }
 
-// check 43 — THE HOME PAGE AND THE TOOLS WEAR DIFFERENT IDENTITIES (owner's instruction, 2026-10-07)
-// The owner's instruction: the platform home and the tools must be clearly different, not one page
-// frame reused. The home page wears Zimbabwe GOLD (`accent="gold"`, gold + black — the flag's
-// colours, distinct from both tools); the tool landings keep the emerald State palette. This fails the
-// build if the home page loses its gold identity, if a tool landing takes it, or if the shell stops
-// supporting both.
+// check 43 — THE HOME PAGE AND THE TOOLS WEAR DIFFERENT IDENTITIES, AND THE HOME IS NEVER YELLOW
+// (owner's instructions, 2026-10-07). The platform home and the tools must be clearly different, not
+// one page frame reused: the home page wears the Zimbabwe flag's BLACK with GOLD accents, and the
+// tool landings keep the emerald State palette. The owner's SECOND complaint is why this check is
+// strict about colour: the earlier bright-gold masthead and hero band read as "yellow ... ugly and
+// does not look like a government platform" — gold is an ACCENT on the home page, never a field. This
+// fails the build if the home page loses its gold identity, if the home page paints a full gold
+// background again, if its service bar stops being the flag's black, if the shell's gold identity
+// turns back into a gold masthead, or if the shell stops supporting both identities.
 {
   const problems = [];
   const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
@@ -2027,6 +2030,17 @@ if (!existsSync(cssPath)) {
   const home = readIf("src/pages/Home.tsx");
   if (home === null || !/PublicPageShell[\s\S]{0,120}accent="gold"/.test(home)) {
     problems.push('src/pages/Home.tsx no longer wears the gold identity (`accent="gold"`) — it would look like the tool again');
+  } else {
+    // Gold is an accent. A bare `bg-gold` anywhere on the home page means a full yellow field has
+    // come back. The gold action BUTTONS (`!bg-gold`) and `bg-gold-foreground` are not a field, so
+    // they are deliberately not counted.
+    const goldField = home.match(/(?<!!)bg-gold(?![-/\w])/g) ?? [];
+    if (goldField.length > 0) {
+      problems.push(`src/pages/Home.tsx paints a full gold background again (${goldField.length}× a bare \`bg-gold\`) — the owner rejected the yellow band; gold is an accent, never a field`);
+    }
+    if (!/bg-gold-foreground/.test(home)) {
+      problems.push("src/pages/Home.tsx's service bar no longer wears the flag's black (`bg-gold-foreground`)");
+    }
   }
 
   const landing = readIf("src/pages/Landing.tsx");
@@ -2035,12 +2049,31 @@ if (!existsSync(cssPath)) {
   }
 
   const shell = readIf("src/components/public/PublicPageShell.tsx");
-  if (shell === null || !/bg-gold/.test(shell) || !/bg-primary/.test(shell)) {
-    problems.push("the public shell no longer supports BOTH identities (gold for the home page, emerald for the tools)");
+  if (shell === null) {
+    problems.push("src/components/public/PublicPageShell.tsx is missing");
+  } else {
+    if (!/bg-primary/.test(shell)) {
+      problems.push("the public shell no longer supports the emerald identity for the tool pages");
+    }
+    // The GOLD identity read as its OWN block, so a change to the emerald one cannot satisfy it.
+    const goldBlock = /gold:\s*\{([\s\S]*?)\n\s*\}/.exec(shell)?.[1] ?? "";
+    if (goldBlock === "") {
+      problems.push("the public shell has no `gold` identity block");
+    } else {
+      if (!/masthead:\s*"bg-gold-foreground"/.test(goldBlock)) {
+        problems.push('the shell\'s gold identity no longer paints the masthead the flag\'s black (`masthead: "bg-gold-foreground"`) — a gold masthead is the yellow the owner rejected');
+      }
+      if (!/rule:\s*"bg-gold"/.test(goldBlock)) {
+        problems.push("the shell's gold identity lost its gold hairline under the masthead");
+      }
+      if (!/footer:\s*"bg-gold-foreground"/.test(goldBlock)) {
+        problems.push("the shell's gold identity no longer paints the footer the flag's black");
+      }
+    }
   }
 
   if (problems.length === 0) {
-    notes.push("INFO  the home page wears gold and the tool landings wear emerald — the two are kept visually apart");
+    notes.push("INFO  the home page wears the flag's black with gold accents (gold never a full field) and the tool landings wear emerald — the two are kept visually apart");
   }
   check("the home page and the tools wear different identities", problems);
 }

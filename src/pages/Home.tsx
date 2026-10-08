@@ -60,7 +60,7 @@ function Door({
     <div
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
-      className="flex flex-col rounded-lg bg-gold-foreground p-3.5 ring-1 ring-inset ring-gold/30 transition-all hover:ring-gold/70"
+      className="flex flex-col rounded-lg bg-gold-foreground p-3.5 ring-1 ring-inset ring-gold/40 transition-all hover:ring-gold/80"
     >
       <p className="text-sm font-semibold tracking-tight text-gold">{name}</p>
       <p className="mt-1 flex-1 text-xs leading-relaxed text-gold/80">{role}</p>
@@ -119,13 +119,13 @@ export default function Home() {
     <PublicPageShell
       accent="gold"
       hero={
-        /* THE GOLD BAND — the platform home's OWN colour identity (owner's instruction, 2026-10-07).
-           The two service cards live INSIDE this band at the very top of the page, so they sit in the
-           coloured top section and do not disturb the story below. Gold + black are the Zimbabwe
-           flag's colours, so the home page is unmistakably different from the green policy tool and
-           the blue research tool. */
-        <section className="bg-gold text-gold-foreground">
-          <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        /* THE SERVICE BAR — the platform home's OWN identity (owner's instruction, 2026-10-07). It
+           holds ONLY the two service doors, so it is the first thing on the page and never pushes the
+           story below. It is the Zimbabwe flag's black with gold accents: the gold hairline the shell
+           draws under the masthead, and two gold-bordered black cards. The owner's complaint about the
+           previous build is exactly why gold is an accent here and never a big yellow field. */
+        <section className="bg-gold-foreground text-primary-foreground">
+          <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6">
             {/* THE STATIC PICTURE — the hovered tool's own landing, shown behind the doors and never
                 clickable (`aria-hidden` + `pointer-events-none`). Absent on touch screens; its fade
                 is skipped under `prefers-reduced-motion` but the picture still appears. */}
@@ -140,29 +140,16 @@ export default function Home() {
               </div>
             )}
 
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-foreground/70">
-              {PLATFORM_HOME.eyebrow}
-            </p>
-            <h1
-              id="home-heading"
-              className="mt-2 max-w-3xl text-2xl font-bold tracking-tight sm:text-4xl"
-            >
-              {PLATFORM_HOME.heading}
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gold-foreground/80 sm:text-base">
-              {PLATFORM_HOME.standfirst}
-            </p>
-
-            {/* THE TWO DOORS — inside the gold band, above the picture layer (z-50), so they stay
-                visible and clickable while the rest of the page becomes the hovered tool's landing. */}
-            <div className="relative z-50 mt-5">
+            {/* THE TWO DOORS — inside the bar, above the picture layer (z-50), so they stay visible
+                and clickable while the rest of the page becomes the hovered tool's landing. */}
+            <div className="relative z-50">
               <h2
                 id="service-choice-heading"
-                className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-foreground/70"
+                className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary-foreground/75"
               >
                 {PLATFORM_HOME.tools.heading}
               </h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div className="mt-2.5 grid gap-3 sm:grid-cols-2">
                 <Door
                   name={PLATFORM_HOME.tools.simulation.name}
                   role={PLATFORM_HOME.tools.simulation.role}
@@ -186,6 +173,24 @@ export default function Home() {
       }
     >
       <div className="relative">
+
+        {/* THE PAGE'S TITLE AND STANDFIRST — back in the page's own content, below the service bar
+            (owner's instruction, 2026-10-07), so the two cards are the first thing on the page and
+            the story is not pushed down by a coloured band. */}
+        <section aria-labelledby="home-heading" className="relative z-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            {PLATFORM_HOME.eyebrow}
+          </p>
+          <h1
+            id="home-heading"
+            className="mt-2 max-w-3xl text-2xl font-bold tracking-tight text-foreground sm:text-4xl"
+          >
+            {PLATFORM_HOME.heading}
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            {PLATFORM_HOME.standfirst}
+          </p>
+        </section>
 
         {/* The national commitments this platform is built to serve — each with its source. */}
         <section aria-labelledby="commitments-heading" className="relative z-10 mt-12">

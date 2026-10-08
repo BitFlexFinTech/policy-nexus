@@ -13,20 +13,22 @@ import coatOfArms from "@/assets/zimbabwe-coat-of-arms.png";
 /**
  * ONE shell for the PUBLIC screens, with TWO colour identities (owner's instruction, 2026-10-07):
  * the department/policy tool wears the emerald State palette (`accent="emerald"`, the default), and
- * the PLATFORM HOME wears Zimbabwe GOLD (`accent="gold"`) — so opening the home page and opening a
- * tool are visibly different things, not the same page frame reused. Both identities are drawn from
- * the tokens already in `src/index.css`; no new colour is introduced.
+ * the PLATFORM HOME wears the Zimbabwe flag's BLACK with GOLD accents (`accent="gold"`) — so opening
+ * the home page and opening a tool are visibly different things, not the same page frame reused.
+ * Both identities are drawn from the tokens already in `src/index.css`; no new colour is introduced.
  *
  * `hero` is an optional full-width band rendered at the very top of the page, directly under the
- * masthead. The home page uses it for its gold service-card band, which sits above the content and
- * so does not disturb it.
+ * masthead. The home page uses it for its black-and-gold SERVICE BAR, which holds only the two
+ * service doors, sits above the content, and so does not disturb it.
  */
 type Accent = "emerald" | "gold";
 
 /**
  * The colour of the shell's dark surfaces, per identity. The gold identity paints the masthead and
- * hero band in the brand gold and the footer in the flag's black, with the text variables overridden
- * INLINE on those wrappers (they inherit to every child), so not one inner class has to change.
+ * the footer the flag's BLACK and identifies itself with a GOLD hairline plus gold accents, with the
+ * text variables overridden INLINE on those wrappers (they inherit to every child), so not one inner
+ * class has to change. (Owner's instruction, 2026-10-07: the earlier bright-gold masthead read as
+ * "yellow ... ugly and does not look like a government platform" — gold is an accent, never a field.)
  */
 const SURFACE = {
   emerald: {
@@ -40,17 +42,19 @@ const SURFACE = {
     wordmarkSuffix: "text-gold",
   },
   gold: {
-    masthead: "bg-gold",
-    /* Black text on the brand gold — the flag's gold-and-black. */
-    mastheadText: { "--primary-foreground": "0 0% 10%" } as CSSProperties,
-    /* A black rule under a gold masthead (a gold rule would be invisible on gold). */
-    rule: "bg-gold-foreground",
+    /* The flag's black — NOT a gold field. */
+    masthead: "bg-gold-foreground",
+    /* White type on the black — the same text token the emerald masthead uses. */
+    mastheadText: { "--primary-foreground": "0 0% 100%" } as CSSProperties,
+    /* THE GOLD HAIRLINE under the black masthead — the accent that marks the home page. */
+    rule: "bg-gold",
     strip: "bg-gold/15",
     chip: "border-gold-foreground/30 text-gold-foreground",
     /* The flag's black, with gold text. */
     footer: "bg-gold-foreground",
     footerText: { "--primary-foreground": "45 100% 60%" } as CSSProperties,
-    wordmarkSuffix: "text-gold-foreground",
+    /* The wordmark's accent word in gold, on the black. */
+    wordmarkSuffix: "text-gold",
   },
 } as const;
 
@@ -156,7 +160,7 @@ function OfficialMasthead({
           )}
         </div>
       </div>
-      <div className={cn("h-[3px] w-full", surface.rule)} />
+      <div data-testid="masthead-rule" className={cn("h-[3px] w-full", surface.rule)} />
     </header>
   );
 }
