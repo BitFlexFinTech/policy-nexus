@@ -33,8 +33,10 @@ const seedDocument = () =>
   });
 
 /**
- * The research policy brief (ZEPARI Batch F) — the structure and the sources are always shown; the
- * words need the research model, and with none connected the platform writes NO brief.
+ * The research policy brief (ZEPARI Batch F) — the structure and the sources are always shown, and a
+ * brief is always PRODUCED: the research model writes it when one is connected, and with none connected
+ * it is assembled from the passages the topic matched. The one section that needs a judgement
+ * (Recommendations) says plainly that it was not produced.
  */
 describe("the research policy brief", () => {
   beforeEach(() => {
@@ -45,15 +47,25 @@ describe("the research policy brief", () => {
     vi.unstubAllGlobals();
   });
 
-  it("shows the structure and the sources, but writes NO brief, when no model is connected", async () => {
-    seedDocument();
+  it("PRODUCES the brief from the library, section by section, when no model is connected", async () => {
+    const document = seedDocument();
     const result = await draftResearchBrief("mining revenue");
 
-    expect(result.status).toBe("no-answer-model");
-    expect(result.brief).toBeNull();
-    expect(result.structure).toEqual(RESEARCH_BRIEF_SECTIONS);
+    expect(result.status).toBe("assembled");
+    expect(result.brief, "a matched topic must never be left without a brief").not.toBeNull();
+    const brief = result.brief ?? "";
+    // Every section of the fixed structure is present...
+    for (const section of RESEARCH_BRIEF_SECTIONS) {
+      expect(brief).toContain(section);
+    }
+    // ...the quotation traces to the document that matched...
     expect(result.sources.length).toBeGreaterThan(0);
-    expect(result.detail).toMatch(/No brief model is connected/);
+    expect(brief).toContain(result.sources[0].name);
+    expect(brief).toContain(result.sources[0].excerpt);
+    expect(document.text).toContain(result.sources[0].excerpt);
+    // ...and the one section that needs a judgement says plainly that it was not produced.
+    expect(brief).toMatch(/Not produced/);
+    expect(result.detail).toMatch(/Assembled from ZEPARI's own documents/);
   });
 
   it("drafts the brief from the sources when the research model is connected", async () => {
@@ -90,7 +102,7 @@ describe("the research policy brief", () => {
     expect(result.sources).toHaveLength(0);
   });
 
-  it("renders on the research workspace, and writes no brief with no model", async () => {
+  it("renders on the research workspace, and PRODUCES the brief with no model", async () => {
     seedDocument();
     window.history.pushState({}, "", "/research/app/brief");
     signInResearcher("chipika");
@@ -104,8 +116,9 @@ describe("the research policy brief", () => {
     });
     fireEvent.click(within(panel).getByRole("button", { name: /draft the brief/i }));
 
+    // The BRIEF itself appears — assembled from the document — not merely a notice that no model is on.
     await waitFor(() =>
-      expect(within(panel).getByText(/No brief model is connected/)).toBeInTheDocument(),
+      expect(within(panel).getByText(/ASSEMBLED from ZEPARI's own documents/)).toBeInTheDocument(),
     );
     expect(within(panel).getByText("Mining revenue note")).toBeInTheDocument();
   });

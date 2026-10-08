@@ -7,21 +7,30 @@
  *  - **Retrieval** always runs, locally and deterministically, over the documents ZEPARI added
  *    (see `researchRetrieval.ts`). The matching passages are the SOURCES, and they are real text.
  *  - **The written answer** is produced by the research model (OpenRouter, the research key entered
- *    on the administration screen). When no model is connected, NO answer is written — the platform
- *    shows the sources and says plainly that no answer model is connected. It never invents an answer.
+ *    on the administration screen) when one is connected. **When none is connected the question is
+ *    still ANSWERED — from the library** (see `researchAssembly.ts`): the matched passages are
+ *    quoted, each under the name of the document it came from, and the answer says plainly that it
+ *    was assembled rather than written. The owner's build plan requires answers "from the library
+ *    WITH OR WITHOUT AI" (`docs/ZEPARI_BUILD_PLAN.md`, Stage B), and a question that goes unanswered
+ *    is not a demonstration of anything. Nothing is ever invented: every quotation really appears in
+ *    the documents, and no figure is stated that is not in them.
  *
  * The strict boundary holds: nothing here reaches the policy-simulation engine.
  */
 
 import { liveService, OPENROUTER_CHAT_ENDPOINT, type CapabilityConfig } from "@/config/platform";
+import { ASSEMBLED_ANSWER_DETAIL, assembleAnswer } from "./researchAssembly";
 import { listResearchDocuments } from "./researchDocuments";
 import { findSources, type ResearchSource } from "./researchRetrieval";
 
-export type ResearchChatStatus = "answered" | "no-answer-model" | "no-sources" | "error";
+export type ResearchChatStatus = "answered" | "assembled" | "no-sources" | "error";
 
 export interface ResearchChatAnswer {
   status: ResearchChatStatus;
-  /** The written answer, when a research model is connected. `null` when none is. */
+  /**
+   * The answer. Written by the research model when one is connected; **quoted from the library**
+   * when none is (status `assembled`). `null` only when no document matched the question.
+   */
   answer: string | null;
   /** The library documents the question matched, quoted. Always shown. */
   sources: readonly ResearchSource[];
@@ -77,8 +86,10 @@ const researchClient = (config: CapabilityConfig) => ({
 });
 
 /**
- * Ask the research assistant a question. Retrieval always runs; the written answer needs the research
- * model. With no model connected the sources are still shown — no answer is fabricated.
+ * Ask the research assistant a question. Retrieval always runs, and the question is always ANSWERED:
+ * the research model writes the answer when one is connected, and with none connected the matched
+ * passages are quoted from the library instead (`status: "assembled"`). `answer` is `null` only when
+ * no document matched at all. No answer is ever fabricated.
  */
 export const askResearchQuestion = async (question: string): Promise<ResearchChatAnswer> => {
   const trimmed = question.trim();
@@ -86,13 +97,24 @@ export const askResearchQuestion = async (question: string): Promise<ResearchCha
   const config = liveService("research");
 
   if (!config) {
+    if (!sources.length) {
+      return {
+        status: "no-sources",
+        answer: null,
+        sources,
+        detail:
+          "No document in the research library matches this question. Add the relevant document to the library first.",
+      };
+    }
+    /* NO MODEL CONNECTED — the question is still answered, from the library itself. This is the free
+       default the owner's build plan requires ("answers from the library WITH OR WITHOUT AI"), and a
+       refusal to answer was a defect: the owner asked a question and the screen appeared to do
+       nothing. Every word below is quoted from a document that really matched. */
     return {
-      status: sources.length ? "no-answer-model" : "no-sources",
-      answer: null,
+      status: "assembled",
+      answer: assembleAnswer(sources),
       sources,
-      detail: sources.length
-        ? "No answer model is connected. The sources this question matched are shown below; connect the research model on the administration screen to have them answered."
-        : "No answer model is connected, and no document in the research library matches this question.",
+      detail: ASSEMBLED_ANSWER_DETAIL,
     };
   }
 

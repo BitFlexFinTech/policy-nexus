@@ -1670,11 +1670,17 @@ if (!existsSync(cssPath)) {
 
 
 // ---------------------------------------------------------------------------------------------
-// check 36 — THE RESEARCH CHAT IS GROUNDED AND NEVER FABRICATES AN ANSWER (ZEPARI Batch E)
+// check 36 — THE RESEARCH CHAT IS GROUNDED, AND ANSWERS WITH OR WITHOUT A MODEL (ZEPARI Batch E)
 // The owner's decision: the research assistant answers from ZEPARI's own documents and shows its
-// sources. Retrieval always runs; a written answer needs the research model, and WITHOUT one the
-// platform shows the sources and says so — never an invented answer. This fails the build if the
-// retrieval, the chat service, its honest not-connected path, the panel, or the wiring is removed.
+// sources. Retrieval always runs; the research model writes the answer when one is connected, and
+// WITHOUT one the question is still ANSWERED — the matched passages are quoted from the library
+// (see `researchAssembly.ts`). Nothing is invented either way.
+//
+// THIS CHECK HELPED HIDE A DEFECT AND WAS REWRITTEN ON 2026-10-07. It used to require the string
+// "No answer model is connected" — so it DEMANDED a refusal to answer, which is exactly what the
+// owner reported as "nothing happened" when he asked a question. It now requires the assembled
+// answer, and the words that keep it honest. It fails the build if the retrieval, the chat service,
+// the assembly, the panel or the wiring is removed, or if the answer can become empty again.
 {
   const problems = [];
   const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
@@ -1686,6 +1692,19 @@ if (!existsSync(cssPath)) {
     problems.push("the retrieval no longer offers findSources — the chat cannot show its sources");
   }
 
+  const assembly = readIf("src/services/research/researchAssembly.ts");
+  if (assembly === null) {
+    problems.push("src/services/research/researchAssembly.ts is missing — with no model connected a matched question would go unanswered, which is the defect the owner reported");
+  } else {
+    for (const [symbol, why] of [
+      ["assembleAnswer", "the answer assembled from the library is gone"],
+      ["QUOTED from ZEPARI's own documents", "the assembled answer no longer says that its words are quotations"],
+      ["no words were written for you", "the assembled answer no longer says that no model wrote it"],
+    ]) {
+      if (!assembly.includes(symbol)) problems.push(`the library-only answer: ${why} (${symbol})`);
+    }
+  }
+
   const chat = readIf("src/services/research/researchChat.ts");
   if (chat === null) {
     problems.push("src/services/research/researchChat.ts is missing — there is no grounded chat");
@@ -1693,7 +1712,8 @@ if (!existsSync(cssPath)) {
     for (const [symbol, why] of [
       ["askResearchQuestion", "the chat entry point is gone"],
       ['liveService("research")', "the chat no longer uses the research model key"],
-      ["No answer model is connected", "the honest not-connected path is gone (an answer could be fabricated)"],
+      ["assembleAnswer", "the WITHOUT-A-MODEL answer is gone — a matched question would be left unanswered (the owner's defect)"],
+      ["ASSEMBLED_ANSWER_DETAIL", "the plain line that says the answer was assembled is gone"],
     ]) {
       if (!chat.includes(symbol)) problems.push(`the research chat: ${why} (${symbol})`);
     }
@@ -1708,21 +1728,38 @@ if (!existsSync(cssPath)) {
   }
 
   if (problems.length === 0) {
-    notes.push("INFO  the research chat is grounded in the research library and never fabricates an answer");
+    notes.push("INFO  the research chat answers from the research library with or without a model, and never fabricates an answer");
   }
-  check("the research chat is grounded and never fabricates an answer", problems);
+  check("the research chat is grounded and answers with or without a model", problems);
 }
 
 
 // ---------------------------------------------------------------------------------------------
-// check 37 — THE RESEARCH POLICY BRIEF IS GROUNDED AND NEVER FABRICATES A BRIEF (ZEPARI Batch F)
-// The owner's decision: a short brief drafted from the research library, with its sources shown. The
-// structure and the sources are always shown; the words need the research model, and WITHOUT one the
-// platform writes NO brief. This fails the build if the brief service, its honest not-connected path,
-// the fixed structure, the panel, or the wiring is removed.
+// check 37 — THE RESEARCH POLICY BRIEF IS GROUNDED, AND IS PRODUCED WITH OR WITHOUT A MODEL (ZEPARI
+// Batch F). The owner's decision: a short brief drawn from the research library, with its sources
+// shown. The structure is always shown; the research model writes the words when one is connected,
+// and WITHOUT one the brief is still PRODUCED — assembled from the matched passages, with the one
+// section that needs a judgement saying plainly that it was not produced (`researchAssembly.ts`).
+//
+// THIS CHECK HELPED HIDE A DEFECT AND WAS REWRITTEN ON 2026-10-07: it used to require the string
+// "No brief model is connected", so it DEMANDED that no brief be produced. It now requires the
+// assembled brief and the honesty that goes with it.
 {
   const problems = [];
   const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const assembly = readIf("src/services/research/researchAssembly.ts");
+  if (assembly === null) {
+    problems.push("src/services/research/researchAssembly.ts is missing — with no model connected a matched topic would produce no brief at all");
+  } else {
+    for (const [symbol, why] of [
+      ["assembleBrief", "the brief assembled from the library is gone"],
+      ["ASSEMBLED from ZEPARI's own documents", "the assembled brief no longer says that its words are quotations"],
+      ["Not produced", "the assembled brief no longer admits which section it could not produce (a recommendation is a judgement)"],
+    ]) {
+      if (!assembly.includes(symbol)) problems.push(`the library-only brief: ${why} (${symbol})`);
+    }
+  }
 
   const brief = readIf("src/services/research/researchBrief.ts");
   if (brief === null) {
@@ -1731,7 +1768,8 @@ if (!existsSync(cssPath)) {
     for (const [symbol, why] of [
       ["draftResearchBrief", "the brief entry point is gone"],
       ['liveService("research")', "the brief no longer uses the research model key"],
-      ["No brief model is connected", "the honest not-connected path is gone (a brief could be fabricated)"],
+      ["assembleBrief", "the WITHOUT-A-MODEL brief is gone — a matched topic would be left without a brief"],
+      ["ASSEMBLED_BRIEF_DETAIL", "the plain line that says the brief was assembled is gone"],
     ]) {
       if (!brief.includes(symbol)) problems.push(`the research brief: ${why} (${symbol})`);
     }
@@ -1751,10 +1789,15 @@ if (!existsSync(cssPath)) {
   }
 
   if (problems.length === 0) {
-    notes.push("INFO  the research policy brief is grounded in the research library and never fabricates a brief");
+    notes.push("INFO  the research policy brief is produced from the research library with or without a model, and never fabricates a brief");
   }
-  check("the research policy brief is grounded and never fabricates a brief", problems);
+  check("the research policy brief is grounded and is produced with or without a model", problems);
 }
+
+  // The old duplicate tail of check 37 — panel, structure, panel-wiring and its own `check(...)` — used
+// to sit here. It was removed on 2026-10-07 when the check was rewritten, because a copied tail is a
+// second source of truth for the same requirement and it left `problems`/`readIf` referenced outside
+// the block that defines them.
 
 
 // ---------------------------------------------------------------------------------------------

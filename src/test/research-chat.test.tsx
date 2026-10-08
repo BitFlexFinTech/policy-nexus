@@ -33,9 +33,11 @@ const seedDocument = () =>
   });
 
 /**
- * The grounded research chat (ZEPARI Batch E) — retrieval always runs over ZEPARI's own documents;
- * a written answer needs the research model, and with none connected the platform shows the sources
- * and says so rather than inventing an answer.
+ * The grounded research chat (ZEPARI Batch E) — retrieval always runs over ZEPARI's own documents, and
+ * the question is ALWAYS answered: the research model writes the answer when one is connected, and with
+ * none connected the matched passages are QUOTED from the library instead. Nothing is ever invented,
+ * which is exactly why "no model connected" must still produce an answer (the owner's build plan
+ * requires answers "from the library WITH OR WITHOUT AI").
  */
 describe("the grounded research chat", () => {
   beforeEach(() => {
@@ -55,14 +57,23 @@ describe("the grounded research chat", () => {
     expect(findSources("completely unrelated wording", [document])).toHaveLength(0);
   });
 
-  it("shows the sources but writes NO answer when no research model is connected", async () => {
-    seedDocument();
+  it("ANSWERS FROM THE LIBRARY, QUOTED, when no research model is connected", async () => {
+    const document = seedDocument();
     const result = await askResearchQuestion("mining revenue gold");
 
-    expect(result.status).toBe("no-answer-model");
-    expect(result.answer).toBeNull();
+    expect(result.status).toBe("assembled");
+    expect(result.answer, "a matched question must never be left unanswered").not.toBeNull();
+    const answer = result.answer ?? "";
+    // Every quotation in the answer traces to a document that really matched...
     expect(result.sources.length).toBeGreaterThan(0);
-    expect(result.detail).toMatch(/No answer model is connected/);
+    for (const source of result.sources) {
+      expect(answer).toContain(source.name);
+      expect(answer).toContain(source.excerpt);
+      expect(document.text).toContain(source.excerpt);
+    }
+    // ...and the platform says plainly that it ASSEMBLED the answer rather than writing it.
+    expect(answer).toMatch(/no words were written for you/);
+    expect(result.detail).toMatch(/Assembled from ZEPARI's own documents/);
   });
 
   it("answers from the sources when the research model is connected", async () => {
@@ -83,7 +94,7 @@ describe("the grounded research chat", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("renders on the research workspace, and writes no answer with no model", async () => {
+  it("renders on the research workspace, and ANSWERS from the library with no model", async () => {
     seedDocument();
     window.history.pushState({}, "", "/research/app/ask");
     signInResearcher("chigumira");
@@ -97,8 +108,10 @@ describe("the grounded research chat", () => {
     });
     fireEvent.click(within(panel).getByRole("button", { name: /ask/i }));
 
+    // The ANSWER appears on the screen — quoted from the document — and not merely a notice that no
+    // model is connected. This is the defect the owner reported: he asked and the screen did nothing.
     await waitFor(() =>
-      expect(within(panel).getByText(/No answer model is connected/)).toBeInTheDocument(),
+      expect(within(panel).getByText(/QUOTED from ZEPARI's own documents/)).toBeInTheDocument(),
     );
     expect(within(panel).getByText("Mining revenue note")).toBeInTheDocument();
   });

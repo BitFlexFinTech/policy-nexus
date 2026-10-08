@@ -8,10 +8,10 @@ import { draftResearchBrief, type ResearchBrief } from "@/services/research/rese
  * The research policy brief (ZEPARI Batch F).
  *
  * A topic is matched against ZEPARI's research library, and the brief's structure and the sources it
- * draws on are always shown. When a research model is connected it drafts the brief from those
- * sources only; when none is connected, the structure and sources are still shown and the panel says
- * plainly that no brief model is connected — it never writes a brief it cannot ground. Nothing here
- * reaches the simulation engine.
+ * draws on are always shown. When a research model is connected it drafts the brief from those sources
+ * only; when none is connected the brief is still PRODUCED — assembled from the matched passages in its
+ * fixed sections, with the one section that needs a judgement saying plainly that it was not produced.
+ * It never says anything the documents do not. Nothing here reaches the simulation engine.
  */
 export function ResearchBriefPanel() {
   const [topic, setTopic] = useState("");
@@ -38,8 +38,9 @@ export function ResearchBriefPanel() {
         Policy brief
       </h2>
       <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-        A short brief on a topic, drafted from ZEPARI's own documents with its sources shown. The
-        structure is fixed; the words come from the research model, and only from the sources below.
+        A short brief on a topic, drawn from ZEPARI's own documents with its sources shown. The
+        structure is fixed. The words are written by the research model when one is connected, and
+        quoted from the sources when none is — the brief never says anything the documents do not.
       </p>
 
       <div className="mt-3 flex flex-wrap items-end gap-2">

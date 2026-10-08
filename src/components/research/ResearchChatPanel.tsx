@@ -9,8 +9,10 @@ import { askResearchQuestion, type ResearchChatAnswer } from "@/services/researc
  *
  * A question is matched against ZEPARI's research library, and the passages that matched are shown as
  * the sources. When a research model is connected, it writes an answer drawn ONLY from those sources;
- * when none is connected, the sources are still shown and the panel says plainly that no answer model
- * is connected — it never writes an answer it cannot ground. Nothing here reaches the simulation engine.
+ * when none is connected the question is still ANSWERED — the matched passages are quoted from the
+ * library, each under the document it came from, and the panel says plainly that the answer was
+ * assembled rather than written. It never says anything the documents do not. Nothing here reaches the
+ * simulation engine.
  */
 export function ResearchChatPanel() {
   const [question, setQuestion] = useState("");

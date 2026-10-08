@@ -4,22 +4,29 @@
  * The owner's decision (ZEPARI Batch F). Built the same honest way as the research chat: retrieval
  * over ZEPARI's own documents always runs and its passages are shown as SOURCES; the words of the
  * brief are produced by the research model (OpenRouter, the research key), drawn ONLY from those
- * sources. When no model is connected the brief's STRUCTURE and its sources are still shown and the
- * platform says plainly that no brief model is connected — it never invents a brief.
+ * sources. **When no model is connected the brief is still PRODUCED — assembled from the library**
+ * (see `researchAssembly.ts`): its fixed sections are filled with the passages the topic matched,
+ * each named, and the one section that needs a judgement (Recommendations) says plainly that it was
+ * not produced. The owner's build plan requires answers "from the library WITH OR WITHOUT AI"
+ * (`docs/ZEPARI_BUILD_PLAN.md`, Stage B). No brief is ever invented.
  *
  * The strict boundary holds: nothing here reaches the policy-simulation engine.
  */
 
 import { liveService, OPENROUTER_CHAT_ENDPOINT, type CapabilityConfig } from "@/config/platform";
 import { RESEARCH_BRIEF_SECTIONS } from "@/config/research";
+import { ASSEMBLED_BRIEF_DETAIL, assembleBrief } from "./researchAssembly";
 import { listResearchDocuments } from "./researchDocuments";
 import { findSources, type ResearchSource } from "./researchRetrieval";
 
-export type ResearchBriefStatus = "drafted" | "no-answer-model" | "no-sources" | "error";
+export type ResearchBriefStatus = "drafted" | "assembled" | "no-sources" | "error";
 
 export interface ResearchBrief {
   status: ResearchBriefStatus;
-  /** The brief's words, when a research model is connected. `null` when none is. */
+  /**
+   * The brief. Written by the research model when one is connected; **assembled from the library**
+   * when none is (status `assembled`). `null` only when no document matched the topic.
+   */
   brief: string | null;
   /** The library documents the topic matched, quoted. Always shown. */
   sources: readonly ResearchSource[];
@@ -79,8 +86,10 @@ const briefClient = (config: CapabilityConfig) => ({
 });
 
 /**
- * Draft a brief on a topic. Retrieval always runs; the words need the research model. With no model
- * connected the structure and the sources are still shown — no brief is fabricated.
+ * Draft a brief on a topic. Retrieval always runs, and a brief is always produced: the research model
+ * writes it when one is connected, and with none connected it is ASSEMBLED from the matched passages
+ * in the brief's fixed sections (`status: "assembled"`), saying plainly which section it could not
+ * produce. `brief` is `null` only when no document matched at all.
  */
 export const draftResearchBrief = async (topic: string): Promise<ResearchBrief> => {
   const trimmed = topic.trim();
@@ -89,14 +98,24 @@ export const draftResearchBrief = async (topic: string): Promise<ResearchBrief> 
   const config = liveService("research");
 
   if (!config) {
+    if (!sources.length) {
+      return {
+        status: "no-sources",
+        brief: null,
+        sources,
+        structure,
+        detail:
+          "No document in the research library matches this topic. Add the relevant document to the library first.",
+      };
+    }
+    /* NO MODEL CONNECTED — the brief is still produced, assembled from the library. Same reason as
+       the chat: the build plan's free default is "answers from the library WITH OR WITHOUT AI". */
     return {
-      status: sources.length ? "no-answer-model" : "no-sources",
-      brief: null,
+      status: "assembled",
+      brief: assembleBrief(trimmed, sources, structure),
       sources,
       structure,
-      detail: sources.length
-        ? "No brief model is connected. The brief's structure and the sources for this topic are shown; connect the research model on the administration screen to draft the words."
-        : "No brief model is connected, and no document in the research library matches this topic.",
+      detail: ASSEMBLED_BRIEF_DETAIL,
     };
   }
 
