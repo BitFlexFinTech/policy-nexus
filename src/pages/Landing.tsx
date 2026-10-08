@@ -129,28 +129,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* THE CONFIDENTIALITY CARD (owner's instruction, 2026-10-07) — the same promise the ZEPARI pages
-          make, worded for a POLICY DRAFT on this page. The sentence itself lives in
-          `src/config/brand.ts`, in one place for both pages, so the two can never drift apart and
-          cannot be swapped; validate check 47 fails the build if this card goes missing here or if
-          the home page's wording appears here. */}
-      <section aria-labelledby="simulator-confidentiality-heading" className="mb-4 sm:mb-10">
-        <aside className="rounded-lg border border-l-4 border-border border-l-primary bg-card p-4 sm:p-5">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />
-            <h2
-              id="simulator-confidentiality-heading"
-              className="text-xs font-semibold uppercase tracking-[0.16em] text-primary"
-            >
-              {CONFIDENTIALITY.heading}
-            </h2>
-          </div>
-          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-foreground">
-            {CONFIDENTIALITY.simulator}
-          </p>
-        </aside>
-      </section>
-
       <section
         aria-labelledby="landing-heading"
         className="grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:items-start lg:gap-10"
@@ -259,6 +237,34 @@ export default function Landing() {
           </ol>
           <p className="mt-1 border-t border-border pt-3 text-sm font-medium tracking-tight text-foreground">
             {BRAND.tagline}
+          </p>
+        </aside>
+      </section>
+
+      {/* THE CONFIDENTIALITY CARD (owner's instruction, 2026-10-07) — the same promise the ZEPARI
+          pages make, worded for a POLICY DRAFT on this page.
+
+          It is placed AFTER the hero deliberately, and that is not a style choice: the hero holds the
+          page's first action, and on a phone that action must stay within the first screen (a locked
+          requirement, measured by the browser test). Putting this card above the hero pushed that
+          action to 1045px on an 844px screen, so the card must never be allowed back above it.
+
+          The sentence itself lives in `src/config/brand.ts` — ONE place for both pages — and validate
+          check 47 fails the build if this card goes missing here, or if the home page's wording
+          appears here by mistake. */}
+      <section aria-labelledby="simulator-confidentiality-heading" className="mt-16">
+        <aside className="rounded-lg border border-l-4 border-border border-l-primary bg-card p-4 sm:p-5">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />
+            <h2
+              id="simulator-confidentiality-heading"
+              className="text-xs font-semibold uppercase tracking-[0.16em] text-primary"
+            >
+              {CONFIDENTIALITY.heading}
+            </h2>
+          </div>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-foreground">
+            {CONFIDENTIALITY.simulator}
           </p>
         </aside>
       </section>
