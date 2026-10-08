@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicPageShell } from "@/components/public/PublicPageShell";
 import Landing from "@/pages/Landing";
 import ResearchLanding from "@/pages/ResearchLanding";
 import {
   AI_STRATEGY,
+  CONFIDENTIALITY,
   GOVERNANCE,
   MINISTER_STATEMENT,
   PLATFORM_HOME,
@@ -364,6 +365,29 @@ export default function Home() {
           </p>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
             {MINISTER_STATEMENT}
+          </p>
+        </section>
+
+        {/* THE CONFIDENTIALITY CARD (owner's instruction, 2026-10-07) — the same promise the ZEPARI
+            pages make, worded for DOCUMENTS generally, because this page is the door to BOTH
+            assistants. The sentence lives in one place (`src/config/brand.ts`); validate check 47
+            fails the build if this card goes missing here, or if the policy simulator's
+            "policy draft" wording is used here by mistake. */}
+        <section
+          aria-labelledby="home-confidentiality-heading"
+          className="relative z-10 mt-12 rounded-lg border border-l-4 border-border border-l-gold-rule bg-card p-5"
+        >
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-gold-rule" aria-hidden="true" />
+            <h2
+              id="home-confidentiality-heading"
+              className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground"
+            >
+              {CONFIDENTIALITY.heading}
+            </h2>
+          </div>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            {CONFIDENTIALITY.home}
           </p>
         </section>
 

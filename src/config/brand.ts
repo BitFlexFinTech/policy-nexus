@@ -297,6 +297,31 @@ export const SERVICE_NOTICE = {
 } as const;
 
 /**
+ * THE CONFIDENTIALITY STATEMENT for the POLICY side (owner's instruction, 2026-10-07).
+ *
+ * The owner dictated both sentences word for word, so they are kept here in ONE place and drawn by
+ * both pages — they cannot drift apart, and they cannot be swapped: the policy SIMULATOR's says
+ * "policy draft"; the HOME page's says "documents" generally, because that page is the door to both
+ * assistants. `npm run validate` (check 47) fails the build if either page loses its card or if the
+ * two wordings are exchanged.
+ *
+ * Both are built from the two single sources of truth — `PROMOTER.name` for the company, `NAME` for
+ * the product (which already carries the ™ the owner asked to keep) — so the names can never be
+ * written a second way.
+ */
+const CONFIDENTIALITY_TAIL =
+  "As administrators we manage only live support, the servers and the connections between services — " +
+  `never the documents. ${NAME}'s data is stored on the servers managed by ${PROMOTER.name}.`;
+
+export const CONFIDENTIALITY = {
+  heading: "Confidentiality",
+  /** On the policy-simulation landing page (`/simulation`) — about a policy draft. */
+  simulator: `${PROMOTER.name} cannot read any policy draft. ${CONFIDENTIALITY_TAIL}`,
+  /** On the platform home page (`/`) — the door to both assistants, so about documents generally. */
+  home: `${PROMOTER.name} cannot read any documents. ${CONFIDENTIALITY_TAIL}`,
+} as const;
+
+/**
  * The decision-support disclaimer. It is rendered on the executive summary, the
  * full assessment, and every exported/printed document, and is checked by
  * `npm run validate` (check 8) — the wording must not be softened.

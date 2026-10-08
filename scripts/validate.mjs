@@ -2286,6 +2286,67 @@ if (!existsSync(cssPath)) {
   check("the picture of a tool's page begins at the bottom of the cards", problems);
 }
 
+// check 47 — THE TWO CONFIDENTIALITY CARDS, AND ONLY THOSE TWO (owner's instruction, 2026-10-07:
+// "we also need to add this card to the policy simulator but obviously modify the wording for policy",
+// with one sentence for the /simulation page about a POLICY DRAFT and one for the home page about
+// DOCUMENTS). The owner dictated both sentences, so this fails the build if either page loses its card,
+// if a sentence stops coming from the single config home, or — the point of the check — if the two are
+// ever SWAPPED. A reader must never see "cannot read any documents" on the simulator or "cannot read
+// any policy draft" on the home page, because the second is a narrower promise in the wrong place.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const brand = readIf("src/config/brand.ts");
+  if (brand === null) {
+    problems.push("src/config/brand.ts is missing");
+  } else if (!/export const CONFIDENTIALITY = \{/.test(brand)) {
+    problems.push("src/config/brand.ts no longer holds the CONFIDENTIALITY statement — the two cards would have nowhere to come from");
+  } else {
+    if (!/simulator: `\$\{PROMOTER\.name\} cannot read any policy draft\./.test(brand)) {
+      problems.push('the simulator\'s confidentiality sentence no longer says "cannot read any policy draft" — the policy page must name a policy draft');
+    }
+    if (!/home: `\$\{PROMOTER\.name\} cannot read any documents\./.test(brand)) {
+      problems.push('the home page\'s confidentiality sentence no longer says "cannot read any documents"');
+    }
+    if (!/servers managed by \$\{PROMOTER\.name\}/.test(brand)) {
+      problems.push("the confidentiality statement no longer says whose servers the data is stored on");
+    }
+    if (!/heading: "Confidentiality"/.test(brand)) {
+      problems.push('the confidentiality heading is gone — the card must still say "Confidentiality"');
+    }
+  }
+
+  const simulatorPage = readIf("src/pages/Landing.tsx");
+  if (simulatorPage === null) {
+    problems.push("src/pages/Landing.tsx is missing — the policy simulator page has no confidentiality card");
+  } else {
+    if (!/CONFIDENTIALITY\.simulator/.test(simulatorPage)) {
+      problems.push("the policy-simulation page no longer shows the confidentiality card (CONFIDENTIALITY.simulator)");
+    }
+    if (/CONFIDENTIALITY\.home/.test(simulatorPage)) {
+      problems.push('the policy-simulation page shows the HOME page\'s wording ("any documents") — the simulator must name a policy draft');
+    }
+  }
+
+  const homePage = readIf("src/pages/Home.tsx");
+  if (homePage === null) {
+    problems.push("src/pages/Home.tsx is missing");
+  } else {
+    if (!/CONFIDENTIALITY\.home/.test(homePage)) {
+      problems.push("the platform home page no longer shows the confidentiality card (CONFIDENTIALITY.home)");
+    }
+    if (/CONFIDENTIALITY\.simulator/.test(homePage)) {
+      problems.push('the platform home page shows the SIMULATOR\'s wording ("policy draft") — the home page is the door to both assistants, so its promise is about documents');
+    }
+  }
+
+  if (problems.length === 0) {
+    notes.push('INFO  both confidentiality cards are in place and worded apart: the policy simulator names a policy draft, and the home page speaks about documents');
+  }
+  check("the two confidentiality cards are in place and are not swapped", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));
