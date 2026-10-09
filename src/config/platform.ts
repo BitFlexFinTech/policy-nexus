@@ -171,9 +171,20 @@ const SIMULATED: CapabilityConfig = { mode: "simulated", endpoint: "", key: "", 
  * immediately after the demo. The long-term answer (the funded server — the "MiroFish" seam this
  * project already plans) keeps the key on the server, so nothing sensitive ever reaches a browser.
  */
-const IS_TEST_ENV = import.meta.env.MODE === "test";
-const BAKED_POLICY_KEY: string = IS_TEST_ENV ? "" : (import.meta.env.VITE_OPENROUTER_KEY_POLICY ?? "");
-const BAKED_RESEARCH_KEY: string = IS_TEST_ENV ? "" : (import.meta.env.VITE_OPENROUTER_KEY_RESEARCH ?? "");
+/**
+ * VITE'S BUILD-TIME ENVIRONMENT, READ SAFELY.
+ *
+ * Vite replaces `import.meta.env` with its own object while it builds the site — that is how the two
+ * `VITE_`-prefixed keys reach the build. It is read through a variable, and every read is guarded,
+ * because this file is ALSO loaded outside Vite: the end-to-end tests import `ADMIN_ROUTE` from it, and
+ * there `import.meta.env` does not exist at all, so an unguarded read crashes the whole test run.
+ */
+const buildEnv = import.meta.env as unknown as Record<string, string> | undefined;
+const IS_TEST_ENV = buildEnv?.MODE === "test";
+const BAKED_POLICY_KEY: string =
+  IS_TEST_ENV || !buildEnv ? "" : buildEnv.VITE_OPENROUTER_KEY_POLICY ?? "";
+const BAKED_RESEARCH_KEY: string =
+  IS_TEST_ENV || !buildEnv ? "" : buildEnv.VITE_OPENROUTER_KEY_RESEARCH ?? "";
 
 /**
  * One assistant capability, already carrying its demonstration key: live and completely configured

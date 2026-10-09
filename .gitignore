@@ -25,6 +25,7 @@ dist-ssr
 
 # Generated / test artifacts (never committed — clean-tree rule)
 dist
+dist-e2e
 playwright-report
 test-results
 *.zip

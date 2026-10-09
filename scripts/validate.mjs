@@ -2437,8 +2437,9 @@ if (!existsSync(cssPath)) {
     problems.push("src/config/platform.ts is missing");
   } else {
     for (const [name, why] of [
-      ["import.meta.env.VITE_OPENROUTER_KEY_POLICY", "the Nzwisiso drafter's key is no longer read into the build, so it would have to be typed in again (the owner's strict rule)"],
-      ["import.meta.env.VITE_OPENROUTER_KEY_RESEARCH", "the ZEPARI assistant's key is no longer read into the build, so it would have to be typed in again (the owner's strict rule)"],
+      ["import.meta.env", "the build no longer reads Vite's environment at all, so no demonstration key can reach the built site"],
+      ["VITE_OPENROUTER_KEY_POLICY", "the Nzwisiso drafter's key is no longer read into the build, so it would have to be typed in again (the owner's strict rule)"],
+      ["VITE_OPENROUTER_KEY_RESEARCH", "the ZEPARI assistant's key is no longer read into the build, so it would have to be typed in again (the owner's strict rule)"],
     ]) {
       if (!platform.includes(name)) problems.push(`the demonstration keys: ${why} (${name})`);
     }
