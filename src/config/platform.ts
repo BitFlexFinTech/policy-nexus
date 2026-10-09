@@ -71,7 +71,17 @@ export interface PlatformConfig {
   sso: SsoConfig;
 }
 
-export const PLATFORM_CONFIG_STORAGE_KEY = "nzwisiso.platform.config.v1";
+/**
+ * Where the administrator's own saved settings are kept in this browser.
+ *
+ * BUMPED TO v2 on 2026-10-09, on purpose. From this build the two demonstration keys are baked into
+ * the platform's own defaults (see `DEFAULT_PLATFORM_CONFIG` below), so the site is live the moment it
+ * opens. A browser that still held a v1 record from an earlier build would keep overriding those
+ * defaults with its old settings, and the owner's rule is "i should just open the website and
+ * everything should work" — so the older record is deliberately left behind. An administrator can
+ * still change anything on the screen and save it again.
+ */
+export const PLATFORM_CONFIG_STORAGE_KEY = "nzwisiso.platform.config.v2";
 
 /**
  * Where the platform administration screen is mounted.
@@ -139,12 +149,52 @@ export const OPENROUTER_MODEL_SUGGESTIONS: readonly string[] = [
 
 const SIMULATED: CapabilityConfig = { mode: "simulated", endpoint: "", key: "", model: "" };
 
-/** Everything simulated: the default, and the state the platform ships in. */
+/* ------------------------------------------------------------------------- */
+/* The demonstration keys, baked into the build                               */
+/* ------------------------------------------------------------------------- */
+
+/**
+ * THE DEMONSTRATION KEYS ARE SAVED INTO THIS BUILD (the owner's strict rule, 2026-10-07): *"this is
+ * the machine i am doing the demo from … i should not have to enter anything manually the api keys
+ * should be saved … i should just open the website and everything should work."*
+ *
+ * `.env` carries the same two keys under the `VITE_`-prefixed names below. Vite copies a `VITE_`
+ * value into the built site at build time, which is exactly what "saved into the build" means: the
+ * Nzwisiso policy drafter and the ZEPARI research assistant are live the moment the site opens, with
+ * nothing typed in.
+ *
+ * The test runner is deliberately left out, so the suite never depends on a secret being present and
+ * stays deterministic. The development server and the published build are both live.
+ *
+ * A key that ships inside a website can be read by anyone who looks at that website's code. That is
+ * acceptable here, and only here, because these are demonstration keys and the owner rotates both
+ * immediately after the demo. The long-term answer (the funded server — the "MiroFish" seam this
+ * project already plans) keeps the key on the server, so nothing sensitive ever reaches a browser.
+ */
+const IS_TEST_ENV = import.meta.env.MODE === "test";
+const BAKED_POLICY_KEY: string = IS_TEST_ENV ? "" : (import.meta.env.VITE_OPENROUTER_KEY_POLICY ?? "");
+const BAKED_RESEARCH_KEY: string = IS_TEST_ENV ? "" : (import.meta.env.VITE_OPENROUTER_KEY_RESEARCH ?? "");
+
+/**
+ * One assistant capability, already carrying its demonstration key: live and completely configured
+ * when a key is present, and plain simulated when none is (a machine with no `.env`), so a missing key
+ * can never leave a half-configured capability behind.
+ */
+export const demoAssistantCapability = (key: string): CapabilityConfig =>
+  key.trim()
+    ? { mode: "live", endpoint: OPENROUTER_CHAT_ENDPOINT, key, model: DEFAULT_DRAFTING_MODEL }
+    : { ...SIMULATED };
+
+/**
+ * The state the platform ships in: everything simulated EXCEPT the two assistants, which carry the
+ * demonstration keys baked into this build and are therefore live from the first moment the site
+ * opens.
+ */
 export const DEFAULT_PLATFORM_CONFIG: PlatformConfig = {
   platformMode: "simulated",
   assessment: { ...SIMULATED },
-  drafting: { ...SIMULATED },
-  research: { ...SIMULATED },
+  drafting: demoAssistantCapability(BAKED_POLICY_KEY),
+  research: demoAssistantCapability(BAKED_RESEARCH_KEY),
   extraction: { ...SIMULATED },
   library: { ...SIMULATED },
   sso: { mode: "simulated", issuer: "", clientId: "", redirectUri: "", departmentClaim: "department_id" },

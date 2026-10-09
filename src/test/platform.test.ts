@@ -2,9 +2,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ADMIN_ROUTE,
   CAPABILITY_IDS,
+  DEFAULT_DRAFTING_MODEL,
   DEFAULT_PLATFORM_CONFIG,
+  OPENROUTER_CHAT_ENDPOINT,
   PLATFORM_CONFIG_STORAGE_KEY,
   clearConfig,
+  demoAssistantCapability,
   describeCapability,
   getConfig,
   isAbsoluteHttpUrl,
@@ -40,11 +43,31 @@ describe("platform configuration", () => {
   });
 
   it("ships with every capability simulated", () => {
+    // Under the test runner the two demonstration keys are deliberately withheld (see
+    // `demoAssistantCapability` below), so the defaults here are fully simulated. The PUBLISHED build
+    // carries both keys baked in, so the two assistants are live the moment the site opens.
     expect(getConfig()).toEqual(DEFAULT_PLATFORM_CONFIG);
     CAPABILITY_IDS.forEach((id) =>
       expect(describeCapability(getConfig(), id).state, id).toBe("simulated"),
     );
     expect(isAnyCapabilityLive()).toBe(false);
+  });
+
+  it("bakes a demonstration key into an assistant, and stays simulated without one", () => {
+    // The owner's strict rule (2026-10-07): the keys are saved into the build so nothing is typed in
+    // before a demonstration. `DEFAULT_PLATFORM_CONFIG` calls this with the two baked keys.
+    expect(demoAssistantCapability("sk-demo")).toEqual({
+      mode: "live",
+      endpoint: OPENROUTER_CHAT_ENDPOINT,
+      key: "sk-demo",
+      model: DEFAULT_DRAFTING_MODEL,
+    });
+    expect(demoAssistantCapability("   ")).toEqual({
+      mode: "simulated",
+      endpoint: "",
+      key: "",
+      model: "",
+    });
   });
 
   it("keeps a half-configured capability simulated rather than half-working", () => {

@@ -1483,7 +1483,7 @@ if (!existsSync(cssPath)) {
     for (const [symbol, why] of [
       ["research: CapabilityConfig", "the research capability is not part of PlatformConfig"],
       ['research: "Research model (OpenRouter)"', "the research capability has no label"],
-      ["research: { ...SIMULATED }", "the research capability has no default (it must ship simulated)"],
+      ["research: demoAssistantCapability(BAKED_RESEARCH_KEY)", "the research capability has no default (it must carry its OWN baked demonstration key, so it is live with nothing typed)"],
       ["research: { ...config.research, mode }", "the master switch no longer flips the research capability"],
       ["research: normaliseService(record.research", "a stored research key would be dropped on reload"],
     ]) {
@@ -2395,71 +2395,74 @@ if (!existsSync(cssPath)) {
   check("the research screens wear ZEPARI's colours, never the department emerald", problems);
 }
 
-// check 49 — THE FREE IN-BROWSER MODEL IS WIRED, AND NOTHING IT NEEDS COMES FROM OUTSIDE OUR SITE
-// (owner's decision, 2026-10-07: "go with free in-browser model we need the research engine to
-// actually work for the demo presentation", and the earlier instruction "local models … not chatboxes
-// that are hosted outside Zimbabwe").
+// check 49 — THE IN-BROWSER MODEL IS GONE FOR GOOD, AND BOTH ASSISTANTS ARE LIVE FROM THE BUILD WITH
+// NOTHING TYPED (the owner's strict rules, 2026-10-07: "no remove the in-browser model completely. we
+// dont need it, it failed." and "the api keys should be saved … i should just open the website and
+// everything should work").
 //
-// The model runs in the visitor's browser, so the only thing that keeps the promise is the library's
-// configuration: remote models OFF, and the model files and the engine's own WebAssembly files pointed
-// at OUR OWN web root. This fails the build if any of that is removed, if either service stops asking
-// the browser model, or if the models are allowed into the code store (about 53 MB of binary that must
-// be fetched onto a machine, never committed).
+// Two jobs. (1) The free in-browser model must never come back — its file, its downloader, its
+// build-time file-copier, its browser proof, its dependency and its downloaded binary all stay out.
+// (2) The demonstration keys must stay baked into the build: the drafting and research defaults must
+// read the two `VITE_`-prefixed names, so the platform is live the moment it opens. A future session
+// must NOT "helpfully" remove the baked key for safety — that is now a defect, not a fix.
 {
   const problems = [];
   const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
 
-  const model = readIf("src/services/research/researchBrowserModel.ts");
-  if (model === null) {
-    problems.push("src/services/research/researchBrowserModel.ts is missing — with no key connected the assistant could only quote the library");
-  } else {
-    for (const [symbol, why] of [
-      ["env.allowRemoteModels = false", "remote models are no longer switched off — a request could leave our own site (the owner's sovereignty instruction)"],
-      ['env.localModelPath = "/models/"', "the model files are no longer read from our own web root"],
-      ["wasmPaths = \"/models/ort/\"", "the engine's own WebAssembly files are no longer read from our own web root"],
-      ["onnx-community/mobilebert-uncased-squad-v2-ONNX", "the answering model is gone"],
-      ["answer(question, passage.text)", "the two-argument call is gone — the object form returns an empty answer with no error, which looks exactly like a model that cannot run"],
-    ]) {
-      if (!model.includes(symbol)) problems.push(`the in-browser model: ${why} (${symbol})`);
-    }
-  }
-
-  for (const [file, label] of [
-    ["src/services/research/researchChat.ts", "the chat"],
-    ["src/services/research/researchBrief.ts", "the brief"],
+  for (const [file, why] of [
+    ["src/services/research/researchBrowserModel.ts", "the removed in-browser model is back"],
+    ["scripts/fetch-models.mjs", "the removed in-browser model's downloader is back"],
+    ["scripts/prune-dist.mjs", "the removed in-browser model's build step is back"],
+    ["e2e/research-model.spec.ts", "the removed in-browser model's browser proof is back"],
+    ["public/models", "the removed in-browser model's binary is back (about 53 MB that must never be committed)"],
   ]) {
-    const source = readIf(file);
-    if (source && !source.includes("researchBrowserModel")) {
-      problems.push(`${label} no longer asks the free in-browser model — with no key it would answer only by quoting the library`);
-    }
-  }
-
-  const fetcher = readIf("scripts/fetch-models.mjs");
-  if (fetcher === null) {
-    problems.push("scripts/fetch-models.mjs is missing — the models could not be put on a machine or on the server");
-  } else {
-    if (!fetcher.includes("onnx-community/mobilebert-uncased-squad-v2-ONNX")) {
-      problems.push("the model fetcher no longer fetches the answering model");
-    }
-    if (!fetcher.includes("huggingface.co/")) {
-      problems.push("the model fetcher no longer names where the files come from");
-    }
+    if (existsSync(join(ROOT, file))) problems.push(`${file} exists again — ${why}`);
   }
 
   const packageJson = readIf("package.json");
-  if (packageJson && !/"fetch:models"/.test(packageJson)) {
-    problems.push("`npm run fetch:models` is gone from package.json");
+  if (packageJson) {
+    if (/@huggingface\/transformers/.test(packageJson)) {
+      problems.push("`@huggingface/transformers` is back in package.json — the in-browser model's dependency must stay removed");
+    }
+    if (/"fetch:models"/.test(packageJson)) {
+      problems.push("`npm run fetch:models` is back in package.json — the in-browser model's command must stay removed");
+    }
+    if (!/"build": "vite build"/.test(packageJson)) {
+      problems.push("the build script is no longer plain `vite build` — the removed model's prune step must not return");
+    }
   }
 
-  const ignore = readIf(".gitignore");
-  if (ignore && !/^public\/models\/$/m.test(ignore)) {
-    problems.push("public/models/ is no longer gitignored — about 53 MB of model binary could be committed into the code store");
+  const platform = readIf("src/config/platform.ts");
+  if (platform === null) {
+    problems.push("src/config/platform.ts is missing");
+  } else {
+    for (const [name, why] of [
+      ["import.meta.env.VITE_OPENROUTER_KEY_POLICY", "the Nzwisiso drafter's key is no longer read into the build, so it would have to be typed in again (the owner's strict rule)"],
+      ["import.meta.env.VITE_OPENROUTER_KEY_RESEARCH", "the ZEPARI assistant's key is no longer read into the build, so it would have to be typed in again (the owner's strict rule)"],
+    ]) {
+      if (!platform.includes(name)) problems.push(`the demonstration keys: ${why} (${name})`);
+    }
+    if (
+      !/drafting: demoAssistantCapability\(/.test(platform) ||
+      !/research: demoAssistantCapability\(/.test(platform)
+    ) {
+      problems.push("the drafting and research defaults no longer carry a baked demonstration key — the site would open with both assistants needing a key typed in");
+    }
+  }
+
+  const env = readIf(".env");
+  if (env !== null) {
+    for (const name of ["VITE_OPENROUTER_KEY_POLICY", "VITE_OPENROUTER_KEY_RESEARCH"]) {
+      if (!new RegExp(`^${name}=\\S`, "m").test(env)) {
+        problems.push(`.env no longer carries ${name} — the built site would open with that assistant needing a key typed in`);
+      }
+    }
   }
 
   if (problems.length === 0) {
-    notes.push("INFO  the free in-browser model is wired, reads every file from our own site, and its binary is kept out of the code store");
+    notes.push("INFO  the in-browser model is gone for good, and both demonstration keys are baked into the build — the site is live the moment it opens");
   }
-  check("the free in-browser model is wired and reads nothing from outside our site", problems);
+  check("the in-browser model is gone, and both assistants are live from the build with nothing typed", problems);
 }
 
 // summary

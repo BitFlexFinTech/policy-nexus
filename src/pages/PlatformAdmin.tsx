@@ -127,6 +127,14 @@ export default function PlatformAdmin() {
           )}
         </section>
 
+        <section className="rounded-lg border border-primary/30 bg-primary-tint p-3 text-xs leading-relaxed text-foreground">
+          <strong className="font-semibold">The demonstration keys are already saved in this build.</strong>{" "}
+          Both assistants — the {BRAND.productName} policy drafter and the ZEPARI research assistant —
+          are live the moment the site opens: their keys are built into this copy of the platform, so
+          nothing is typed in before a demonstration. This screen stays available if a key ever needs
+          changing.
+        </section>
+
         <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-4">
           <div>
             <h2 className="flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground">

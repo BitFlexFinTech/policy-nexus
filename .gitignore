@@ -37,7 +37,3 @@ Review Zip/
 .env.local
 .env.*.local
 
-# The research models are served from our own web root but are NOT kept in the code store:
-# about 92 MB of binary. `npm run fetch:models` downloads them onto a machine; `npm run build`
-# copies them into dist/ and `npm run deploy` uploads them.
-public/models/

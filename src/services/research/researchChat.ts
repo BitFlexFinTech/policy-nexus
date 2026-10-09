@@ -6,27 +6,20 @@
  *
  *  - **Retrieval** always runs, locally and deterministically, over the documents ZEPARI added
  *    (see `researchRetrieval.ts`). The matching passages are the SOURCES, and they are real text.
- *  - **The written answer** is produced by the research model (OpenRouter, the research key entered
- *    on the administration screen) when one is connected, or — with no key, which is the owner's
- *    default — by the **FREE model running in the visitor's own browser** (`researchBrowserModel.ts`).
- *    **If neither can run, the question is still ANSWERED, by quoting the library**
- *    (`researchAssembly.ts`): the matched passages are quoted, each under the name of the document it
- *    came from, and the answer says plainly that it was assembled rather than written. The owner's
- *    build plan requires answers "from the library WITH OR WITHOUT AI" (`docs/ZEPARI_BUILD_PLAN.md`,
- *    Stage B), and a question that goes unanswered is not a demonstration of anything. Nothing is ever
- *    invented at any of the three levels: every quotation really appears in the documents, and no
- *    figure is stated that is not in them.
+ *  - **The written answer** is produced by the research model (OpenRouter; its key is built into this
+ *    copy of the platform, so it is live the moment the site opens). **With no model connected the
+ *    question is still ANSWERED, by quoting the library** (`researchAssembly.ts`): the matched passages
+ *    are quoted, each under the name of the document it came from, and the answer says plainly that it
+ *    was assembled rather than written. The owner's build plan requires answers "from the library WITH
+ *    OR WITHOUT AI" (`docs/ZEPARI_BUILD_PLAN.md`, Stage B), and a question that goes unanswered is not a
+ *    demonstration of anything. Nothing is ever invented at either level: every quotation really appears
+ *    in the documents, and no figure is stated that is not in them.
  *
  * The strict boundary holds: nothing here reaches the policy-simulation engine.
  */
 
 import { liveService, OPENROUTER_CHAT_ENDPOINT, type CapabilityConfig } from "@/config/platform";
 import { ASSEMBLED_ANSWER_DETAIL, assembleAnswer } from "./researchAssembly";
-import {
-  answerWithBrowserModel,
-  IN_BROWSER_ANSWER_DETAIL,
-  passagesFromSources,
-} from "./researchBrowserModel";
 import { listResearchDocuments } from "./researchDocuments";
 import { findSources, type ResearchSource } from "./researchRetrieval";
 
@@ -114,23 +107,11 @@ export const askResearchQuestion = async (question: string): Promise<ResearchCha
           "No document in the research library matches this question. Add the relevant document to the library first.",
       };
     }
-    /* NO ANSWER MODEL CONNECTED — the FREE in-browser model answers, which is the owner's default (no
-       key, no cost, nothing leaving this machine). If it cannot run at all — no model files on the
-       server, no WebAssembly in this browser — the question is still answered by quoting the library.
-       Either way it IS answered: "a question the screen appeared to ignore" was the defect the owner
-       reported on 2026-10-07. */
-    const written = await answerWithBrowserModel(
-      trimmed,
-      passagesFromSources(sources, (id) => documents.find((document) => document.id === id)?.text),
-    );
-    if (written) {
-      return {
-        status: "answered",
-        answer: `“${written.text}”\n\nQuoted from ${written.sourceName} — read by the model running in this browser.`,
-        sources,
-        detail: IN_BROWSER_ANSWER_DETAIL,
-      };
-    }
+    /* NO MODEL CONNECTED — the question is still ANSWERED, by quoting the library. The owner's build
+       plan requires answers "from the library WITH OR WITHOUT AI" (`docs/ZEPARI_BUILD_PLAN.md`, Stage B),
+       and a question that goes unanswered is not a demonstration of anything: "a question the screen
+       appeared to ignore" was the defect the owner reported on 2026-10-07. Every quotation really
+       appears in the documents, and no figure is stated that is not in them. */
     return {
       status: "assembled",
       answer: assembleAnswer(sources),

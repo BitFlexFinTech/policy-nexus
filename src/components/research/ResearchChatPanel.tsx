@@ -62,14 +62,11 @@ export function ResearchChatPanel() {
         </Button>
       </div>
 
-      {/* THE FIRST QUESTION IS SLOW AND MUST NOT LOOK FROZEN: with no key connected the free model runs
-          in this browser, so the first question downloads it from this site once (about 80 MB — the
-          model plus the engine's own files), and later questions use the copy already held. Measured on
-          2026-10-07: the answer appears in a few seconds once the files are held. */}
+      {/* A question that is being answered must not look frozen. The research model is a real service
+          now (its key is built into this copy of the platform), so this is a short wait, not a download. */}
       {asking && (
         <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground" role="status">
-          Reading ZEPARI's documents with the model in this browser. The first question downloads the
-          model from this site once (about 80 MB); after that it is quick.
+          Reading ZEPARI's documents…
         </p>
       )}
 

@@ -15,12 +15,7 @@
 
 import { liveService, OPENROUTER_CHAT_ENDPOINT, type CapabilityConfig } from "@/config/platform";
 import { RESEARCH_BRIEF_SECTIONS } from "@/config/research";
-import { ASSEMBLED_BRIEF_DETAIL, assembleBrief, assembleBriefWithFindings } from "./researchAssembly";
-import {
-  findingsWithBrowserModel,
-  IN_BROWSER_BRIEF_DETAIL,
-  passagesFromSources,
-} from "./researchBrowserModel";
+import { ASSEMBLED_BRIEF_DETAIL, assembleBrief } from "./researchAssembly";
 import { listResearchDocuments } from "./researchDocuments";
 import { findSources, type ResearchSource } from "./researchRetrieval";
 
@@ -114,29 +109,11 @@ export const draftResearchBrief = async (topic: string): Promise<ResearchBrief> 
           "No document in the research library matches this topic. Add the relevant document to the library first.",
       };
     }
-    /* NO ANSWER MODEL CONNECTED — the FREE in-browser model is asked to point at the sentence each
-       document carries for this topic (the owner's default: no key, no cost, nothing leaving this
-       machine). If it cannot run at all, the brief is still produced by quoting the library. Same
-       reason as the chat: the build plan's free default is "answers from the library WITH OR WITHOUT
-       AI", and a topic with no brief is not a demonstration of anything. */
-    /* The model is asked a QUESTION about the topic, not given the bare topic: measured 2026-10-07, a
-       bare topic like "agriculture policy pillars" makes a small extractive model point at the document's
-       TITLE ("national agriculture policy framework 2019 - 2030") and miss the substance, while a
-       question shape pulls out the sentence that carries the answer. The same reason the chat asks a
-       question. */
-    const findings = await findingsWithBrowserModel(
-      `What does this document say about ${trimmed}?`,
-      passagesFromSources(sources, (id) => documents.find((document) => document.id === id)?.text),
-    );
-    if (findings.length) {
-      return {
-        status: "drafted",
-        brief: assembleBriefWithFindings(trimmed, findings, structure),
-        sources,
-        structure,
-        detail: IN_BROWSER_BRIEF_DETAIL,
-      };
-    }
+    /* NO MODEL CONNECTED — the brief is still PRODUCED, assembled from the library: its fixed sections
+       are filled with the passages the topic matched, each named, and the one section that needs a
+       judgement (Recommendations) says plainly that it was not produced. The owner's build plan requires
+       answers "from the library WITH OR WITHOUT AI" (`docs/ZEPARI_BUILD_PLAN.md`, Stage B), and a topic
+       with no brief is not a demonstration of anything. No brief is ever invented. */
     return {
       status: "assembled",
       brief: assembleBrief(trimmed, sources, structure),

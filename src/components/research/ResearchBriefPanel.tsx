@@ -62,12 +62,11 @@ export function ResearchBriefPanel() {
         </Button>
       </div>
 
-      {/* Same note as the chat's, for the same reason: the first brief is slow because the model is
-          downloaded from this site once (about 80 MB). */}
+      {/* A brief that is being drawn must not look frozen. The research model is a real service now
+          (its key is built into this copy of the platform), so this is a short wait, not a download. */}
       {drafting && (
         <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground" role="status">
-          Drawing the brief from ZEPARI's documents with the model in this browser. The first brief
-          downloads the model from this site once (about 80 MB); after that it is quick.
+          Drawing the brief from ZEPARI's documents…
         </p>
       )}
 
