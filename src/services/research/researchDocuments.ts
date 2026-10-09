@@ -17,6 +17,8 @@ import { nowIso } from "@/lib/clock";
 import { createKeyValueStore } from "@/lib/browserStorage";
 import { hashString, toSeedHex } from "@/lib/prng";
 import type { ExtractionKind } from "@/services/extraction/extractPolicyText";
+import type { RetrievableDocument } from "./researchRetrieval";
+import { loadZepariCorpus, zepariCitation } from "./zepariCorpus";
 
 export const RESEARCH_DOCUMENTS_KEY = "nzwisiso.research-documents.v1";
 
@@ -131,4 +133,31 @@ export const clearAllResearchDocuments = (): void => {
   cachedRaw = undefined;
   cachedDocuments = EMPTY;
   emit();
+};
+
+/**
+ * EVERYTHING THE RESEARCH ASSISTANT MAY READ, in one list.
+ *
+ * Two parts, and both are shown: **ZEPARI's own published documents** — the built-in library, every
+ * publication on their three listing pages, read from our own site (see `zepariCorpus.ts`) — and any
+ * document added on this machine. ZEPARI's documents are named with the body that published them and
+ * their date, so any quotation can be traced back to the exact publication.
+ *
+ * If ZEPARI's published documents cannot be read (no connection), the added documents are still
+ * searched, so the assistant keeps working and the caller can say plainly what is missing.
+ */
+export const libraryDocuments = async (): Promise<readonly RetrievableDocument[]> => {
+  const added: RetrievableDocument[] = listResearchDocuments().map((document) => ({
+    id: document.id,
+    name: document.name,
+    text: document.text,
+  }));
+  const corpus: RetrievableDocument[] = (await loadZepariCorpus())
+    .filter((document) => document.text)
+    .map((document) => ({
+      id: document.id,
+      name: zepariCitation(document),
+      text: document.text,
+    }));
+  return [...added, ...corpus];
 };

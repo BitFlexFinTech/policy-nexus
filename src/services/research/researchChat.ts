@@ -20,7 +20,7 @@
 
 import { liveService, OPENROUTER_CHAT_ENDPOINT, type CapabilityConfig } from "@/config/platform";
 import { ASSEMBLED_ANSWER_DETAIL, assembleAnswer } from "./researchAssembly";
-import { listResearchDocuments } from "./researchDocuments";
+import { libraryDocuments } from "./researchDocuments";
 import { findSources, type ResearchSource } from "./researchRetrieval";
 
 export type ResearchChatStatus = "answered" | "assembled" | "no-sources" | "error";
@@ -93,7 +93,7 @@ const researchClient = (config: CapabilityConfig) => ({
  */
 export const askResearchQuestion = async (question: string): Promise<ResearchChatAnswer> => {
   const trimmed = question.trim();
-  const documents = listResearchDocuments();
+  const documents = await libraryDocuments();
   const sources = findSources(trimmed, documents);
   const config = liveService("research");
 

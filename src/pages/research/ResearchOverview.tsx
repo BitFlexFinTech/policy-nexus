@@ -27,7 +27,7 @@ import { resetResearchSample } from "@/services/research/researchSample";
 
 /** One "try this" step — a numbered action that opens the screen it describes. */
 const STEPS: ReadonlyArray<{ to: string; title: string; body: string }> = [
-  { to: "/research/app/library", title: "Read the library", body: "ZEPARI's own documents. A demonstration sample is loaded so there is something to work with." },
+  { to: "/research/app/library", title: "Read the library", body: "ZEPARI's own published documents — every publication on their Policy Briefs, Research Studies and Economic Barometer listings." },
   { to: "/research/app/ask", title: "Ask a question", body: "A question is matched to the library and answered from it, with the passages it used shown as sources." },
   { to: "/research/app/brief", title: "Draft a brief", body: "A short policy brief on a topic, drawn from the library, with its fixed structure and sources shown." },
 ];
@@ -79,9 +79,10 @@ export default function ResearchOverview() {
           {RESEARCH_NAME}
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-          {RESEARCH_INSTITUTION}. A demonstration sample is loaded so you can see how it works right
-          away: a small research library, some data sources, a few published economic indicators and two
-          findings. Open a section to work, or reset the sample at any time.
+          {RESEARCH_INSTITUTION}. ZEPARI's own published documents are the library — every publication on
+          their Policy Briefs, Research Studies and Economic Barometer listings — and a small set of data
+          sources, published economic indicators and findings is loaded so you can see how it works right
+          away. Open a section to work, or reset the sample at any time.
         </p>
       </section>
 

@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import App from "@/App";
 import { clearConfig } from "@/config/platform";
 import { clearResearchSample } from "@/services/research/researchSample";
+import { forgetZepariCorpus } from "@/services/research/zepariCorpus";
 import { signInResearcher } from "@/session/researchSession";
 
 const renderAt = (path: string) => {
@@ -12,13 +13,16 @@ const renderAt = (path: string) => {
 
 /**
  * The research workspace (the redesign) — it is a workspace with a section navigation, a home that
- * orients, and a seeded demonstration sample, not six empty panels stacked down one page.
+ * orients, and a library that is never empty: ZEPARI's own published documents ARE the library (the
+ * owner's strict rule, 2026-10-07), not the short "demonstration extract" stand-ins that used to be
+ * seeded here.
  */
 describe("the research workspace", () => {
   beforeEach(() => {
     window.localStorage.clear();
     clearConfig();
     clearResearchSample();
+    forgetZepariCorpus();
     signInResearcher("chigumira");
   });
 
@@ -31,9 +35,15 @@ describe("the research workspace", () => {
     expect(screen.getByRole("button", { name: "Reset the sample" })).toBeInTheDocument();
   });
 
-  it("seeds a demonstration sample, so a section is not empty on first open", () => {
+  it("never opens an empty library: ZEPARI's published documents are the library", () => {
     renderAt("/research/app/library");
-    expect(screen.getAllByText(/demonstration extract/i).length).toBeGreaterThan(0);
+    const panel = screen
+      .getByRole("heading", { name: /research library/i })
+      .closest("section") as HTMLElement;
+    expect(within(panel).getByText(/ZEPARI's published library/)).toBeInTheDocument();
+    // The old "(demonstration extract)" stand-ins are gone for good — the library is ZEPARI's real
+    // publications, and if they cannot be read the panel says so rather than showing an empty library.
+    expect(within(panel).queryByText(/demonstration extract/i)).not.toBeInTheDocument();
   });
 
   it("carries the six tools, and a brief section shows its fixed structure", () => {

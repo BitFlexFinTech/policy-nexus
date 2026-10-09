@@ -13,6 +13,7 @@ import {
 } from "@/services/research/researchDocuments";
 import { askResearchQuestion } from "@/services/research/researchChat";
 import { findSources } from "@/services/research/researchRetrieval";
+import { forgetZepariCorpus } from "@/services/research/zepariCorpus";
 import { signInResearcher } from "@/session/researchSession";
 
 /** A local address, so this file carries no reachable remote address at all. */
@@ -44,6 +45,7 @@ describe("the grounded research chat", () => {
     window.localStorage.clear();
     clearConfig();
     clearAllResearchDocuments();
+    forgetZepariCorpus();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
@@ -91,7 +93,10 @@ describe("the grounded research chat", () => {
 
     expect(result.status).toBe("answered");
     expect(result.answer).toMatch(/Mining revenue rose/);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    // Two calls: ZEPARI's published library (read from our own site) and then the research model.
+    const urls = fetchMock.mock.calls.map((call) => String((call as unknown[])[0]));
+    expect(urls).toContain(ENDPOINT);
+    expect(urls).toContain("/zepari-corpus.json");
   });
 
   it("renders on the research workspace, and ANSWERS from the library with no model", async () => {

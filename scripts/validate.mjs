@@ -2465,6 +2465,61 @@ if (!existsSync(cssPath)) {
   check("the in-browser model is gone, and both assistants are live from the build with nothing typed", problems);
 }
 
+// check 50 — THE RESEARCH LIBRARY IS ZEPARI'S REAL PUBLISHED DOCUMENTS, NEVER A SAMPLE OR AN EXTRACT
+// (the owner's strict rule, 2026-10-07: "you were supposed to download the available public files / pdfs
+// that are zepari's website … stop making excuses and saying you only downloaded an extract").
+//
+// This fails the build if the shipped corpus is missing, has shrunk to a sample, has documents that are
+// not cited, or has lost one of the three listing sections; if the library stops reading it; or if the
+// old "(demonstration extract)" documents come back in place of the real ones.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const corpusPath = join(ROOT, "public/zepari-corpus.json");
+  if (!existsSync(corpusPath)) {
+    problems.push("public/zepari-corpus.json is missing — the research library would have no real documents");
+  } else {
+    try {
+      const corpus = JSON.parse(readFileSync(corpusPath, "utf8"));
+      const documents = Array.isArray(corpus.documents) ? corpus.documents : [];
+      if (documents.length < 100) {
+        problems.push(`the corpus holds only ${documents.length} documents — ZEPARI's three listing pages carried 103`);
+      }
+      const readable = documents.filter((d) => typeof d.text === "string" && d.text.length > 0).length;
+      if (readable < 90) {
+        problems.push(`only ${readable} of the ${documents.length} published documents carry readable text — 98 could be read`);
+      }
+      const uncited = documents.filter((d) => !d.title || !d.publisher || !d.date || !d.url).length;
+      if (uncited > 0) {
+        problems.push(`${uncited} documents are not cited (title, publisher, date and the published address are all required)`);
+      }
+      for (const section of ["Policy Briefs", "Research Studies", "Economic Barometer"]) {
+        if (!documents.some((d) => d.section === section)) {
+          problems.push(`the corpus covers no documents from ${section}`);
+        }
+      }
+    } catch (error) {
+      problems.push(`public/zepari-corpus.json could not be read (${error.message})`);
+    }
+  }
+
+  const library = readIf("src/services/research/researchDocuments.ts");
+  if (library && !library.includes("loadZepariCorpus")) {
+    problems.push("the research library no longer reads ZEPARI's published documents — the assistant would answer from the added documents only");
+  }
+
+  const sample = readIf("src/services/research/researchSample.ts");
+  if (sample && /demonstration extract/i.test(sample)) {
+    problems.push("the demonstration extracts are back in researchSample.ts — the library must be ZEPARI's real publications, never an extract");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the research library is ZEPARI's real published corpus — every publication on their three listing pages, each cited by title, publisher and date");
+  }
+  check("the research library is ZEPARI's real published documents, never a sample or an extract", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

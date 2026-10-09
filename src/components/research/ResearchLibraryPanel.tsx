@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { FilePlus2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import {
   subscribeToResearchDocuments,
 } from "@/services/research/researchDocuments";
 import { researchDocumentStoreFor } from "@/services/research/researchDocumentStore";
+import { loadZepariCorpus, type ZepariCorpusDocument } from "@/services/research/zepariCorpus";
 
 /**
  * ZEPARI's research library (ZEPARI Batch C).
@@ -33,6 +34,20 @@ export function ResearchLibraryPanel() {
     getResearchDocumentsServerSnapshot,
   );
   const documents = store.list();
+
+  /* ZEPARI's own published documents — the real library. Read from our own site, once, when this panel
+     opens. Until it arrives the panel says it is loading rather than showing an empty library. */
+  const [corpus, setCorpus] = useState<readonly ZepariCorpusDocument[] | null>(null);
+  useEffect(() => {
+    let live = true;
+    void loadZepariCorpus().then((loaded) => {
+      if (live) setCorpus(loaded);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+  const readableCorpus = corpus ? corpus.filter((document) => document.read).length : 0;
 
   const [isReading, setIsReading] = useState(false);
   const [notices, setNotices] = useState<string[]>([]);
@@ -115,9 +130,9 @@ export function ResearchLibraryPanel() {
         Research library
       </h2>
       <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-        ZEPARI's own research documents. Files added here are read by this browser and kept for the
-        research assistant. {documents.length}{" "}
-        {documents.length === 1 ? "document has" : "documents have"} been added.
+        ZEPARI's own published documents are the library (listed below). Files added here are read by
+        this browser and kept for the research assistant. {documents.length}{" "}
+        {documents.length === 1 ? "document has" : "documents have"} been added here.
       </p>
       <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">
         <span className="font-medium text-foreground">Kept on: {store.label}.</span> {store.limitation}
@@ -125,6 +140,44 @@ export function ResearchLibraryPanel() {
           ? ""
           : " This browser refused to keep data between visits, so they last only until this page is closed."}
       </p>
+
+      <div className="mt-3 rounded-md border bg-background p-3">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+          ZEPARI's published library
+        </span>
+        {corpus === null ? (
+          <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground" role="status">
+            Loading ZEPARI's published documents…
+          </p>
+        ) : corpus.length === 0 ? (
+          <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+            ZEPARI's published documents could not be loaded, so the assistant can read only what is
+            added below. They are served from this site, so a connection is needed to read them.
+          </p>
+        ) : (
+          <>
+            <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+              {corpus.length} documents — every publication on ZEPARI's Policy Briefs, Research Studies
+              and Economic Barometer listings. {readableCorpus} are read in full;{" "}
+              {corpus.length - readableCorpus} are image-only scans, recorded by name and honestly marked
+              as not read.
+            </p>
+            <ul className="mt-2 max-h-64 space-y-1 overflow-auto">
+              {corpus.map((document) => (
+                <li key={document.id} className="rounded-md border bg-card px-3 py-2">
+                  <span className="block truncate text-xs text-foreground">{document.title}</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {document.section} · {document.publisher} · {document.date} · {document.pages} pages ·{" "}
+                    {document.read
+                      ? `${document.characters} characters read`
+                      : "not read — image-only scan"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted/60">

@@ -13,6 +13,7 @@ import {
   clearAllResearchDocuments,
 } from "@/services/research/researchDocuments";
 import { draftResearchBrief } from "@/services/research/researchBrief";
+import { forgetZepariCorpus } from "@/services/research/zepariCorpus";
 import { signInResearcher } from "@/session/researchSession";
 
 /** A local address, so this file carries no reachable remote address at all. */
@@ -43,6 +44,7 @@ describe("the research policy brief", () => {
     window.localStorage.clear();
     clearConfig();
     clearAllResearchDocuments();
+    forgetZepariCorpus();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
@@ -92,7 +94,10 @@ describe("the research policy brief", () => {
     expect(result.status).toBe("drafted");
     expect(result.brief).toMatch(/Purpose: inform the fiscus/);
     expect(result.structure).toEqual(RESEARCH_BRIEF_SECTIONS);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    // Two calls: ZEPARI's published library (read from our own site) and then the research model.
+    const urls = fetchMock.mock.calls.map((call) => String((call as unknown[])[0]));
+    expect(urls).toContain(ENDPOINT);
+    expect(urls).toContain("/zepari-corpus.json");
   });
 
   it("reports no sources when the library holds nothing on the topic", async () => {

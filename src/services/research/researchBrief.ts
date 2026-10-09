@@ -16,7 +16,7 @@
 import { liveService, OPENROUTER_CHAT_ENDPOINT, type CapabilityConfig } from "@/config/platform";
 import { RESEARCH_BRIEF_SECTIONS } from "@/config/research";
 import { ASSEMBLED_BRIEF_DETAIL, assembleBrief } from "./researchAssembly";
-import { listResearchDocuments } from "./researchDocuments";
+import { libraryDocuments } from "./researchDocuments";
 import { findSources, type ResearchSource } from "./researchRetrieval";
 
 export type ResearchBriefStatus = "drafted" | "assembled" | "no-sources" | "error";
@@ -93,7 +93,7 @@ const briefClient = (config: CapabilityConfig) => ({
  */
 export const draftResearchBrief = async (topic: string): Promise<ResearchBrief> => {
   const trimmed = topic.trim();
-  const documents = listResearchDocuments();
+  const documents = await libraryDocuments();
   const sources = findSources(trimmed, documents);
   const structure = RESEARCH_BRIEF_SECTIONS;
   const config = liveService("research");
