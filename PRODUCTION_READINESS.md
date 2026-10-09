@@ -27,6 +27,24 @@ deliberate scenario-mode implementations behind swappable seams.
 - Each new surface — **library · institution data-connectors · chat-grounding · policy brief · Economic Barometer · findings-to-departments** — carries its own build gate.
 
 
+## 0b. NO DEMO DATA ANYWHERE — THE OWNER'S LOCKED DECISION (2026-10-09; the plan is saved, the build happens in a new chat)
+
+**The owner's words:** *"now we have the real api key so everything should work no more demo data anywhere"* · *"all i meant was the policy should actually be a real policy draft not fake."*
+
+**The locked decision (do not re-open it):** **every invented figure is REPLACED by a DIFFERENT measure that carries a real, named, published source.** No invented figure stays, and no screen is left thin either. The label `Modelled` disappears from the platform. Where no real substitute exists for one slot, that slot takes a different real measure relevant to that department, and the unsourceable slot is named in the report.
+
+| Item | What it is today | What replaces it | Where |
+|---|---|---|---|
+| The department document register | **48 invented entries** (3 per department × 16) — name, type, size and date all made up, **no text at all**, never read | The department's **real published documents**, downloaded and read with PyMuPDF, cited by title · publishing body · date · address, shipped as a data file on our own site | `src/config/departments.ts` (`documents`) · the new corpus data file |
+| Department indicator cards | **281 of 320 invented** (`Modelled`) | A real published measure for each slot, from a named body | `src/config/departments.ts` |
+| Reference indicators | **235 of 510 invented** | A real published measure for each slot | `src/config/departments.ts` · `src/config/reference.ts` |
+| Stakeholder groups | **130 of 150 modelled** | A real published basis, or the group is replaced by one that has one | `src/config/reference.ts` |
+| The drafted policy | Written **offline by a template**, about 25–35 printed pages, reading only what an officer uploaded | Written by the **live** AI from the real documents and the real figures. **40 printed pages is a FLOOR, not a target** — it must be as long as the real content needs (we discussed up to about 70) | `src/services/documents/remoteDraftingClient.ts` |
+| An officer's own uploaded PDF | **Not read at all** | Needs a **new component added to the app** — the owner must approve it; ask him | `src/services/extraction/extractPolicyText.ts` |
+| The research library | ✅ **REAL as of 2026-10-09** — ZEPARI's 103 published documents | Nothing; do not re-break it | `public/zepari-corpus.json` |
+
+**Standing rules that already govern this work:** every figure must name the body that publishes it, the publication and the period; **every door must be tried before a source is called unavailable** (JSON API · OData/SDMX · bulk download · the document itself · a registry or regulator list · an aggregator that names the origin), and the doors tried are recorded.
+
 ## 1. Simulation / assessment engine
 | Item | Current implementation | Real replacement | Where it is switched |
 |---|---|---|---|
