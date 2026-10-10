@@ -38,3 +38,6 @@ Review Zip/
 .env.local
 .env.*.local
 
+# The downloaded PDFs used to build the document library — never committed (the TEXT is what ships).
+.corpus-cache/
+

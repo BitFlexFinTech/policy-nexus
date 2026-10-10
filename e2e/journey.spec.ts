@@ -793,9 +793,13 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
     await page.mouse.move(box.x + box.width / 2 + 90, box.y + box.height / 2 + 70, { steps: 8 });
-    const during = await group.getAttribute("transform");
+    // The mark follows the pointer as soon as the frame paints, which can land a tick after the
+    // mouse move; polling waits for that paint instead of reading one instant and hoping. (This was
+    // an intermittent failure — the assertion passed in isolation but flaked in a full run.)
+    await expect
+      .poll(() => group.getAttribute("transform"), { timeout: 5_000 })
+      .not.toBe(before);
     await page.mouse.up();
-    expect(during).not.toBe(before);
 
     // The run still finishes, and the graph is complete when it does.
     await expect(page.getByRole("heading", { name: "Assessment Complete" })).toBeVisible({

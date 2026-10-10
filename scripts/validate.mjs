@@ -2597,6 +2597,60 @@ if (!existsSync(cssPath)) {
   check("Batch 0 — the register keeps no document text, a generated document is written once per run, and the evidence card is honest", problems);
 }
 
+// check 51 — THE NATIONAL CROSS-CUTTING DOCUMENTS ARE REAL (Batch B1).
+// The owner's one rule that never moves: real data only, never invented. This fails the build if the
+// national library is missing, has shrunk below the agreed set, has documents that are not cited, has
+// lost one of the four groups, has a "read" document with no text or a "not read" one with text, or if
+// the loader stops reading it from our own site.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  const corpusPath = join(ROOT, "public/national-corpus.json");
+  if (!existsSync(corpusPath)) {
+    problems.push("public/national-corpus.json is missing — the departments would have no real national documents");
+  } else {
+    try {
+      const corpus = JSON.parse(readFileSync(corpusPath, "utf8"));
+      const documents = Array.isArray(corpus.documents) ? corpus.documents : [];
+      if (documents.length < 15) {
+        problems.push(`the national library holds only ${documents.length} documents — the agreed first set is 15`);
+      }
+      const readable = documents.filter((d) => typeof d.text === "string" && d.text.length > 0).length;
+      if (readable < 13) {
+        problems.push(`only ${readable} of the ${documents.length} national documents carry readable text — at least 13 should`);
+      }
+      const uncited = documents.filter((d) => !d.title || !d.publisher || !d.date || !/^https?:\/\//.test(d.url || "")).length;
+      if (uncited > 0) {
+        problems.push(`${uncited} national documents are not cited (title, publisher, date and the published address are all required)`);
+      }
+      const faked = documents.filter((d) => (d.read ? !(typeof d.text === "string" && d.text.length > 0) : d.text !== "")).length;
+      if (faked > 0) {
+        problems.push(`${faked} national documents contradict their own "read" flag — a document that could not be read must carry no text, and one that could must carry it`);
+      }
+      for (const section of ["National Budget", "National Development Strategy", "Auditor-General", "ZIMSTAT"]) {
+        if (!documents.some((d) => d.section === section)) {
+          problems.push(`the national library covers no documents from ${section}`);
+        }
+      }
+    } catch (error) {
+      problems.push(`public/national-corpus.json could not be read (${error.message})`);
+    }
+  }
+
+  const loader = readIf("src/services/documents/nationalCorpus.ts");
+  if (!loader || !/export const loadNationalCorpus/.test(loader)) {
+    problems.push("nationalCorpus.ts is missing — the national documents must be read from our own site when a screen needs them");
+  } else if (!/NATIONAL_CORPUS_PATH = "\/national-corpus\.json"/.test(loader)) {
+    problems.push("nationalCorpus.ts no longer reads the library from our own site at /national-corpus.json");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the national document library is real — the Budget, the NDS, the Auditor-General's reports and ZIMSTAT's releases, each cited by title, publisher, date and address");
+  }
+  check("the national cross-cutting documents are real, cited, and read from our own site (Batch B1)", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));

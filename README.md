@@ -11,7 +11,11 @@ repeatable assessment: the draft is understood and mapped, becomes a simulated p
 those agents interact, and only then is an assessment produced — findings, risks and recommendations
 for human review.
 
-- **Scenario mode only.** No backend, no database, no external AI call, no runtime network request.
+- **Scenario mode by default; the AI is called only where it adds value.** No backend and no database.
+  The research assistant and the policy drafter call the configured AI provider (OpenRouter) when a key
+  is present; with no key they fall back to what is stored and say so. Sovereignty holds — no CDN
+  scripts and no outside fonts are loaded at runtime. *(Corrected 2026-10-10: this line used to claim
+  "no external AI call, no runtime network request", which stopped being true once the keys were added.)*
 - **Deterministic.** The same department and the same policy text always produce a byte-identical
   run and byte-identical generated documents.
 - **Decision support, not decision making.** The platform informs review; it does not determine

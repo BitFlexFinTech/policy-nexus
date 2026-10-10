@@ -20,7 +20,10 @@ shaped decisions here are recorded, with where they were applied.
    survive: the chosen department (session), not derived simulation output.
 5. **Fail loudly, degrade honestly** — an unconfigured real implementation should throw a
    clear "not configured" error, never silently return fake data.
-   Applied: `mirofish.ts` seam throws; mock values use unmistakable placeholders.
+   Applied: the `AssessmentService` seam (`src/services/assessment/AssessmentService.ts`) picks the
+   scenario engine or the live one from the platform's own configuration, and says which produced a
+   result; mock values use unmistakable placeholders. *(Corrected 2026-10-10: this line used to name a
+   `mirofish.ts` seam that has never existed.)*
 6. **Keep blast radius small** — one consumer per shared module; additive over invasive change.
    Applied: optional props on existing components, route-scoped edits, `@media print` isolation.
 
