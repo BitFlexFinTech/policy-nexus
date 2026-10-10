@@ -1,26 +1,23 @@
 import { useState } from "react";
-import { File, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import {
+  documentsInReadingOrder,
   findDepartment,
-  sortDocumentsByCitation,
   type DepartmentDocument,
 } from "@/config/departments";
-import { citedInstrumentLabel } from "@/config/instruments";
-import { formatReferenceDate } from "@/config/reference";
 import { LIBRARY_EVIDENCE_TITLE, libraryEvidenceLines } from "@/config/runNotice";
 import { useSession } from "@/session/useSession";
 import { RecordedDocumentDialog } from "@/components/documents/RecordedDocumentDialog";
 import { DepartmentDocumentsPanel } from "@/components/documents/DepartmentDocumentsPanel";
 
 /**
- * Document Library — the full department document register, with each document's
- * stated kind, size, date and purpose, and the instrument it is prepared under.
- * Every declared document is listed, and every entry opens what the register
- * knows about it.
+ * Document Library — the department's real, published documents, in full.
  *
- * The citation is DERIVED from `CITED_INSTRUMENTS` — the register holds a key, never the
- * citation text — so a title and its chapter cannot drift apart. Cited documents are
- * listed first, by the same rule the workspace rail uses.
+ * Since Batch B4 the register IS the department's published documents, so every row names the document
+ * by the title the publishing body gives it, with its page count, the date the source states, and the
+ * body that published it. Every declared document is listed, and every entry opens what the register
+ * knows about it. A document whose text could not be read — the printed Constitution is a picture-only
+ * scan — is listed and marked as such rather than dropped or faked.
  */
 export default function Documents() {
   const session = useSession();
@@ -65,29 +62,26 @@ export default function Documents() {
       </section>
 
       <ul className="space-y-1">
-        {sortDocumentsByCitation(documents).map((doc) => (
+        {documentsInReadingOrder(documents).map((doc) => (
           <li key={doc.id}>
             <button
               type="button"
               onClick={() => setSelected(doc)}
               className="flex w-full items-start gap-3 rounded-md border bg-card px-3 py-2 text-left transition-colors hover:border-primary/40 hover:bg-muted/40 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary"
             >
-              {doc.kind === "pdf" ? (
-                <FileText className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-              ) : (
-                <File className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              )}
+              <FileText className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
               <span className="flex min-w-0 flex-col">
-                <span className="truncate text-xs text-foreground">{doc.name}</span>
+                <span className="truncate text-xs text-foreground">{doc.title}</span>
                 <span className="text-[10px] text-muted-foreground">
-                  {doc.kind.toUpperCase()} · {doc.sizeLabel} · {formatReferenceDate(doc.date)}
+                  PDF · {doc.pages} pages · {doc.date}
                 </span>
-                <span className="text-[10px] text-muted-foreground">{doc.note}</span>
-                {doc.instrument ? (
+                <span className="text-[10px] text-muted-foreground">{doc.publisher}</span>
+                {doc.read ? null : (
                   <span className="text-[10px] text-muted-foreground">
-                    Prepared under {citedInstrumentLabel(doc.instrument)}
+                    Recorded by name only — the published file is a picture-only scan, so its text
+                    could not be read.
                   </span>
-                ) : null}
+                )}
               </span>
             </button>
           </li>

@@ -6,20 +6,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { BRAND } from "@/config/brand";
-import { citedInstrumentLabel } from "@/config/instruments";
-import { formatReferenceDate } from "@/config/reference";
 import type { DepartmentDocument } from "@/config/departments";
 
 /**
- * What the register knows about one department document.
+ * What the register knows about one published document.
  *
- * The register holds the record, not the file, and this build stores no document
- * content — so this states what the document is rather than pretending to open
- * it. Selecting a document therefore produces a real answer instead of a row that
- * looks clickable and does nothing.
- *
- * Where the document cites an instrument, this names it. The citation is DERIVED from
- * `CITED_INSTRUMENTS`, so the dialog and the rail can never show different titles.
+ * Since Batch B4 the register holds real, published documents, so this states what the source itself
+ * says: the body that published it, the date it states, how long the file is, whether its text could
+ * really be read, and the address of the published file so an officer can check it. Nothing is
+ * inferred from a filename and nothing is invented.
  */
 export function RecordedDocumentDialog({
   document,
@@ -35,19 +30,26 @@ export function RecordedDocumentDialog({
   if (!document) return null;
 
   const rows: Array<[string, string]> = [
-    ["Format", document.kind.toUpperCase()],
-    ["Recorded size", document.sizeLabel],
-    ["Recorded date", formatReferenceDate(document.date)],
+    ["Published by", document.publisher],
+    ["Published", document.date],
+    ["Length", `${document.pages} pages`],
+    [
+      "Text read",
+      document.read
+        ? `${document.characters} characters read from the published file`
+        : "Not read — the published file is a picture-only scan",
+    ],
+    ["Held by", departmentName],
   ];
-  if (document.instrument) rows.push(["Prepared under", citedInstrumentLabel(document.instrument)]);
-  rows.push(["Held by", departmentName]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-sm">{document.name}</DialogTitle>
-          <DialogDescription className="text-xs">{document.note}</DialogDescription>
+          <DialogTitle className="text-sm">{document.title}</DialogTitle>
+          <DialogDescription className="text-xs">
+            {document.section} · {document.publisher}, {document.date}
+          </DialogDescription>
         </DialogHeader>
         <dl className="space-y-1.5">
           {rows.map(([label, value]) => (
@@ -56,14 +58,25 @@ export function RecordedDocumentDialog({
               className="flex items-baseline justify-between gap-4 border-b border-border/60 pb-1.5 last:border-0"
             >
               <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</dt>
-              <dd className="text-xs text-foreground">{value}</dd>
+              <dd className="text-right text-xs text-foreground">{value}</dd>
             </div>
           ))}
         </dl>
         <p className="text-[10px] leading-relaxed text-muted-foreground">
-          This platform holds the department's document register, not the files themselves. To work
-          with a document's contents, upload it to the policy input — plain text is read in the
-          browser. {BRAND.classification}.
+          The published file:{" "}
+          <a
+            href={document.url}
+            target="_blank"
+            rel="noreferrer"
+            className="break-all text-primary underline"
+          >
+            {document.url}
+          </a>
+        </p>
+        <p className="text-[10px] leading-relaxed text-muted-foreground">
+          This platform holds the register of these documents, and the text of each published file as it
+          was read from the body that published it. To work with your own file's contents, upload it to
+          the policy input — plain text is read in the browser. {BRAND.classification}.
         </p>
       </DialogContent>
     </Dialog>

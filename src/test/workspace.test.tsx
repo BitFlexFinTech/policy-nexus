@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import App from "@/App";
 import { DEPARTMENTS, findDepartment, indicatorBasisLabel } from "@/config/departments";
-import { citedInstrumentLabel } from "@/config/instruments";
 import {
   MODELLED_SHARE_LABEL,
   REFERENCE_RATES,
@@ -82,7 +81,7 @@ describe("workspace — all 16 departments, department-aware panels", () => {
     signInToDepartment("health");
     renderAt("/app/documents");
     department.documents.forEach((doc) => {
-      expect(screen.getByText(doc.name)).toBeInTheDocument();
+      expect(screen.getByText(doc.title)).toBeInTheDocument();
     });
   });
 
@@ -108,42 +107,45 @@ describe("workspace — all 16 departments, department-aware panels", () => {
     });
   });
 
-  it("names the instrument each document is prepared under, in the rail and in the detail", async () => {
+  it("names the body that published each document, in the rail and in the detail", async () => {
     const department = findDepartment("fin")!;
     signInToDepartment("fin");
     renderAt("/app");
 
-    // The rail shows the derived citation for every document it lists.
+    // BATCH B4 — the rail used to name an invented instrument each document was "prepared under".
+    // The register now holds the department's real, published documents, so what the rail shows is
+    // the citation a reader can check: the body that published it.
     department.documents.forEach((doc) => {
-      expect(doc.instrument, `${doc.id} cites an instrument`).toBeTruthy();
-      const label = citedInstrumentLabel(doc.instrument!);
+      expect(doc.publisher, `${doc.id} names the body that published it`).toBeTruthy();
       expect(
-        screen.getAllByText(new RegExp(escapeRegex(label))).length,
-        `${doc.name} shows ${label} in the rail`,
+        screen.getAllByText(new RegExp(escapeRegex(doc.publisher))).length,
+        `${doc.title} shows ${doc.publisher} in the rail`,
       ).toBeGreaterThan(0);
     });
 
-    // Opening a document names the instrument in the dialog too — same derived text.
+    // Opening a document names the same body in the dialog.
     const first = department.documents[0];
     fireEvent.click(
-      screen.getByRole("button", { name: new RegExp(escapeRegex(first.name)) }),
+      screen.getByRole("button", { name: new RegExp(escapeRegex(first.title)) }),
     );
     const dialog = within(await screen.findByRole("dialog"));
-    expect(dialog.getByText("Prepared under")).toBeInTheDocument();
-    expect(dialog.getByText(citedInstrumentLabel(first.instrument!))).toBeInTheDocument();
+    expect(dialog.getByText("Published by")).toBeInTheDocument();
+    expect(dialog.getByText(first.publisher)).toBeInTheDocument();
   });
 
-  it("shows each document's cited instrument on the document library screen", () => {
+  it("shows each document's publishing body and length on the document library screen", () => {
     const department = findDepartment("health")!;
     signInToDepartment("health");
     renderAt("/app/documents");
 
     department.documents.forEach((doc) => {
-      expect(doc.instrument, `${doc.id} cites an instrument`).toBeTruthy();
-      const label = `Prepared under ${citedInstrumentLabel(doc.instrument!)}`;
       expect(
-        screen.getAllByText(new RegExp(escapeRegex(label))).length,
-        `${doc.name} shows "${label}"`,
+        screen.getAllByText(new RegExp(escapeRegex(doc.publisher))).length,
+        `${doc.title} shows ${doc.publisher}`,
+      ).toBeGreaterThan(0);
+      expect(
+        screen.getAllByText(new RegExp(`PDF · ${doc.pages} pages`)).length,
+        `${doc.title} shows its length`,
       ).toBeGreaterThan(0);
     });
   });

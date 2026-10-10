@@ -4,7 +4,6 @@ import { readFileSync } from "node:fs";
 import { DEPARTMENTS, DEPARTMENT_COUNT, findDepartment } from "../src/config/departments";
 import { BRAND, PROMOTER } from "../src/config/brand";
 import { ADMIN_ROUTE } from "../src/config/platform";
-import { citedInstrumentLabel } from "../src/config/instruments";
 import { createStoredZip } from "../src/services/documents/zip";
 
 /**
@@ -608,25 +607,27 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     // at all — the demo looks exactly as it always has.
     await expect(page.getByText(/Live services in use/)).toHaveCount(0);
 
-    // The document rail used to advertise a click with no handler behind it.
+    // The document rail used to advertise a click with no handler behind it. Since Batch B4 the
+    // register holds the department's real, published documents, so the rail and the dialog name the
+    // body that published the document — the citation a reader can check — instead of the invented
+    // instrument the old register used to claim each document was "prepared under".
     const document = DEPARTMENT.documents[0];
-    expect(document.instrument).toBeTruthy();
-    const citation = citedInstrumentLabel(document.instrument!);
+    expect(document.publisher).toBeTruthy();
 
-    // E-4: the rail states the instrument the document is prepared under.
     await expect(
-      page.getByRole("button", { name: new RegExp(escapeRegex(document.name)) }).getByText(citation),
+      page
+        .getByRole("button", { name: new RegExp(escapeRegex(document.title)) })
+        .getByText(document.publisher),
     ).toBeVisible();
 
     await page
-      .getByRole("button", { name: new RegExp(escapeRegex(document.name)) })
+      .getByRole("button", { name: new RegExp(escapeRegex(document.title)) })
       .click();
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByText(document.note)).toBeVisible();
-    // E-4: and the dialog names it too — the same derived text.
-    await expect(dialog.getByText("Prepared under")).toBeVisible();
-    await expect(dialog.getByText(citation)).toBeVisible();
+    await expect(dialog.getByText(document.title, { exact: true })).toBeVisible();
+    await expect(dialog.getByText("Published by")).toBeVisible();
+    await expect(dialog.getByText(`${document.pages} pages`, { exact: true })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
 

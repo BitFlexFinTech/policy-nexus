@@ -139,7 +139,7 @@ export const RELATION_BANK = {
   } as Record<ReactionSentiment, string>,
   /** The draft is assessed against each stated priority. */
   assessedAgainst: "is assessed against",
-  /** The draft is read against the department's own reference documents. */
+  /** The draft is read against the department's own real, published documents. */
   readAgainst: "is read against",
   /** A modelled group and a stated priority in the same run. */
   modelledAgainst: "is modelled against",
@@ -358,16 +358,33 @@ export const buildRelationshipGraph = (run: AssessmentRun): RelationshipGraph =>
     });
   });
 
-  department.documents.forEach((document, index) => {
+  // The department's own published documents: the material the draft is read against. The weight on
+  // each edge is REAL — the document's share of the text its readable documents hold — so a document
+  // that could not be read (the printed Constitution is a picture-only scan) weighs nothing, instead
+  // of being given a line that looks the same as one that was really read.
+  const readableCharacters = department.documents.reduce(
+    (total, document) => total + (document.read ? document.characters : 0),
+    0,
+  );
+
+  department.documents.forEach((document) => {
     const id = `document:${document.id}`;
-    nodes.push({ id, label: document.name, kind: "corpus", note: document.note });
+    nodes.push({
+      id,
+      label: document.title,
+      kind: "corpus",
+      note: `${document.publisher}, ${document.date}`,
+    });
     arrival[id] = mapRound;
     edges.push({
       id: edgeIdFor(POLICY_NODE_ID, id, RELATION_BANK.readAgainst),
       source: POLICY_NODE_ID,
       target: id,
       relation: RELATION_BANK.readAgainst,
-      strength: 0.4 + index * 0.08,
+      strength:
+        document.read && readableCharacters > 0
+          ? round2(document.characters / readableCharacters)
+          : 0,
     });
   });
 

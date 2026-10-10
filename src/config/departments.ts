@@ -3,9 +3,15 @@
  * content.
  *
  * This is the ONLY place department identity, priorities, indicators,
- * stakeholder segments, policy templates and document registers are defined.
- * Components read from here; they never carry their own copies.
+ * stakeholder segments and policy templates are defined. Components read from
+ * here; they never carry their own copies.
  * (see .clinerules/03-single-source-of-truth.md)
+ *
+ * The document register is the one thing NOT authored here: each department's
+ * documents are real, published documents, so the register is GENERATED from the
+ * corpora in `public/department-corpus/` by `scripts/build-department-register.mjs`
+ * and imported from `./departmentDocuments`. That way the register and the
+ * documents can never drift apart.
  *
  * DETERMINISM: this file is plain authored data. No clock, no randomness.
  * The same departmentId must always resolve to byte-identical content.
@@ -19,6 +25,7 @@ import {
   type TimeHorizonId,
 } from "./reference";
 import { UNIVERSAL_INSTRUMENTS, type CitedInstrumentId } from "./instruments";
+import { DEPARTMENT_DOCUMENTS } from "./departmentDocuments";
 
 /** The exact, stable department identifiers. Never renumber or rename these. */
 export type DepartmentId =
@@ -148,23 +155,55 @@ export interface PolicyTemplate {
   segments: StakeholderSegmentId[];
 }
 
-/** A document in the department's library rail. */
+/**
+ * A document in the department's library: one real, published document, described exactly as the body
+ * that published it describes it.
+ *
+ * It is the corpus document (`DepartmentCorpusDocument`) without the text — the text is far too large
+ * to load for a screen that only lists documents, so it stays in
+ * `public/department-corpus/<departmentId>.json` and is read only when the wording is needed. The
+ * shape is declared here, once; the corpus service extends it rather than repeating it.
+ *
+ * Every field is copied from the corpus, which was built from the publication itself. Nothing is
+ * authored here and nothing is inferred from a filename: the title, the body that published it, the
+ * date and the address of the published file are the ones the source states. The register itself is
+ * GENERATED from the corpora (`scripts/build-department-register.mjs`), so it cannot drift from them.
+ */
 export interface DepartmentDocument {
+  /** Stable id, `<departmentId>-001`… — assigned when the corpus was built. */
   id: string;
-  name: string;
-  kind: "pdf" | "docx" | "txt";
-  sizeLabel: string;
-  /** ISO date, always on or before SCENARIO_ANCHOR_DATE. */
+  /** The group it is listed under, e.g. "Governing law", "Sector policy", "Committee report". */
+  section: string;
+  /** The title exactly as the publishing body states it. */
+  title: string;
+  /** The body that published it, named in every citation. */
+  publisher: string;
+  /** The publication date as the source states it — "2024", "2 October 2024". Never reformatted. */
   date: string;
-  note: string;
-  /**
-   * The instrument this document is prepared under, as a key into `CITED_INSTRUMENTS`.
-   * Optional, so a document that genuinely rests on no single instrument simply carries
-   * none. The citation text is derived from that table — never stored here — so a title
-   * and its chapter cannot drift apart.
-   */
-  instrument?: CitedInstrumentId;
+  /** The address of the published file, so any quotation can be checked against it. */
+  url: string;
+  /** How many printed pages the published file has. */
+  pages: number;
+  /** True only when the published file carried a text layer that could really be read. */
+  read: boolean;
+  /** How many characters of real text were read from it; 0 for a picture-only scan. */
+  characters: number;
 }
+
+/**
+ * The published documents a department holds, read from the generated register.
+ *
+ * It throws rather than returning an empty list when a department has no set, so a missing corpus is
+ * loud instead of a library that silently looks empty. `npm run validate` fails the build if any
+ * department's set is missing, and a test holds the same line.
+ */
+const documentsFor = (id: DepartmentId): readonly DepartmentDocument[] => {
+  const documents = DEPARTMENT_DOCUMENTS[id];
+  if (!documents || documents.length === 0) {
+    throw new Error(`No published document set is registered for ${id}.`);
+  }
+  return documents;
+};
 
 export interface Department {
   id: DepartmentId;
@@ -185,11 +224,17 @@ export interface Department {
   policyTemplates: PolicyTemplate[];
   /**
    * The instruments this department's work rests on: the universal set every department
-   * carries, plus its own. Every document's `instrument` must be one of these, so a
-   * department can never cite an instrument outside its mandate.
+   * carries, plus its own. The citation text is derived from that table — never stored —
+   * so a title and its chapter cannot drift apart.
    */
   instruments: CitedInstrumentId[];
-  documents: DepartmentDocument[];
+  /**
+   * The department's real, published documents: its own governing law, its sector policy, the
+   * parliamentary committees' reports on it and the audits of it. Read from the generated register
+   * (`src/config/departmentDocuments.ts`), which is derived from the corpora on our own site — so a
+   * screen, a run and the documents themselves can never disagree.
+   */
+  documents: readonly DepartmentDocument[];
 }
 
 /**
@@ -277,11 +322,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "public-entities-corporate-governance-act", "provincial-councils-act", "administrative-justice-act"],
-    documents: [
-      { id: "opc-doc-1", name: "National_Development_Strategy_Progress_Review.pdf", kind: "pdf", sizeLabel: "3.1 MB", date: "2026-08-19", note: "Annual delivery review across all ministries.", instrument: "nds2" },
-      { id: "opc-doc-2", name: "Public_Sector_Reform_Phase_II_Concept.docx", kind: "docx", sizeLabel: "892 KB", date: "2026-07-30", note: "Concept note for process simplification.", instrument: "administrative-justice-act" },
-      { id: "opc-doc-3", name: "Devolution_Absorption_Report.txt", kind: "txt", sizeLabel: "126 KB", date: "2026-06-11", note: "Provincial absorption figures and commentary.", instrument: "provincial-councils-act" },
-    ],
+    documents: documentsFor("opc"),
   },
   {
     id: "fin",
@@ -372,12 +413,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "rbz-act", "banking-act", "public-debt-management-act", "money-laundering-act", "bank-use-promotion-act", "microfinance-act", "pension-provident-funds-act", "movable-property-security-act", "income-tax-act"],
-    documents: [
-      { id: "fin-doc-1", name: "Budget_Framework_Statement_2026.pdf", kind: "pdf", sizeLabel: "4.6 MB", date: "2026-08-28", note: "Fiscal framework and expenditure ceilings.", instrument: "pfma" },
-      { id: "fin-doc-2", name: "Small_Business_Tax_Simulation_Note.docx", kind: "docx", sizeLabel: "1.3 MB", date: "2026-07-22", note: "Distributional note on presumptive bands.", instrument: "income-tax-act" },
-      { id: "fin-doc-3", name: "Export_Settlement_Review.txt", kind: "txt", sizeLabel: "214 KB", date: "2026-06-30", note: "Options paper on settlement shares.", instrument: "rbz-act" },
-      { id: "fin-doc-4", name: "Debt_Sustainability_Update.pdf", kind: "pdf", sizeLabel: "2.8 MB", date: "2026-05-14", note: "Updated sustainability position.", instrument: "public-debt-management-act" },
-    ],
+    documents: documentsFor("fin"),
   },
   {
     id: "agri",
@@ -456,11 +492,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "rural-land-act", "agricultural-land-settlement-act", "land-acquisition-act", "land-survey-act", "farm-equipment-act", "warehouse-receipt-act", "water-act"],
-    documents: [
-      { id: "agri-doc-1", name: "Seasonal_Crop_Assessment_2026.pdf", kind: "pdf", sizeLabel: "5.2 MB", date: "2026-07-08", note: "Provincial production estimates and commentary.", instrument: "census-statistics-act" },
-      { id: "agri-doc-2", name: "Irrigation_Rehabilitation_Options.txt", kind: "txt", sizeLabel: "168 KB", date: "2026-06-19", note: "Scheme-by-scheme rehabilitation options.", instrument: "water-act" },
-      { id: "agri-doc-3", name: "Livestock_Disease_Contingency.docx", kind: "docx", sizeLabel: "1.1 MB", date: "2026-04-27", note: "Contingency plan for notifiable diseases.", instrument: "rural-land-act" },
-    ],
+    documents: documentsFor("agri"),
   },
   {
     id: "health",
@@ -582,11 +614,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "public-health-act", "health-service-act", "mental-health-act", "family-planning-council-act", "social-workers-act"],
-    documents: [
-      { id: "health-doc-1", name: "National_Health_Profile_2026.pdf", kind: "pdf", sizeLabel: "6.4 MB", date: "2026-08-05", note: "National health indicators by province.", instrument: "public-health-act" },
-      { id: "health-doc-2", name: "Workforce_Retention_Options.docx", kind: "docx", sizeLabel: "1.7 MB", date: "2026-07-14", note: "Non-salary retention options appraisal.", instrument: "health-service-act" },
-      { id: "health-doc-3", name: "Essential_Medicines_Stock_Report.txt", kind: "txt", sizeLabel: "96 KB", date: "2026-06-02", note: "Tracer medicine availability report.", instrument: "public-health-act" },
-    ],
+    documents: documentsFor("health"),
   },
   {
     id: "edu",
@@ -678,11 +706,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "education-act", "childrens-act", "manpower-planning-act"],
-    documents: [
-      { id: "edu-doc-1", name: "Annual_School_Census_2026.pdf", kind: "pdf", sizeLabel: "4.1 MB", date: "2026-08-12", note: "Enrolment, staffing and infrastructure census.", instrument: "education-act" },
-      { id: "edu-doc-2", name: "Teacher_Deployment_Analysis.txt", kind: "txt", sizeLabel: "142 KB", date: "2026-07-03", note: "Vacancy and ratio analysis by district.", instrument: "manpower-planning-act" },
-      { id: "edu-doc-3", name: "Curriculum_Implementation_Review.docx", kind: "docx", sizeLabel: "2.2 MB", date: "2026-05-21", note: "Review of curriculum rollout readiness.", instrument: "education-act" },
-    ],
+    documents: documentsFor("edu"),
   },
   {
     id: "hedu",
@@ -756,11 +780,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "higher-education-act", "research-act", "research-development-centre-act", "manpower-planning-act"],
-    documents: [
-      { id: "hedu-doc-1", name: "Tertiary_Enrolment_Report_2026.pdf", kind: "pdf", sizeLabel: "3.3 MB", date: "2026-08-21", note: "Enrolment and completion by institution.", instrument: "higher-education-act" },
-      { id: "hedu-doc-2", name: "Skills_Priority_Schedule.txt", kind: "txt", sizeLabel: "88 KB", date: "2026-07-10", note: "Occupations identified as national skill gaps.", instrument: "manpower-planning-act" },
-      { id: "hedu-doc-3", name: "Innovation_Fund_Design_Note.docx", kind: "docx", sizeLabel: "1.4 MB", date: "2026-05-29", note: "Design options for competitive research funding.", instrument: "research-act" },
-    ],
+    documents: documentsFor("hedu"),
   },
   {
     id: "ict",
@@ -835,11 +855,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "postal-telecommunications-act", "broadcasting-services-act", "access-to-information-act"],
-    documents: [
-      { id: "ict-doc-1", name: "National_Broadband_Coverage_Survey.pdf", kind: "pdf", sizeLabel: "2.9 MB", date: "2026-08-14", note: "Coverage and quality survey by district.", instrument: "postal-telecommunications-act" },
-      { id: "ict-doc-2", name: "Digital_Services_Inventory.txt", kind: "txt", sizeLabel: "104 KB", date: "2026-07-17", note: "Inventory of online-ready public services.", instrument: "access-to-information-act" },
-      { id: "ict-doc-3", name: "Data_Residency_Standard_Draft.docx", kind: "docx", sizeLabel: "780 KB", date: "2026-06-05", note: "Draft classification and residency standard.", instrument: "access-to-information-act" },
-    ],
+    documents: documentsFor("ict"),
   },
   {
     id: "mines",
@@ -909,11 +925,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "mines-minerals-act", "mines-minerals-bill-2025", "movable-property-security-act", "environmental-management-act"],
-    documents: [
-      { id: "mines-doc-1", name: "Mineral_Revenue_Statement_2026.pdf", kind: "pdf", sizeLabel: "2.2 MB", date: "2026-08-07", note: "Royalty and mineral revenue by commodity.", instrument: "mines-minerals-act" },
-      { id: "mines-doc-2", name: "Artisanal_Mining_Register.txt", kind: "txt", sizeLabel: "156 KB", date: "2026-07-01", note: "Registered small-scale operations by district.", instrument: "mines-minerals-bill-2025" },
-      { id: "mines-doc-3", name: "Beneficiation_Options_Paper.docx", kind: "docx", sizeLabel: "1.9 MB", date: "2026-04-30", note: "Options for domestic processing incentives.", instrument: "environmental-management-act" },
-    ],
+    documents: documentsFor("mines"),
   },
   {
     id: "energy",
@@ -995,11 +1007,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "electricity-act", "energy-regulatory-act", "petroleum-act"],
-    documents: [
-      { id: "energy-doc-1", name: "National_Electrification_Survey.pdf", kind: "pdf", sizeLabel: "3.7 MB", date: "2026-08-18", note: "Access and connection survey by district.", instrument: "electricity-act" },
-      { id: "energy-doc-2", name: "Tariff_Path_Modelling.txt", kind: "txt", sizeLabel: "132 KB", date: "2026-06-25", note: "Modelled tariff path and affordability analysis.", instrument: "energy-regulatory-act" },
-      { id: "energy-doc-3", name: "Fuel_Stockholding_Review.docx", kind: "docx", sizeLabel: "940 KB", date: "2026-05-08", note: "Review of strategic stock obligations.", instrument: "petroleum-act" },
-    ],
+    documents: documentsFor("energy"),
   },
   {
     id: "psc",
@@ -1101,11 +1109,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "public-service-act", "constitution-s202-203", "allowances-pensions-act", "labour-act", "tripartite-negotiating-forum-act"],
-    documents: [
-      { id: "psc-doc-1", name: "Establishment_and_Payroll_Report.pdf", kind: "pdf", sizeLabel: "2.4 MB", date: "2026-08-26", note: "Establishment, vacancy and payroll reconciliation.", instrument: "public-service-act" },
-      { id: "psc-doc-2", name: "Age_Profile_Analysis.txt", kind: "txt", sizeLabel: "74 KB", date: "2026-07-09", note: "Age distribution by cadre and ministry.", instrument: "allowances-pensions-act" },
-      { id: "psc-doc-3", name: "Performance_Framework_Options.docx", kind: "docx", sizeLabel: "1.2 MB", date: "2026-06-16", note: "Options for appraisal reform.", instrument: "constitution-s202-203" },
-    ],
+    documents: documentsFor("psc"),
   },
   {
     id: "lg",
@@ -1190,11 +1194,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "traditional-leaders-act", "urban-councils-act", "rural-district-councils-act", "provincial-councils-act", "local-government-laws-amendment-act"],
-    documents: [
-      { id: "lg-doc-1", name: "Local_Authority_Performance_Report.pdf", kind: "pdf", sizeLabel: "3.4 MB", date: "2026-08-23", note: "Service performance across urban and rural councils.", instrument: "local-government-laws-amendment-act" },
-      { id: "lg-doc-2", name: "Water_Supply_Audit.txt", kind: "txt", sizeLabel: "148 KB", date: "2026-07-06", note: "Supply hours and non-revenue water by town.", instrument: "urban-councils-act" },
-      { id: "lg-doc-3", name: "Devolution_Absorption_Brief.docx", kind: "docx", sizeLabel: "860 KB", date: "2026-05-19", note: "Absorption by province and council.", instrument: "provincial-councils-act" },
-    ],
+    documents: documentsFor("lg"),
   },
   {
     id: "mfa",
@@ -1277,11 +1277,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "immigration-act", "citizenship-act", "trade-marks-act", "zida-act"],
-    documents: [
-      { id: "mfa-doc-1", name: "Trade_Agreement_Utilisation_Report.pdf", kind: "pdf", sizeLabel: "2.6 MB", date: "2026-08-09", note: "Utilisation of preferential access by agreement.", instrument: "zida-act" },
-      { id: "mfa-doc-2", name: "Consular_Service_Audit.txt", kind: "txt", sizeLabel: "112 KB", date: "2026-06-27", note: "Processing times and volumes by mission.", instrument: "citizenship-act" },
-      { id: "mfa-doc-3", name: "Diaspora_Framework_Consultation.docx", kind: "docx", sizeLabel: "1.5 MB", date: "2026-05-11", note: "Consultation record on diaspora channels.", instrument: "immigration-act" },
-    ],
+    documents: documentsFor("mfa"),
   },
   {
     id: "env",
@@ -1359,11 +1355,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "environmental-management-act", "parks-wildlife-act", "forest-act", "water-act"],
-    documents: [
-      { id: "env-doc-1", name: "State_of_the_Environment_Report.pdf", kind: "pdf", sizeLabel: "8.1 MB", date: "2026-08-01", note: "National environmental condition report.", instrument: "environmental-management-act" },
-      { id: "env-doc-2", name: "Wetland_Inventory.txt", kind: "txt", sizeLabel: "204 KB", date: "2026-07-13", note: "Listed wetlands by province and district.", instrument: "water-act" },
-      { id: "env-doc-3", name: "Impact_Assessment_Reform_Options.docx", kind: "docx", sizeLabel: "1.6 MB", date: "2026-05-26", note: "Options for tiered assessment.", instrument: "environmental-management-act" },
-    ],
+    documents: documentsFor("env"),
   },
   {
     id: "def",
@@ -1436,11 +1428,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "defence-act", "war-veterans-act", "veterans-liberation-struggle-act", "national-security-council-act"],
-    documents: [
-      { id: "def-doc-1", name: "Readiness_Assessment_Report.pdf", kind: "pdf", sizeLabel: "1.8 MB", date: "2026-08-16", note: "Personnel and equipment readiness assessment.", instrument: "defence-act" },
-      { id: "def-doc-2", name: "Veterans_Benefits_Register_Summary.txt", kind: "txt", sizeLabel: "66 KB", date: "2026-07-07", note: "Beneficiary counts and payment summary.", instrument: "war-veterans-act" },
-      { id: "def-doc-3", name: "Civil_Support_Framework_Draft.docx", kind: "docx", sizeLabel: "1.0 MB", date: "2026-06-09", note: "Draft framework for disaster support.", instrument: "defence-act" },
-    ],
+    documents: documentsFor("def"),
   },
   {
     id: "zimra",
@@ -1510,11 +1498,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "revenue-authority-act", "customs-excise-act", "income-tax-act", "vat-act", "money-laundering-act"],
-    documents: [
-      { id: "zimra-doc-1", name: "Revenue_Performance_Report_2026.pdf", kind: "pdf", sizeLabel: "2.7 MB", date: "2026-08-25", note: "Collections by tax head against target.", instrument: "revenue-authority-act" },
-      { id: "zimra-doc-2", name: "Border_Clearance_Study.txt", kind: "txt", sizeLabel: "118 KB", date: "2026-07-02", note: "Clearance time study at major ports.", instrument: "customs-excise-act" },
-      { id: "zimra-doc-3", name: "Compliance_Strategy_Options.docx", kind: "docx", sizeLabel: "1.3 MB", date: "2026-05-15", note: "Options for compliance and dispute reform.", instrument: "income-tax-act" },
-    ],
+    documents: documentsFor("zimra"),
   },
   {
     id: "zida",
@@ -1591,11 +1575,7 @@ const DEPARTMENT_DATA: Department[] = [
       },
     ],
     instruments: [...UNIVERSAL_INSTRUMENTS, "zida-act", "special-economic-zones-act", "companies-act", "competition-act", "competitiveness-commission-act"],
-    documents: [
-      { id: "zida-doc-1", name: "Investment_Licensing_Report_2026.pdf", kind: "pdf", sizeLabel: "2.1 MB", date: "2026-08-20", note: "Licences issued by sector and origin.", instrument: "zida-act" },
-      { id: "zida-doc-2", name: "Zone_Occupancy_Returns.txt", kind: "txt", sizeLabel: "82 KB", date: "2026-07-16", note: "Zone occupancy and employment figures.", instrument: "special-economic-zones-act" },
-      { id: "zida-doc-3", name: "Aftercare_Case_Review.docx", kind: "docx", sizeLabel: "1.1 MB", date: "2026-06-13", note: "Review of investor aftercare cases.", instrument: "companies-act" },
-    ],
+    documents: documentsFor("zida"),
   },
 ];
 
@@ -1648,18 +1628,32 @@ export const ALL_DEPARTMENT_DOCUMENTS = DEPARTMENTS.flatMap((department) =>
 );
 
 /**
- * The register's documents in the order the rails show them: the documents that cite an
- * instrument come first, and everything else keeps the register's own order.
+ * The department's documents in the order both rails show them.
  *
- * Both rails sort by this one rule rather than each carrying its own copy of it. Today
- * every document in the register cites an instrument, so the order is unchanged — the
- * helper is here so a future document with no instrument can never push a cited one
- * down the rail. It copies the array, so the authored register is never rearranged.
+ * The sections are kept in the order the register first lists them — the corpus order, which puts a
+ * department's governing law first, then its sector policy, then the committees' reports on it and the
+ * audits of it — and the documents inside a section are listed by title. So the order is stable and
+ * meaningful, and it never depends on the order the documents happened to be downloaded in.
+ *
+ * Both rails sort by this one rule rather than each carrying its own copy of it. It copies the array,
+ * so the register itself is never rearranged.
+ *
+ * The comparison is written by hand rather than with `localeCompare`, because a locale-dependent
+ * comparison would order the same register differently on two machines (see rule 04, determinism).
  */
-export const sortDocumentsByCitation = (
+export const documentsInReadingOrder = (
   documents: readonly DepartmentDocument[],
-): DepartmentDocument[] =>
-  [...documents].sort((a, b) => Number(Boolean(b.instrument)) - Number(Boolean(a.instrument)));
+): DepartmentDocument[] => {
+  const sectionOrder = new Map<string, number>();
+  documents.forEach((document) => {
+    if (!sectionOrder.has(document.section)) sectionOrder.set(document.section, sectionOrder.size);
+  });
+  return [...documents].sort((a, b) => {
+    const bySection = sectionOrder.get(a.section)! - sectionOrder.get(b.section)!;
+    if (bySection !== 0) return bySection;
+    return a.title < b.title ? -1 : a.title > b.title ? 1 : 0;
+  });
+};
 
 /** The number of departments the platform must always render. */
 export const DEPARTMENT_COUNT = DEPARTMENTS.length;

@@ -183,18 +183,31 @@ describe("department config (src/config/departments.ts)", () => {
     expect(Object.keys(DEPARTMENT_SEGMENTS).sort()).toEqual([...DEPARTMENT_IDS].sort());
   });
 
-  it("cites only real instruments, each from its own department's register", () => {
+  it("registers only real instruments, each from the department's own table", () => {
     for (const d of DEPARTMENTS) {
       // Every instrument in the register must exist in the table.
       for (const id of d.instruments) {
         expect(isCitedInstrumentId(id), `${d.id} registers unknown instrument ${id}`).toBe(true);
       }
-      // Every document must cite one of ITS OWN department's instruments — so a document
-      // can neither carry a fabricated citation nor reach outside its mandate.
+    }
+  });
+
+  it("cites every published document to its source: title, publishing body, date and address", () => {
+    // BATCH B4 — the register is no longer authored here. It is GENERATED from the real published
+    // documents in `public/department-corpus/<departmentId>.json`, so what a document must carry is
+    // the citation a reader can check — the title, the body that published it, the date the source
+    // states and the address of the published file — not an invented link to one of the department's
+    // own instruments. `src/test/department-corpus.test.ts` holds the register against the corpora.
+    for (const d of DEPARTMENTS) {
       expect(d.documents.length, `${d.id} documents`).toBeGreaterThan(0);
       for (const doc of d.documents) {
-        expect(doc.instrument, `${doc.id} cites an instrument`).toBeTruthy();
-        expect(d.instruments, `${doc.id} cites outside ${d.id}'s register`).toContain(doc.instrument);
+        expect(doc.id.startsWith(`${d.id}-`), `${doc.id} belongs to ${d.id}`).toBe(true);
+        expect(doc.title, `${doc.id} carries the title the source states`).toBeTruthy();
+        expect(doc.section, `${doc.id} is grouped under a section`).toBeTruthy();
+        expect(doc.publisher, `${doc.id} names the body that published it`).toBeTruthy();
+        expect(doc.date, `${doc.id} carries the date the source states`).toBeTruthy();
+        expect(doc.url, `${doc.id} carries the address of the published file`).toMatch(/^https?:\/\//);
+        expect(doc.pages, `${doc.id} records its page count`).toBeGreaterThan(0);
       }
     }
   });
@@ -243,17 +256,26 @@ describe("department config (src/config/departments.ts)", () => {
     for (const t of ALL_POLICY_TEMPLATES) expect(allowed, `${t.template.id} horizon`).toContain(t.template.timeHorizon);
   });
 
-  it("gives every department a document rail with unique document ids", () => {
+  it("gives every department a document library with unique document ids", () => {
     for (const d of DEPARTMENTS) {
-      expect(d.documents.length, `${d.id} documents`).toBeGreaterThanOrEqual(3);
+      // The agreed minimum, the same number `npm run validate` holds the shipped corpora to.
+      expect(d.documents.length, `${d.id} documents`).toBeGreaterThanOrEqual(6);
       expect(new Set(d.documents.map((doc) => doc.id)).size, `${d.id} duplicate document id`).toBe(d.documents.length);
     }
   });
 
-  it("keeps every document date on or before SCENARIO_ANCHOR_DATE (determinism)", () => {
+  it("dates every published document with a real year, never one from the future", () => {
+    // BATCH B4 — the dates are now the ones the publishing bodies state, so they read "2024" or
+    // "2 October 2024" rather than an invented ISO day. That means the old "on or before
+    // SCENARIO_ANCHOR_DATE" comparison cannot be made (a year alone carries no day), so this checks
+    // what IS true and checkable: every date really carries a four-digit year, and no document is
+    // dated after the reference year the platform computes its figures for.
+    const referenceYear = Number(SCENARIO_ANCHOR_DATE.slice(0, 4));
     for (const d of DEPARTMENTS) {
       for (const doc of d.documents) {
-        expect(doc.date <= SCENARIO_ANCHOR_DATE, `${doc.id} ${doc.date} is after SCENARIO_ANCHOR_DATE`).toBe(true);
+        const year = Number(/(\d{4})/.exec(doc.date)?.[1]);
+        expect(Number.isInteger(year), `${doc.id} carries a year in its date ("${doc.date}")`).toBe(true);
+        expect(year, `${doc.id} "${doc.date}" is dated after the reference year ${referenceYear}`).toBeLessThanOrEqual(referenceYear);
       }
     }
   });

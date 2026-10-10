@@ -3,8 +3,9 @@
  *
  * The real published documents that belong to ONE department — its governing law, its sector
  * policy, the parliamentary committee's reports on it and the audits of it. They are the
- * department side's counterpart to ZEPARI's corpus (`zepariCorpus.ts`) and the national
- * cross-cutting set (`nationalCorpus.ts`), built the same way, by the same rule: a real, named,
+ * department side's counterpart to ZEPARI's corpus (`public/zepari-corpus.json`, read by
+ * `src/services/research/researchDocuments.ts`) and the national cross-cutting set
+ * (`nationalCorpus.ts`), built the same way, by the same rule: a real, named,
  * published source — never an invented one.
  *
  * WHERE THE TEXT LIVES. The full text is far larger than a browser's storage will hold and far more
@@ -22,23 +23,10 @@
  * into a screen; the caller says plainly that the department's documents could not be loaded.
  */
 
-export interface DepartmentCorpusDocument {
-  /** Stable id, `<departmentId>-001`… — assigned when the corpus was built. */
-  id: string;
-  /** Which group it belongs to, e.g. "Governing law", "Sector policy", "Committee report". */
-  section: string;
-  title: string;
-  /** The body that published it, named in every citation. */
-  publisher: string;
-  /** The publication date as the source states it. */
-  date: string;
-  /** The address of the published file, so any quotation can be checked. */
-  url: string;
-  pages: number;
-  /** True only when the published file carried a text layer that could really be read. */
-  read: boolean;
-  characters: number;
-  /** The document's real text. Empty for the picture-only scans. */
+import type { DepartmentDocument } from "@/config/departments";
+
+export interface DepartmentCorpusDocument extends DepartmentDocument {
+  /** The document's real text, as read from the published file. Empty for the picture-only scans. */
   text: string;
 }
 

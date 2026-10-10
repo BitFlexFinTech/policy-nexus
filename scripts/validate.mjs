@@ -57,8 +57,12 @@
  * 50. BATCH 0 — the register keeps a REFERENCE and a FINGERPRINT per document (never the text), a
  *     generated document is written once per run, and the evidence-status card reads its number from
  *     the register rather than typing it.
+ * 53. BATCH B4 — the department document register the screens read is GENERATED from the real
+ *     published corpora, so a corpus that is rebuilt without regenerating the register fails the
+ *     build instead of shipping a screen that describes documents differently from the documents.
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { join, relative } from "node:path";
 
@@ -120,7 +124,7 @@ const scan = (files, patterns, { ignoreLine } = {}) => {
   const hits = [];
   for (const file of files) {
     lines(file).forEach((line, i) => {
-      if (ignoreLine && ignoreLine(line)) return;
+      if (ignoreLine && ignoreLine(line, file)) return;
       for (const [label, re] of patterns) {
         if (re.test(line)) hits.push(`${rel(file)}:${i + 1}  [${label}]  ${line.trim().slice(0, 100)}`);
       }
@@ -185,14 +189,57 @@ const clockFile = join(ROOT, "src", "lib", "clock.ts");
 check("determinism (no Math.random/Date.now/new Date)", scan(appFiles.filter((p) => p !== clockFile), determinism, { ignoreLine: commentLine }));
 
 // 5 — no runtime network calls
+//
+// THE ONE EXEMPTION ADDED BY BATCH B4, AND WHY IT IS SAFE. The generated department register
+// (`src/config/departmentDocuments.ts`) carries, for every real published document, THE ADDRESS OF
+// THE PUBLISHED FILE — the citation a reader can check. Those addresses are DATA, exactly like the
+// openrouter.ai default below: the build never contacts them. The exemption is written as narrowly
+// as it can be — it applies to that one file, and only to a line whose whole content is a document's
+// `url:` field — and the gate directly beneath it proves the file carries no way to MAKE a request,
+// so the exemption cannot become a hole. (The dialog prints the address as a link the reader may
+// choose to follow; the platform itself never fetches it.)
+const REGISTER_FILE = join(ROOT, "src/config/departmentDocuments.ts");
+const isCitationLine = (line) => /^\s*url: "https?:\/\/[^"]*",\s*$/.test(line);
 check("no runtime network URLs", scan(srcFiles, [
   ["network", /https?:\/\/[^\s"')]+/],
 ], {
   // openrouter.ai is allowed as DATA only: it is the DEFAULT address the administrator may
   // enter for the drafting model. It is not a request the shipped build makes — no request is
   // made at all until an administrator switches the capability on and the workspace drafts.
-  ignoreLine: (line) => /^\s*(\/\/|\*|\/\*)/.test(line) || /schemaLocation|w3\.org|localhost|127\.0\.0\.1|openrouter\.ai/.test(line),
+  ignoreLine: (line, file) =>
+    /^\s*(\/\/|\*|\/\*)/.test(line) ||
+    /schemaLocation|w3\.org|localhost|127\.0\.0\.1|openrouter\.ai/.test(line) ||
+    (file === REGISTER_FILE && isCitationLine(line)),
 }));
+
+// 5b — the exemption above is only honest while the exempted file is data and nothing else. This
+// fails the build if the register ever grows a way to make a request, or carries a network address
+// that is not a document's own citation.
+{
+  const problems = [];
+  if (existsSync(REGISTER_FILE)) {
+    const text = readFileSync(REGISTER_FILE, "utf8");
+    for (const [label, re] of [
+      ["a way to make a request", /\b(fetch|XMLHttpRequest|EventSource|WebSocket)\s*\(/],
+      ["a network import", /from\s+["'](node:)?https?["']/],
+      ["a network client", /\baxios\b/],
+    ]) {
+      if (re.test(text)) {
+        problems.push(`src/config/departmentDocuments.ts carries ${label} — the register must be data only`);
+      }
+    }
+    const stray = text
+      .split("\n")
+      .filter((line) => /https?:\/\//.test(line) && !isCitationLine(line));
+    if (stray.length) {
+      problems.push(
+        `src/config/departmentDocuments.ts carries ${stray.length} network address(es) that are not a document's citation:\n` +
+          stray.map((line) => `    ${line.trim().slice(0, 100)}`).join("\n"),
+      );
+    }
+  }
+  check("the department register is data only, and every address in it is a citation", problems);
+}
 
 // 6 — the 16 departments, with the exact stable IDs
 const deptFile = join(ROOT, "src/config/departments.ts");
@@ -2717,6 +2764,26 @@ if (!existsSync(cssPath)) {
     notes.push("INFO  the department document libraries are real — each built department's governing law, sector policy, committee reports and audits, each cited by title, publisher, date and address");
   }
   check("the department documents are real, cited, and read from our own site (all 16 departments)", problems);
+}
+
+// check 53 — THE DEPARTMENT REGISTER IS GENERATED FROM THE REAL PUBLISHED DOCUMENTS (Batch B4).
+// Every screen reads `src/config/departmentDocuments.ts`, which is derived from the corpora in
+// `public/department-corpus/`. This re-runs the generator in check mode, so a corpus that is rebuilt
+// without regenerating the register — or a register that is edited by hand — fails the build rather
+// than shipping a library that describes documents differently from the documents themselves.
+{
+  const problems = [];
+  const result = spawnSync("node", ["scripts/build-department-register.mjs", "--check"], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  const said = `${result.stdout || ""}${result.stderr || ""}`.trim();
+  if (result.status !== 0) {
+    problems.push(said || "the department register could not be checked against the corpora");
+  } else if (said) {
+    notes.push(`INFO  ${said}`);
+  }
+  check("the department register is generated from the real published documents (Batch B4)", problems);
 }
 
 // summary

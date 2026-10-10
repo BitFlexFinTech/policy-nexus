@@ -46,15 +46,15 @@ const documentCountLabel = (documentCount: number): string =>
 
 /** The line that states how many documents the library holds, and how each is cited. */
 export const libraryHoldLine = (departmentName: string, documentCount: number): string =>
-  `${departmentName} holds ${documentCountLabel(documentCount)} in this library, each cited to the instrument it is prepared under, together with any document the department adds itself.`;
+  `${departmentName} holds ${documentCountLabel(documentCount)} in this library — its governing law, its sector policy, the committees' reports on it and the audits of it. Each is cited to the body that published it and the date it was published, together with any document the department adds itself.`;
 
 /** The line that says what a run reads, and what adding the department's own material does. */
 export const libraryReadsLine = (): string =>
   "Every run reads the documents the department adds here. The more of its own reports, spreadsheets and statistics it adds, the longer and better grounded its assessment and its drafted policy become.";
 
-/** The line that states what arrives on approval for Government use. */
+/** The line that states what still arrives on approval for Government use. */
 export const libraryArchivePromise = (departmentName: string): string =>
-  `On approval for Government use, ${departmentName}'s full document archive will be loaded here, and every run will read it.`;
+  `The rest of ${departmentName}'s document archive will be added here when the platform is approved for Government use, and every run will read it.`;
 
 /** The whole card body, in reading order. */
 export const libraryEvidenceLines = (departmentName: string, documentCount: number): string[] => [

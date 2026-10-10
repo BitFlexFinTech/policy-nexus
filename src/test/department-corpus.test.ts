@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEPARTMENT_IDS } from "@/config/departments";
+import { DEPARTMENT_IDS, findDepartment } from "@/config/departments";
 import {
   DEPARTMENT_CORPUS_DIRECTORY,
   departmentCitation,
@@ -28,6 +28,7 @@ const SHIPPED = FILES.map((name) => ({
       url: string;
       pages: number;
       read: boolean;
+      characters: number;
       text: string;
     }>;
   }),
@@ -85,6 +86,36 @@ describe("the department document library", () => {
         } else {
           expect(document.text, `${document.id} is not readable so its text must be empty`).toBe("");
         }
+      }
+    }
+  });
+
+  it("is exactly what the app's register carries, for every department", () => {
+    // BATCH B4 — the register every screen reads (`src/config/departmentDocuments.ts`) is GENERATED
+    // from these corpus files by `scripts/build-department-register.mjs`, and `npm run validate`
+    // re-runs the generator in check mode. This is the app-side half of the same gate: it proves the
+    // register the application actually imports describes each document exactly as the corpus does,
+    // and carries no text of its own — the text belongs in the corpus, which is loaded on demand.
+    for (const corpus of SHIPPED) {
+      const department = findDepartment(corpus.department);
+      expect(department, `${corpus.department} is a real department`).toBeTruthy();
+      expect(
+        department!.documents.map((document) => document.id),
+        `${corpus.department} register ids`,
+      ).toEqual(corpus.documents.map((document) => document.id));
+
+      for (const document of corpus.documents) {
+        const registered = department!.documents.find((entry) => entry.id === document.id)!;
+        expect(registered, `${document.id} is in the register`).toBeTruthy();
+        expect(registered.title, `${document.id} title`).toBe(document.title);
+        expect(registered.section, `${document.id} section`).toBe(document.section);
+        expect(registered.publisher, `${document.id} publisher`).toBe(document.publisher);
+        expect(registered.date, `${document.id} date`).toBe(document.date);
+        expect(registered.url, `${document.id} address`).toBe(document.url);
+        expect(registered.pages, `${document.id} pages`).toBe(document.pages);
+        expect(registered.read, `${document.id} read flag`).toBe(document.read);
+        expect(registered.characters, `${document.id} characters`).toBe(document.characters);
+        expect("text" in registered, `${document.id} carries no text in the register`).toBe(false);
       }
     }
   });

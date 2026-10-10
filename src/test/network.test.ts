@@ -7,6 +7,7 @@ import {
   AGENT_MARK_CAP,
   AGENT_POPULATION_CEILING,
   AGENT_POPULATION_FLOOR,
+  POLICY_NODE_ID,
   PREVIEW_DEPARTMENT_ID,
   RELATION_BANK,
   RELATIONSHIP_KINDS,
@@ -56,11 +57,46 @@ describe("relationship graph — derived from the run", () => {
       department.priorities.map((priority) => priority.label),
     );
     expect(graph.nodes.filter((node) => node.kind === "corpus").map((n) => n.label)).toEqual(
-      department.documents.map((document) => document.name),
+      department.documents.map((document) => document.title),
     );
     // Every id is unique — a duplicate would silently collapse two marks.
     expect(new Set(graph.nodes.map((node) => node.id)).size).toBe(graph.nodes.length);
     expect(new Set(graph.edges.map((edge) => edge.id)).size).toBe(graph.edges.length);
+  });
+
+  it("weights each document edge by the document's real share of the department's read material", () => {
+    // BATCH B4 — the weight used to be decorative (`0.4 + index * 0.08`), which drew every document
+    // as a differently-weighted line with nothing behind the number. It is now real: a document's
+    // share of the text the department's readable documents hold. A document whose text could not be
+    // read therefore weighs nothing, which is exactly what it contributes.
+    const run = buildSimulatedRun(requestFor("opc"));
+    const department = findDepartment("opc")!;
+    const graph = buildRelationshipGraph(run);
+
+    const readable = department.documents.filter((document) => document.read);
+    const total = readable.reduce((sum, document) => sum + document.characters, 0);
+
+    // Both kinds of document must exist here, or the check below would prove nothing.
+    expect(readable.length).toBeGreaterThan(0);
+    expect(department.documents.some((document) => !document.read)).toBe(true);
+
+    // Every document the department holds is in the graph, read or not.
+    expect(graph.nodes.filter((node) => node.kind === "corpus")).toHaveLength(
+      department.documents.length,
+    );
+
+    for (const document of department.documents) {
+      const edge = graph.edges.find(
+        (candidate) =>
+          candidate.source === POLICY_NODE_ID &&
+          candidate.target === `document:${document.id}` &&
+          candidate.relation === RELATION_BANK.readAgainst,
+      );
+      expect(edge, `${document.id} has a read-against edge`).toBeTruthy();
+      const expected =
+        document.read && total > 0 ? Math.round((document.characters / total) * 100) / 100 : 0;
+      expect(edge!.strength, `${document.id} weight`).toBe(expected);
+    }
   });
 
   it("dates every arrival to a round the run really produced", () => {

@@ -29,12 +29,13 @@ describe("registers are actionable", () => {
     renderAt("/app");
 
     fireEvent.click(
-      screen.getByRole("button", { name: new RegExp(escapeRegex(document.name)) }),
+      screen.getByRole("button", { name: new RegExp(escapeRegex(document.title)) }),
     );
 
     const dialog = within(await screen.findByRole("dialog"));
-    expect(dialog.getByText(document.note)).toBeInTheDocument();
-    expect(dialog.getByText(/document register, not the files themselves/)).toBeInTheDocument();
+    expect(dialog.getByText(document.title)).toBeInTheDocument();
+    expect(dialog.getByText(document.publisher)).toBeInTheDocument();
+    expect(dialog.getByText(/holds the register of these documents/)).toBeInTheDocument();
   });
 
   it("opens a department document from the document library screen", async () => {
@@ -44,13 +45,13 @@ describe("registers are actionable", () => {
     renderAt("/app/documents");
 
     fireEvent.click(
-      screen.getByRole("button", { name: new RegExp(escapeRegex(document.name)) }),
+      screen.getByRole("button", { name: new RegExp(escapeRegex(document.title)) }),
     );
 
     const dialog = within(await screen.findByRole("dialog"));
-    expect(dialog.getByText(document.name)).toBeInTheDocument();
-    expect(dialog.getByText(document.note)).toBeInTheDocument();
-    expect(dialog.getByText(document.sizeLabel)).toBeInTheDocument();
+    expect(dialog.getByText(document.title)).toBeInTheDocument();
+    expect(dialog.getByText(document.publisher)).toBeInTheDocument();
+    expect(dialog.getByText(`${document.pages} pages`)).toBeInTheDocument();
   });
 
   it("links every prepared draft in the policy register to the workspace", () => {
