@@ -787,8 +787,12 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     // priority and a diamond for a document.
     const mark = group.locator(":scope > .graph-mark").last();
     // Scrolled in first: a pointer event aimed below the fold lands nowhere, and
-    // this page is taller than the viewport.
-    await mark.scrollIntoViewIfNeeded();
+    // this page is taller than the viewport. The scroll is done through the DOM rather than with
+    // Playwright's scrollIntoViewIfNeeded, because that waits for the element to hold still for two
+    // frames — and the graph drifts VERY slowly when at rest (the owner's instruction), so the mark
+    // never satisfies that wait and the scroll times out. This was an intermittent failure: it passed
+    // in isolation and flaked in a full run. Scrolling the element directly removes the wait entirely.
+    await mark.evaluate((element) => element.scrollIntoView({ block: "center" }));
     const box = (await mark.boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();

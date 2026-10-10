@@ -2651,6 +2651,70 @@ if (!existsSync(cssPath)) {
   check("the national cross-cutting documents are real, cited, and read from our own site (Batch B1)", problems);
 }
 
+// check 52 — THE DEPARTMENT DOCUMENTS ARE REAL (Batch B2).
+// The owner's one rule that never moves: real data only, never invented. This fails the build if a
+// department's set is missing, has shrunk below the agreed minimum, carries a document that is not
+// cited, has a "read" document with no text or a "not read" one with text, reuses a document id, or
+// names a department that does not exist; or if the loader stops reading a set from our own site.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+  const DEPARTMENT_IDS = [
+    "opc", "ict", "fin", "agri", "health", "edu", "hedu", "mines",
+    "energy", "psc", "lg", "mfa", "env", "def", "zimra", "zida",
+  ];
+
+  const dir = join(ROOT, "public/department-corpus");
+  if (!existsSync(dir)) {
+    problems.push("public/department-corpus/ is missing — the departments would have no real documents of their own");
+  } else {
+    const files = readdirSync(dir).filter((name) => name.endsWith(".json"));
+    if (files.length < 8) {
+      problems.push(`only ${files.length} department corpora ship — Batch B2 agreed eight (departments 1 to 8)`);
+    }
+    for (const name of files) {
+      const department = name.replace(/\.json$/, "");
+      if (!DEPARTMENT_IDS.includes(department)) {
+        problems.push(`public/department-corpus/${name} is not a real department id`);
+        continue;
+      }
+      try {
+        const corpus = JSON.parse(readFileSync(join(dir, name), "utf8"));
+        const documents = Array.isArray(corpus.documents) ? corpus.documents : [];
+        if (documents.length < 6) {
+          problems.push(`${department} ships only ${documents.length} documents — the agreed minimum is six`);
+        }
+        const uncited = documents.filter((d) => !d.title || !d.publisher || !d.date || !/^https?:\/\//.test(d.url || "")).length;
+        if (uncited > 0) {
+          problems.push(`${department}: ${uncited} documents are not cited (title, publisher, date and the published address are all required)`);
+        }
+        const faked = documents.filter((d) => (d.read ? !(typeof d.text === "string" && d.text.length > 0) : d.text !== "")).length;
+        if (faked > 0) {
+          problems.push(`${department}: ${faked} documents contradict their own "read" flag — a document that could not be read must carry no text, and one that could must carry it`);
+        }
+        const ids = documents.map((d) => d.id);
+        if (new Set(ids).size !== ids.length) {
+          problems.push(`${department}: document ids are not unique`);
+        }
+      } catch (error) {
+        problems.push(`public/department-corpus/${name} could not be read (${error.message})`);
+      }
+    }
+  }
+
+  const loader = readIf("src/services/documents/departmentCorpus.ts");
+  if (!loader || !/export const loadDepartmentCorpus/.test(loader)) {
+    problems.push("departmentCorpus.ts is missing — a department's documents must be read from our own site when a screen needs them");
+  } else if (!/DEPARTMENT_CORPUS_DIRECTORY = "\/department-corpus"/.test(loader)) {
+    problems.push("departmentCorpus.ts no longer reads a department's set from our own site at /department-corpus/");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  the department document libraries are real — each built department's governing law, sector policy, committee reports and audits, each cited by title, publisher, date and address");
+  }
+  check("the department documents are real, cited, and read from our own site (Batch B2)", problems);
+}
+
 // summary
 console.log("\n" + "-".repeat(72));
 if (notes.length) console.log(notes.join("\n") + "\n" + "-".repeat(72));
