@@ -12,6 +12,8 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
 > ## THE ONE RULE THAT NEVER MOVES
 > **Real data only. Never invented.** The AI **reasons and writes**; it never supplies a figure, a count, a citation or a document's text. Every figure comes from a real, named, published source, cited on screen.
 >
+> **WHO USES IT FOR NOW — SETTLED BY THE OWNER, 2026-10-10. THE OWNER ALONE.** The owner's own words: *"i am the only one who is going to be using the platform until the government approves of the project… no one else is going to have access to it. the demo is literally for me to show them exactly how it works."* So there are **no external visitors to design around**: the shared host's address is not being handed out, and a cost that lands **only on the owner's own machine** (a short load, a slower first paint) is **not a reason to avoid a change**. **Do not use "the visitor's browser" as a reason to defer work** — the browser in question is the owner's own laptop. What the VPS changes is where the heavy work happens, not who is using it.
+>
 > ## WHERE THE AI IS CALLED — AND WHERE IT MUST NEVER BE
 >
 > | Step | AI? |
