@@ -175,15 +175,35 @@ export const verifyDocumentCitations = (
 
   const unknown = citations.filter((citation) => !allowedSet.has(citation));
 
+  // BATCH B4 — the chapters the platform can vouch for are those the department's instrument register
+  // carries AND those that appear in the published title of one of the department's REAL documents. A
+  // real document's own title — with the address of the published file, held on our own site and gated
+  // as real — is as good a warrant as the index: the chapter is not invented, it is quoted from a
+  // publication. Without this, naming a real document in Annex D would trip the draft's own citation
+  // gate, and the gate would be reporting the instrument index's gaps rather than the generator's
+  // invention, which is not what it is for.
+  const publishedTitles = department.documents.map((document) => document.title);
   const strayChapters = (text.match(CHAPTER_PATTERN) ?? []).filter(
-    (marker) => !allowed.some((citation) => citation.includes(marker)),
+    (marker) =>
+      !allowed.some((citation) => citation.includes(marker)) &&
+      !publishedTitles.some((title) => title.includes(marker)),
   );
 
   // An instrument from the wider table counts as "outside the register" only where one of
   // this department's allowed citations does not already cover the words. Without this,
   // "Education Act" would be reported against a department that only holds "Zimbabwe
   // Council for Higher Education Act", because the shorter title sits inside the longer one.
-  const residue = allowed.reduce((carry, citation) => carry.split(citation).join(" "), text);
+  //
+  // BATCH B4 — the TITLE of a real published document is quoted text, not a claim the instrument
+  // makes about its own mandate, so the published titles are removed from the residue for the same
+  // reason the department's own citations are. Naming a source whose published title happens to
+  // mention another Act is not the draft reaching outside its register; only the exact title the
+  // corpus holds (gated as real and cited) is removed, so this cannot hide a claim of the draft's own.
+  const quotedTitles = department.documents.reduce(
+    (carry, document) => carry.split(document.title).join(" "),
+    text,
+  );
+  const residue = allowed.reduce((carry, citation) => carry.split(citation).join(" "), quotedTitles);
   const outsideRegister = CITED_INSTRUMENTS.map((instrument) => citedInstrumentLabel(instrument.id))
     .filter((citation) => !allowedSet.has(citation) && residue.includes(citation));
 

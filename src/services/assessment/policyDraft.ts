@@ -16,7 +16,7 @@
  *      inputs always produce byte-identical text. No clock, no network call, no randomness.
  */
 
-import { indicatorBasisLabel, type Department } from "@/config/departments";
+import { documentsInReadingOrder, indicatorBasisLabel, type Department } from "@/config/departments";
 import { BRAND, DISCLAIMER, SOVEREIGNTY_STATEMENT, VOCABULARY } from "@/config/brand";
 import { officerDisplayName } from "@/config/officer";
 import {
@@ -270,6 +270,18 @@ export const buildPolicyDraft = (
   const reluctant = run.reactions.filter((reaction) => reaction.sentiment === "resistant");
   // Batch 5 — the department's own material, read from the run's own documents.
   const material = readMaterial(run, department);
+  // Batch B4 — the department's REAL, PUBLISHED documents, read from its own register. These are
+  // the sources the instrument is checked against: its governing law, its sector policy, the
+  // parliamentary committees' reports on it and the audits of it. They are named in Annex D with
+  // the body that published each one, its date and the address of the published file, so any
+  // reader can find and check it.
+  const published = documentsInReadingOrder(department.documents);
+  const publishedRead = published.filter((document) => document.read);
+  const publishedCharacters = publishedRead.reduce(
+    (total, document) => total + document.characters,
+    0,
+  );
+  const publishedUnread = published.length - publishedRead.length;
 
   const frontMatter: GeneratedSection[] = [];
   const numbered: GeneratedSection[] = [];
@@ -663,13 +675,34 @@ export const buildPolicyDraft = (
     heading: `${ANNEX.instruments} — Instruments relied on`,
   });
 
+  // Batch B4 — the department's PUBLISHED documents first (the sources the instrument is checked
+  // against), then the material the department supplied for this run. Both live in Annex D, because
+  // a reader asking "what does this policy rest on?" wants both answers together, and the mandated
+  // annex list is unchanged.
+  const publishedLines = published.map(
+    (document) =>
+      `${document.title} — ${document.publisher}, ${document.date} · ${document.pages} pages · ${
+        document.read
+          ? `text read (${document.characters} characters)`
+          : "text not read — picture-only scan"
+      } · ${document.url}`,
+  );
+
   annexes.push({
     id: "annex-documents",
     heading: `${ANNEX.documents} — Documents and data relied upon`,
-    paragraphs:
-      material.documents.length > 0
+    paragraphs: [
+      `${department.name} holds ${published.length} published ${published.length === 1 ? "document" : "documents"} in its Document Library — its governing law, its sector policy, the parliamentary committees' reports on it and the audits of it. ${publishedRead.length} of them carry text that could be read, ${publishedCharacters} characters in all; ${
+        publishedUnread === 0
+          ? "none is a picture-only scan"
+          : publishedUnread === 1
+            ? "one is a picture-only scan, recorded by name and page count only"
+            : `${publishedUnread} are picture-only scans, recorded by name and page count only`
+      }. Every one is listed below with the body that published it, the date it states and the address of the published file, so a reader can check it.`,
+      "These are the published sources this instrument is checked against. Nothing in this list is inferred from a filename, and nothing is presented as a published figure unless it is one.",
+      ...(material.documents.length > 0
         ? [
-            `The department supplied ${material.documents.length} ${material.documents.length === 1 ? "document" : "documents"} of its own through its Document Library. ${material.read.length} of them were read — ${material.characters} characters — and a document that could not be read is listed below as recorded by name and contributes nothing, to this policy or to its preparation.`,
+            `The department also supplied ${material.documents.length} ${material.documents.length === 1 ? "document" : "documents"} of its own through its Document Library. ${material.read.length} of them were read — ${material.characters} characters — and a document that could not be read is listed below as recorded by name and contributes nothing, to this policy or to its preparation.`,
             ...(material.unavailable.length > 0
               ? [
                   `A document the department no longer holds in its library is listed below as "no longer held": it was supplied when the run was recorded, and it is named here so the record is not lost, but its material could not be read back for this draft.`,
@@ -680,7 +713,9 @@ export const buildPolicyDraft = (
         : [
             "The department supplied no document of its own for this policy, so nothing in this policy rests on departmental material beyond the submitted draft, and nothing is inferred from a document that was not read.",
             "A department adds its own reports, spreadsheets and statistics through its Document Library, and every run it makes afterwards reads them and records them here.",
-          ],
+          ]),
+    ],
+    bullets: publishedLines,
     table:
       material.documents.length > 0
         ? {
@@ -731,7 +766,7 @@ export const buildPolicyDraft = (
     heading: `${ANNEX.method} — Method and limitations`,
     paragraphs: [
       DISCLAIMER.long,
-      `The ${VOCABULARY.simulationCore} derived this examination from the submitted policy text, the department's reference indicators and its modelled stakeholder groups, using a seeded deterministic process. The same inputs always produce the same result.`,
+      `The ${VOCABULARY.simulationCore} derived this examination from the submitted policy text, the department's real published documents, its reference indicators and its modelled stakeholder groups, using a seeded deterministic process. The same inputs always produce the same result.`,
       SOVEREIGNTY_STATEMENT,
       "Limitations to be read with the figures above: the support indices and participation measures are modelled, not observed; a group's modelled position is a range of behaviour under stated assumptions and is not a statement by that group; and the examination cannot price a measure or read a draft into law. Those are the department's to do, and are marked for completion where they arise.",
     ],

@@ -128,6 +128,33 @@ describe("Batch 5 — the department's own documents are used in the drafted pol
     expect(text).toContain("Document Library");
   });
 
+  it("names the department's real published documents, with their publishers and dates, at Annex D", async () => {
+    // BATCH B4 — Annex D used to list only the material the department supplied for the run. It now
+    // also names the department's real, PUBLISHED documents — the sources the instrument is checked
+    // against — each with the body that published it, its date, its page count and the address of the
+    // published file, so a reader can find and check every one.
+    const { department, draft } = await draftFor("opc");
+    const annex = draft.sections.find((section) => section.id === "annex-documents")!;
+    const text = renderDocumentText(draft);
+
+    // Every published document the department holds is named — never a silent subset.
+    expect(annex.bullets).toHaveLength(department.documents.length);
+    for (const document of department.documents) {
+      const line = annex.bullets!.find((entry) => entry.includes(document.title));
+      expect(line, `${document.id} is named in Annex D`).toBeTruthy();
+      expect(line).toContain(document.publisher);
+      expect(line).toContain(document.date);
+      expect(line).toContain(`${document.pages} pages`);
+      expect(line).toContain(document.url);
+      // What was read is stated per document, and a scan is never claimed as read.
+      expect(line).toContain(document.read ? "text read" : "text not read");
+    }
+
+    expect(text).toContain("published documents in its Document Library");
+    // opc holds the printed Constitution, which is a picture-only scan: the annex says so by name.
+    expect(text).toContain("one is a picture-only scan");
+  });
+
   it("changes the draft when a document is added, and is byte-identical for the same inputs", async () => {
     const without = await draftFor("fin");
     const withDocs = await draftFor("fin", documents);
