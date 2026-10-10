@@ -2651,7 +2651,7 @@ if (!existsSync(cssPath)) {
   check("the national cross-cutting documents are real, cited, and read from our own site (Batch B1)", problems);
 }
 
-// check 52 — THE DEPARTMENT DOCUMENTS ARE REAL (Batch B2).
+// check 52 — THE DEPARTMENT DOCUMENTS ARE REAL (Batch B2 built departments 1-8; Batch B3 completed all 16).
 // The owner's one rule that never moves: real data only, never invented. This fails the build if a
 // department's set is missing, has shrunk below the agreed minimum, carries a document that is not
 // cited, has a "read" document with no text or a "not read" one with text, reuses a document id, or
@@ -2669,8 +2669,12 @@ if (!existsSync(cssPath)) {
     problems.push("public/department-corpus/ is missing — the departments would have no real documents of their own");
   } else {
     const files = readdirSync(dir).filter((name) => name.endsWith(".json"));
-    if (files.length < 8) {
-      problems.push(`only ${files.length} department corpora ship — Batch B2 agreed eight (departments 1 to 8)`);
+    if (files.length < DEPARTMENT_IDS.length) {
+      problems.push(`only ${files.length} department corpora ship — all ${DEPARTMENT_IDS.length} departments must hold their own documents (Batch B3 completes the set)`);
+    }
+    const noSet = DEPARTMENT_IDS.filter((id) => !files.includes(`${id}.json`));
+    if (noSet.length > 0) {
+      problems.push(`no document set ships for: ${noSet.join(", ")} — every department must have real published documents of its own`);
     }
     for (const name of files) {
       const department = name.replace(/\.json$/, "");
@@ -2712,7 +2716,7 @@ if (!existsSync(cssPath)) {
   if (problems.length === 0) {
     notes.push("INFO  the department document libraries are real — each built department's governing law, sector policy, committee reports and audits, each cited by title, publisher, date and address");
   }
-  check("the department documents are real, cited, and read from our own site (Batch B2)", problems);
+  check("the department documents are real, cited, and read from our own site (all 16 departments)", problems);
 }
 
 // summary

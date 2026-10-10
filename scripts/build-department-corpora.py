@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-BUILD THE DEPARTMENT DOCUMENT LIBRARIES (Batch B2 — departments 1 to 8).
+BUILD THE DEPARTMENT DOCUMENT LIBRARIES (Batch B2 = departments 1-8, Batch B3 = departments 9-16;
+all sixteen departments are now built).
 
 WHAT THIS IS FOR, IN PLAIN WORDS.
 The platform must never invent a document or a figure. So each department's real published
@@ -370,6 +371,120 @@ SOURCES = {
         {"id": "zimra-008", "section": "Regulations", "title": "Customs and Excise (General) (Amendment) Regulations, 2026 (No. 129) (S.I. 15 of 2026)",
          "publisher": "Government of Zimbabwe", "date": "2026",
          "url": V + "SI%202026-015%20Customs%20and%20Excise%20%28General%29%20%28Amendment%29%20Regulations%2C%202026%20%28No.%20129%29.pdf"},
+    ],
+    # BATCH B3, PART 2 (2026-10-10). Defence and War Veterans Affairs, and Foreign Affairs and
+    # International Trade. Their governing Acts on veritaszim are published as WORD files, not PDFs
+    # (Defence Act [Chapter 11:02], War Veterans Act [Chapter 11:15], Suppression of Foreign and
+    # International Terrorism Act [Chapter 11:21]). A Word file carries no reliable page count, and
+    # this set records a real page count for every document, so those files are NOT included — and
+    # that is stated here rather than faked with an invented page count. What IS included is what
+    # the same bodies publish as readable PDFs: the parliamentary committees' own reports on these
+    # departments, and the instruments and bills made under their Acts.
+    "def": [
+        {"id": "def-001", "section": "Committee report", "title": "Report of the Portfolio Committee on Defence, Home Affairs, Security Services and War Veterans' Affairs on the Petition from the Zimbabwe National Association of Liberation War Veteran Cadres Regarding the Amendment of the Veterans of the Liberation Struggle Act (S.C. 35, 2025)",
+         "publisher": "Parliament of Zimbabwe", "date": "2025",
+         "url": V + "REPORT%20ON%20THE%20PETITION%20FROM%20THE%20ZIMBABWE%20NATIONAL%20ASSOCIATION%20OF%20LIBERATION%20WAR%20VETERAN%20CADRES%20REGARDING%20THE%20AMENDMENT%20OF%20THE%20VETERANS%20OF%20THE%20LIBERATION%20STRUGGLE%20ACT.pdf"},
+        {"id": "def-002", "section": "Committee report", "title": "Report of the Portfolio Committee on Defence, Home Affairs, Security Services and War Veterans' Affairs on the Petition from the Children of War Veterans and Heroes' Dependants Forum on Economic Empowerment for War Veterans and their Dependants (S.C. 5, 2024)",
+         "publisher": "Parliament of Zimbabwe", "date": "2024",
+         "url": V + "Report%20on%20Chidren%20of%20War%20Veterans%20Petition.pdf"},
+        {"id": "def-003", "section": "Committee report", "title": "Report of the Portfolio Committee on Defence, Home Affairs, Security Services and War Veterans' Affairs on Statelessness of Migrants in Zimbabwe (S.C. 13, 2024)",
+         "publisher": "Parliament of Zimbabwe", "date": "2024",
+         "url": V + "Report%20on%20Statelessness%20of%20Migrants%20in%20Zimbabwe-Defence%20Committee.pdf"},
+        {"id": "def-004", "section": "Committee report", "title": "Report of the Portfolio Committee on Defence, Home Affairs, Security Services and War Veterans' Affairs on the Petition from Sam Parerenyatwa on Exhumation and Decent Reburials of Heroes and Heroines who Perished during the Liberation Struggle (S.C. 6, 2024)",
+         "publisher": "Parliament of Zimbabwe", "date": "2024",
+         "url": V + "Petition%20Report%20for%20Cde%20Sam%20Parerenyatwa%20%27s%20Petition.pdf"},
+        {"id": "def-005", "section": "Regulations", "title": "Defence (Regular Force) (Officers) (Amendment) Regulations, 2024 (No. 5) — S.I. 199 of 2024",
+         "publisher": "Government of Zimbabwe", "date": "2024",
+         "url": V + "SI%202024-199%20Defence%20%28Regular%20Force%29%20%28Officers%29%20%28Amendment%29%20Regulations%2C%202024%20%28No.%205%29.pdf"},
+        {"id": "def-006", "section": "Regulations", "title": "Defence (Regular Force) (Non-Commissioned Members) (Amendment) Regulations, 2024 (No. 8) — S.I. 198 of 2024",
+         "publisher": "Government of Zimbabwe", "date": "2024",
+         "url": V + "SI%202024-198%20Defence%20%28Regular%20Force%29%20%28Non-Commissioned%20Members%29%20%28Amendment%29%20Regulations%2C%202024%20%28No.%208%29.pdf"},
+        {"id": "def-007", "section": "General notice", "title": "Extension of Term of the Commander of the Zimbabwe Defence Forces — General Notice 15 of 2025, under the Defence Act [Chapter 11:02]",
+         "publisher": "Government of Zimbabwe", "date": "2025",
+         "url": V + "GN%202025-0005%20Extension%20of%20Term%20of%20the%20Commander%20of%20the%20Zimbabwe%20Defence%20Forces.pdf"},
+        {"id": "def-008", "section": "Bill", "title": "Zimbabwe National Defence University Bill, 2015 (H.B. 12, 2015)",
+         "publisher": "Government of Zimbabwe", "date": "2015",
+         "url": V + "Zimbabwe%20National%20Defence%20University%20-%20HB%2012-2015.pdf"},
+    ],
+    "mfa": [
+        {"id": "mfa-001", "section": "Committee report", "title": "Fourth Report of the Portfolio Committee on Foreign Affairs and International Trade on the 2021 First, Second, Third and Fourth Quarter Budget Performance Reports for the Ministry of Foreign Affairs and International Trade",
+         "publisher": "Parliament of Zimbabwe", "date": "2021",
+         "url": V + "REPORT%20OF%20THE%20PORTFOLIO%20COMMITTEE%20ON%20FOREIGN%20AFFAIRS%20AND%20INTERNATIONAL%20TRADE%20ON%20THE%202021%20BUDGET%20PERFOMANCE%20REPORTS%20FOR%20THE%20MINISTRY%20OF%20FOREIGN%20AFFAIRS%20AND%20INTERNATIONAL%20TRADE.pdf"},
+        {"id": "mfa-002", "section": "Committee report", "title": "First Report of the Portfolio Committee on Foreign Affairs on Attracting Foreign Direct Investment (S.C. 6, 2015)",
+         "publisher": "Parliament of Zimbabwe", "date": "2015",
+         "url": V + "First%20Report%20of%20The%20Portfolio%20Committee%20on%20Foreign%20Affairs%20on%20Attracting%20Foreign%20Direct%20Investment.pdf"},
+        {"id": "mfa-003", "section": "Committee report", "title": "Report of the Exchange Visit to Palestine by the Portfolio Committee on Foreign Affairs, 15–20 May 2016",
+         "publisher": "Parliament of Zimbabwe", "date": "2016",
+         "url": V + "Report%20of%20the%20May%202016%20Exchange%20Visit%20to%20Palestine%20by%20the%20Portfolio%20Committee%20on%20Foreign%20Affairs.pdf"},
+        {"id": "mfa-004", "section": "Committee report", "title": "Report of the Portfolio Committee on Foreign Affairs and International Trade on the Virtual Conference held with the Foreign Affairs Committee of the National People's Congress of the People's Republic of China, 26 May 2021",
+         "publisher": "Parliament of Zimbabwe", "date": "2021",
+         "url": V + "CHINA%20VIRTUAL%20CONFERENCE%20FINAL%20REPORT.pdf"},
+        {"id": "mfa-005", "section": "Committee report", "title": "Report of the Bilateral Visit to Russia by a Parliamentary Delegation led by the Speaker of the Parliament of the Republic of Zimbabwe",
+         "publisher": "Parliament of Zimbabwe", "date": "2022",
+         "url": V + "REPORT%20OF%20THE%20BILATERAL%20VISIT%20TO%20RUSSIA%20BY%20A%20PARLIAMENTARY%20DELEGATION%20LED%20BY%20SPEAKER%20OF%20THE%20PARLIAMENT%20OF%20THE%20REPUBLIC%20OF%20ZIMBABWE.pdf"},
+        {"id": "mfa-006", "section": "Committee report", "title": "Report on the Zimbabwe Parliamentary Delegation to Iran for the 6th International Conference in Support of the Palestinian Uprising, Teheran, 21–22 February 2017",
+         "publisher": "Parliament of Zimbabwe", "date": "2017",
+         "url": V + "REPORT%20ON%20THE%20ZIMBABWE%20PARLIAMENTARY%20DELEGATION%20TO%20IRAN%20FOR%20THE%206TH%20INTERNATIONAL%20CONFERENCE%20IN%20SUPPORT%20OF%20PALESTINIAN%20UPRISING.pdf"},
+        {"id": "mfa-007", "section": "Committee report", "title": "Report on the Parliamentary Delegation to the Osaka 2025 World Expo, 7–14 September 2025",
+         "publisher": "Parliament of Zimbabwe", "date": "2025",
+         "url": V + "REPORT%20ON%20THE%20PARLIAMENTARY%20DELEGATION%20TO%20THE%20OSAKA%202025%20WORLD%20EXPO.pdf"},
+        {"id": "mfa-008", "section": "Committee report", "title": "Report of the Delegation to the United Nations Office of Counter Terrorism High-Level Conference on Parliamentary Support to Victims of Terrorism, Rome, Italy, 7–8 June 2022",
+         "publisher": "Parliament of Zimbabwe", "date": "2022",
+         "url": V + "REPORT%20ITALY-%20HIGH%20LEVEL%20CONFERENCE%20ON%20PARLIAMENTARY%20SUPPORT%20TO%20VICTIMS%20OF%20TERRORISM%20FINAL.pdf"},
+    ],
+    # The Public Service Commission, and Zimbabwe's investment-promotion agency. The Public Service
+    # Act [Chapter 16:04] on veritaszim is also a WORD file (same reason as above, so not included);
+    # the commission's own Bills, the corporate-governance law it applies and the committees'
+    # reports on it ARE readable PDFs and are included. ZIDA's governing Act and the Special
+    # Economic Zones Act are both PDFs, so this department carries its full governing law.
+    "psc": [
+        {"id": "psc-001", "section": "Bill", "title": "State Service (Pensions) Bill, 2024 (H.B. 9, 2024)",
+         "publisher": "Government of Zimbabwe", "date": "2024",
+         "url": V + "H.B.%209%2C%202024%20State%20Service%20Pension%20Bill.pdf"},
+        {"id": "psc-002", "section": "Bill", "title": "Public Service Amendment Bill, 2025 (H.B. 8, 2025)",
+         "publisher": "Government of Zimbabwe", "date": "2025",
+         "url": V + "Public%20Service%20Amendment%20Bill%20H.B.%208%2C%202025.pdf"},
+        {"id": "psc-003", "section": "Governing law", "title": "Public Entities Corporate Governance Act [Chapter 10:31] (No. 4 of 2018)",
+         "publisher": "Government of Zimbabwe", "date": "2018",
+         "url": V + "PUBLIC%20ENTITIES%20CORPORATE%20GOVERNANCE%20ACT_0.pdf"},
+        {"id": "psc-004", "section": "Regulations", "title": "Public Entities Corporate Governance (General) Regulations, 2018 (S.I. 168 of 2018)",
+         "publisher": "Government of Zimbabwe", "date": "2018",
+         "url": V + "SI%202018-168%20Public%20Entities%20Corporate%20Governance%20%28General%29%20Regulations.pdf"},
+        {"id": "psc-005", "section": "Regulations", "title": "Date of Commencement: Public Entities Corporate Governance Act [Chapter 10:31] (S.I. 89 of 2018)",
+         "publisher": "Government of Zimbabwe", "date": "2018",
+         "url": V + "SI%202018%20-%2089%20Date%20of%20Commencement%20Public%20Entities%20Corporate%20Governance%20Act.pdf"},
+        {"id": "psc-006", "section": "Committee report", "title": "Joint Portfolio Committee on Public Service, Labour and Social Welfare and the Thematic Committee on Human Rights: Report on the Petition by the Of Touch Institution (S.C. 18, 2026)",
+         "publisher": "Parliament of Zimbabwe", "date": "2026",
+         "url": V + "JOINT-PORTFOLIO-COMMITTEE-ON-PUBLIC-SERVICE-LABOUR-AND-SOCIAL-WELFARE-AND-THE-THEMATIC-COMMITTEE-ON-HUMAN-RIGHTS-PETITION-BY-THE-OF-TOUCH-INSTITUTION.pdf"},
+        {"id": "psc-007", "section": "Committee report", "title": "Public Service, Labour and Social Welfare Portfolio Committee: First Report on the Administration of the Basic Education Assistance Module (S.C. 2, 2016)",
+         "publisher": "Parliament of Zimbabwe", "date": "2016",
+         "url": V + "Public%20Service%2C%20Labour%20and%20Social%20Welfare%20Portfolio%20Committee%20Report%20on%20the%20Administration%20of%20the%20Basic%20Education%20Assistance%20Module%20-%20SC%202-2016.pdf"},
+    ],
+    "zida": [
+        {"id": "zida-001", "section": "Governing law", "title": "Zimbabwe Investment and Development Agency Act [Chapter 14:37] (Act No. 10 of 2019)",
+         "publisher": "Government of Zimbabwe", "date": "2019",
+         "url": V + "Zimbabwe%20Investment%20and%20Development%20Agency%20Act%20-%20Act%2010-2019.pdf"},
+        {"id": "zida-002", "section": "Bill", "title": "Zimbabwe Investment and Development Agency Bill, 2019 (H.B. 2, 2019)",
+         "publisher": "Government of Zimbabwe", "date": "2019",
+         "url": V + "Zimbabwe%20Investment%20and%20Development%20Agency%20Bill%20-%20HB%202%2C%202019.pdf"},
+        {"id": "zida-003", "section": "Governing law", "title": "Special Economic Zones Act [Chapter 14:34] (No. 7 of 2016)",
+         "publisher": "Government of Zimbabwe", "date": "2016",
+         "url": V + "Special%20Economic%20Zones%20Act%20%5BChapter%2014-34%5D.pdf"},
+        {"id": "zida-004", "section": "Regulations", "title": "Zimbabwe Investment and Development Agency (Special Economic Zones) Regulations, 2023 (S.I. 226 of 2023)",
+         "publisher": "Government of Zimbabwe", "date": "2023",
+         "url": V + "SI%202023-226%20%20Zimbabwe%20Investment%20and%20Development%20Agency%20.pdf"},
+        {"id": "zida-005", "section": "Regulations", "title": "Zimbabwe Investment and Development Agency (Special Economic Zones) (Amendment) Regulations, 2026 (No. 1) (S.I. 18 of 2026)",
+         "publisher": "Government of Zimbabwe", "date": "2026",
+         "url": V + "SI%202026-018%20Zimbabwe%20Investment%20and%20Development%20Agency%20%28Special%20Economic%20Zones%29%20%28Amendment%29%20Regulations%2C%202026%20%28No.%201%29.pdf"},
+        {"id": "zida-006", "section": "Regulations", "title": "Zimbabwe Investment and Development Agency (General Investments) (Amendment) Regulations, 2026 (No. 1) (S.I. 17 of 2026)",
+         "publisher": "Government of Zimbabwe", "date": "2026",
+         "url": V + "SI%202026-017%20Zimbabwe%20Investment%20and%20Development%20Agency%20%28General%20Investments%29%20%28Amendment%29%20Regulations%2C%202026%20%28No.%201%29.pdf"},
+        {"id": "zida-007", "section": "Committee report", "title": "Report of the Joint Portfolio Committees on Industry and Commerce and on Foreign Affairs and International Trade on the Zimbabwe Investment and Development Agency Bill, 16 July 2019",
+         "publisher": "Parliament of Zimbabwe", "date": "2019",
+         "url": V + "PC%20Report%20on%20ZIDA%20Bill%20-%2016%20July%202019%20_0001.pdf"},
+        {"id": "zida-008", "section": "General notice", "title": "Amendment of a Special Economic Zone — General Notice 2086 of 2020, under the Zimbabwe Investment and Development Agency Act [Chapter 14:37]",
+         "publisher": "Government of Zimbabwe", "date": "2020",
+         "url": V + "GN%202086-2089%20SEZ%20Announcements.pdf"},
     ],
 }
 

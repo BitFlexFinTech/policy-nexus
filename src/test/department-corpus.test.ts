@@ -34,7 +34,7 @@ const SHIPPED = FILES.map((name) => ({
 }));
 
 /**
- * THE DEPARTMENT DOCUMENTS MUST BE REAL (Batch B2). The owner's one rule that never moves: real data
+ * THE DEPARTMENT DOCUMENTS MUST BE REAL (Batch B2 built departments 1-8; Batch B3 completed all 16). The owner's one rule that never moves: real data
  * only, never invented. These gates prove every built department ships a real, cited set of documents,
  * that a picture-only scan is recorded honestly rather than faked, that the set only ever covers real
  * departments, and that a failure to read a department's file degrades safely instead of breaking.
@@ -46,10 +46,13 @@ describe("the department document library", () => {
     vi.unstubAllGlobals();
   });
 
-  it("ships a real, cited set for every department that has been built", () => {
-    // Batch B2 builds departments 1 to 8; Batch B3 adds the rest. Every built set carries the
-    // agreed minimum (6 documents), and this test grows with the set.
-    expect(SHIPPED.length).toBeGreaterThanOrEqual(8);
+  it("ships a real, cited set for every department", () => {
+    // Batch B3 completes the set: all sixteen departments hold their own real published documents,
+    // and every set carries the agreed minimum (6 documents). The gate grows with the set — it now
+    // requires the whole country, not a subset, so a department whose documents silently disappear
+    // fails here instead of going unnoticed.
+    expect(SHIPPED.length).toBe(DEPARTMENT_IDS.length);
+    expect([...SHIPPED.map((corpus) => corpus.department)].sort()).toEqual([...DEPARTMENT_IDS].sort());
     for (const corpus of SHIPPED) {
       expect(corpus.documents.length, `${corpus.department} ships at least six documents`).toBeGreaterThanOrEqual(6);
     }

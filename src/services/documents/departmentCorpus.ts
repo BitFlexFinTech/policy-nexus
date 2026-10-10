@@ -1,5 +1,5 @@
 /**
- * THE DEPARTMENT DOCUMENT LIBRARY (Batch B2).
+ * THE DEPARTMENT DOCUMENT LIBRARY (Batch B2 built departments 1-8; Batch B3 completed all 16).
  *
  * The real published documents that belong to ONE department — its governing law, its sector
  * policy, the parliamentary committee's reports on it and the audits of it. They are the
