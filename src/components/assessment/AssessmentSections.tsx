@@ -375,7 +375,11 @@ export function InputRecord({ run }: { run: AssessmentRun }) {
           label="Departmental documents"
           value={
             run.documents && run.documents.length > 0
-              ? `${run.documents.length} supplied · ${run.documents.filter((document) => document.characters > 0).length} read`
+              ? `${run.documents.length} supplied · ${run.documents.filter((document) => document.characters > 0).length} read${
+                  run.documents.some((document) => document.unavailable)
+                    ? ` · ${run.documents.filter((document) => document.unavailable).length} no longer in the library`
+                    : ""
+                }`
               : "None added for this department"
           }
         />

@@ -325,6 +325,7 @@ export function PolicyInput() {
       <RunSimulationNotice
         open={noticeOpen}
         departmentName={department.shortName}
+        documentCount={department.documents.length}
         onOpenChange={handleNoticeOpenChange}
         onOpenLibrary={openLibraryFromNotice}
         onRun={runFromNotice}

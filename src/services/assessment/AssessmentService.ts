@@ -24,6 +24,7 @@ import {
   saveRunRequest,
 } from "./runStore";
 import { createRemoteAssessmentClient } from "./remoteAssessmentClient";
+import { rehydrateStoredRun } from "./runHydration";
 import type { AssessmentRequest, AssessmentRun } from "./types";
 
 /**
@@ -57,15 +58,19 @@ const createScenarioAssessmentService = (): AssessmentService => ({
     const id = saveRunRequest(request);
     // Rebuild from what was RECORDED, so the run handed back here carries the same recorded
     // moment — and therefore the same date — that the register and every screen will show.
+    // The stored run keeps only fingerprints per document, so its text is read back from the
+    // department's library here (Batch 0) before the engine builds the run.
     const stored = getRunRequest(id);
-    return Promise.resolve(buildScenarioRun(stored ?? request));
+    return Promise.resolve(buildScenarioRun(stored ? rehydrateStoredRun(stored) : request));
   },
   getRun: (runId) => {
     const stored = getRunRequest(runId);
-    return Promise.resolve(stored ? buildScenarioRun(stored) : undefined);
+    return Promise.resolve(stored ? buildScenarioRun(rehydrateStoredRun(stored)) : undefined);
   },
   listRuns: (departmentId) =>
-    Promise.resolve(listRunRequestsFor(departmentId).map((stored) => buildScenarioRun(stored))),
+    Promise.resolve(
+      listRunRequestsFor(departmentId).map((stored) => buildScenarioRun(rehydrateStoredRun(stored))),
+    ),
 });
 
 /**
@@ -131,14 +136,14 @@ export const buildSimulatedRun = (request: AssessmentRequest): AssessmentRun =>
 export const peekRun = (runId: string): AssessmentRun | undefined => {
   if (platformModeOf() !== "simulated" || liveService("assessment")) return undefined;
   const stored = getRunRequest(runId);
-  return stored ? buildScenarioRun(stored) : undefined;
+  return stored ? buildScenarioRun(rehydrateStoredRun(stored)) : undefined;
 };
 
 export const peekRuns = (departmentId?: DepartmentId | null): AssessmentRun[] | undefined => {
   if (platformModeOf() !== "simulated" || liveService("assessment")) return undefined;
   return listRunRequests()
     .filter((stored) => !departmentId || stored.departmentId === departmentId)
-    .map((stored) => buildScenarioRun(stored));
+    .map((stored) => buildScenarioRun(rehydrateStoredRun(stored)));
 };
 
 /**

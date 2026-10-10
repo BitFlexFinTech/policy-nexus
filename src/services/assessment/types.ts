@@ -92,6 +92,14 @@ export interface DepartmentDocumentInput {
   id: string;
   name: string;
   text: string;
+  /**
+   * The fingerprint recorded with the run. It is present only when this document was read BACK from
+   * the register rather than supplied live (see `runHydration.ts`). When it is present the seed uses
+   * it, never the text, so a run's identity cannot change because its document was later edited or
+   * removed. The register never stores the text itself (Batch 0), which is what keeps the browser's
+   * storage from filling up.
+   */
+  fingerprint?: string;
 }
 
 /** What a run recorded about one departmental document it was given. */
@@ -108,6 +116,18 @@ export interface RunDocumentRecord {
    * it is missing.
    */
   text?: string;
+  /**
+   * The fingerprint recorded with the run. Present when the run was read back from the register;
+   * it is what keeps the run's identity stable. Empty for a file that could only be recorded by
+   * name.
+   */
+  fingerprint?: string;
+  /**
+   * True when the run was recorded WITH this document's material, but the document is no longer in
+   * the department's library (removed, or its text changed since), so that material cannot be read
+   * back now. The run says so rather than quietly dropping the document (Batch 0).
+   */
+  unavailable?: boolean;
 }
 
 export interface SimulationRound {

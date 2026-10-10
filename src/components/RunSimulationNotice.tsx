@@ -39,12 +39,15 @@ import {
 export function RunSimulationNotice({
   open,
   departmentName,
+  documentCount,
   onOpenChange,
   onOpenLibrary,
   onRun,
 }: {
   open: boolean;
   departmentName: string;
+  /** The REAL number of documents the department's library holds, read from the register. */
+  documentCount: number;
   onOpenChange: (open: boolean) => void;
   onOpenLibrary: () => void;
   onRun: () => void;
@@ -55,7 +58,7 @@ export function RunSimulationNotice({
         <DialogHeader>
           <DialogTitle className="text-sm">{RUN_NOTICE_TITLE}</DialogTitle>
           <DialogDescription className="text-xs leading-relaxed">
-            {runNoticeBody(departmentName)}
+            {runNoticeBody(departmentName, documentCount)}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2 sm:justify-between">

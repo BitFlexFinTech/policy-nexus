@@ -54,6 +54,9 @@
  * 31. The administration screen clears this browser's saved data in one click (owner's instruction,
  *     2026-10-06) — the reset is composed in ONE place, forgets every store through its own seam, and
  *     sweeps the platform's shared key prefix so a store added later is cleared too.
+ * 50. BATCH 0 — the register keeps a REFERENCE and a FINGERPRINT per document (never the text), a
+ *     generated document is written once per run, and the evidence-status card reads its number from
+ *     the register rather than typing it.
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -2519,6 +2522,79 @@ if (!existsSync(cssPath)) {
     notes.push("INFO  the research library is ZEPARI's real published corpus — every publication on their three listing pages, each cited by title, publisher and date");
   }
   check("the research library is ZEPARI's real published documents, never a sample or an extract", problems);
+}
+
+// 50 — BATCH 0. Three promises made when the register's storage limit, the repeating model call and
+// the library's honesty were fixed. Each can be undone silently by a later session, so each is
+// pinned here:
+//   (a) the register keeps a REFERENCE and a FINGERPRINT per document, never the document's text —
+//       storing the text is what could fill the browser's storage and make runs vanish with no error;
+//   (b) a generated document is written ONCE per run, so re-opening it makes no second model call;
+//   (c) the evidence-status card's number is READ from the register, never typed, and its wording has
+//       one home — so the card and the library can never disagree.
+{
+  const problems = [];
+  const readIf = (rel) => (existsSync(join(ROOT, rel)) ? readFileSync(join(ROOT, rel), "utf8") : null);
+
+  // (a) the register keeps no document text.
+  const runStore = readIf("src/services/assessment/runStore.ts");
+  if (!runStore) {
+    problems.push("src/services/assessment/runStore.ts is missing");
+  } else {
+    if (!/interface StoredDocumentReference/.test(runStore)) {
+      problems.push("runStore.ts no longer defines StoredDocumentReference — the register must keep a reference per document");
+    }
+    if (!/documents\?:\s*StoredDocumentReference\[\]/.test(runStore)) {
+      problems.push("StoredRun.documents is no longer StoredDocumentReference[] — the register must keep references, not document inputs");
+    }
+    if (/documents\?:\s*DepartmentDocumentInput\[\]/.test(runStore)) {
+      problems.push("runStore.ts stores DepartmentDocumentInput[] again — a document's TEXT would be kept in the register");
+    }
+    if (!/documentFingerprint/.test(runStore)) {
+      problems.push("runStore.ts no longer fingerprints a document — a stored run could not reproduce its result");
+    }
+  }
+  const hydration = readIf("src/services/assessment/runHydration.ts");
+  if (!hydration || !/export const rehydrateStoredRun/.test(hydration)) {
+    problems.push("runHydration.ts is missing — the document text must be read back from the library when a screen needs it");
+  }
+  const seed = readIf("src/services/assessment/seed.ts");
+  if (!seed || !/export const documentFingerprint/.test(seed) || !/document\.fingerprint/.test(seed)) {
+    problems.push("seed.ts no longer reads a recorded document's fingerprint — a stored run's identity could move when its document changes");
+  }
+  const seam = readIf("src/services/assessment/AssessmentService.ts");
+  if (!seam || !/rehydrateStoredRun/.test(seam)) {
+    problems.push("AssessmentService.ts no longer rehydrates a stored run before building it");
+  }
+
+  // (b) a generated document is written once per run.
+  const generatedStore = readIf("src/services/documents/generatedDocumentStore.ts");
+  if (
+    !generatedStore ||
+    !/export const getStoredDocument/.test(generatedStore) ||
+    !/export const saveStoredDocument/.test(generatedStore)
+  ) {
+    problems.push("generatedDocumentStore.ts is missing — a generated document must be saved with its run so re-opening it costs nothing");
+  }
+  const hook = readIf("src/services/documents/useGeneratedDocument.ts");
+  if (!hook || !/getStoredDocument/.test(hook) || !/saveStoredDocument/.test(hook)) {
+    problems.push("useGeneratedDocument.ts no longer saves a document once per run and reuses it on a second visit");
+  }
+
+  // (c) the evidence-status card reads its number from the register; the wording has one home.
+  const notice = readIf("src/config/runNotice.ts");
+  if (!notice || !/libraryEvidenceLines = \(departmentName: string, documentCount: number\)/.test(notice)) {
+    problems.push("runNotice.ts no longer takes the library's document count as a parameter — the card's number must be read from the register, never typed");
+  }
+  const documentsPage = readIf("src/pages/Documents.tsx");
+  if (!documentsPage || !/libraryEvidenceLines\(department\.shortName, documents\.length\)/.test(documentsPage)) {
+    problems.push("Documents.tsx no longer renders the evidence card with the register's own count");
+  }
+
+  if (problems.length === 0) {
+    notes.push("INFO  Batch 0 holds: the register keeps no document text, a generated document is written once per run, and the evidence card reads its number from the register");
+  }
+  check("Batch 0 — the register keeps no document text, a generated document is written once per run, and the evidence card is honest", problems);
 }
 
 // summary

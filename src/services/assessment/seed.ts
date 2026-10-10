@@ -14,6 +14,28 @@ import { resolveLevers, type ScenarioLevers } from "./levers";
 import type { AssessmentRequest, DepartmentDocumentInput } from "./types";
 
 /**
+ * The per-document fingerprint: the document's id, the number of characters really read, and a
+ * short hash of its text. It changes the moment the text changes and it never contains the text,
+ * so it is what the register keeps IN PLACE OF the document (Batch 0 — see `runStore.ts`).
+ */
+export const documentFingerprint = (document: { id: string; text: string }): string =>
+  `${document.id}:${document.text.length}:${toSeedHex(hashString(document.text))}`;
+
+/**
+ * One line of the digest for one document, or `null` when it contributes nothing.
+ *
+ * A document read back from the register carries its recorded fingerprint, and that is used —
+ * never the text — so a stored run's identity cannot change because its document was edited or
+ * removed afterwards. A live document is digested from its own text, and one with no real text is
+ * dropped: a file recorded by name (a PDF in this build) reads nothing, so it must not change the
+ * run either.
+ */
+const seedDocumentLine = (document: DepartmentDocumentInput): string | null => {
+  if (typeof document.fingerprint === "string") return document.fingerprint || null;
+  return document.text.trim().length > 0 ? documentFingerprint(document) : null;
+};
+
+/**
  * A short, stable fingerprint of the departmental documents a run was given.
  *
  * The documents themselves are far too large to put in the seed — and the seed is displayed
@@ -23,12 +45,9 @@ import type { AssessmentRequest, DepartmentDocumentInput } from "./types";
  */
 const documentDigest = (documents?: DepartmentDocumentInput[]): string => {
   if (!documents || documents.length === 0) return "";
-  return [...documents]
-    // Only documents with real text are part of the examination. A file recorded by name
-    // (a PDF in this build) contributes nothing, so it must not change the run either —
-    // the platform reads nothing and the seed says nothing.
-    .filter((document) => document.text.trim().length > 0)
-    .map((document) => `${document.id}:${document.text.length}:${toSeedHex(hashString(document.text))}`)
+  return documents
+    .map(seedDocumentLine)
+    .filter((line): line is string => line !== null)
     .sort()
     .join("|");
 };

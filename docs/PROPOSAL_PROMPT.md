@@ -445,11 +445,14 @@ do not omit it to look authoritative.
   are the engineering record of exactly what is built and what is still simulated. They are internal
   documents and contain deployment and credential notes, so **do not hand them to the Minister, to
   ZEPARI or to Cabinet**. The document for that room is **Part 1 — the funding memo**.
-- **What the live site actually is today (re-checked 2026-10-07, at the end of the evening, after the ZEPARI landing page was given its own status band and the hover picture was moved below the page's chrome).**
-  The host `nzwisiso.bitflex.app` now serves the **2026-10-07 RESEARCH ENGINE build**
+- **What the live site actually is today (re-checked 2026-10-10, after Batch A published the current build and deleted the retired in-browser model from the live server).**
+  The host `nzwisiso.bitflex.app` now serves the **2026-10-10 Batch A build**
+  `assets/index-CbLJTe2e.js`
+  (`f27347d37a7cb40430344560435ede528668a406a10e9c0166ca679c60906be3`), byte-identical to the local
+  build. Before that, on 2026-10-07, it served the **2026-10-07 RESEARCH ENGINE build**
   `assets/index-DoddAYZ5.js`
-  (`58a9a2479a544288d58e9118c48d940097404718486de842bf5b9c15893df394`), which is byte-identical to the
-  local build, so **the live site is the build published on 2026-10-07** (the platform homepage rebuild — a new `/` homepage with the national story and both tools, the policy-simulation landing moved to `/simulation`, and the centred footer copyright — now opening with a **black-and-gold service bar holding only the two cards, at the very top under the Government header**, the home masthead the flag's black with a gold hairline; the ZEPARI landing page now carries its own status band, worded for the research product) — it shows the **live date and
+  (`58a9a2479a544288d58e9118c48d940097404718486de842bf5b9c15893df394`), then byte-identical to its
+  local build — that build was the platform homepage rebuild — a new `/` homepage with the national story and both tools, the policy-simulation landing moved to `/simulation`, and the centred footer copyright — now opening with a **black-and-gold service bar holding only the two cards, at the very top under the Government header**, the home masthead the flag's black with a gold hairline; the ZEPARI landing page now carries its own status band, worded for the research product — it shows the **live date and
   time** (read back from the served page in a real browser: "Today 4 October 2026 · 04:20"), carries the newly published indicator figures (275 published / 235 modelled), and it carries the authority line, the modelled
   agent population, the named sources (with the corrected sentence naming both publishers the stakeholder
   shares stand on), the official Coat of Arms, the favicon set, the Nzwisiso.ai

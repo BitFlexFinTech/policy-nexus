@@ -19,6 +19,7 @@ import { SCENARIO_ANCHOR_DATE } from "@/config/reference";
 import { findDepartment } from "@/config/departments";
 import { clearSession, signInToDepartment } from "@/session/session";
 import { clearRuns, getRunRequest, saveRunRequest } from "@/services/assessment/runStore";
+import { rehydrateStoredRun } from "@/services/assessment/runHydration";
 import { assessmentService, buildSimulatedRun } from "@/services/assessment/AssessmentService";
 import { buildLongReport, renderDocumentText } from "@/services/assessment/documents";
 
@@ -73,7 +74,9 @@ describe("a run's own date", () => {
     expect(stored!.recordedAt).not.toBe(SCENARIO_ANCHOR_DATE);
 
     // The run built from it reads that same moment, so the run and its documents agree.
-    const run = buildSimulatedRun(stored!);
+    // (A stored run keeps only fingerprints per document, so it is read back through the
+    // hydration seam before the engine builds it — Batch 0.)
+    const run = buildSimulatedRun(rehydrateStoredRun(stored!));
     expect(run.createdAt).toBe(stored!.recordedAt);
 
     const department = findDepartment("fin")!;

@@ -6,6 +6,7 @@ import { buildLongReport, buildPolicyDraft } from "@/services/assessment/documen
 import { buildImplementationPack } from "@/services/assessment/implementationPack";
 import type { AssessmentRun, GeneratedDocument } from "@/services/assessment/types";
 import { buildDraftingGrounding, type DraftingSource } from "./drafting";
+import { getStoredDocument, saveStoredDocument } from "./generatedDocumentStore";
 import { remoteDraftingClient } from "./remoteDraftingClient";
 
 import type { DocumentKind } from "@/services/assessment/types";
@@ -74,7 +75,7 @@ export const useGeneratedDocument = (
   // The run identifies the document: one run, one document of each kind.
   const key = run ? `${kind}:${run.id}` : "";
   const [fetched, setFetched] = useState<
-    { key: string; document?: GeneratedDocument; error?: string } | null
+    { key: string; document?: GeneratedDocument; error?: string; source?: DraftingSource } | null
   >(null);
 
   const serviceSource: DraftingSource = useMemo(
@@ -84,6 +85,14 @@ export const useGeneratedDocument = (
   const localSource: DraftingSource = useMemo(() => ({ producer: "local-generator" }), []);
 
   useEffect(() => {
+    // Written once per run (Batch 0): a document already saved with this run is reused, so
+    // re-opening it makes NO second call and shows the identical text. The reuse is guarded to
+    // live mode, so a document produced by a configured service is what is shown when it is live.
+    const saved = live && run ? getStoredDocument(run.id, kind) : undefined;
+    if (saved) {
+      setFetched({ key, document: saved.document, source: saved.source });
+      return;
+    }
     const client = live ? remoteDraftingClient() : null;
     if (!client || !run || !grounding || !key) {
       setFetched(null);
@@ -93,7 +102,10 @@ export const useGeneratedDocument = (
     client
       .generate({ kind, model: "", run, grounding })
       .then((document) => {
-        if (active) setFetched({ key, document });
+        if (!active) return;
+        // Save it with the run before showing it, so the next visit costs nothing.
+        saveStoredDocument({ runId: run.id, kind, document, source: serviceSource });
+        setFetched({ key, document, source: serviceSource });
       })
       .catch((error: unknown) => {
         if (active) {
@@ -101,13 +113,14 @@ export const useGeneratedDocument = (
             key,
             error:
               error instanceof Error ? error.message : "The drafting service could not be reached.",
+            source: serviceSource,
           });
         }
       });
     return () => {
       active = false;
     };
-  }, [live, key, kind, run, grounding]);
+  }, [live, key, kind, run, grounding, serviceSource]);
 
   if (!live) {
     // Live mode with no drafting service connected: show NOTHING rather than the local
@@ -127,7 +140,9 @@ export const useGeneratedDocument = (
       document: fetched.document ?? null,
       pending: false,
       error: fetched.error ?? null,
-      source: serviceSource,
+      // The source the document was actually produced by — recorded when it was saved, so a
+      // reused document still states who wrote it (Batch 0).
+      source: fetched.source ?? serviceSource,
     };
   }
   return { document: null, pending: true, error: null, source: serviceSource };

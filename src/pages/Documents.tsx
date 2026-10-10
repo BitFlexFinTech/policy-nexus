@@ -7,6 +7,7 @@ import {
 } from "@/config/departments";
 import { citedInstrumentLabel } from "@/config/instruments";
 import { formatReferenceDate } from "@/config/reference";
+import { LIBRARY_EVIDENCE_TITLE, libraryEvidenceLines } from "@/config/runNotice";
 import { useSession } from "@/session/useSession";
 import { RecordedDocumentDialog } from "@/components/documents/RecordedDocumentDialog";
 import { DepartmentDocumentsPanel } from "@/components/documents/DepartmentDocumentsPanel";
@@ -39,6 +40,29 @@ export default function Documents() {
         </p>
         <p className="mt-1 max-w-3xl text-xs text-muted-foreground">{department.description}</p>
       </header>
+
+      {/* Batch 0 — the evidence-status card. Its number is READ from the register above, never
+          typed, so the card and the library can never disagree (a gate holds this). The wording
+          lives in `src/config/runNotice.ts`, the single home shared with the before-you-run
+          notice and the line above the upload control. */}
+      <section
+        aria-labelledby="library-evidence-title"
+        className="max-w-3xl rounded-md border bg-primary/5 px-3 py-2"
+      >
+        <h3
+          id="library-evidence-title"
+          className="text-[10px] font-semibold uppercase tracking-wide text-foreground"
+        >
+          {LIBRARY_EVIDENCE_TITLE}
+        </h3>
+        <ul className="mt-1 space-y-1">
+          {libraryEvidenceLines(department.shortName, documents.length).map((line) => (
+            <li key={line} className="text-[10px] leading-relaxed text-muted-foreground">
+              {line}
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <ul className="space-y-1">
         {sortDocumentsByCitation(documents).map((doc) => (

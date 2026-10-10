@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Department } from "@/config/departments";
 import { formatReferenceDate } from "@/config/reference";
+import { libraryArchivePromise } from "@/config/runNotice";
 import { usePlatformConfig } from "@/config/usePlatformConfig";
 import { extractPolicyFile, isAcceptedPolicyFile } from "@/services/extraction/extractPolicyText";
 import {
@@ -134,6 +135,12 @@ export function DepartmentDocumentsPanel({ department }: { department: Departmen
         {isDepartmentDocumentStorePersistent()
           ? ""
           : " This browser refused to keep data between visits, so they last only until this page is closed."}
+      </p>
+
+      {/* Batch 0 — the third placement of the evidence-status card: one line above the upload
+          control, from the same single wording in `src/config/runNotice.ts`. */}
+      <p className="mt-2 max-w-3xl text-[10px] leading-relaxed text-muted-foreground">
+        {libraryArchivePromise(department.shortName)}
       </p>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">

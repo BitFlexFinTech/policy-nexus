@@ -798,11 +798,20 @@ const buildRun = (request: AssessmentRequest): AssessmentRun => {
             // department's own material (Batch 5). Only text that was really read is kept:
             // a file recorded by name keeps an empty string, so nothing implies it was read.
             const text = document.text.trim();
+            const hasFingerprint = typeof document.fingerprint === "string" && document.fingerprint !== "";
             return {
               id: document.id,
               name: document.name,
               characters: text.length,
               text,
+              // Present only on a run read back from the register, so a fresh run's record is
+              // exactly what it always was.
+              ...(typeof document.fingerprint === "string"
+                ? { fingerprint: document.fingerprint }
+                : {}),
+              // The run was recorded with this document's material, but it is no longer in the
+              // department's library — say so rather than quietly dropping it (Batch 0).
+              ...(hasFingerprint && text.length === 0 ? { unavailable: true } : {}),
             };
           })
         : undefined,

@@ -131,6 +131,12 @@ interface MaterialDocument {
   name: string;
   characters: number;
   text: string;
+  /**
+   * True when the run was recorded with this document's material, but the document is no longer in
+   * the department's library (removed, or changed since), so its material cannot be read back now.
+   * Stated plainly, never shown as "not read" as though it had never been given (Batch 0).
+   */
+  unavailable: boolean;
 }
 
 /** One of the department's stated priorities, and the sentence of the material that carries it. */
@@ -145,6 +151,8 @@ interface MaterialReading {
   documents: MaterialDocument[];
   /** Only those whose real text was read. */
   read: MaterialDocument[];
+  /** Documents the run was recorded with that are no longer in the department's library. */
+  unavailable: MaterialDocument[];
   /** Characters of real text read across all of them. */
   characters: number;
   /** The priorities the material's own wording carries, with the sentence that carries it. */
@@ -218,10 +226,12 @@ const readMaterial = (run: AssessmentRun, department: Department): MaterialReadi
       name: document.name,
       characters: document.characters,
       text: (document.text ?? "").trim(),
+      unavailable: document.unavailable === true,
     }))
     .sort((left, right) => left.name.localeCompare(right.name));
 
   const read = documents.filter((document) => document.text.length > 0);
+  const unavailable = documents.filter((document) => document.unavailable);
   const characters = read.reduce((total, document) => total + document.text.length, 0);
 
   const carried: MaterialEvidence[] = [];
@@ -239,7 +249,7 @@ const readMaterial = (run: AssessmentRun, department: Department): MaterialReadi
     }
   }
 
-  return { documents, read, characters, carried };
+  return { documents, read, unavailable, characters, carried };
 };
 
 /* ------------------------------------------------------------------------- */
@@ -413,9 +423,14 @@ export const buildPolicyDraft = (
     id: "situation-documents",
     heading: `${CLAUSE.situation}.4 The department's own material`,
     paragraphs:
-      material.read.length > 0
+      material.documents.length > 0
         ? [
             `The department supplied ${material.documents.length} of its own ${material.documents.length === 1 ? "document" : "documents"} through its Document Library, and ${material.read.length} of them were read for this policy — ${material.characters} characters of the department's own material. Each is listed at ${ANNEX.documents}, with what was and was not read.`,
+            ...(material.unavailable.length > 0
+              ? [
+                  `${material.unavailable.length === 1 ? "One document was" : `${material.unavailable.length} documents were`} recorded with an earlier run of this policy and ${material.unavailable.length === 1 ? "is" : "are"} no longer in the department's library, so ${material.unavailable.length === 1 ? "its" : "their"} material could not be read back now — ${material.unavailable.length === 1 ? "it is" : "they are"} shown at ${ANNEX.documents} as no longer held, not as never read.`,
+                ]
+              : []),
             "That material is the department's own record. Where it repeats one of the department's stated priorities, the sentence carrying that wording is quoted below, so a reader sees the department's own words rather than a summary of them.",
           ]
         : [
@@ -655,6 +670,11 @@ export const buildPolicyDraft = (
       material.documents.length > 0
         ? [
             `The department supplied ${material.documents.length} ${material.documents.length === 1 ? "document" : "documents"} of its own through its Document Library. ${material.read.length} of them were read — ${material.characters} characters — and a document that could not be read is listed below as recorded by name and contributes nothing, to this policy or to its preparation.`,
+            ...(material.unavailable.length > 0
+              ? [
+                  `A document the department no longer holds in its library is listed below as "no longer held": it was supplied when the run was recorded, and it is named here so the record is not lost, but its material could not be read back for this draft.`,
+                ]
+              : []),
             "Only text that was really read is counted or quoted, and only a sentence that carries one of the department's stated priorities is shown beside it. Quoted wording is the department's own, recorded as it was supplied: it is not presented as a published figure, and nothing in this policy is inferred from a filename.",
           ]
         : [
@@ -668,7 +688,11 @@ export const buildPolicyDraft = (
             columns: ["Document", "Read", "Characters", "Priority wording it carries"],
             rows: material.documents.map((document) => [
               document.name,
-              document.text.length > 0 ? "Read" : "Not read — recorded by name",
+              document.unavailable
+                ? "No longer held — recorded with the run"
+                : document.text.length > 0
+                  ? "Read"
+                  : "Not read — recorded by name",
               String(document.characters),
               material.carried
                 .filter((entry) => entry.documentName === document.name)

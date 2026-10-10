@@ -16,15 +16,34 @@ import { nowIso } from "@/lib/clock";
 import { SCENARIO_ANCHOR_DATE } from "@/config/reference";
 import { isDepartmentId } from "@/config/departments";
 import { createKeyValueStore } from "@/lib/browserStorage";
-import { runIdFor } from "./seed";
-import type { AssessmentRequest } from "./types";
+import { clearStoredDocuments } from "@/services/documents/generatedDocumentStore";
+import { documentFingerprint, runIdFor } from "./seed";
+import type { AssessmentRequest, DepartmentDocumentInput } from "./types";
 
 export const RUNS_STORAGE_KEY = "nzwisiso.runs.v1";
 
+/**
+ * A department's document as the REGISTER keeps it: a name, and the fingerprint taken when the run
+ * was recorded — never the text (Batch 0). Keeping the text here is what could fill the browser's
+ * storage and make runs vanish with no error; the text is read back from the department's library
+ * only when a screen genuinely needs it (see `runHydration.ts`).
+ */
+export interface StoredDocumentReference {
+  id: string;
+  name: string;
+  /** The fingerprint of the text that was read, or "" for a file recorded by name. */
+  fingerprint: string;
+}
+
 /** A persisted request plus its deterministic id. The moment it was recorded lives on the
  *  request itself (`recordedAt`), so a run and every document it produces read one date. */
-export interface StoredRun extends AssessmentRequest {
+export interface StoredRun extends Omit<AssessmentRequest, "documents"> {
   id: string;
+  /**
+   * A reference and a fingerprint per document — never the document's text. Absent when the run
+   * was given no departmental documents, so runs made before this existed are unchanged.
+   */
+  documents?: StoredDocumentReference[];
 }
 
 /* ------------------------------------------------------------------------- */
@@ -52,6 +71,40 @@ export const subscribeToRuns = (listener: () => void) => {
 
 const EMPTY: readonly StoredRun[] = Object.freeze([]);
 
+/**
+ * Turn whatever a stored document looks like into a reference, so the register NEVER keeps a
+ * document's text. A run recorded before Batch 0 stored the text; its fingerprint is derived here
+ * once and the text is dropped, so the shrink happens the first time the register is read. The
+ * fingerprint is what makes the run reproducible, so dropping the text changes nothing about it.
+ */
+const toStoredDocuments = (
+  documents: readonly unknown[] | undefined,
+): StoredDocumentReference[] | undefined => {
+  if (!documents || documents.length === 0) return undefined;
+  const references = documents
+    .filter(
+      (entry): entry is { id: string; name?: string; fingerprint?: string; text?: string } =>
+        Boolean(entry) &&
+        typeof entry === "object" &&
+        typeof (entry as { id?: unknown }).id === "string",
+    )
+    .map((entry) => {
+      const text = typeof entry.text === "string" ? entry.text : "";
+      const fingerprint =
+        typeof entry.fingerprint === "string" && entry.fingerprint
+          ? entry.fingerprint
+          : text.trim().length > 0
+            ? documentFingerprint({ id: entry.id, text })
+            : "";
+      return {
+        id: entry.id,
+        name: typeof entry.name === "string" ? entry.name : entry.id,
+        fingerprint,
+      };
+    });
+  return references.length ? references : undefined;
+};
+
 /** Defensive parse — a malformed entry is dropped rather than crashing a panel. */
 const parseRuns = (raw: string | null): readonly StoredRun[] => {
   if (!raw) return EMPTY;
@@ -72,13 +125,19 @@ const parseRuns = (raw: string | null): readonly StoredRun[] => {
       // A run stored before the platform kept a real date carries none. It is given the scenario
       // anchor date HERE, in one place, so every screen that shows a run's date is safe — the
       // defect this guards against was an administration page that blanked on an older run.
-      .map((entry) => ({
-        ...entry,
-        recordedAt:
-          typeof entry.recordedAt === "string" && entry.recordedAt
-            ? entry.recordedAt
-            : SCENARIO_ANCHOR_DATE,
-      }));
+      // The documents are rebuilt as references in the same pass, so no stored run keeps text.
+      .map((entry) => {
+        const { documents: storedDocuments, ...rest } = entry;
+        const documents = toStoredDocuments(storedDocuments as readonly unknown[] | undefined);
+        return {
+          ...rest,
+          recordedAt:
+            typeof entry.recordedAt === "string" && entry.recordedAt
+              ? entry.recordedAt
+              : SCENARIO_ANCHOR_DATE,
+          ...(documents ? { documents } : {}),
+        };
+      });
     return runs.length ? runs : EMPTY;
   } catch {
     return EMPTY;
@@ -120,7 +179,15 @@ export const getRunRequest = (runId: string): StoredRun | undefined =>
  */
 export const saveRunRequest = (request: AssessmentRequest): string => {
   const id = runIdFor(request);
-  const record: StoredRun = { ...request, id, recordedAt: nowIso() };
+  // The register keeps a reference and a fingerprint per document, never the text (Batch 0).
+  const { documents, ...rest } = request;
+  const storedDocuments = toStoredDocuments(documents);
+  const record: StoredRun = {
+    ...rest,
+    id,
+    recordedAt: nowIso(),
+    ...(storedDocuments ? { documents: storedDocuments } : {}),
+  };
   const existing = getRunsSnapshot().filter((run) => run.id !== id);
   const next = [record, ...existing].slice(0, 60);
   storage.write(RUNS_STORAGE_KEY, JSON.stringify(next));
@@ -135,5 +202,8 @@ export const clearRuns = (): void => {
   storage.remove(RUNS_STORAGE_KEY);
   cachedRaw = undefined;
   cachedRuns = EMPTY;
+  // A generated document belongs to its run, so clearing the register clears them together —
+  // otherwise a later run could reuse a document from a run that no longer exists (Batch 0).
+  clearStoredDocuments();
   emit();
 };
