@@ -8,8 +8,8 @@ deliberate scenario-mode implementations behind swappable seams.
 
 | Item | Current implementation | What is left | Where it is switched |
 |---|---|---|---|
-| Answering a research question | **THE OWNER'S INSTRUCTION (2026-10-07): the in-browser model is REMOVED COMPLETELY — *"we dont need it, it failed."*** The failure is measured, not an opinion: on the live site, asked the owner's own question, it took **282 seconds** and answered with **one fragment of one sentence** ("management of national resources"), because that model can only point at words that already exist. The engine becomes the **OpenRouter research key**, typed at the administration screen. | Batch 1 removes the model's code, its files, its build step and its gate, and takes its **53 MB off the live server**; Batch 2 loads ZEPARI's real corpus so the answer has substance. | `src/config/platform.ts` (`research`) · the key typed at `/platform-admin` |
-| The model files | **TO BE DELETED (owner's instruction).** `public/models/` holds about 53 MB — the 25.7 MB MobileBERT answering model and ONNX Runtime's 26 MB WebAssembly file — copied into `dist/` by the build and **currently sitting on the live server**. Batch 1 deletes the folder here, removes the files from the server, drops the `fetch:models` command and the `@huggingface/transformers` dependency, restores the build to plain `vite build`, and rewrites the build check so the model cannot come back. | Batch 1. After it, `dist/` is about 1.6 MB of application code and nothing else. | `scripts/fetch-models.mjs` (deleted) · `scripts/prune-dist.mjs` (deleted) |
+| Answering a research question | **THE OWNER'S INSTRUCTION (2026-10-07): the in-browser model is REMOVED COMPLETELY — *"we dont need it, it failed."*** The failure is measured, not an opinion: on the live site, asked the owner's own question, it took **282 seconds** and answered with **one fragment of one sentence** ("management of national resources"), because that model can only point at words that already exist. The engine becomes the **OpenRouter research key**, **built into the platform** — the owner's strict rule is that nothing is typed (see *"The two OpenRouter keys"* row below). | ✅ **DONE:** Batch 1 removed the model's code, its files, its build step and its gate (2026-10-09), and **Batch A took its 53 MB off the live server** (2026-10-10); Batch 2 loaded ZEPARI's real corpus (103 documents) so an answer has substance. | `src/config/platform.ts` (`research`) · the key still reachable at `/platform-admin` if it ever needs changing |
+| The model files | ✅ **DELETED — from the code 2026-10-09 (Batch 1, commit `1b4fee5`), from the LIVE SERVER 2026-10-10 (Batch A).** About 53 MB in all: the 26,903,231 B MobileBERT answering model (`…-ONNX/onnx/model_quantized.onnx`), ONNX Runtime's 26,861,777 B `ort-wasm-simd-threaded.asyncify.wasm`, the small tokenizer/config files, and three leftover model chunks the old build had left in `assets/` (`transformers.web-BNA0XoCc.js`, `transformers.web-CUHIBQwP.js`, `ort-wasm-simd-threaded.asyncify-CxOG5pUO.wasm`). The `models/` folder is no longer in the web-root listing and every one of those addresses now returns the site's 404 fallback. The `fetch:models` command, `scripts/fetch-models.mjs` and `scripts/prune-dist.mjs` are gone, the `@huggingface/transformers` dependency is removed, the build is plain `vite build`, and the build check fails if any of it returns. | Nothing further for the mock list. `dist/` is about 1.6 MB of application code plus the 9.4 MB corpus. | `scripts/fetch-models.mjs` (deleted) · `scripts/prune-dist.mjs` (deleted) |
 | The research library's depth | **2 demonstration extracts today** (`researchSample.ts`: the National Agriculture Policy Framework's nine pillars and the ICT policy's areas). **The owner's strict instruction: ZEPARI's public PDFs are ALL downloaded** — from `/publications/policy-briefs`, `/publications/research-studies` and `/publications/economic-barometer` on `zepari.co.zw`, every page of each listing — converted to text with **PyMuPDF** (already installed) and loaded with **title + publisher + date**, cited. | Batch 2: download, convert, load, and report every document and every dead link **by name**. Never an extract presented as the whole document again. | the corpus data files (text only — their PDFs are not committed) |
 | The drafted policy | **OFFLINE today: 28 parts, about 8,341–12,627 words — roughly 25–35 printed pages — and no page count is measured or gated anywhere.** The live path already exists: `liveService("drafting")` → `src/services/documents/remoteDraftingClient.ts`, which sends the run and the department's grounding and **rejects an answer that does not match the document's shape** rather than falling back silently. | Batch 3: measure the real printed-page count with the drafting key live, then assemble the instrument clause by clause to **a minimum of 40 printed pages** with real content — never padding — and gate it so it cannot regress. Report the number of model calls and tokens one drafted policy costs. | `src/config/platform.ts` (`drafting`) · the key typed at `/platform-admin` |
 | The two OpenRouter keys | **SAVED, PROVED, AND BUILT INTO THE PLATFORM — the owner's strict rule (2026-10-07): no manual entry, ever.** `OPENROUTER_KEY_RESEARCH` (ZEPARI) and `OPENROUTER_KEY_POLICY` (Nzwisiso) live in **`.env`** (gitignored, never committed, never printed), and are read at **build time** into the platform's own defaults, so **opening the site needs nothing typed** — this is his machine, his demo. Each key was tested with a real request: **HTTP 200 both**. He **rotates both after the demo**. | Batch 1 wires the baked defaults (`.env` gains the two `VITE_`-prefixed names, `DEFAULT_PLATFORM_CONFIG` goes live with them) and removes the typing step from every instruction. **The exposure is named and accepted:** a key inside a published site can be read by a visitor, the keys are demonstration keys rotated immediately afterwards, and the VPS will use a server-side proxy instead. | `src/config/platform.ts` (`DEFAULT_PLATFORM_CONFIG`) · `.env` |
@@ -387,17 +387,32 @@ which produced `assets/index-BrYtdYWT.js`, and the host was one build behind unt
 | FTP user | `nzwisiso@nzwisiso.bitflex.app` | cPanel account |
 | Transport | Explicit **FTPS** (AUTH TLS), port 21 | No SSH/SFTP daemon exists (22/2222/990 closed) |
 | SPA routing | `public/.htaccess` → `RewriteRule . /index.html [L]` | Shipped by Vite into `dist/`. Without it, refresh on `/app/**` 404s |
-| Server files to preserve | `cgi-bin/`, `.well-known/pki-validation/<token>.txt` | Never deploy with `mirror --delete` |
+| Server files to preserve | `cgi-bin/`, `.well-known/pki-validation/<token>.txt` | Never deploy with `mirror --delete`. `scripts/deploy.sh` may delete **only** `assets/index-<hash>.js` / `.css` files the site's own `index.html` no longer names, and it deletes nothing at all if it cannot read those names |
+| Stale bundle files | Removed by `npm run deploy` from 2026-10-10 | Before that, every past build's `assets/index-….js` stayed forever; after ~84 of them the account had **no room left** and the host began refusing writes (FTP `451`) — this was the root cause of a whole failed publishing session |
 | Credentials | **`.env`** (gitignored, mode 600): `FTP_HOST`, `FTP_USER`, `FTP_PASS`, `FTP_REMOTE_ROOT` | Added Phase Q so a cold session never has to ask again |
 
 **Redeploy command (no questions asked, reads the gitignored `.env`):**
 ```bash
-cd "policy-nexus" && npm run build
-set -a; . ./.env; set +a
-lftp -u "$FTP_USER","$FTP_PASS" "ftp://$FTP_HOST" -e \
-  'set ssl:verify-certificate no; set ftp:ssl-force true; set ftp:ssl-protect-data true;
-   mirror -R --verbose=1 dist .; bye'
+cd "policy-nexus" && npm run build && npm run deploy && npm run sync:check
 ```
+**`npm run deploy` was rewritten on 2026-10-10 (and this note replaces the old `lftp` snippet).** The
+previous one-liner used `lftp … mirror -R`, which on this host **hangs** — it would sit asleep with only
+the control connection open and never finish. It also never deleted, which is how the account filled up.
+The script now publishes with **`curl`** over the same explicit-FTPS connection and:
+- sends each file **slowly** (`--limit-rate`, default `2k`; override with `DEPLOY_RATE`), because this
+  host **silently truncates a fast upload** — a 73 KB file arrived as 16 KB, a 24 KB PNG as 8 KB;
+- **checks every file after it lands** (same size; same fingerprint for files under 64 KB, since
+  `index.html` can be rebuilt to the same size with different content) and finishes a part-sent file with
+  `curl -C -` rather than restarting it;
+- connects by the **resolved address**, because name resolution proved flaky under load;
+- **prunes** old `assets/index-<hash>.js|.css` files the site's `index.html` no longer names — with a
+  guard that deletes nothing if it cannot read those names.
+
+The two safety rules are unchanged: **the target is `/`** and **we never delete anything this build did
+not put there** (`cgi-bin/`, `.well-known/` remain untouched). Verified the same day: `bash -n` clean; a
+dry-run of the keep/delete decision kept the two live bundles and removed a simulated old one; a real run
+finished with **`removed 0 old bundle file(s)`** and nothing to upload; `npm run sync:check` printed
+**IN SYNC** with the served bundle's fingerprint matching the local build.
 
 **Credential status (updated in Phase Q):** the FTP credentials are stored in the **gitignored
 `.env`**, so the deploy is repeatable without asking. The password was supplied in plaintext in chat
