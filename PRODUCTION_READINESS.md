@@ -4,6 +4,17 @@ Every active mock, placeholder, or simulated capability in this build, what repl
 and where it is entered. **Updated every session.** Nothing here is a bug — these are
 deliberate scenario-mode implementations behind swappable seams.
 
+## ★ SAVED PLAN, 2026-10-10 — WHAT THE VPS UNLOCKS, AND WHAT IS DEFERRED
+
+The plan to build is the block at the very top of `PROJECT_STATUS.md`. Two things here matter for go-live:
+
+**What the VPS (a funded server) unlocks.** (a) The **API keys move server-side** — today the keys ship inside the built website, so a visitor can read one (acceptable only while these are the owner's demonstration keys, which he rotates); (b) the **register moves off the browser**, removing its storage limit; (c) the **full** document archives can be held (the demo keeps only 6–8 real documents per department, because the shared host has little space and a slow upload); (d) the **local models**; (e) a **server-side PDF reader**, so an officer's uploaded `.pdf` is really read.
+
+**What is real today, and what is still placeholder — counted in the code on 2026-10-10, not from memory.** REAL: the **research assistant** (ZEPARI's 103 published documents) and the **drafted policy** (written by the AI). PLACEHOLDER — and honestly labelled on screen: **236 of 510** department figures are modelled (276 published); **130 of 150** stakeholder shares are modelled (20 published); the **50** department register documents carry **no text**, so nothing is read from them; an officer's PDF is not read; the simulation is **our own deterministic model**, not agents.
+
+**Deferred and locked — never to be reported as working.** The **second re-run path** ("take the drafted policy back through the simulation") builds its request **without the department's documents**, so a run made that way ignores them; a demonstration uses only the labelled **"Re-run simulation"** control. See Batch G in `PROJECT_STATUS.md`.
+
+
 ## 0. THE RESEARCH ENGINE AND THE DRAFTED POLICY — WHAT IS REAL, AND WHAT THE OWNER HAS INSTRUCTED (plan saved 2026-10-07; the build starts in the next session)
 
 | Item | Current implementation | What is left | Where it is switched |
