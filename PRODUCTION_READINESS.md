@@ -142,7 +142,7 @@ client is registered.
 ## 6b. Verified clean in Phase D
 - `npm run validate` → **PASS — all checks green** (banned copy, predictive phrasing, vendor
   terminology, determinism, network URLs, 16 department ids, scenario anchor date, disclaimer).
-- Zero runtime network references in the built output (`grep -roE 'https?://' dist/index.html dist/assets/*.css` → 0).
+- Zero addresses in the built **markup and stylesheet** (`grep -roE 'https?://' dist/index.html dist/assets/*.css` → 0). *(Corrected 2026-10-11: this line used to read "Zero runtime network references in the built output", which overstates it — the stylesheet and markup carry no address, but the **script** does call the AI provider, so the built output as a whole is no longer address-free.)*
 
 ## 6c. Verified in a real browser (Phase H)
 - `npx playwright test` → **4/4 PASS** against the production `vite preview` build: home lists all
@@ -150,9 +150,12 @@ client is registered.
   Run Simulation → **Assessment Complete** → executive summary → metric drill-down →
   Print / Save-as-PDF / Download-Word (a real `…-executive-summary.doc` at the time — Phase X changed it to a real OOXML `.docx`) / Share · upload → the run
   records `source upload`.
-- Every browser test asserts **0 console errors, 0 uncaught page errors, and 0 off-origin requests** —
-  the built bundle provably makes **no runtime network call**, which is the strongest available form
-  of the mock-first / no-CDN guarantee.
+- Every browser test asserts **0 console errors, 0 uncaught page errors, and 0 off-origin requests**.
+  *(Corrected 2026-10-11: this used to conclude that "the built bundle provably makes **no runtime network
+  call**". That is no longer true and the conclusion was wrong — the journey makes no off-origin request
+  because **every live capability is off unless a key is entered**, and no test enters one. The bundle
+  itself does contain the AI provider's address and will call out the moment a key is set. What the tests
+  prove is the mock-first guarantee: **nothing is contacted when nothing is configured**.)*
 - Stated plainly: the **Phase H** journey was verified against the **local** production preview, and the
   deployment state recorded beside it at the time — that the live host was running the Phase D bundle —
   is **superseded**: the live host (`nzwisiso.bitflex.app`) was redeployed on 2026-09-28 and at that date
@@ -387,8 +390,10 @@ which produced `assets/index-BrYtdYWT.js`, and the host was one build behind unt
   is excluded as non-app stock code).
 - Google Fonts CDN: **removed** in Phase B. Inter and JetBrains Mono are now self-hosted from
   `public/fonts/` via `src/fonts.css`. Verified: `grep -roE 'https?://' dist/index.html
-  dist/assets/*.css` returns zero matches, so the built application makes no runtime network
-  request of any kind.
+  dist/assets/*.css` returns zero matches. *(Corrected 2026-10-11: this used to conclude "so the built
+  application makes no runtime network request of any kind" — that conclusion is false now that the AI
+  keys ship in the build. What the grep proves is narrower and still true: **no font and no stylesheet
+  is fetched from anywhere**.)*
 - Note on the fonts: Google served the *same* variable woff2 for every requested weight
   (confirmed by md5), so the build ships one file per family with the full weight axis declared,
   rather than four identical copies of Inter.

@@ -30,6 +30,38 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
 > **11. WHAT IS ALREADY BUILT AND WORKING.** 16 departments · 150 stakeholder groups · 510 reference indicators, each cited · **125 real published documents** across all 16 departments, read and cited, served from our own site · **ZEPARI's 103 real publications** (66 studies, 24 briefs, 13 barometers) · the deterministic scenario engine behind the `AssessmentService` seam · the drafted policy (29 parts, ~9,700 words for ICT) · the long-form report · the implementation pack · PDF and Word export · the relationship graph · the document library · the research assistant · the support desk · the admin screen · SSO built but not switched on · 53 validate checks · 650 tests · 36 browser tests.
 >
 
+> ## ★ PROGRESS LEDGER — WHAT IS ACTUALLY DONE, VERIFIED 2026-10-11 ("continue where you left off")
+>
+> **Item 1 — NOT DONE. IT IS WAITING ON THE OWNER'S SINGLE CLICK, AND IT HOLDS UP EVERYTHING BEHIND IT.** The sign-in was started (`gcloud auth application-default login`, asking for Drive + Sheets + Cloud access, and the browser did open with those permissions in its address); it is still sitting at the consent screen. **Nothing in Phase 0 or Phase 1 can finish until that click happens.**
+> **Plainly:** until then the Drive folder cannot be shared with the platform's own identity, and the pricing document cannot be read — so **no figure may be quoted from anywhere, and none is.**
+>
+> **Item 2 — DONE (built earlier, re-verified in this session): the platform has its OWN Google app.** Cloud project **`nzwisiso-policy-nexus`** (number 209774041654); the **Drive API, the Sheets API and IAM** are enabled on it; its own service account **`nzwisiso-drive@nzwisiso-policy-nexus.iam.gserviceaccount.com`**; its own key file **`~/.config/nzwisiso/service-account.json`** (created 2026-10-11 22:24, mode 600). **Evidence:** the key authenticates — `REFRESH: OK`. It is **not** the trading bot's identity and **not** any other project's.
+>
+> **Item 3 — BLOCKED on item 1, and the exact failure is known.** Tested directly with that key: opening the Drive folder `17eO0fAV2V7-5mtN164S79m68EHOTXMGB` returns **`404 File not found`**. The identity is right; the **share is missing**. Sharing needs the owner's one click.
+>
+> **Item 4 — DONE.** New global rule **`google-app-per-project.md`**, byte-identical in BOTH global rule folders (sha256 `3174fca7ee20770b8fc531117ac305b0e9e48dd05536b923afaf514bb4aaf0a0` in each), declared in `RULES-MANIFEST.json` with its 4 required markers → `check-rules.mjs` **PASS (16 passed, 0 failed, 26 rules declared)**. New registry **`~/.cline/GOOGLE_APPS.md`** (4 projects) and new checker **`~/.cline/rules/check-google-apps.mjs`**, **proved able to fail**: with this project's key moved inside the repository it FAILED; with SDATP given the same identity as this project it FAILED on all three sharing checks; the registry was then restored **byte-identical** (sha256 `f1749ee32af070083e9dc9a346ab279f80c48fe67725ecb31b4fbf0bb0ec5605` before and after).
+>
+> **Item 4's checker is RED — honestly — and this is the work it names.** `node ~/.cline/rules/check-google-apps.mjs` → **GOOGLE_APPS_FAIL (6 passed, 4 failed)**. The registry is correct; these four are real and must be migrated **one at a time, each verified** (fact 6):
+> 1. **Sovereign Digital Asset Treasury Pipeline** — no app of its own; borrows the machine-wide credential.
+> 2. **Kai Dolphin Studios** — the same shared credential as SDATP, so the two break on the same day.
+> 3. **latency-scalper** — borrows the trading bot's Cloud project `aws-bot-485323`; the key file it expects is not on this machine.
+> 4. **`1. Mercenta`** — uses Google but has no row at all.
+> *(A false positive was found and fixed while building the checker: a bare `googleapis` marker flagged four projects that merely mention Google Fonts; the marker now matches only a real import.)*
+>
+> **Item 9 — DONE. Every false statement named there is corrected AT SOURCE**, each marked with its correction date:
+> 1. the claim that a **40-page gate exists** — `PROJECT_STATUS.md` now says plainly **"NOT BUILT YET — nothing measures a page count today"** (item 24);
+> 2. the stale `src/session/sso.ts` header claiming the callback route and the claim→department mapping are missing — **both exist** (`/auth/callback` in `src/App.tsx`; `claimFrom` reading `department_id`); the header now says so and names the real gap (a registered identity provider);
+> 3. the proposal's, the deck's, the prompt's and the demo sheet's **"no network request at all / no external AI service is called"** — corrected in five files, keeping the sovereignty message and naming the engine sentence;
+> 4. **SDATP's "which refreshes itself"** — corrected at source and committed there on branch **`fix/stale-credential-note`** (SDATP sits on `main`, and an agent never commits to `main`);
+> 5. the stale **`PRODUCTION_READINESS.md`** rows claiming the built bundle "makes no runtime network call" — three rows corrected.
+> **One further false statement found and fixed while doing this:** `README.md` gave the dev address as **8080**; this project owns **5180** (`vite.config.ts`, `strictPort`).
+>
+> **Items 5–8 and 10–48 — NOT STARTED.** Item 10 (read the pricing document) is **BLOCKED on item 1**: it cannot be read without Drive access.
+>
+> **VERIFICATION LOG, this session (real output):** `npm run validate` **PASS — all checks green** · `npm run typecheck` **0** · `npm run lint` **0 errors, 7 pre-existing warnings** · `npm test` **650/650 across 72 files** · `npm run build` **✓ `assets/index-CKGYIErc.js`** · `node ~/.cline/rules/check-rules.mjs` **RULES_CHECK_PASS (16 passed, 0 failed, 26 rules declared)** · `node ~/.cline/rules/check-google-apps.mjs` **FAIL (6 passed, 4 failed — the migration list above)**.
+>
+> **PLAIN SUMMARY (OWNER-FACING).** Two things are finished and one thing needs you. Finished: the platform now has **its own Google identity** — its own account and its own key, named after the project — so it can never again be the thing that breaks when somebody else's login expires; and the rule saying **no two projects may share a Google identity** is now written, registered and checked on this machine. Twelve statements across the project's papers that had quietly become untrue (chief among them "it makes no network request at all", which stopped being true when the AI keys were built in) now say what is actually true. **What needs you is one click:** the browser sign-in that was started is still waiting for **Accept**. Until you accept it, I cannot put the Ministry's documents folder into the platform's own hands, and I cannot open the pricing sheet — so I will not quote a single figure, because quoting an unchecked figure is exactly the mistake this project has forbidden.
+>
 > ## PHASE 0 — ACCESS AND TRUTH *(nothing else can be trusted until this is done)*
 >
 > **1. THE OWNER'S ONE ACTION:** the assistant runs `gcloud auth application-default login`; **the owner clicks Accept once in the browser.** That is the only thing the owner does.
@@ -138,7 +170,7 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
 > | **Population weighting and support arithmetic** | **Never** — must be exact and repeatable |
 > | **Citations, titles, counts, dates** | **Never** — must be checkable |
 > | **Reading an uploaded PDF's text** | **Never** — a parser reads it; an AI can misread it |
-> | **The drafted policy's page count** | **Never** — measured and gated |
+> | **The drafted policy's page count** | **Never** — counted from the pages themselves, by a parser. *(**Honest correction, 2026-10-11:** the gate that would check the floor is **NOT BUILT YET** — nothing measures a page count today. See item 24.)* |
 >
 > ## WHERE WE ARE, VERIFIED — DO NOT RE-DERIVE
 > - **Batch A (publish + remove the model) is DONE and proven** — the full evidence is in the block below. The live site serves this exact build (`assets/index-CbLJTe2e.js`, sha256 `f27347d37a7cb40430344560435ede528668a406a10e9c0166ca679c60906be3`), the 53 MB in-browser model is deleted from the live server, and `npm run sync:check` reports **IN SYNC**.
@@ -186,7 +218,7 @@ Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE ri
 > - A department's documents stay **real and must not shrink** below the agreed count.
 > - Every document is **loaded and cited, or named as a failed link** — no silent gaps.
 > - The Document Library count equals **what was actually loaded**; the card's number equals it too.
-> - The drafted policy's **printed page count** is measured and gated at the floor (**never below 40 printed pages**; the floor is a floor, not a target).
+> - **TO BUILD (not built today — nothing measures a page count anywhere):** the drafted policy's **printed page count** is measured and gated at the floor (**never below 40 printed pages**; the floor is a floor, not a target). This is **item 24**; until it exists, no document may describe it as an existing check.
 > - A live answer that does not match the expected shape is **rejected**, never replaced by invented text.
 > - A generated document is **written once per run** and re-renders **identically**.
 > - **No figure without a named source**; the published-vs-modelled counts shown on screen are true.

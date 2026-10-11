@@ -23,7 +23,7 @@ Dear Honourable Minister, Members of the ZEPARI Board and Executive,
 
 1. Oreida Pvt Ltd respectfully submits this proposal for a pilot policy-simulation capability to be retained by the Ministry of Information Communication Technology, Postal and Courier Services, in partnership with ZEPARI, and put to work as a pilot for the **Digitalize Zimbabwe** initiative.
 
-2. The capability already exists and works. It is a browser-based platform, built and deployed, that lets a government department test a draft policy against a simulated population before the policy is implemented, and that produces structured findings for human review. It is not a concept, a mock-up or a promise: it runs today in an ordinary web browser and makes no network request at all.
+2. The capability already exists and works. It is a browser-based platform, built and deployed, that lets a government department test a draft policy against a simulated population before the policy is implemented, and that produces structured findings for human review. It is not a concept, a mock-up or a promise: it runs today in an ordinary web browser, its simulation needs no network connection, and the parts written by the AI are produced by the **Nzwisiso AI Policy Simulation Engine®** over an interface.
 
 3. What we are asking for is small and specific. We ask the Ministry to (a) endorse the platform as a pilot for the **Digitalize Zimbabwe** initiative, (b) fund the three named build steps that harden the demonstration for Government use, and (c) host the pilot inside the Ministry. We ask **ZEPARI** to (d) partner on the evidence base and the methods, and (e) endorse the platform as a pilot for ZEPARI's evidence-based policy work. Oreida Pvt Ltd seeks to partner with ZEPARI and the Ministry of ICT, and the two endorsements are sought together. The detail is set out in Part B, and the decision requested is repeated in a single page at Part C.
 
@@ -85,7 +85,7 @@ Mr Tadii Tendayi — Representative
 
 4.8 **Reproducibility is a design property, not a claim:** the same department and the same policy text always produce a byte-identical result. There is no randomness and no clock in the result, which is what makes a finding defensible in a meeting.
 
-4.9 **The assessment runs entirely in the reader's own browser.** The demonstration build makes **no network request at all** — no external AI service is called, no document text leaves the machine, and no third-party script is loaded. That is what makes it sovereign in operation: nothing is sent anywhere to be processed.
+4.9 **The simulation runs entirely in the reader's own browser.** The modelled population, every figure and every relationship are computed on the machine in front of the reader, and the simulation needs **no network connection at all** — no third-party script is loaded and no outside font is fetched, which is what keeps the demonstration sovereign in operation. The parts that are written by the AI — the drafted policy and the research answers — are produced by the **Nzwisiso AI Policy Simulation Engine®**, which the platform calls over an interface; on the Ministry's deployment that engine runs on **Oreida Pvt Ltd's own servers**, so no policy text is passed to a consumer AI service.
 
 4.10 **The governance boundary is built into the product.** The platform states, word for word, that it does not replace policymakers or determine policy outcomes, and that it provides an additional analytical lens to support informed human judgement. Every generated document carries a decision-support disclaimer.
 
@@ -156,7 +156,7 @@ Mr Tadii Tendayi — Representative
 
 10.2 **The specific risk of borrowing a national programme's or an institution's name.** The platform holds **no** endorsement from **Digitalize Zimbabwe**, the Ministry **or ZEPARI**. This proposal states that plainly, and obtaining those endorsements is part of the ask.
 
-10.3 **Data and sovereignty risk.** The demonstration makes no network request and no document text leaves the machine, which removes the risk of policy text being processed outside national custody.
+10.3 **Data and sovereignty risk.** The simulation is computed on the reader's own machine, and the AI-written parts are produced by the **Nzwisiso AI Policy Simulation Engine®**, which Oreida Pvt Ltd owns and which runs on Oreida Pvt Ltd's own servers on the Ministry's deployment — no policy text is passed to a consumer AI service, which removes the risk of policy text being processed outside national custody. *(Corrected 2026-10-11: this clause previously said the demonstration "makes no network request", which stopped being true once the AI keys were built into it.)*
 
 ### 11. Consultation
 

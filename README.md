@@ -42,7 +42,7 @@ self-hosted in `public/fonts/`.
 
 ```bash
 npm install
-npm run dev        # http://localhost:8080/
+npm run dev        # http://localhost:5180/  (this project OWNS 5180 — see vite.config.ts)
 npm run build
 npm test
 npm run validate && npm run typecheck && npm run lint

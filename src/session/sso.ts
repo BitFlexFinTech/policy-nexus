@@ -5,10 +5,17 @@
  * completely set up in platform administration. Until then the workspace keeps
  * its one-click simulated entry, labelled as such.
  *
- * STILL MISSING, and it cannot be written without a registered identity provider:
- *  1. a route to receive the provider's callback, and
- *  2. the mapping from the provider's claims to one of the 16 departments.
- * Both are specified in docs/SERVER_CONTRACT.md.
+ * WHAT WAS ONCE LISTED HERE AS MISSING IS NOW BUILT — corrected 2026-10-11, because the note had gone
+ * stale and was describing a gap that no longer existed:
+ *  1. the callback route EXISTS — `/auth/callback` in `src/App.tsx`, handled by `AuthCallback`;
+ *  2. the claim-to-department mapping EXISTS — `claimFrom` below, reading the claim named by the
+ *     `departmentClaim` setting (default `department_id`).
+ * Both are covered by tests (`src/test/auth-callback.test.tsx`, `src/test/sso.test.ts`).
+ *
+ * WHAT IS GENUINELY STILL MISSING is the one thing no code can supply: a REGISTERED identity provider to
+ * point these at. Until a provider is registered and its details are entered in platform administration,
+ * every entry point correctly reports "not configured". The server-side half — verifying the token's
+ * signature and mapping the department on our own server — is specified in docs/SERVER_CONTRACT.md §4.
  *
  * ON RANDOMNESS: PKCE needs an unpredictable verifier — a guessable one defeats
  * the protection entirely. `crypto.getRandomValues` is used for the state and the

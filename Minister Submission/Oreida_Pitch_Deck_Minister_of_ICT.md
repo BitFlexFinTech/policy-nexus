@@ -27,7 +27,7 @@ Keep this slide short. The point is the timing of the cost: after, instead of be
 - This is **not** a concept, a mock-up or a slideware promise. It is a built, deployed platform that runs today in an ordinary web browser.
 - It models **150 stakeholder groups** (40 per institution) and holds **510 reference indicators** across **16 government institutions**.
 - The same department and the same policy text always produce a **byte-identical** result — no randomness, no clock in the result.
-- It makes **no network request at all**: no external AI service, no third-party script, and no document text leaves the machine.
+- The simulation runs **entirely on the reader's own machine** — no third-party script and no outside font is ever fetched. The parts written by the AI come from the **Nzwisiso AI Policy Simulation Engine®**, which the platform calls over an interface and which runs on **Oreida Pvt Ltd's own servers** on the Ministry's deployment.
 
 ::: notes
 The differentiating claim is reproducibility plus sovereignty. Say both.
@@ -49,7 +49,7 @@ These are coverage figures, not proof of savings. Do not present them as outcome
 
 - We can demonstrate the whole journey today, on a machine the Ministry already owns, with no installation.
 - **Click order for a live run:** (1) choose a department; (2) pick a prepared draft; (3) press **Run Simulation**; (4) watch the modelled population and its relationships build up; (5) open the executive summary; (6) open the full assessment; (7) export to PDF or Word; (8) generate the drafted policy.
-- **If the network is unavailable:** the demonstration does not need it. The platform makes no network request, so it runs from the local build exactly as it does online.
+- **If the network is unavailable:** the simulation still runs in full, because it is computed on the reader's own machine. Only the AI-written parts (the drafted policy, the research answers) need the engine to be reachable — so **do the live demonstration with connectivity**. *(Corrected 2026-10-11: this bullet previously said the platform "makes no network request", which stopped being true once the AI keys were built in.)*
 
 ::: notes
 Rehearse this click order once before the meeting. Nothing here depends on connectivity.

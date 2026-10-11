@@ -73,10 +73,18 @@ Then open the address it prints (usually **http://localhost:4173/**).
 
 ## What to expect
 
-The site behaves identically with the network off. It makes **no network request at all** — no external
-AI service is called, no third-party script is loaded, no font is fetched from the internet (the fonts
-ship inside the site), and no document text leaves the machine. That is what makes it sovereign in
-operation.
+**The page loads and the simulation runs identically with the network off**: no third-party script is
+loaded, no font is fetched from the internet (the fonts ship inside the site), and the modelled
+population, every figure and every relationship are computed on this machine.
+
+**What does need the network is the AI-written parts** — the drafted policy and the research answers.
+Those are produced by the **Nzwisiso AI Policy Simulation Engine®** over an interface, so with the
+network off the drafting step is the one thing that cannot run.
+
+*(Corrected 2026-10-11: this section previously said the platform "makes **no network request at all**
+— no external AI service is called". That stopped being true once the AI keys were built into the
+platform, and leaving it here would have sent someone into a live demonstration with a step that cannot
+work.)*
 
 ## One small thing to know
 
@@ -89,12 +97,16 @@ address. Option B (`npm run preview`) handles this automatically.
 
 - [ ] `dist/` copied to the demonstration laptop.
 - [ ] Local server started; the root address opens the site.
-- [ ] Wi-Fi turned **off**; the page still loads.
+- [ ] Wi-Fi turned **off**; the page still loads and the simulation still runs.
 - [ ] One full journey run end to end (department → policy → run → assessment → export).
+- [ ] **Decide about the drafting step:** with Wi-Fi **off** the AI-written drafted policy cannot be
+      produced. Before the meeting, either leave Wi-Fi **on** for that step, or say plainly that it is
+      switched off for this run.
 - [ ] The live date shown on screen is the correct day.
 
 ---
 
-*Related: the platform's own rule that it makes no runtime network request is enforced by
-`src/test/network.test.ts` and `scripts/validate.mjs`; this sheet is the human procedure that puts the
-built site on a laptop with the network off.*
+*Related: what the platform is allowed to contact is enforced by `src/test/network.test.ts` and
+`scripts/validate.mjs` — specifically that **nothing is contacted when nothing is configured**; this
+sheet is the human procedure that puts the built site on a laptop and shows that the simulation itself
+needs no network.*

@@ -149,13 +149,14 @@ that it already runs on Government infrastructure or in the Government estate.**
 - **Reproducibility is a design property, not a claim**: the same department and the same policy
   text always produce a byte-identical result. There is no randomness and no clock in the result,
   which is what makes a finding defensible in a meeting.
-- **The assessment runs entirely in the reader's own browser.** The platform makes **no
-  network request at all** — no external AI service is called, no document text leaves the machine,
-  and no third-party script is loaded. That is what makes it **sovereign in operation**: nothing is
-  sent anywhere to be processed. It is also why the platform can be moved onto Government
-  infrastructure without being rebuilt — so the memo should **ask for that move**, not assert that
-  it has already happened. This is verifiable, and it is the platform's strongest governance
-  property.
+- **The simulation runs entirely in the reader's own browser.** The modelled population, every figure
+  and every relationship are computed on the reader's machine; no third-party script is loaded and no
+  outside font is fetched. The parts written by the AI are produced by the **Nzwisiso AI Policy
+  Simulation Engine®**, which the platform calls over an interface and which runs on **Oreida Pvt Ltd's
+  own servers** on the Ministry's deployment — so no policy text is passed to a consumer AI service.
+  That is what makes it **sovereign in operation**. *(Corrected 2026-10-11: this bullet previously said
+  the platform "makes no network request at all — no external AI service is called". That stopped being
+  true once the AI keys were built in, and it must not be repeated.)*
 - **Every run models a population of 2,000–3,200 simulated agents**, drawn as the relationships
   between the modelled groups. The platform states plainly what each drawn mark represents rather
   than overstating the picture, and it should keep doing so.
@@ -203,8 +204,9 @@ and do not rename it. The spelling the Government uses is **"Digitalize Zimbabwe
 - The Government has already decided *that* Zimbabwe will digitalise public administration, and the
   **National AI Strategy (June 2026)** sets the direction. What does not yet exist is a **working,
   sovereign example that the Ministry itself hosts**. Nzwisiso AI™ is exactly that, one step short:
-  it is not a concept or a mock-up, it runs today in a browser, it makes **no network request at
-  all**, and hosting it inside the Ministry is a small, named step — not a rebuild.
+  it is not a concept or a mock-up, it runs today in a browser with the
+  simulation computed on the reader's own machine, and hosting it inside the Ministry is a small, named
+  step — not a rebuild.
 - It answers the AI Strategy's own criteria in one product: applied AI in a public service
   (policy assessment), reproducible and reviewable, and keeping **every policy text and every
   result inside national custody** — the sovereignty property the programme is built on.
@@ -285,8 +287,8 @@ afford:
 3. **The problem it addresses** — policies are implemented without a structured way to examine
    likely stakeholder responses first; the cost of that is discovered after implementation.
 4. **What has already been delivered** — the verified facts above, stated plainly and without
-   inflation, including that it runs in a browser with no network request and is **not yet on
-   Government infrastructure**.
+   inflation, including that it runs in a browser with the simulation computed on the reader's own
+   machine and is **not yet on Government infrastructure**.
 5. **The pilot case — Digitalize Zimbabwe.** One short section arguing the fit, in the programme's
    own terms. State what Digitalize Zimbabwe is using **only** the verified facts above; name the
    programme's own workstreams this platform delivers against (services delivered digitally,
