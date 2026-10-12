@@ -3,6 +3,33 @@
 Source of truth for project state. **Read this FIRST at every session.**
 Statuses: `NOT STARTED` / `IN PROGRESS` / `DONE`. Notes describe what is TRUE right now.
 `DONE` only appears where it was verified in the same session it was written.
+> # ★★★★★ THE THREE PROJECTS — ONE LEDGER. **ADDED 2026-10-12, BECAUSE A SESSION NARROWED A THREE-PROJECT TASK TO ONE PROJECT AND THE OWNER HAD TO CATCH IT.** The owner's words: *"did you create and also amend the docs and everything we discussed for all 3 projects?"* — and *"why not? that was what you were supposed to do… this is unacceptable."* **The task was: bring the documents of all THREE projects onto one house format, give each the five-case spine, and create a Service Agreement for each.** One project was done and two were not. **This block exists so that can never be silently repeated.**
+>
+> **THE RULE THIS BLOCK ENFORCES.** Any session that claims a task *"for all 3 projects"* must **show all three rows changed**, with the files named. A session that works on one project **must update that project's row before it stops**, and must state plainly that the other two were not touched. **Never report a three-project task as done when one row is unchanged.**
+>
+> **THE LEDGER — VERIFIED FROM THE FOLDERS ON DISK, 2026-10-12** (paths: Nzwisiso `…/policy-nexus` · GovComms `…/6. GovComms` · SDATP `…/3. Sovereign Digital Asset Treasury Pipeline`)
+>
+> | Document type | Nzwisiso | GovComms | SDATP |
+> |---|---|---|---|
+> | Proposal | ✅ amended | ✅ **price applied 2026-10-12**, Drive byte-identical | ✅ figures synced 2026-10-12 |
+> | Pitch deck | ✅ markdown amended · ❌ **`.pptx` STALE (7 Oct)** | ✅ rebuilt, Drive identical | ✅ rebuilt (38 replacements) |
+> | Executive Justification Summary | ❌ **NOT CREATED** | ✅ exists | ⚠️ **A STUB — 2,475 chars, 0 tables** |
+> | **Service Agreement (the contract)** | ❌ **NOT CREATED** | ❌ **NOT CREATED** | ❌ **NOT CREATED** |
+> | Technical Specification | ❌ **NOT CREATED** | ❌ **NOT CREATED** | ✅ exists |
+> | Technical Capability Statement | ❌ **NOT CREATED** | ❌ **NOT CREATED** | ✅ exists |
+> | Research & Source Register | ❌ not created | ✅ exists (27 sources, 9 uncertainties) | ❌ not created |
+> | Cost-comparison table | ✅ created (read-only draft) | ❌ **NOT CREATED** | ❌ **NOT CREATED** |
+> | The five-case spine (strategic · economic · commercial · financial · management) | ❌ not applied | ❌ not applied | ❌ not applied |
+> | "Why this route" section | ❌ not written | ❌ not written | ❌ not written |
+> | Monitoring-and-evaluation plan | ❌ not written | ❌ not written | ❌ not written |
+> | Private-finance annex | ❌ not written | ❌ not written | ❌ not written |
+> | Tadii Tendayi annex (tailored per project) | ❌ not written | ❌ not written | ❌ not written |
+> | The shared generator (one generator, one content file per project) | ❌ not built | ✅ **the model to copy** (`_build/`) | ❌ its own scripts |
+>
+> **WHAT WAS ACTUALLY DONE ON 2026-10-12, PROJECT BY PROJECT — so the gap is never re-argued:** **Nzwisiso** — clause 7.1's ownership contradiction fixed; the hosting contradiction fixed across both documents; the price ($2,800,000 + $72,000) and the five payment steps applied; both costed sheets updated and read back; the evidence pack written; the mark swept ® → ™; the research tool named and marked; the `.docx` regenerated; two publisher defects fixed; the live site published and **`sync:check` IN SYNC**. **GovComms** — the decided price **$2,200,000 + $48,000** applied in `_build/content.py` (every denial statement removed), all four deliverables rebuilt, uploaded to Drive, and **`verify_drive.py` reports ALL 6 FILES BYTE-IDENTICAL**; its own locked rule lifted and the lift recorded in its `PROJECT_STATUS.md`. **SDATP** — the economic table's fleet hashrate unit fixed (**kSol/s → MSol/s, all three columns**), a **new `fleetHashrate` field added to `docs_lib.field_forms` and `figures-ledger.json` and to the proposal's required list**, `docs:sync` run one-way (**proposal 44 replacements · deck 38 across 9 slides · techspec 1 · onepager 8**), the ledger advanced to 2026-10-12, and **`validate:documents` 75/75 PASSED** (from 2 failures at baseline) — **with the new gate proved able to fail** (mutation → 1 of 75 failed → restored byte-identical `8b09121c44f69723` → green again).
+>
+> **⚠ BLOCKED, WITH THE EXACT MISSING INPUT — SDATP's DRIVE UPLOAD.** `docs:sync` rewrote the local copies and then died on Drive: **`invalid_grant: Token has been expired or revoked`**. The SDATP Google credential is dead (fact 4: the OAuth app sits in Google's "Testing" mode and the token dies every 7 days). **The local SDATP documents are correct and gated; the DRIVE copies still carry the old figures and the wrong unit.** **Missing input: a working Google credential for SDATP — its own app and its own key file, per `google-app-per-project.md`, entered by the owner once.** Nothing else closes it.
+
 > # ★★★ START HERE — THE PLAN TO BUILD NEXT. **SAVED 2026-10-11, on the owner's instruction: *"when i toggle act you do not actually build anything you just save the plan so i can open a new chat"* — and then *"continue where you left off"* in the NEW chat BUILDS IT.** This block is **the complete plan: 48 numbered items in 7 phases**, and it is the authority. **The older blocks below it are history, not instruction.**
 >
 > ## THE FACTS A COLD SESSION NEEDS — ALL VERIFIED 2026-10-11, DO NOT RE-DERIVE THEM
