@@ -15,7 +15,7 @@ drafted-policy series, which is **DONE**.
 
 ONE platform, TWO assistants:
 - **Nzwisiso Policy Simulation Assistant** (the department / government side — today's platform, unchanged).
-- **ZEPARI Policy Research Assistant** (the research side — ZEPARI's own evidence, answerable, publishable, discoverable).
+- **ZEPARI Research Assistant** (the research side — ZEPARI's own evidence, answerable, publishable, discoverable).
 
 They are kept **private to each other**, and share **only what a researcher deliberately publishes**,
 through a controlled bridge called **The Evidence Exchange**. The research side **never feeds a figure
@@ -64,7 +64,7 @@ privately, in the browser, free to run.*
 **Landing headline (recommended):** "Zimbabwe's economic evidence — from question to policy."
 *(Alternates: "Ask. Draft. Publish. Be found." · "One dashboard for Zimbabwe's policy research.")*
 
-**Standfirst:** "The ZEPARI Policy Research Assistant turns the institute's own evidence into answers,
+**Standfirst:** "The ZEPARI Research Assistant turns the institute's own evidence into answers,
 briefs and publications — and puts them in front of the people who make policy. One dashboard, from the
 first question to lasting impact."
 

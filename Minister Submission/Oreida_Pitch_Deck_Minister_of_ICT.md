@@ -27,7 +27,7 @@ Keep this slide short. The point is the timing of the cost: after, instead of be
 - This is **not** a concept, a mock-up or a slideware promise. It is a built, deployed platform that runs today in an ordinary web browser.
 - It models **150 stakeholder groups** (40 per institution) and holds **510 reference indicators** across **16 government institutions**.
 - The same department and the same policy text always produce a **byte-identical** result — no randomness, no clock in the result.
-- The simulation runs **entirely on the reader's own machine** — no third-party script and no outside font is ever fetched. The parts written by the AI come from the **Nzwisiso AI Policy Simulation Engine®**, which the platform calls over an interface and which runs on **Oreida Pvt Ltd's own servers** under the licence.
+- The simulation runs **entirely on the reader's own machine** — no third-party script and no outside font is ever fetched. The parts written by the AI come from the **Nzwisiso AI Policy Simulation Engine™**, which the platform calls over an interface and which runs on **Oreida Pvt Ltd's own servers** under the licence.
 
 ::: notes
 The differentiating claim is reproducibility plus sovereignty. Say both.

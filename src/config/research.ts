@@ -16,7 +16,7 @@
 import { NAME, PROMOTER, SERVICE_NOTICE } from "@/config/brand";
 
 /** The research product's name — plain, no registered mark (owner's decision). */
-export const RESEARCH_NAME = "ZEPARI Policy Research Assistant";
+export const RESEARCH_NAME = "ZEPARI Research Assistant";
 
 /** The institute whose work the assistant supports. */
 export const RESEARCH_INSTITUTION =
@@ -172,7 +172,7 @@ export const RESEARCH_BRIEF_SECTIONS: readonly string[] = [
 export const RESEARCH_HEADLINE = "Zimbabwe's economic evidence — from question to policy.";
 
 export const RESEARCH_STANDFIRST =
-  "The ZEPARI Policy Research Assistant turns the institute's own evidence into answers, briefs and " +
+  "The ZEPARI Research Assistant turns the institute's own evidence into answers, briefs and " +
   "publications — and puts them in front of the people who make policy. One dashboard, from the " +
   "first question to lasting impact.";
 
@@ -202,7 +202,7 @@ export const GOVERNMENT_PAGE = {
   ministryVisionBy: "Republic of Zimbabwe, Ministry of ICT, Postal and Courier Services",
   assistants: [
     { name: `${NAME} Policy Simulation Assistant`, role: "Test a draft policy before it is implemented." },
-    { name: "ZEPARI Policy Research Assistant", role: "The evidence behind the policy." },
+    { name: "ZEPARI Research Assistant", role: "The evidence behind the policy." },
   ],
   together: [
     "Evidence reaches the policy desk.",

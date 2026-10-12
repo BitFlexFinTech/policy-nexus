@@ -22,7 +22,7 @@ test.describe("the ZEPARI research assistant — the redesigned workspace", () =
     // The landing.
     await page.goto("/research");
     await expect(
-      page.getByRole("heading", { level: 1, name: "ZEPARI Policy Research Assistant" }),
+      page.getByRole("heading", { level: 1, name: "ZEPARI Research Assistant" }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Enter as Dr. Gibson Chigumira" })).toBeVisible();
     // The status band (owner's instruction, 2026-10-07): the ZEPARI landing page wears the same band

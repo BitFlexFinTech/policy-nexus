@@ -7,7 +7,7 @@ history and no clarifying questions. **Nothing in this plan has been built yet.*
 named below. Then build in the order in §4.
 
 ## 0. The owner's two complaints, in their words
-1. **"i told you to put the Nzwisiso AI™ Policy Simulation Assistant and ZEPARI Policy Research Assistant
+1. **"i told you to put the Nzwisiso AI™ Policy Simulation Assistant and ZEPARI Research Assistant
    cards at the very top so they don't disturb the content on the main homepage but they are still in the
    same place!"** — In the current build the home page's top band runs *title → standfirst → cards*, so the
    cards still sit BELOW the heading. They must be the very first thing on the page.

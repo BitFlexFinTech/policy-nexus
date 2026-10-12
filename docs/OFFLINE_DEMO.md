@@ -78,7 +78,7 @@ loaded, no font is fetched from the internet (the fonts ship inside the site), a
 population, every figure and every relationship are computed on this machine.
 
 **What does need the network is the AI-written parts** — the drafted policy and the research answers.
-Those are produced by the **Nzwisiso AI Policy Simulation Engine®** over an interface, so with the
+Those are produced by the **Nzwisiso AI Policy Simulation Engine™** over an interface, so with the
 network off the drafting step is the one thing that cannot run.
 
 *(Corrected 2026-10-11: this section previously said the platform "makes **no network request at all**

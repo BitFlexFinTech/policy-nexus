@@ -152,7 +152,7 @@ that it already runs on Government infrastructure or in the Government estate.**
 - **The simulation runs entirely in the reader's own browser.** The modelled population, every figure
   and every relationship are computed on the reader's machine; no third-party script is loaded and no
   outside font is fetched. The parts written by the AI are produced by the **Nzwisiso AI Policy
-  Simulation Engine®**, which the platform calls over an interface and which runs on **Oreida Pvt Ltd's
+  Simulation Engine™**, which the platform calls over an interface and which runs on **Oreida Pvt Ltd's
   own servers** on the Ministry's deployment — so no policy text is passed to a consumer AI service.
   That is what makes it **sovereign in operation**. *(Corrected 2026-10-11: this bullet previously said
   the platform "makes no network request at all — no external AI service is called". That stopped being
