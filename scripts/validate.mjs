@@ -60,6 +60,12 @@
  * 53. BATCH B4 — the department document register the screens read is GENERATED from the real
  *     published corpora, so a corpus that is rebuilt without regenerating the register fails the
  *     build instead of shipping a screen that describes documents differently from the documents.
+ * 54. THE MINISTER-FACING DOCUMENTS (the owner's plan, item 18) — the Word files in
+ *     `Minister Submission/` are generated from their markdown, so a Word file that no longer
+ *     says what its markdown says fails the build; a `$` left unescaped fails (pandoc reads
+ *     `$...$` as arithmetic and ate the currency symbol out of the price-comparison paragraph);
+ *     a clause number used twice fails; and the Executive Justification Summary is MEASURED at
+ *     one printed page, never assumed.
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -2784,6 +2790,36 @@ if (!existsSync(cssPath)) {
     notes.push(`INFO  ${said}`);
   }
   check("the department register is generated from the real published documents (Batch B4)", problems);
+}
+
+// check 54 — THE MINISTER-FACING DOCUMENTS ARE GENERATED FROM THEIR MARKDOWN, AND ARE CORRECT.
+// The markdown in `Minister Submission/` is the single source of truth for what the Ministry is
+// sent, and the Word files are generated from it. This re-runs that generator in check mode, so:
+//   * a Word file that no longer says what its markdown says fails the build, rather than going
+//     out with an old figure still in it;
+//   * a `$` left unescaped fails, because pandoc reads `$...$` as arithmetic — which is how
+//     `appraised at US$20 million and signed at US$10 million` reached the Minister's copy as
+//     `appraised at US20million**andsignedat**US10 million`, the currency symbol gone;
+//   * a clause number used twice fails (the proposal carried two clauses numbered 4.9);
+//   * the Executive Justification Summary is MEASURED, not assumed — it must print on ONE page.
+// Proved able to fail four ways on 2026-10-12 (mutate → FAIL → restore byte-identical).
+{
+  const problems = [];
+  const result = spawnSync("python3", ["scripts/build-minister-docx.py", "--check"], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  const said = `${result.stdout || ""}${result.stderr || ""}`.trim();
+  if (result.status !== 0) {
+    problems.push(said || "the Minister-facing documents could not be checked");
+  } else {
+    const lines = said.split("\n").filter((l) => l.startsWith("PASS") || l.startsWith("MINISTER_DOCS"));
+    notes.push(
+      `INFO  ${lines.length} document checks green — the Minister-facing Word files say exactly what their markdown says, no ` +
+        "`$` is eaten as arithmetic, no clause number is repeated, and the Summary is 1 printed page",
+    );
+  }
+  check("the Minister-facing documents are generated from their markdown, and are correct (item 18)", problems);
 }
 
 // summary

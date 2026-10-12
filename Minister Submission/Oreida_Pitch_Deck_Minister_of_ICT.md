@@ -143,14 +143,14 @@ Every figure is the price proposed by Oreida Pvt Ltd, not an approved cost. A fu
 
 # How this compares
 
-- Zimbabwe's Ministry of Finance had a financial-management system project appraised at **US$20 million** and signed at **US$10 million** — and the Government pays **approximately US$3 million a year** just to maintain that system *(World Bank, Zimbabwe: Public Financial Management Enhancement Project, ICR00005623, 4 February 2022)*.
-- Comparable national platforms built by other African governments cost **US$1.45 million to US$7.8 million** to design and build, with annual running of **US$155,000 to US$873,000** *(World Bank, Electronic Government Procurement — Implementation Types: Options for Africa, 2022, pages 99–110)*.
-- **Zimbabwe's own budget** allocated **US$1.7 million** to establishing **one** information system — the automated mining cadastre — in 2018, and it was **never spent** *(Government of Zimbabwe National Budget Statement 2019)*.
-- Our price sits **inside both published ranges**: a one-off of **US$2,800,000**, and **US$72,000 a month** that includes hosting, hardware, power, connectivity, support and updates — where the comparators' annual figures **excluded** hosting.
+- Zimbabwe's Ministry of Finance had a financial-management system project appraised at **US\$20 million** and signed at **US\$10 million** — and the Government pays **approximately US\$3 million a year** just to maintain that system *(World Bank, Zimbabwe: Public Financial Management Enhancement Project, ICR00005623, 4 February 2022)*.
+- Comparable national platforms built by other African governments cost **US\$1.45 million to US\$7.8 million** to design and build, with annual running of **US\$155,000 to US\$873,000** *(World Bank, Electronic Government Procurement — Implementation Types: Options for Africa, 2022, pages 99–110)*.
+- **Zimbabwe's own budget** allocated **US\$1.7 million** to establishing **one** information system — the automated mining cadastre — in 2018, and it was **never spent** *(Government of Zimbabwe National Budget Statement 2019)*.
+- Our price sits **inside both published ranges**: a one-off of **US\$2,800,000**, and **US\$72,000 a month** that includes hosting, hardware, power, connectivity, support and updates — where the comparators' annual figures **excluded** hosting.
 - The published record on building it yourself: large IT projects run **45% over budget on average**, and **18% of IT projects overrun by more than 50%** — those by **447%**.
 
 ::: notes
-Lead with Zimbabwe's own US$20 million appraisal and the US$3 million a year maintenance line: it is our own Government's own figure, published by the World Bank, and nobody can argue with it. Then the African band. Then the decisive point — our monthly includes hosting, hardware, power and connectivity that theirs excluded. Full citations: World Bank ICR00005623 (4 February 2022); World Bank, Electronic Government Procurement — Implementation Types: Options for Africa, 2022; Government of Zimbabwe National Budget Statement 2019; McKinsey & Company (2012); Journal of Management Information Systems, Vol 39, Issue 3.
+Lead with Zimbabwe's own US\$20 million appraisal and the US\$3 million a year maintenance line: it is our own Government's own figure, published by the World Bank, and nobody can argue with it. Then the African band. Then the decisive point — our monthly includes hosting, hardware, power and connectivity that theirs excluded. Full citations: World Bank ICR00005623 (4 February 2022); World Bank, Electronic Government Procurement — Implementation Types: Options for Africa, 2022; Government of Zimbabwe National Budget Statement 2019; McKinsey & Company (2012); Journal of Management Information Systems, Vol 39, Issue 3.
 :::
 
 
