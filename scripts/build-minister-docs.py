@@ -57,6 +57,8 @@ DOCUMENTS = (
     ("Oreida_Service_Agreement_Minister_of_ICT", False),
     ("Oreida_Technical_Capability_Statement", False),
     ("Oreida_Technical_Specification", False),
+    ("Oreida_Cost_Comparison", False),
+    ("Oreida_Appraisal_Annex", False),
 )
 
 # The pitch deck is a PowerPoint file, and it needs a different reader from the Word files:
