@@ -272,7 +272,7 @@ export const PLATFORM_HOME = {
       to: "/simulation",
     },
     research: {
-      name: "ZEPARI Research Assistant",
+      name: "ZEPARI Research Assistant™",
       role: "The evidence behind a policy, from ZEPARI's own research.",
       door: "Enter the research assistant",
       to: "/research",

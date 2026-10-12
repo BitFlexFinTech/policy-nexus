@@ -94,10 +94,22 @@ while IFS= read -r rel; do
     else
       [ "$(remote_size "$rel")" = "$want" ] && { done_it=1; break; }
     fi
-    RESUME=()
-    [ "$t" -gt 1 ] && RESUME=(-C -)
-    echo "  uploading $rel ($want B)…"
-    "${C[@]}" -m 2400 "${RESUME[@]}" -T "dist/$rel" "$BASE/$rel" >/dev/null 2>&1 || true
+    # TWO SEPARATE CALLS, NOT ONE WITH AN OPTIONAL FLAG (fixed 2026-10-12).
+    # The old form was:  RESUME=(); [ "$t" -gt 1 ] && RESUME=(-C -); ... "${RESUME[@]}" ...
+    # Under `set -u` (set at the top of this file) expanding an EMPTY array with `[@]` is an
+    # "unbound variable" error on the bash this machine ships (macOS bash 3.2 — it only became
+    # legal in bash 4.4). So the first attempt at EVERY file died before uploading anything, and a
+    # deploy could never finish. That is exactly what happened on 2026-10-12: the log ended with
+    # "line 100: RESUME[@]: unbound variable". Nothing was half-written — the error happens while
+    # the command line is being built, before curl runs — but the publish did not happen.
+    # Keep these two calls separate. Do not "tidy" them back into one line with a flag variable.
+    if [ "$t" -gt 1 ]; then
+      echo "  uploading $rel ($want B, resuming)…"
+      "${C[@]}" -m 2400 -C - -T "dist/$rel" "$BASE/$rel" >/dev/null 2>&1 || true
+    else
+      echo "  uploading $rel ($want B)…"
+      "${C[@]}" -m 2400 -T "dist/$rel" "$BASE/$rel" >/dev/null 2>&1 || true
+    fi
     sleep 3
   done
   [ "$done_it" = 1 ] || { echo "  !! FAILED to publish $rel"; FAILED=1; }

@@ -1348,7 +1348,7 @@ test("the drawing stays crisp at three card widths", async ({ page }) => {
     await researchLink.click();
     await expect(page).toHaveURL(/\/research$/);
     await expect(
-      page.getByRole("heading", { level: 1, name: "ZEPARI Research Assistant" }),
+      page.getByRole("heading", { level: 1, name: "ZEPARI Research Assistant™" }),
     ).toBeVisible();
     await expect(page.getByText(/cannot read any research/i)).toBeVisible();
 

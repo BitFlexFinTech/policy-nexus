@@ -7,16 +7,20 @@
  * AI-usage statement, the boundary between the two products, and the two researchers who enter it
  * in this demonstration.
  *
- * NO product mark is carried: the owner's instruction is that this demonstration uses the ZEPARI
- * name plainly, so ZEPARI can see it, and the registered mark is not asserted. See PROJECT_STATUS.md.
+ * MARK: the tool carries the UNREGISTERED mark — "ZEPARI Research Assistant™". The owner's instruction
+ * (2026-10-12) is that the pitch shows the intended product identity, mark and all, because this is a
+ * proposal put to ZEPARI and the Ministry and they are being shown what it will look like. The
+ * REGISTERED mark (the R-in-a-circle symbol) is still NOT asserted on the ZEPARI name, and
+ * `npm run validate` (check 33) fails the build if one is ever written into this file.
+ * See PROJECT_STATUS.md.
  *
  * DETERMINISM: plain authored data. No clock, no randomness.
  */
 
 import { NAME, PROMOTER, SERVICE_NOTICE } from "@/config/brand";
 
-/** The research product's name — plain, no registered mark (owner's decision). */
-export const RESEARCH_NAME = "ZEPARI Research Assistant";
+/** The research product's name — carries the unregistered mark, never the registered one. */
+export const RESEARCH_NAME = "ZEPARI Research Assistant™";
 
 /** The institute whose work the assistant supports. */
 export const RESEARCH_INSTITUTION =
@@ -172,7 +176,7 @@ export const RESEARCH_BRIEF_SECTIONS: readonly string[] = [
 export const RESEARCH_HEADLINE = "Zimbabwe's economic evidence — from question to policy.";
 
 export const RESEARCH_STANDFIRST =
-  "The ZEPARI Research Assistant turns the institute's own evidence into answers, briefs and " +
+  "The ZEPARI Research Assistant™ turns the institute's own evidence into answers, briefs and " +
   "publications — and puts them in front of the people who make policy. One dashboard, from the " +
   "first question to lasting impact.";
 
@@ -195,14 +199,14 @@ export const GOVERNMENT_PAGE = {
   hero: "From evidence to decision — one platform for Zimbabwe's policy work.",
   standfirst:
     `The ${NAME} Policy Simulation Assistant lets a department test a draft policy before it is ` +
-    "implemented. The ZEPARI Research Assistant provides the evidence behind it. Together they carry " +
+    "implemented. The ZEPARI Research Assistant™ provides the evidence behind it. Together they carry " +
     "a policy from research to decision — in step with Vision 2030 and the Ministry's own vision of " +
     "a connected, knowledge-based society with secure information systems by 2030.",
   ministryVision: "A connected knowledge-based society with secure information systems by 2030.",
   ministryVisionBy: "Republic of Zimbabwe, Ministry of ICT, Postal and Courier Services",
   assistants: [
     { name: `${NAME} Policy Simulation Assistant`, role: "Test a draft policy before it is implemented." },
-    { name: "ZEPARI Research Assistant", role: "The evidence behind the policy." },
+    { name: "ZEPARI Research Assistant™", role: "The evidence behind the policy." },
   ],
   together: [
     "Evidence reaches the policy desk.",
