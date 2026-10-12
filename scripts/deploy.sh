@@ -63,7 +63,14 @@ RATE="${DEPLOY_RATE:-2k}"
 # so which of the two we dial makes no difference to what gets published.
 HOST_IP="$(dig +short "$FTP_HOST" 2>/dev/null | head -1 || true)"
 BASE="ftp://${HOST_IP:-$FTP_HOST}"
-C=(curl -sS -k --ssl-reqd --ftp-pasv --limit-rate "$RATE" -u "$FTP_USER:$FTP_PASS")
+C=(curl -sS -k --ssl-reqd --ftp-pasv --ftp-create-dirs --limit-rate "$RATE" -u "$FTP_USER:$FTP_PASS")
+# `--ftp-create-dirs` was ADDED 2026-10-12 and must stay. Without it, any file inside a folder the
+# server does not already have fails with "550 Server denied you to change to the given directory",
+# and the file is silently never published. That is what happened to the whole `department-corpus/`
+# folder — sixteen data files the site fetches at runtime were never on the server, and because the
+# host answers any missing path with index.html, the script's size check saw the fallback page, called
+# it a mismatch, and retried the same impossible upload five times on every run. Measured on the day:
+# with the flag the same file landed whole (agri.json, 222,480 bytes, live size identical).
 
 remote_size() {
   "${C[@]}" -m 60 -I "$BASE/$1" 2>/dev/null | tr -d '\r' \
