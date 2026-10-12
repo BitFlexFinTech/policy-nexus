@@ -134,6 +134,9 @@ These four are the whole ask. Everything else is detail in the proposal document
 | | **One-off licence** — design, build, deployment and training | One-off | **2,800,000** |
 | | **Monthly service charge** — hosting, running, power, connectivity, support and updates | Recurring | **72,000 per month** |
 
+- **One price for both tools** — the policy-simulation assistant and the research assistant. **No per-tool charge and no per-officer charge.** Either can be used entirely on its own, and they complement each other.
+- Paid in **five part-payments as the work is accepted**: a **1,300,000 licence fee on signature** for software that already exists, a **500,000 mobilisation advance secured by a bank guarantee**, then **300,000 + 300,000 + 400,000** on acceptance of the three build steps.
+
 ::: notes
 Every figure is the price proposed by Oreida Pvt Ltd, not an approved cost. A full Treasury business case would follow an approval in principle. Everything in the list above is included in either the one-off licence or the monthly service charge — there is no separate charge for hosting, power, connectivity or training.
 :::

@@ -18,6 +18,15 @@ At the end of the term the platform and all data **revert to the Government**. F
 Nzwisiso: **$7,120,000**. Yearly running as a share of the one-off: Nzwisiso **30.9%**, GovComms
 **26.2%** — *(arithmetic done here, not a published figure)*.
 
+**One price, two tools — and this must be said in every document.** The licence and the monthly service
+charge cover **both** tools: the **policy-simulation assistant**, which tests a draft policy against the
+groups it reaches, and the **research assistant**, which turns ZEPARI's published evidence into answers,
+briefs and a policy brief. **Either can be used entirely on its own; they complement each other. Nothing
+is charged per tool and nothing is charged per officer.** The agreed payment steps for the 2,800,000:
+**1,300,000 licence fee on signature · 500,000 mobilisation advance against a bank guarantee · 300,000 +
+300,000 + 400,000 on written acceptance of the three build steps.** *(These are part-payments of the
+one-off, all inside the build period at the start — not years, and not the ten-year term.)*
+
 ---
 
 ## The one-paragraph answer to "is this reasonable?"
