@@ -25,7 +25,7 @@ Dear Honourable Minister, Members of the ZEPARI Board and Executive,
 
 2. The capability already exists and works. It is a browser-based platform, built and deployed, that lets a government department test a draft policy against a simulated population before the policy is implemented, and that produces structured findings for human review. It is not a concept, a mock-up or a promise: it runs today in an ordinary web browser, its simulation needs no network connection, and the parts written by the AI are produced by the **Nzwisiso AI Policy Simulation Engine®** over an interface.
 
-3. What we are asking for is small and specific. We ask the Ministry to (a) endorse the platform as a pilot for the **Digitalize Zimbabwe** initiative, (b) fund the three named build steps that harden the demonstration for Government use, and (c) host the pilot inside the Ministry. We ask **ZEPARI** to (d) partner on the evidence base and the methods, and (e) endorse the platform as a pilot for ZEPARI's evidence-based policy work. Oreida Pvt Ltd seeks to partner with ZEPARI and the Ministry of ICT, and the two endorsements are sought together. The detail is set out in Part B, and the decision requested is repeated in a single page at Part C.
+3. What we are asking for is small and specific. We ask the Ministry to (a) endorse the platform as a pilot for the **Digitalize Zimbabwe** initiative, (b) fund the three named build steps that harden the demonstration for Government use, and (c) approve the arrangement under which the platform is run and hosted for the Ministry by Oreida Pvt Ltd, under the public-private partnership and licence. We ask **ZEPARI** to (d) partner on the evidence base and the methods, and (e) endorse the platform as a pilot for ZEPARI's evidence-based policy work. Oreida Pvt Ltd seeks to partner with ZEPARI and the Ministry of ICT, and the two endorsements are sought together. The detail is set out in Part B, and the decision requested is repeated in a single page at Part C.
 
 4. We hold **no** endorsement from the Ministry, from ZEPARI or from any national programme for this platform. Obtaining those endorsements is precisely part of what is being requested.
 
@@ -45,11 +45,11 @@ Mr Tadii Tendayi — Representative
 
 ### 1. Recommendation
 
-1.1 That the Ministry approve a **pilot** of the Nzwisiso AI™ policy-simulation platform, endorsed as a pilot for the **Digitalize Zimbabwe** initiative, hosted inside the Ministry, and funded for the three named build steps below, **in partnership with ZEPARI**, whose endorsement of the platform as a pilot for ZEPARI's evidence-based policy work is sought at the same time.
+1.1 That the Ministry approve a **pilot** of the Nzwisiso AI™ policy-simulation platform, endorsed as a pilot for the **Digitalize Zimbabwe** initiative, run and hosted for the Ministry by **Oreida Pvt Ltd** under the public-private partnership and licence, and funded for the three named build steps below, **in partnership with ZEPARI**, whose endorsement of the platform as a pilot for ZEPARI's evidence-based policy work is sought at the same time.
 
 1.2 That the pilot be assessed on the results of **one institution, one policy question and one run**, before any national rollout is committed to.
 
-1.3 That the Ministry, if it approves in principle, direct the pilot to begin with the three build steps named at paragraph 9.2 — namely server-side document text extraction, server-side identity verification, and deployment onto Government infrastructure.
+1.3 That the Ministry, if it approves in principle, direct the pilot to begin with the three build steps named at paragraph 9.2 — namely server-side document text extraction, server-side identity verification, and deployment to a production service under service levels.
 
 ### 2. Background
 
@@ -99,13 +99,13 @@ Mr Tadii Tendayi — Representative
 
 5.4 In June 2026 the Government launched the **National Artificial Intelligence Strategy**, whose named priority sectors are **healthcare, agriculture, education and financial inclusion**, and which commits to AI that reflects Zimbabwe's linguistic and cultural diversity.
 
-5.5 The Government has therefore already decided that Zimbabwe will digitalise public administration, and the AI Strategy sets the direction. What does not yet exist is a **working, sovereign example that the Ministry itself hosts**. This platform is exactly that, one step short.
+5.5 The Government has therefore already decided that Zimbabwe will digitalise public administration, and the AI Strategy sets the direction. What does not yet exist is a **working, sovereign example that the Ministry itself can put to work**. This platform is exactly that, one step short.
 
 5.6 The platform answers the programme's own criteria in one product: applied AI in a public service (policy assessment); reproducible and reviewable results; and **every policy text and every result kept inside national custody** — the sovereignty property the programme is built on.
 
 5.7 What is proposed is a **pilot**: one institution, assessed on its results, before any national rollout is committed to. This is a proposal put to the programme's owners, **not** an announcement of their decision. The Ministry holds **no** endorsement of this platform, and obtaining one is part of the ask.
 
-5.8 **ZEPARI — the research partner.** **ZEPARI** is the **Zimbabwe Economic Policy Analysis and Research Institute**, an autonomous economic policy analysis and research think-tank established in 2003 by a Deed of Trust. Its stated mission is to conduct applied economic policy analysis, research and capacity building to promote a culture of evidence-based policy making in Zimbabwe. That is precisely the evidence base this platform consumes, which is why Oreida Pvt Ltd seeks to partner with ZEPARI: the Ministry hosts the capability, and ZEPARI owns the evidence and the methods independently. ZEPARI is asked to partner, and to endorse the platform as a pilot for its evidence-based policy work. ZEPARI holds **no** endorsement of this platform today, and obtaining one is part of the ask.
+5.8 **ZEPARI — the research partner.** **ZEPARI** is the **Zimbabwe Economic Policy Analysis and Research Institute**, an autonomous economic policy analysis and research think-tank established in 2003 by a Deed of Trust. Its stated mission is to conduct applied economic policy analysis, research and capacity building to promote a culture of evidence-based policy making in Zimbabwe. That is precisely the evidence base this platform consumes, which is why Oreida Pvt Ltd seeks to partner with ZEPARI: the Ministry puts the capability to work, and ZEPARI owns the evidence and the methods independently. ZEPARI is asked to partner, and to endorse the platform as a pilot for its evidence-based policy work. ZEPARI holds **no** endorsement of this platform today, and obtaining one is part of the ask.
 
 ### 6. Governance and legal position
 
@@ -121,34 +121,40 @@ Mr Tadii Tendayi — Representative
 
 ### 8. Financial implications
 
-8.1 The tables below separate one-off costs from recurring costs. Every figure is an `[ASSUMPTION — to be confirmed]` and none is presented as approved. A full Treasury business case is not part of this proposal and would be produced after an approval in principle, if required.
+8.1 The tables below separate the one-off licence from the recurring service charge. **The price is the price proposed by Oreida Pvt Ltd, stated in United States dollars; it is not approved, and the payment milestones are to be agreed in the Service Agreement.** A full Treasury business case is not part of this proposal and would be produced after an approval in principle, if required. *(Corrected 2026-10-12: every figure in this section previously read `[ASSUMPTION — to be confirmed]`; the prices stated below are now the ones proposed.)*
 
 8.2 **The proposed funding route.** No single budget should carry the whole cost, so the proposal spreads it across four named, matched routes. Each is a **proposed** route — the route is what is being recommended, not an agreement already in place — and each remains a `[QUESTION — needs a decision]` until the office named confirms it.
 
 | # | What it pays for | Proposed route |
 |---|---|---|
-| 8.3 | The build — the three named build steps | The Ministry of ICT, through **Treasury**, or the **POTRAZ Universal Service Fund** |
+| 8.3 | The licence and the three named build steps | The Ministry of ICT, through **Treasury**, or the **POTRAZ Universal Service Fund** |
 | 8.4 | Capacity — training officers and transferring know-how | **ZEPARI**, with **ACBF** (the African Capacity Building Foundation) |
 | 8.5 | The pilot study — one institution, one policy question, one run | A **development partner ZEPARI already works with** — UNDP, the African Development Bank, the World Bank or USAID `[QUESTION — needs a decision]` |
 | 8.6 | The first sector pilot — applying the tool to one industry | The **Chamber of Mines of Zimbabwe** or the **Confederation of Zimbabwe Industries (CZI)** |
 
-8.7 **The cost table.** One-off costs are separated from recurring costs; every figure is an `[ASSUMPTION — to be confirmed]` and none is presented as approved.
+8.7 **The cost table.** The one-off licence is separated from the recurring service charge. The figures are the prices proposed by Oreida Pvt Ltd; they are not approved.
 
-| # | Item | Type | Estimate (USD) | Estimate (ZWG) |
-|---|---|---|---|---|
-| 8.8 | Server-side document text extraction (build step 1) | One-off | [ASSUMPTION — to be confirmed] | [ASSUMPTION — to be confirmed] |
-| 8.9 | Server-side identity verification (build step 2) | One-off | [ASSUMPTION — to be confirmed] | [ASSUMPTION — to be confirmed] |
-| 8.10 | Deployment onto Government infrastructure (build step 3) | One-off | [ASSUMPTION — to be confirmed] | [ASSUMPTION — to be confirmed] |
-| 8.11 | Pilot delivery (one institution, one policy question, one run) | One-off | [ASSUMPTION — to be confirmed] | [ASSUMPTION — to be confirmed] |
-| 8.12 | Hosting inside the Ministry | Recurring | [ASSUMPTION — to be confirmed] | [ASSUMPTION — to be confirmed] |
-| 8.13 | Support and maintenance | Recurring | [ASSUMPTION — to be confirmed] | [ASSUMPTION — to be confirmed] |
-| 8.14 | Training of officers | Recurring | [ASSUMPTION — to be confirmed] | [ASSUMPTION — to be confirmed] |
+| # | Item | Type | Price (USD) |
+|---|---|---|---|
+| 8.8 | Server-side document text extraction (build step 1) | One-off | Included in the licence |
+| 8.9 | Server-side identity verification (build step 2) | One-off | Included in the licence |
+| 8.10 | Deployment to a production service under service levels (build step 3) | One-off | Included in the licence |
+| 8.11 | Pilot delivery (one institution, one policy question, one run) | One-off | Included in the licence |
+| 8.12 | Hosting and running the platform, by Oreida Pvt Ltd | Recurring | Included in the monthly service charge |
+| 8.13 | Support and maintenance | Recurring | Included in the monthly service charge |
+| 8.14 | Training of officers | Recurring | Included in the monthly service charge |
+| — | **One-off licence** — design, build, deployment and training | One-off | **2,800,000** |
+| — | **Monthly service charge** — hosting, running, power, connectivity, support, maintenance and updates | Recurring | **72,000 per month** |
+
+8.15 The licence is for a term of **ten years, reviewed at the fifth year**, and at the end of the term the platform and all data revert to the Government. The Service Agreement sets out the payment milestones, the service levels and the indexation.
+
+8.16 **How this price compares with published figures.** Zimbabwe's own Ministry of Finance had a financial-management project appraised at **US$20 million** and signed at **US$10 million**, and the Government pays **approximately US$3 million a year** to maintain that system alone *(World Bank, Zimbabwe: Public Financial Management Enhancement Project, report ICR00005623, 4 February 2022)*. Comparable national platforms built by other African governments cost **US$1.45 million to US$7.8 million** to design and build, with annual running of **US$155,000 to US$873,000** *(World Bank, Electronic Government Procurement — Implementation Types: Options for Africa, 2022)*. This licence and its service charge sit inside both ranges.
 
 ### 9. Implementation approach and timeframe
 
 9.1 The approach is phased, and the **pilot institution is named as the first milestone**.
 
-9.2 **The three build items come first:** (a) server-side document text extraction; (b) server-side identity verification; and (c) deployment onto Government infrastructure.
+9.2 **The three build items come first:** (a) server-side document text extraction; (b) server-side identity verification; and (c) deployment to a production service under service levels.
 
 9.3 Phases: approval in principle; then the three build items; then the pilot at one institution on one policy question; then a review of the pilot's results; then, only if the review supports it, consideration of a wider rollout. Every date is an `[ASSUMPTION — to be confirmed]`.
 
@@ -158,7 +164,7 @@ Mr Tadii Tendayi — Representative
 
 10.2 **The specific risk of borrowing a national programme's or an institution's name.** The platform holds **no** endorsement from **Digitalize Zimbabwe**, the Ministry **or ZEPARI**. This proposal states that plainly, and obtaining those endorsements is part of the ask.
 
-10.3 **Data and sovereignty risk.** The simulation is computed on the reader's own machine, and the AI-written parts are produced by the **Nzwisiso AI Policy Simulation Engine®**, which Oreida Pvt Ltd owns and which runs on Oreida Pvt Ltd's own servers on the Ministry's deployment — no policy text is passed to a consumer AI service, which removes the risk of policy text being processed outside national custody. *(Corrected 2026-10-11: this clause previously said the demonstration "makes no network request", which stopped being true once the AI keys were built into it.)*
+10.3 **Data and sovereignty risk.** The simulation is computed on the reader's own machine, and the AI-written parts are produced by the **Nzwisiso AI Policy Simulation Engine®**, which Oreida Pvt Ltd owns and which runs on Oreida Pvt Ltd's own servers under the licence — no policy text is passed to a consumer AI service, which removes the risk of policy text being processed outside national custody. *(Corrected 2026-10-11: this clause previously said the demonstration "makes no network request", which stopped being true once the AI keys were built into it.)*
 
 ### 11. Consultation
 
@@ -192,15 +198,15 @@ Date: 2 October 2026
 
 **What is being asked, from whom, by when, and what approval unlocks.**
 
-**Naming the pilot.** This platform is put forward as a pilot for the **Digitalize Zimbabwe** initiative, in partnership with **ZEPARI**. The ask therefore includes the programme's **endorsement** and ZEPARI's **endorsement and research partnership**, alongside the funding and the hosting decision.
+**Naming the pilot.** This platform is put forward as a pilot for the **Digitalize Zimbabwe** initiative, in partnership with **ZEPARI**. The ask therefore includes the programme's **endorsement** and ZEPARI's **endorsement and research partnership**, alongside the funding and the hosting-and-running arrangement.
 
 **The decision requested — addressed to all four addressees:** the Honourable Minister of Information Communication Technology, Postal and Courier Services; Dr. Gibson Chigumira, Executive Director of ZEPARI; Dr. Jesimen Chipika, Chairperson of the ZEPARI Board of Trustees and Deputy Governor of the Reserve Bank of Zimbabwe; and the ZEPARI Board of Trustees.
 
 **Of the Ministry:**
 
 1. **Endorse** the Nzwisiso AI™ platform as a pilot for the **Digitalize Zimbabwe** initiative.
-2. **Fund** the three named build steps (server-side document text extraction; server-side identity verification; deployment onto Government infrastructure).
-3. **Host** the pilot inside the Ministry.
+2. **Fund** the licence and the three named build steps (server-side document text extraction; server-side identity verification; deployment to a production service under service levels).
+3. **Approve the arrangement under which Oreida Pvt Ltd runs and hosts the platform** for the Ministry, under the public-private partnership and licence.
 4. **Name** the first pilot institution and the first policy question to be tested.
 
 **Of ZEPARI:**
@@ -212,7 +218,7 @@ Date: 2 October 2026
 
 | # | What it pays for | Proposed route |
 |---|---|---|
-| A | The build | Ministry of ICT through **Treasury**, or the **POTRAZ Universal Service Fund** |
+| A | The licence and the build | Ministry of ICT through **Treasury**, or the **POTRAZ Universal Service Fund** |
 | B | Capacity | **ZEPARI** with **ACBF** |
 | C | The pilot study | A **ZEPARI development partner** (UNDP, AfDB, World Bank or USAID) `[QUESTION — needs a decision]` |
 | D | The first sector pilot | The **Chamber of Mines of Zimbabwe** or **CZI** |
@@ -220,11 +226,11 @@ Date: 2 October 2026
 | # | What is needed | When | Unlocks |
 |---|---|---|---|
 | 1 | Approval in principle, programme endorsement, and ZEPARI's endorsement and partnership | Now | The pilot can be announced and scheduled |
-| 2 | Funding for the three build steps | After approval | A Ministry-hosted, Government-ready pilot |
+| 2 | Funding for the licence and the three build steps | After approval | A Government-ready pilot, run and hosted by Oreida Pvt Ltd |
 | 3 | Naming of the first institution and policy question | After funding | The pilot run itself |
 | 4 | Review of the pilot's results | After the pilot run | A decision on any wider rollout |
 
-**What happens if it is granted:** the Ministry obtains a working, sovereign, reproducible policy-assessment capability as a pilot, assessed on its own results before any national rollout is committed to — and the Ministry hosts it.
+**What happens if it is granted:** the Ministry obtains a working, sovereign, reproducible policy-assessment capability as a pilot, assessed on its own results before any national rollout is committed to — and Oreida Pvt Ltd runs and hosts it for the Ministry under the licence, with the platform and all data reverting to the Government at the end of the term.
 
 **Named-source statement.** Stakeholder shares are ZIMSTAT's published 2022 census figures, each naming the figure it stands for, or labelled `Modelled` where no official count exists; reference rates name their publisher and period; every cited instrument is a real Zimbabwean Act; and every department indicator either names its publisher, publication and period or is shown as `Modelled`.
 
