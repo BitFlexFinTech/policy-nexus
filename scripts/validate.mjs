@@ -60,12 +60,13 @@
  * 53. BATCH B4 — the department document register the screens read is GENERATED from the real
  *     published corpora, so a corpus that is rebuilt without regenerating the register fails the
  *     build instead of shipping a screen that describes documents differently from the documents.
- * 54. THE MINISTER-FACING DOCUMENTS (the owner's plan, item 18) — the Word files in
- *     `Minister Submission/` are generated from their markdown, so a Word file that no longer
- *     says what its markdown says fails the build; a `$` left unescaped fails (pandoc reads
- *     `$...$` as arithmetic and ate the currency symbol out of the price-comparison paragraph);
- *     a clause number used twice fails; and the Executive Justification Summary is MEASURED at
- *     one printed page, never assumed.
+ * 54. THE MINISTER-FACING DOCUMENTS (the owner's plan, items 18 and the deck) — the Word files
+ *     and the pitch deck in `Minister Submission/` are generated from their markdown, so a
+ *     generated file that no longer says what its markdown says fails the build; a `$` left
+ *     unescaped fails (pandoc reads `$...$` as arithmetic and ate the currency symbol out of
+ *     the price-comparison paragraph); a clause number used twice fails; the Executive
+ *     Justification Summary is MEASURED at one printed page, never assumed; every deck slide
+ *     must carry a title; and no `::: notes` marker may reach a slide as text.
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -2805,7 +2806,7 @@ if (!existsSync(cssPath)) {
 // Proved able to fail four ways on 2026-10-12 (mutate → FAIL → restore byte-identical).
 {
   const problems = [];
-  const result = spawnSync("python3", ["scripts/build-minister-docx.py", "--check"], {
+  const result = spawnSync("python3", ["scripts/build-minister-docs.py", "--check"], {
     cwd: ROOT,
     encoding: "utf8",
   });
@@ -2815,8 +2816,9 @@ if (!existsSync(cssPath)) {
   } else {
     const lines = said.split("\n").filter((l) => l.startsWith("PASS") || l.startsWith("MINISTER_DOCS"));
     notes.push(
-      `INFO  ${lines.length} document checks green — the Minister-facing Word files say exactly what their markdown says, no ` +
-        "`$` is eaten as arithmetic, no clause number is repeated, and the Summary is 1 printed page",
+      `INFO  ${lines.length} document checks green — the Minister-facing Word files and the pitch deck say exactly what ` +
+        "their markdown says, no `$` is eaten as arithmetic, no clause number is repeated, no registered mark is used, " +
+        "every deck slide carries a title, and the Summary is 1 printed page",
     );
   }
   check("the Minister-facing documents are generated from their markdown, and are correct (item 18)", problems);

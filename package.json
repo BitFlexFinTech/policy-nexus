@@ -14,7 +14,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc -b --pretty false",
     "validate": "node scripts/validate.mjs",
-    "build:minister-docs": "python3 scripts/build-minister-docx.py",
+    "build:minister-docs": "python3 scripts/build-minister-docs.py",
     "sync:check": "node scripts/sync-check.mjs",
     "deploy": "bash scripts/deploy.sh",
     "e2e": "playwright test"

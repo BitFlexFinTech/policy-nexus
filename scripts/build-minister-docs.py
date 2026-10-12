@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Build the Minister-facing Word documents from their markdown, and check them.
+"""Build the Minister-facing documents from their markdown, and check them.
 
 WHY THIS EXISTS
 ---------------
 The markdown files in `Minister Submission/` are the single source of truth for what the
-Ministry is sent. The Word files are GENERATED from them, so the two can never drift: a
-figure amended in the markdown reaches the Word file only by regenerating it, and this
-script fails if a Word file no longer matches its markdown.
+Ministry is sent. The Word files and the pitch deck are GENERATED from them, so the two can
+never drift: a figure amended in the markdown reaches the Word file only by regenerating it,
+and this script fails if a generated file no longer matches its markdown.
 
-Three things are checked, and every one of them can fail:
+Five things are checked, and every one of them can fail:
 
   1. NO `$` IS LEFT UNESCAPED. Pandoc reads `$...$` as arithmetic, so the line
      `appraised at US$20 million and signed at US$10 million` reached the Word file the
@@ -22,11 +22,19 @@ Three things are checked, and every one of them can fail:
   3. THE EXECUTIVE JUSTIFICATION SUMMARY IS GENUINELY ONE PRINTED PAGE — measured by
      converting the Word file to a PDF and counting the pages, never assumed.
 
+  4. EVERY DECK SLIDE CARRIES A TITLE. Pandoc puts a table and other text on one slide only
+     when the text comes first; with the table first it silently splits the section into a
+     second slide that has no title at all.
+
+  5. NO `:::` REACHES A SLIDE. The deck's speaker notes are written as `::: notes` blocks.
+     With a reader that does not understand them, pandoc prints the marker itself onto the
+     slide instead of into the notes — which is how a deck can look right and be wrong.
+
 USAGE
 -----
-  python3 scripts/build-minister-docx.py            # build every document
-  python3 scripts/build-minister-docx.py --check    # build to a temp folder and compare
-  python3 scripts/build-minister-docx.py --only <stem>
+  python3 scripts/build-minister-docs.py            # build every document
+  python3 scripts/build-minister-docs.py --check    # build to a temp folder and compare
+  python3 scripts/build-minister-docs.py --only <stem>
 """
 import argparse
 import os
@@ -41,13 +49,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SUBMISSION = ROOT / "Minister Submission"
 
-# The documents this script owns. `one_page` marks the document that must fit a single
+# The Word documents this script owns. `one_page` marks the document that must fit a single
 # printed page, which is why it alone is built against a tightened reference document.
 DOCUMENTS = (
     ("Oreida_Proposal_Minister_of_ICT", False),
     ("Oreida_Executive_Justification_Summary_Minister_of_ICT", True),
     ("Oreida_Service_Agreement_Minister_of_ICT", False),
 )
+
+# The pitch deck is a PowerPoint file, and it needs a different reader from the Word files:
+# its speaker notes are `::: notes` blocks (a fenced div, which only pandoc's own `markdown`
+# understands) and it uses typographic quotes, which `markdown` also produces. Both facts were
+# read off the committed deck — regenerating with the Word files' reader printed the `:::`
+# markers onto the slides and straightened every quote.
+DECK = ("Oreida_Pitch_Deck_Minister_of_ICT", "markdown")
 
 # A clause number at the start of a line, e.g. "4.9 " in "4.9 **The simulation ...**".
 CLAUSE = re.compile(r"^(\d+\.\d+)\s", re.M)
@@ -104,6 +119,32 @@ def visible_text(docx_path):
     with zipfile.ZipFile(docx_path) as archive:
         xml = archive.read("word/document.xml").decode("utf8")
     return re.sub(r"<[^>]+>", "", re.sub(r"</w:p>", "\n", xml))
+
+
+def pptx_slides(path):
+    """Each slide of a .pptx as (title_text, body_text, speaker_notes).
+
+    The title TEXT is returned, not just whether a title exists: a comparison that only
+    asked "is there a title?" could not see a slide whose title had been reworded, which is
+    exactly the drift this script exists to catch.
+    """
+    from pptx import Presentation
+
+    out = []
+    for slide in Presentation(str(path)).slides:
+        title = "\n".join(
+            shape.text_frame.text
+            for shape in slide.shapes
+            if shape.has_text_frame and shape.name.startswith("Title")
+        )
+        body = "\n".join(
+            shape.text_frame.text
+            for shape in slide.shapes
+            if shape.has_text_frame and not shape.name.startswith("Title")
+        )
+        notes = slide.notes_slide.notes_text_frame.text if slide.has_notes_slide else ""
+        out.append((title.strip(), body, notes))
+    return out
 
 
 def page_count(docx_path, workdir):
@@ -215,6 +256,24 @@ def check_dollars(stem):
     ok(f"{stem}.md — every `$` is escaped, so no figure can be eaten as arithmetic")
 
 
+def check_no_registered_mark(stem, extra_text=""):
+    """Nothing may carry the registered mark — the registration has not issued.
+
+    `src/config/brand.ts` says this in its own comment: the symbol is "™" today, because "®"
+    would assert a registration that does not exist, which is a false legal statement. The
+    same rule has to hold in the documents the Ministry is sent, and this is the check that
+    holds it. Found here while correcting a false claim in the project's own record that the
+    pitch deck's file contained a "®" — measured: no part of it did, and none does now.
+    """
+    text = (SUBMISSION / f"{stem}.md").read_text(encoding="utf8") + extra_text
+    if "\u00ae" in text:
+        fail(
+            f"{stem} carries a registered mark (\u00ae). The registration has not issued, so "
+            f"the symbol asserts something untrue."
+        )
+    ok(f"{stem} — no registered mark, as `src/config/brand.ts` requires")
+
+
 def check_clause_numbers(stem):
     """No clause number may appear twice in one document."""
     markdown = (SUBMISSION / f"{stem}.md").read_text(encoding="utf8")
@@ -265,9 +324,81 @@ def check_generated_matches_source(stem, generated):
     if visible_text(committed) != visible_text(generated):
         fail(
             f"{stem}.docx no longer matches {stem}.md — regenerate it with "
-            f"`python3 scripts/build-minister-docx.py`"
+            f"`python3 scripts/build-minister-docs.py`"
         )
     ok(f"{stem}.docx — says exactly what {stem}.md says")
+
+
+# ---------------------------------------------------------------------------
+# The deck
+# ---------------------------------------------------------------------------
+def build_deck(stem, reader, outdir):
+    """Generate the pitch deck from its markdown."""
+    target = outdir / f"{stem}.pptx"
+    subprocess.run(
+        ["pandoc", "-f", reader, str(SUBMISSION / f"{stem}.md"), "-o", str(target)],
+        check=True,
+    )
+    return target
+
+
+def check_every_slide_has_a_title(stem, generated):
+    """No slide may go out without a title — pandoc splits a table section silently."""
+    slides = pptx_slides(generated)
+    untitled = [number for number, (title, _, _) in enumerate(slides, start=1) if not title]
+    if untitled:
+        fail(
+            f"{stem}.pptx has {len(untitled)} slide(s) with no title: {untitled}. Pandoc "
+            f"puts a table and other text on one slide only when the TEXT comes first."
+        )
+    ok(f"{stem}.pptx — {len(slides)} slides, every one carrying a title")
+
+
+def check_no_fenced_div_reached_a_slide(stem, generated):
+    """The `::: notes` markers must become speaker notes, never slide text."""
+    slides = pptx_slides(generated)
+    leaked = [
+        number
+        for number, (_, body, _) in enumerate(slides, start=1)
+        if ":::" in body
+    ]
+    if leaked:
+        fail(
+            f"{stem}.pptx prints the `:::` marker onto slide(s) {leaked} — the reader used "
+            f"does not understand fenced divs, so the speaker notes went onto the slide"
+        )
+    noted = sum(1 for _, _, notes in slides if notes.strip())
+    ok(f"{stem}.pptx — no `:::` marker on any slide; {noted} slides carry speaker notes")
+
+
+def check_dollars_survived_deck(stem, generated):
+    """Every `$` in the markdown must reach the deck — this catches the maths defect."""
+    markdown = (SUBMISSION / f"{stem}.md").read_text(encoding="utf8")
+    wanted = markdown.count("\\$")
+    got = sum(
+        part.count("$")
+        for title, body, notes in pptx_slides(generated)
+        for part in (title, body, notes)
+    )
+    if wanted != got:
+        fail(
+            f"{stem}.pptx carries {got} `$` where {stem}.md has {wanted} — a figure has "
+            f"been eaten as arithmetic"
+        )
+    ok(f"{stem}.pptx — all {got} `$` survived into the deck")
+
+
+def check_deck_matches_source(stem, generated):
+    """The committed deck must say exactly what its markdown says."""
+    committed = SUBMISSION / f"{stem}.pptx"
+    if not committed.exists():
+        fail(f"{stem}.pptx is missing — the markdown has not been turned into a deck")
+    if pptx_slides(committed) != pptx_slides(generated):
+        fail(
+            f"{stem}.pptx no longer matches {stem}.md — regenerate it with "
+            f"`python3 scripts/build-minister-docs.py`"
+        )
+    ok(f"{stem}.pptx — says exactly what {stem}.md says")
 
 
 
@@ -279,24 +410,31 @@ def main():
     args = parser.parse_args()
 
     if shutil.which("pandoc") is None:
-        fail("pandoc was not found, so no Word document could be generated")
+        fail("pandoc was not found, so no document could be generated")
 
     wanted = [d for d in DOCUMENTS if args.only in (None, d[0])]
-    if not wanted:
+    deck = DECK if args.only in (None, DECK[0]) else None
+    if not wanted and deck is None:
         fail(f"no document named {args.only!r}")
 
+    # Checks that read the markdown only — they run before anything is generated.
     for stem, _ in wanted:
         check_dollars(stem)
         check_clause_numbers(stem)
+        check_no_registered_mark(stem)
     for stem, one_page in wanted:
         if one_page:
             check_summary_content(stem)
+    if deck is not None:
+        check_dollars(deck[0])
+        check_no_registered_mark(deck[0])
 
     with tempfile.TemporaryDirectory() as tmp:
         workdir = Path(tmp)
         reference = workdir / "reference-one-page.docx"
         if any(one_page for _, one_page in wanted):
             tightened_reference(reference)
+
         for stem, one_page in wanted:
             generated = build_one(stem, one_page, workdir, reference)
             check_dollars_survived(stem, generated)
@@ -307,6 +445,21 @@ def main():
             else:
                 shutil.copyfile(generated, SUBMISSION / f"{stem}.docx")
                 print(f"BUILT Minister Submission/{stem}.docx")
+
+        if deck is not None:
+            stem, reader = deck
+            generated = build_deck(stem, reader, workdir)
+            check_dollars_survived_deck(stem, generated)
+            check_every_slide_has_a_title(stem, generated)
+            check_no_fenced_div_reached_a_slide(stem, generated)
+            check_no_registered_mark(
+                stem, "\n".join(part for slide in pptx_slides(generated) for part in slide)
+            )
+            if args.check:
+                check_deck_matches_source(stem, generated)
+            else:
+                shutil.copyfile(generated, SUBMISSION / f"{stem}.pptx")
+                print(f"BUILT Minister Submission/{stem}.pptx")
 
     print("MINISTER_DOCS: PASS — every document built and checked")
 
