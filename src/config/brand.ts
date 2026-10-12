@@ -117,7 +117,7 @@ export const BRAND = {
   /** Full product name used on the homepage, the browser title, and reports. */
   productName: `${NAME} Policy Dashboard`,
   /** What kind of platform Nzwisiso AI is — the subtitle under the product name. */
-  platformLabel: "Policy Intelligence Platform",
+  platformLabel: "Policy Intelligence Platform | By Oreida Pvt Ltd",
   /** The national initiative. The prominent heading on the public landing page. */
   initiative: INITIATIVE,
   /** Short form of the initiative name, for the masthead. */
