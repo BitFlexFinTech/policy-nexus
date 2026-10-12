@@ -113,7 +113,9 @@ Mr Tadii Tendayi — Representative
 
 ### 7. Procurement
 
-7.1 We recommend **phased in-house development with contracted expertise**: the Ministry retains ownership and control of the capability while Oreida Pvt Ltd supplies the build steps and support, because the product already exists and only three named steps separate the demonstration from a Ministry-hosted pilot.
+7.1 We recommend a **public-private partnership**: the platform remains the property of **Oreida Pvt Ltd**, which owns it, licenses it to the Ministry and continues to support it, and the platform and the data it produces revert to the Government at the end of the agreed term. Oreida Pvt Ltd supplies the three named build steps that separate the working demonstration from a Government-ready pilot, because the product already exists and only those three steps stand between the demonstration and a pilot the Ministry can run itself.
+
+*(Corrected 2026-10-12: this clause previously recommended "phased in-house development with contracted expertise" and stated that the Ministry "retains ownership and control of the capability". That is the opposite of the partnership model — Oreida Pvt Ltd owns the platform and licenses it to the Ministry, and the Government takes ownership of the platform and the data at the end of the term. A contract cannot be written while the old wording stands.)*
 
 7.2 The approving office and the exact thresholds are `[QUESTION — needs a decision]`; every threshold and timeline in this proposal is an `[ASSUMPTION — to be confirmed]`. No separate procurement paper is attached.
 
